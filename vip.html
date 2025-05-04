@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Builder Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    #map { width: 100vw; height: 100vh; }
+    .search-box { position: absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1001; background:white; padding:6px 10px; border:1px solid #ccc; border-radius:6px; }
+    .builder-toggles, .legend { position:absolute; z-index:1001; background:white; padding:12px 16px; border:1px solid #aaa; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.2); font-family:sans-serif; }
+    .builder-toggles { top:10px; right:10px; max-height:70vh; overflow-y:auto; }
+    .legend { bottom:10px; right:10px; }
+  </style>
+</head>
+<body>
+  <img src="https://media.discordapp.net/attachments/818706580471808052/1367966343525306568/logo-VIP.png" alt="Logo" style="position:absolute;bottom:10px;left:10px;height:75px;z-index:1002;">
+  <div class="search-box"><input id="searchInput" placeholder="🔍 Search subdivisions..." style="width:250px;padding:4px;" /></div>
+  <div class="builder-toggles" id="builderToggles"></div>
+  <div class="legend"><strong>Builder Legend</strong><br>
+    <span style="color:green;">●</span> Pulte<br>
+    <span style="color:violet;">●</span> Ryan<br>
+    <span style="color:black;">●</span> DR Horton<br>
+    <span style="color:gold;">●</span> Epcon<br>
+    <span style="color:red;">●</span> Shottenstein<br>
+    <span style="color:blue;">●</span> Rockford<br>
+    <span style="color:orange;">●</span> 3 Pillar<br>
+    <span style="color:grey;">●</span> MI Homes<br>
+    <span style="color:yellow;">●</span> America Homes 4 Rent
+  </div>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    // Subdivisions: [builder, name, address, lat, lon]
+    const markerData = [["Pulte","Abberley","3384 Abberley Drive, New Albany, OH 43054",40.052873,-82.816503],
+  ["Pulte","Bloomfield","5002 Roese Ave, South Bloomfield, OH 43103",39.708129,-82.988884],
+  ["Pulte","Clarkshaw","3411 Tender Avenue, Powell, OH 43065",40.223191,-83.104699],
+  ["Pulte","Glenross","106 E Wind Rd, Delaware, OH 43015",40.236117,-83.020358],
+  ["Pulte","Magnolia","Buckeye Cir, Sunbury, OH 43074",40.245262,-82.887000],
+  ["Pulte","Price Ponds","1026 Ping Lane, Sunbury, OH 43074",40.244936,-82.890611],
+  ["Pulte","Sugar Farms","6344 Zuccaro Dr, Hilliard, OH 43026",39.987856,-83.178413],
+  ["Pulte","Towns On The Parkway","4128 John Shields Pkwy, Dublin, OH 43017",40.106649,-83.100162],
+  ["Pulte","Amrine","334 Amrine Wy, Marysville, OH 43040",40.270238,-83.371765],
+  ["Pulte","Buckstone","4918 Ranger Dr, Lockbourne, OH 43137",39.856655,-82.967935],
+  ["Pulte","Clover","40 Reneau Ave, Galloway, OH 43119",39.949993,-83.161864],
+  ["Pulte","Jerome Village","8768 Apricot Wy, Plain City, OH 43064",40.187687,-83.189026],
+  ["Pulte","Nelson","2538 Nelson Ln, Delaware, OH 43015",40.208450,-83.084053],
+  ["Pulte","Berlin Bluffs","2651 Cleo St, Delaware, OH 43015",40.240546,-83.004182],
+  ["Pulte","Carpenters","4448 Ruppert Trl, Powell, OH 43065",40.185143,-83.111785],
+  ["Pulte","Scotts","9556 Burghley Dr, Plain City, OH 43064",40.154941,-83.214898],
+  ["Pulte","Limestone","101 Franks Field Dr, Delaware, OH 43015",40.243077,-83.034845],
+  ["Pulte","Nottingham","7715 Nottingham Blvd, New Albany, OH 43054",40.056261,-82.807968],
+  ["Pulte","Slate","1121 Oldcastle Road, Lewis Center, OH 43035",40.202630,-83.008620],
+  ["Pulte","Beulah","3655 Glacial Ln, Grove City, OH 43123",39.823308,-83.063412],
+  ["Pulte","Eagle","7002 Crown Drive, Galena, OH 43021",40.239073,-82.878949],
+  ["Pulte","Hyatts","6176 Bishop Blvd, Powell, OH 43065",40.219546,-83.090896],
+  ["Pulte","Maeve","2598 McKenna Dr, Delaware, OH 43015",40.241202,-83.027089],
+  ["Pulte","Pioneer","9569 Coach Line Ave, Plain City, OH 43064",40.170580,-83.242140],
+  ["Pulte","Towns on the Greenway","337 Hockberry Ave, Westerville, OH 43081",40.138361,-82.916139],
+  ["DR Horton","Brookview","6541 Pfeifer Ash Dr, Canal Winchester, OH 43110",39.821267,-82.811890],
+  ["DR Horton","Lansdowne","4213 Sycamore Oak Avenue, Canal Winchester, OH 43110",39.821962,-82.830622],
+  ["DR Horton","Longview","102 Cedarhurst Ct, Pickerington, OH 43147",39.902049,-82.778622],
+  ["DR Horton","Madison Meadows","403 Madison Wy, Plain City, OH 43064",40.144500,-83.256100],
+  ["DR Horton","Maplewood","1159 Mueller Dr, Reynoldsburg, OH 43068",39.958560,-82.782585],
+  ["DR Horton","Monarch Greene","1414 Chrisman Drive, Columbus, OH 43223",39.911200,-83.062400],
+  ["DR Horton","Piatt Preserve","2780 Aldengate Ln, Delaware, OH 43015",40.247683,-83.033462],
+  ["DR Horton","River Ridge","1797 Jacko Lane, Circleville, OH 43113",39.607700,-82.954400],
+  ["DR Horton","Overlook","2100 Overlook Wy, Newark, OH 43055",40.072500,-82.452800],
+  ["DR Horton","Wagnalls","1390 Hansberry Dr, Lithopolis, OH 43136",39.805900,-82.803900],
+  ["DR Horton","Walnut","5 Walnut Mill Way, Ashville, OH 43103",39.719900,-82.964800],
+  ["Ryan","Terra Alta","581 Pisa Lp, Delaware, OH 43015",40.264100,-83.036300],
+  ["Ryan","Rolling Hills","1503 Cypress Pt Dr, Sunbury, OH 43074",40.271000,-82.910400],
+  ["Ryan","Glenross","191 Sycamore Ln, Delaware, OH 43015",40.236517,-83.019782],
+  ["Ryan","Hyatts","250 Alicia Kelton Dr, Delaware, OH 43015",40.221200,-83.127300],
+  ["Ryan","Hyland Meadows","8027 Grassland Dr, Plain City, OH 43064",40.189891,-83.191183],
+  ["Epcon","Carr Farms","5755 Arcadian Ave, Hilliard, OH 43026",40.024700,-83.163400],
+  ["Epcon","Morse","3347 Duette Dr, New Albany, OH 43054",40.078800,-82.859200],
+  ["Epcon","Mulberry","4416 Marilyn Ct, Grove City, OH 43123",39.844800,-83.084700],
+  ["Epcon","White Oaks","8400 Ryan Pkwy, Plain City, OH 43064",40.164700,-83.229400],
+  ["Epcon","Hyatts Village","3372 Hyatts Rd, Powell, OH 43065",40.217600,-83.108500],
+  ["Rockford","Foxfire","440 Bethpage Blvd, Commercial Point, OH 43116",39.765300,-83.060500],
+  ["Rockford","HofBauer","2223 Ashby Wy, Plain City, OH 43064",40.166900,-83.250100],
+  ["Rockford","Jerome Aster","6981 Aster Wy, Plain City, OH 43064",40.175300,-83.224900],
+  ["Rockford","Meadow Grove","1813 Silverlawn Dr, Grove City, OH 43123",39.843500,-83.086400],
+  ["Rockford","Willowbend","228 Willow Bnd Dr, Newark, OH 43055",40.064800,-82.389700],
+  ["Rockford","Hazelton Crossing","208 Scotsgrove Drive, Pataskala, OH 43062",40.006300,-82.676900],
+  ["3 Pillar","Jerome Village","11451 Winterberry Dr, Plain City, OH 43064",40.155100,-83.209200],
+  ["3 Pillar","Eversole Woods","11451 Winterberry Drive, Plain City, OH 43064",40.155100,-83.209200],
+  ["MI Homes","Pinnacle","899 Heimat Haus Dr, Grove City, OH 43123",39.842300,-83.075200],
+  ["MI Homes","Browns Farm","3215 Farmhouse Ln, Grove City, OH 43123",39.841900,-83.076600],
+  ["MI Homes","Hill Farm","6960 Gelderland Dr, Hilliard, OH 43026",40.025100,-83.165800],
+  ["MI Homes","Foxfire","444 Bethpage Blvd, Commercial Point, OH 43116",39.766000,-83.060600],
+  ["MI Homes","Heron","12146 Prairie View Dr NW, Pickerington, OH 43147",39.905100,-82.769300],
+  ["MI Homes","Darby","537 Conductor Dr, Plain City, OH 43064",40.147600,-83.250900],
+  ["MI Homes","Forest Ridge","106 Ruby Rd SW, Pataskala, OH 43062",40.026400,-82.666900],
+  ["MI Homes","Liberty","3777 Shoal Way, Powell, OH 43065",40.182800,-83.089600],
+  ["MI Homes","Jerome Village Applewood","10715 Pearl Creek Dr, Plain City, OH 43064",40.166700,-83.220400],
+  ["MI Homes","Winterbrooke","43 Sienna Glenn Dr, Lewis Center, OH 43035",40.200300,-83.001100],
+  ["MI Homes","Miller Farm","2799 Sunbury Rd, Galena, OH 43021",40.242600,-82.883700],
+  ["MI Homes","WoodCrest","6443 Bluejay Rdg Dr, Powell, OH 43065",40.218700,-83.078900],
+  ["MI Homes","Berlin Bluffs","2651 Cleo St, Delaware, OH 43015",40.240546,-83.004182],
+  ["Shottenstein","Renner","6186 Renner Park Drive, Columbus, OH 43228",39.979500,-83.144000],
+  ["Shottenstein","Jerome Aster","6971 Aster Way, Plain City, OH 43064",40.174900,-83.224600],
+  ["Shottenstein","Holton","3600 Whirla Way, Grove City, OH",39.858200,-83.098300],
+  ["Shottenstein","Cottages At Verbana","11738 Verbena Place, Plain City, OH 43064",40.160300,-83.237600],
+  ["Shottenstein","Glacier Pointe","8798 Eliot Drive, Plain City, OH 43064",40.159800,-83.220800],
+  ["America Homes 4 Rent","Eastwood","9045 Lucy Drive, Reynoldsburg, OH",39.961474,-82.758526] ];
+    const colorMap = { 'Pulte':'green','Ryan':'violet','DR Horton':'black','Epcon':'gold','Shottenstein':'red','Rockford':'blue','3 Pillar':'orange','MI Homes':'grey','America Homes 4 Rent':'yellow' };
+    const map = L.map('map').setView([40.05, -83.0], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'&copy; OpenStreetMap contributors' }).addTo(map);
+    const routeLayer = L.layerGroup().addTo(map);
+    let currentOrigin = null;
+    const builderGroups = {}, markers = markerData.map(([builder,name,addr,lat,lon]) => {
+      const icon = L.icon({ iconUrl:`https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${colorMap[builder]||'blue'}.png`, shadowUrl:'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png', iconSize:[25,41], iconAnchor:[12,41], popupAnchor:[1,-34] });
+      const marker = L.marker([lat,lon],{icon}).addTo(map).bindTooltip(name,{direction:'top'});
+      builderGroups[builder] = builderGroups[builder]||L.layerGroup().addTo(map);
+      builderGroups[builder].addLayer(marker);
+      return { builder,name,addr,lat,lon,marker };
+    });
+
+    markers.forEach(({builder,name,addr,lat,lon,marker})=>{
+      marker.on('click',()=>{
+        routeLayer.clearLayers();
+        currentOrigin={lat,lon};
+        const nearest=markers.filter(m=>m.marker!==marker).map(m=>({...m,dist:map.distance([lat,lon],[m.lat,m.lon])})).sort((a,b)=>a.dist-b.dist).slice(0,5);
+        let html=`<b>${name}</b><br>${addr}<br><strong>Closest Subdivisions:</strong><ul id="nearest-list">`;
+        nearest.forEach((d,i)=>{const mins=Math.round((d.dist/1000)/50*3600/60);const miles=(d.dist/1609.34).toFixed(1);const col=mins>30?'black':mins>20?'red':mins>=15?'orange':'green';html+=`<li data-index="${i}" style="cursor:pointer;color:${col}">${d.name} - ${mins} min (${miles} mi)</li>`;}); html+='</ul>';
+        // Bind click handlers before opening popup
+        map.once('popupopen',()=>{
+          document.querySelectorAll('#nearest-list li').forEach(li=>{
+            li.addEventListener('click',async()=>{
+              routeLayer.clearLayers();
+              const d=nearest[li.dataset.index];
+              const url=`https://router.project-osrm.org/route/v1/driving/${currentOrigin.lon},${currentOrigin.lat};${d.lon},${d.lat}?overview=full&geometries=geojson`;
+              try{
+                const res=await fetch(url);const json=await res.json();const coords=json.routes[0].geometry.coordinates.map(c=>[c[1],c[0]]);
+                L.polyline(coords,{color:'blue',weight:8}).addTo(routeLayer);
+                map.fitBounds(L.polyline(coords).getBounds());
+              }catch{
+                L.polyline([[currentOrigin.lat,currentOrigin.lon],[d.lat,d.lon]],{color:'blue',weight:8,dashArray:'5,5'}).addTo(routeLayer);
+              }
+            });
+          });
+        });
+        // Open popup after binding
+        L.popup().setLatLng([lat,lon]).setContent(html).openOn(map);
+      });
+    });
+
+    // Toggles UI
+    const togglesDiv=document.getElementById('builderToggles');['Select All','Select None'].forEach(txt=>{const btn=document.createElement('button');btn.textContent=txt;btn.style.marginRight='8px';btn.addEventListener('click',()=>{Object.values(builderGroups).forEach(g=>txt==='Select All'?g.addTo(map):map.removeLayer(g));togglesDiv.querySelectorAll('input').forEach(cb=>cb.checked=(txt==='Select All'));});togglesDiv.appendChild(btn);});togglesDiv.appendChild(document.createElement('br'));
+    Object.entries(builderGroups).forEach(([b,group])=>{const cb=document.createElement('input');cb.type='checkbox';cb.checked=true;cb.addEventListener('change',()=>cb.checked?group.addTo(map):map.removeLayer(group));const lbl=document.createElement('label');lbl.appendChild(cb);lbl.append(` ${b}`);togglesDiv.appendChild(lbl);togglesDiv.appendChild(document.createElement('br'));});
+    // Search
+    document.getElementById('searchInput').addEventListener('input',function(){const q=this.value.toLowerCase(),f=markers.find(m=>m.name.toLowerCase().includes(q));if(f)map.setView([f.lat,f.lon],14);});
+  </script>
+</body>
+</html>
