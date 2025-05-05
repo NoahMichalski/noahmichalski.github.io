@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Closest Subdivisions Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    #map { height: 100vh; width: 100%; }
+    .selector {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      z-index: 1000;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .highlight { font-weight: bold; color: green; }
+    ul {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 0 1em;
+      text-align: left;
+      margin-top: 10px;
+    }
+    #legend {
+  transition: max-height 0.5s ease, opacity 0.5s ease;
+  overflow: hidden;
+  max-height: 500px;
+  opacity: 1;
+}
+    #legend.hidden {
+  max-height: 0;
+  opacity: 0;
+}
+  </style>
+</head>
+<body>
+  <div class="selector">
+    <label for="subdivisionSelect">Choose a subdivision:</label>
+    <select id="subdivisionSelect"></select>
+  </div>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const apiKey = "5b3ce3597851110001cf624895d5d8857d8d41b6a9508753893fbb25";
+
+        const builderColors = {
+  "DR Horton": "red",
+  "Pulte": "blue",
+  "Ryan": "green",
+  "Epcon": "violet",
+  "Rockford": "orange",
+  "3 Pillar": "yellow",
+  "MI Homes": "black",
+  "Shottenstein": "grey",
+  "America Homes 4 Rent": "green",
+  "Default": "blue"
+};
+
+        const subdivisions = [
+  ["Pulte","Abberley","3384 Abberley Drive, New Albany, OH 43054",40.052873,-82.816503],
+  ["Pulte","Bloomfield","5002 Roese Ave, South Bloomfield, OH 43103",39.708129,-82.988884],
+  ["Pulte","Clarkshaw","3411 Tender Avenue, Powell, OH 43065",40.223191,-83.104699],
+  ["Pulte","Glenross","106 E Wind Rd, Delaware, OH 43015",40.236117,-83.020358],
+  ["Pulte","Magnolia","Buckeye Cir, Sunbury, OH 43074",40.245262,-82.887000],
+  ["Pulte","Price Ponds","1026 Ping Lane, Sunbury, OH 43074",40.244936,-82.890611],
+  ["Pulte","Sugar Farms","6344 Zuccaro Dr, Hilliard, OH 43026",39.987856,-83.178413],
+  ["Pulte","Towns On The Parkway","4128 John Shields Pkwy, Dublin, OH 43017",40.106649,-83.100162],
+  ["Pulte","Amrine","334 Amrine Wy, Marysville, OH 43040",40.270238,-83.371765],
+  ["Pulte","Buckstone","4918 Ranger Dr, Lockbourne, OH 43137",39.856655,-82.967935],
+  ["Pulte","Clover","40 Reneau Ave, Galloway, OH 43119",39.949993,-83.161864],
+  ["Pulte","Jerome Village","8768 Apricot Wy, Plain City, OH 43064",40.187687,-83.189026],
+  ["Pulte","Nelson","2538 Nelson Ln, Delaware, OH 43015",40.208450,-83.084053],
+  ["Pulte","Berlin Bluffs","2651 Cleo St, Delaware, OH 43015",40.240546,-83.004182],
+  ["Pulte","Carpenters","4448 Ruppert Trl, Powell, OH 43065",40.185143,-83.111785],
+  ["Pulte","Scotts","9556 Burghley Dr, Plain City, OH 43064",40.154941,-83.214898],
+  ["Pulte","Limestone","101 Franks Field Dr, Delaware, OH 43015",40.243077,-83.034845],
+  ["Pulte","Nottingham","7715 Nottingham Blvd, New Albany, OH 43054",40.056261,-82.807968],
+  ["Pulte","Slate","1121 Oldcastle Road, Lewis Center, OH 43035",40.202630,-83.008620],
+  ["Pulte","Beulah","3655 Glacial Ln, Grove City, OH 43123",39.823308,-83.063412],
+  ["Pulte","Eagle","7002 Crown Drive, Galena, OH 43021",40.239073,-82.878949],
+  ["Pulte","Hyatts","6176 Bishop Blvd, Powell, OH 43065",40.219546,-83.090896],
+  ["Pulte","Maeve","2598 McKenna Dr, Delaware, OH 43015",40.241202,-83.027089],
+  ["Pulte","Pioneer","9569 Coach Line Ave, Plain City, OH 43064",40.170580,-83.242140],
+  ["Pulte","Towns on the Greenway","337 Hockberry Ave, Westerville, OH 43081",40.138361,-82.916139],
+  ["DR Horton","Brookview","6541 Pfeifer Ash Dr, Canal Winchester, OH 43110",39.821267,-82.811890],
+  ["DR Horton","Lansdowne","4213 Sycamore Oak Avenue, Canal Winchester, OH 43110",39.821962,-82.830622],
+  ["DR Horton","Longview","102 Cedarhurst Ct, Pickerington, OH 43147",39.902049,-82.778622],
+  ["DR Horton","Madison Meadows","403 Madison Wy, Plain City, OH 43064",40.144500,-83.256100],
+  ["DR Horton","Maplewood","1159 Mueller Dr, Reynoldsburg, OH 43068",39.958560,-82.782585],
+  ["DR Horton","Monarch Greene","1414 Chrisman Drive, Columbus, OH 43223",39.911200,-83.062400],
+  ["DR Horton","Piatt Preserve","2780 Aldengate Ln, Delaware, OH 43015",40.247683,-83.033462],
+  ["DR Horton","River Ridge","1797 Jacko Lane, Circleville, OH 43113",39.607700,-82.954400],
+  ["DR Horton","Overlook","2100 Overlook Wy, Newark, OH 43055",40.072500,-82.452800],
+  ["DR Horton","Wagnalls","1390 Hansberry Dr, Lithopolis, OH 43136",39.805900,-82.803900],
+  ["DR Horton","Walnut","5 Walnut Mill Way, Ashville, OH 43103",39.719900,-82.964800],
+  ["Ryan","Terra Alta","581 Pisa Lp, Delaware, OH 43015",40.264100,-83.036300],
+  ["Ryan","Rolling Hills","1503 Cypress Pt Dr, Sunbury, OH 43074",40.271000,-82.910400],
+  ["Ryan","Glenross","191 Sycamore Ln, Delaware, OH 43015",40.236517,-83.019782],
+  ["Ryan","Hyatts","250 Alicia Kelton Dr, Delaware, OH 43015",40.221200,-83.127300],
+  ["Ryan","Hyland Meadows","8027 Grassland Dr, Plain City, OH 43064",40.189891,-83.191183],
+  ["Epcon","Carr Farms","5755 Arcadian Ave, Hilliard, OH 43026",40.024700,-83.163400],
+  ["Epcon","Morse","3347 Duette Dr, New Albany, OH 43054",40.078800,-82.859200],
+  ["Epcon","Mulberry","4416 Marilyn Ct, Grove City, OH 43123",39.844800,-83.084700],
+  ["Epcon","White Oaks","8400 Ryan Pkwy, Plain City, OH 43064",40.164700,-83.229400],
+  ["Epcon","Hyatts Village","3372 Hyatts Rd, Powell, OH 43065",40.217600,-83.108500],
+  ["Rockford","Foxfire","440 Bethpage Blvd, Commercial Point, OH 43116",39.765300,-83.060500],
+  ["Rockford","HofBauer","2223 Ashby Wy, Plain City, OH 43064",40.166900,-83.250100],
+  ["Rockford","Jerome Aster","6981 Aster Wy, Plain City, OH 43064",40.175300,-83.224900],
+  ["Rockford","Meadow Grove","1813 Silverlawn Dr, Grove City, OH 43123",39.843500,-83.086400],
+  ["Rockford","Willowbend","228 Willow Bnd Dr, Newark, OH 43055",40.064800,-82.389700],
+  ["Rockford","Hazelton Crossing","208 Scotsgrove Drive, Pataskala, OH 43062",40.006300,-82.676900],
+  ["3 Pillar","Jerome Village","11451 Winterberry Dr, Plain City, OH 43064",40.155100,-83.209200],
+  ["3 Pillar","Eversole Woods","11451 Winterberry Drive, Plain City, OH 43064",40.155100,-83.209200],
+  ["MI Homes","Pinnacle","899 Heimat Haus Dr, Grove City, OH 43123",39.842300,-83.075200],
+  ["MI Homes","Browns Farm","3215 Farmhouse Ln, Grove City, OH 43123",39.841900,-83.076600],
+  ["MI Homes","Hill Farm","6960 Gelderland Dr, Hilliard, OH 43026",40.025100,-83.165800],
+  ["MI Homes","Foxfire","444 Bethpage Blvd, Commercial Point, OH 43116",39.766000,-83.060600],
+  ["MI Homes","Heron","12146 Prairie View Dr NW, Pickerington, OH 43147",39.905100,-82.769300],
+  ["MI Homes","Darby","537 Conductor Dr, Plain City, OH 43064",40.147600,-83.250900],
+  ["MI Homes","Forest Ridge","106 Ruby Rd SW, Pataskala, OH 43062",40.026400,-82.666900],
+  ["MI Homes","Liberty","3777 Shoal Way, Powell, OH 43065",40.182800,-83.089600],
+  ["MI Homes","Jerome Village Applewood","10715 Pearl Creek Dr, Plain City, OH 43064",40.166700,-83.220400],
+  ["MI Homes","Winterbrooke","43 Sienna Glenn Dr, Lewis Center, OH 43035",40.200300,-83.001100],
+  ["MI Homes","Miller Farm","2799 Sunbury Rd, Galena, OH 43021",40.242600,-82.883700],
+  ["MI Homes","WoodCrest","6443 Bluejay Rdg Dr, Powell, OH 43065",40.218700,-83.078900],
+  ["MI Homes","Berlin Bluffs","2651 Cleo St, Delaware, OH 43015",40.240546,-83.004182],
+  ["Shottenstein","Renner","6186 Renner Park Drive, Columbus, OH 43228",39.979500,-83.144000],
+  ["Shottenstein","Jerome Aster","6971 Aster Way, Plain City, OH 43064",40.174900,-83.224600],
+  ["Shottenstein","Holton","3600 Whirla Way, Grove City, OH",39.858200,-83.098300],
+  ["Shottenstein","Cottages At Verbana","11738 Verbena Place, Plain City, OH 43064",40.160300,-83.237600],
+  ["Shottenstein","Glacier Pointe","8798 Eliot Drive, Plain City, OH 43064",40.159800,-83.220800],
+  ["America Homes 4 Rent","Eastwood","9045 Lucy Drive, Reynoldsburg, OH",39.961474,-82.758526]
+];
+        if (!Array.isArray(subdivisions) || subdivisions.length === 0) throw new Error("No subdivision data found");
+
+        const map = L.map('map').setView([39.95, -83.0], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        subdivisions.forEach(([builder, name, address, lat, lng]) => {
+  const color = builderColors[builder] || builderColors["Default"];
+  const icon = new L.Icon({
+    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
+    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+  L.marker([lat, lng], { icon }).addTo(map).bindPopup(`<b>${builder} – ${name}</b><br>${address}`);
+});
+
+        const dropdown = document.getElementById('subdivisionSelect');
+        subdivisions.forEach(([builder, name, address], idx) => {
+          const option = document.createElement('option');
+          option.value = idx;
+          option.textContent = `${builder} – ${name}`;
+          dropdown.appendChild(option);
+        });
+
+        function haversine(lat1, lon1, lat2, lon2) {
+          const R = 3958.8;
+          const dLat = (lat2 - lat1) * Math.PI / 180;
+          const dLon = (lon2 - lon1) * Math.PI / 180;
+          const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          return R * c;
+        }
+
+        async function getDriveTime(fromLat, fromLon, toLat, toLon, element, button) {
+          try {
+            const response = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
+              method: 'POST',
+              headers: {
+                'Authorization': apiKey,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ coordinates: [[fromLon, fromLat], [toLon, toLat]] })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.features || !data.features[0]?.properties?.summary) {
+              console.error("Bad API response:", data);
+              throw new Error("Invalid or error response from ORS");
+            }
+
+            const duration = data.features[0].properties.summary.duration;
+            const minutes = Math.round(duration / 60);
+
+            const infoSpan = document.createElement('span');
+            infoSpan.className = 'highlight';
+            infoSpan.textContent = ` – ${minutes} min drive`;
+            element.appendChild(infoSpan);
+          } catch (error) {
+            console.error("Drive time fetch error:", error);
+            element.appendChild(document.createTextNode(" – error fetching time"));
+          } finally {
+            button.remove();
+          }
+        }
+
+        dropdown.addEventListener('change', () => {
+          const selected = subdivisions[dropdown.value];
+          const [_, selectedName, selectedAddress, lat1, lon1] = selected;
+
+          const sorted = subdivisions.map(([b, n, a, lat2, lon2]) => {
+            const miles = haversine(lat1, lon1, lat2, lon2);
+            return { builder: b, name: n, address: a, miles: miles.toFixed(2), lat: lat2, lon: lon2 };
+          })
+          .filter(x => x.name !== selectedName)
+          .sort((a, b) => a.miles - b.miles);
+
+          const container = document.createElement('div');
+          const title = document.createElement('b');
+          title.textContent = `Closest to ${selectedName}`;
+          container.appendChild(title);
+          const ul = document.createElement('ul');
+
+          sorted.forEach(({ builder, name, address, miles, lat, lon }) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<b>${builder} – ${name}</b> – ${address} <span class="highlight">(${miles} mi)</span>`;
+            const btn = document.createElement('button');
+            btn.textContent = "Get Drive Time";
+            btn.style.marginLeft = "10px";
+            btn.onclick = () => {
+              btn.disabled = true;
+              btn.textContent = "Loading...";
+              getDriveTime(lat1, lon1, lat, lon, li, btn);
+            };
+            li.appendChild(btn);
+            ul.appendChild(li);
+          });
+
+          container.appendChild(ul);
+
+          L.popup()
+            .setLatLng([lat1, lon1])
+            .setContent(container)
+            .openOn(map);
+
+          map.setView([lat1, lon1], 12);
+        });
+      } catch (e) {
+        alert("Error loading map: " + e.message);
+        console.error(e);
+      }
+    });
+  </script>
+<div id="legend" style="position: absolute; top: 50px; right: 10px; background: white; padding: 10px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 1000; max-height: 500px; overflow: hidden; opacity: 1; transition: max-height 0.5s ease, opacity 0.5s ease;">
+  <button onclick="collapseLegend()" style="position: absolute; top: 10px; right: 10px;">Hide</button>
+  <b>Legend:</b><br>
+  <span style="color:green;">●</span> Pulte<br>
+  <span style="color:violet;">●</span> Ryan<br>
+  <span style="color:black;">●</span> DR Horton<br>
+  <span style="color:gold;">●</span> Epcon<br>
+  <span style="color:red;">●</span> Shottenstein<br>
+  <span style="color:blue;">●</span> Rockford<br>
+  <span style="color:orange;">●</span> 3 Pillar<br>
+  <span style="color:grey;">●</span> MI Homes<br>
+  <span style="color:yellow;">●</span> America Homes 4 Rent<br>
+</div>
+  <div><span style="color:grey;">⬤</span> Shottenstein</div>
+  <div><span style="color:green;">⬤</span> America Homes 4 Rent</div>
+</div>
+  <div><span style="color:yellow;">⬤</span> 3 Pillar</div>
+  <div><span style="color:black;">⬤</span> MI Homes</div>
+  <div><span style="color:grey;">⬤</span> Shottenstein</div>
+  <div><span style="color:green;">⬤</span> America Homes 4 Rent</div>
+</div>
+  <div><span style="color:violet;">⬤</span> Epcon</div>
+  <div><span style="color:orange;">⬤</span> Rockford</div>
+  <div><span style="color:yellow;">⬤</span> 3 Pillar</div>
+  <div><span style="color:black;">⬤</span> MI Homes</div>
+  <div><span style="color:grey;">⬤</span> Shottenstein</div>
+  <div><span style="color:green;">⬤</span> America Homes 4 Rent</div>
+</div>
+  <div><span style="color:blue;">⬤</span> Pulte</div>
+  <div><span style="color:green;">⬤</span> Ryan</div>
+  <div><span style="color:purple;">⬤</span> Epcon</div>
+  <div><span style="color:brown;">⬤</span> Rockford</div>
+  <div><span style="color:teal;">⬤</span> 3 Pillar</div>
+  <div><span style="color:orange;">⬤</span> MI Homes</div>
+  <div><span style="color:pink;">⬤</span> Shottenstein</div>
+  <div><span style="color:black;">⬤</span> America Homes 4 Rent</div>
+</div>
+<button id="show-legend" onclick="document.getElementById('legend').style.display='block'; this.style.display='none';" style="position: absolute; top: 10px; right: 10px; z-index: 1001; display: none;">Show Legend</button>
+<script>
+  const legendEl = document.getElementById('legend');
+  const showBtn = document.getElementById('show-legend');
+
+  function collapseLegend() {
+    legendEl.style.maxHeight = '0';
+    legendEl.style.opacity = '0';
+    showBtn.style.display = 'block';
+  }
+
+  function expandLegend() {
+    legendEl.style.maxHeight = '500px';
+    legendEl.style.opacity = '1';
+    showBtn.style.display = 'none';
+  }
+
+  showBtn.addEventListener('click', expandLegend);
+</script>
+  
+</script>
+</script>
+</body>
+</html>
