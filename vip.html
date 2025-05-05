@@ -120,6 +120,7 @@
   ["Shottenstein","Cottages At Verbana","11738 Verbena Place, Plain City, OH 43064",40.160300,-83.237600],
   ["Shottenstein","Glacier Pointe","8798 Eliot Drive, Plain City, OH 43064",40.159800,-83.220800],
   ["America Homes 4 Rent","Eastwood","9045 Lucy Drive, Reynoldsburg, OH",39.961474,-82.758526] ];
+    
     const colorMap = { 'Pulte':'green','Ryan':'violet','DR Horton':'black','Epcon':'gold','Shottenstein':'red','Rockford':'blue','3 Pillar':'orange','MI Homes':'grey','America Homes 4 Rent':'yellow' };
 
     const map = L.map('map').setView([40.05, -83.0], 10);
@@ -130,11 +131,7 @@
     // Build markers
     const builderGroups = {};
     const markers = markerData.map(([builder,name,addr,lat,lon]) => {
-      const icon = L.icon({
-        iconUrl:`https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${colorMap[builder]||'blue'}.png`,
-        shadowUrl:'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-        iconSize:[25,41],iconAnchor:[12,41],popupAnchor:[1,-34]
-      });
+      const icon = L.icon({ iconUrl:`https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${colorMap[builder]||'blue'}.png`, shadowUrl:'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png', iconSize:[25,41], iconAnchor:[12,41], popupAnchor:[1,-34] });
       const marker = L.marker([lat,lon],{icon}).addTo(map).bindTooltip(name,{direction:'top'});
       builderGroups[builder] = builderGroups[builder]||L.layerGroup().addTo(map);
       builderGroups[builder].addLayer(marker);
@@ -147,7 +144,14 @@
         routeLayer.clearLayers();
         currentOrigin = {lat,lon};
         const nearest = markers.filter(m=>m.marker!==marker).map(m=>({...m,dist:map.distance([lat,lon],[m.lat,m.lon])})).sort((a,b)=>a.dist-b.dist).slice(0,5);
-        let html = `<b>${name}</b><br>${addr}<br><strong>Closest:</strong><ul id="nearest-list">`;
+        // Wrap address in Google Maps link
+        let html = `
+          <b>${name}</b><br>
+          <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="color:inherit;text-decoration:underline;">
+            ${addr}
+          </a><br>
+          <strong>Closest Subdivisions:</strong><ul id="nearest-list">
+        `;
         nearest.forEach((d,i) => {
           const mins = Math.round((d.dist/1000)/50*3600/60);
           const miles = (d.dist/1609.34).toFixed(1);
@@ -188,7 +192,7 @@
       togglesDiv.appendChild(btn);
     }); togglesDiv.appendChild(document.createElement('br'));
     Object.entries(builderGroups).forEach(([b,group]) => {
-      const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=true;
+      const cb = document.createElement('input'); cb.type='checkbox';cb.checked=true;
       cb.addEventListener('change', () => cb.checked ? group.addTo(map) : map.removeLayer(group));
       const lbl = document.createElement('label'); lbl.appendChild(cb); lbl.append(` ${b}`);
       togglesDiv.appendChild(lbl); togglesDiv.appendChild(document.createElement('br'));
@@ -196,8 +200,7 @@
 
     // Search
     document.getElementById('searchInput').addEventListener('input', function() {
-      const q = this.value.toLowerCase();
-      const f = markers.find(m => m.name.toLowerCase().includes(q));
+      const q = this.value.toLowerCase(); const f = markers.find(m => m.name.toLowerCase().includes(q));
       if (f) map.setView([f.lat,f.lon],14);
     });
   </script>
