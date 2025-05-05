@@ -9,15 +9,17 @@
     #map { width: 100vw; height: 100vh; }
     .search-box { position: absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1001; background:white; padding:6px 10px; border:1px solid #ccc; border-radius:6px; }
     .builder-toggles, .legend { position:absolute; z-index:1001; background:white; padding:12px 16px; border:1px solid #aaa; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.2); font-family:sans-serif; }
-    .builder-toggles { top:10px; right:10px; max-height:70vh; overflow-y:auto; }
+    .builder-toggles { top:50px; right:10px; max-height:70vh; overflow-y:auto; }
     .legend { bottom:10px; right:10px; }
+    #toggle-ui-btn { position: absolute; top:10px; right:10px; z-index:1002; padding:6px 10px; background:#fff; border:1px solid #aaa; border-radius:4px; cursor:pointer; }
   </style>
 </head>
 <body>
-  <img src="images/logo-VIP.png" alt="Logo" style="position:absolute;bottom:10px;left:10px;height:75px;z-index:1002;">
+  <img src="https://media.discordapp.net/attachments/818706580471808052/1367966343525306568/logo-VIP.png" alt="Logo" style="position:absolute;bottom:10px;left:10px;height:75px;z-index:1002;">
+  <button id="toggle-ui-btn">Hide Controls</button>
   <div class="search-box"><input id="searchInput" placeholder="🔍 Search subdivisions..." style="width:250px;padding:4px;" /></div>
   <div class="builder-toggles" id="builderToggles"></div>
-  <div class="legend"><strong>Builder Legend</strong><br>
+  <div class="legend" id="legendBox"><strong>Builder Legend</strong><br>
     <span style="color:green;">●</span> Pulte<br>
     <span style="color:violet;">●</span> Ryan<br>
     <span style="color:black;">●</span> DR Horton<br>
@@ -32,8 +34,20 @@
 
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
+    // Toggle UI controls (legend & checkboxes)
+    const toggleBtn = document.getElementById('toggle-ui-btn');
+    const togglesDiv = document.getElementById('builderToggles');
+    const legendBox = document.getElementById('legendBox');
+    let controlsVisible = true;
+    toggleBtn.addEventListener('click', () => {
+      controlsVisible = !controlsVisible;
+      togglesDiv.style.display = controlsVisible ? 'block' : 'none';
+      legendBox.style.display = controlsVisible ? 'block' : 'none';
+      toggleBtn.textContent = controlsVisible ? 'Hide Controls' : 'Show Controls';
+    });
+
     // Subdivisions: [builder, name, address, lat, lon]
-    const markerData = [["Pulte","Abberley","3384 Abberley Drive, New Albany, OH 43054",40.052873,-82.816503],
+    const markerData = [ ["Pulte","Abberley","3384 Abberley Drive, New Albany, OH 43054",40.052873,-82.816503],
   ["Pulte","Bloomfield","5002 Roese Ave, South Bloomfield, OH 43103",39.708129,-82.988884],
   ["Pulte","Clarkshaw","3411 Tender Avenue, Powell, OH 43065",40.223191,-83.104699],
   ["Pulte","Glenross","106 E Wind Rd, Delaware, OH 43015",40.236117,-83.020358],
@@ -107,52 +121,85 @@
   ["Shottenstein","Glacier Pointe","8798 Eliot Drive, Plain City, OH 43064",40.159800,-83.220800],
   ["America Homes 4 Rent","Eastwood","9045 Lucy Drive, Reynoldsburg, OH",39.961474,-82.758526] ];
     const colorMap = { 'Pulte':'green','Ryan':'violet','DR Horton':'black','Epcon':'gold','Shottenstein':'red','Rockford':'blue','3 Pillar':'orange','MI Homes':'grey','America Homes 4 Rent':'yellow' };
+
     const map = L.map('map').setView([40.05, -83.0], 10);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'&copy; OpenStreetMap contributors' }).addTo(map);
     const routeLayer = L.layerGroup().addTo(map);
     let currentOrigin = null;
-    const builderGroups = {}, markers = markerData.map(([builder,name,addr,lat,lon]) => {
-      const icon = L.icon({ iconUrl:`https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${colorMap[builder]||'blue'}.png`, shadowUrl:'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png', iconSize:[25,41], iconAnchor:[12,41], popupAnchor:[1,-34] });
+
+    // Build markers
+    const builderGroups = {};
+    const markers = markerData.map(([builder,name,addr,lat,lon]) => {
+      const icon = L.icon({
+        iconUrl:`https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${colorMap[builder]||'blue'}.png`,
+        shadowUrl:'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+        iconSize:[25,41],iconAnchor:[12,41],popupAnchor:[1,-34]
+      });
       const marker = L.marker([lat,lon],{icon}).addTo(map).bindTooltip(name,{direction:'top'});
       builderGroups[builder] = builderGroups[builder]||L.layerGroup().addTo(map);
       builderGroups[builder].addLayer(marker);
-      return { builder,name,addr,lat,lon,marker };
+      return {builder,name,addr,lat,lon,marker};
     });
 
-    markers.forEach(({builder,name,addr,lat,lon,marker})=>{
-      marker.on('click',()=>{
+    // Marker click logic
+    markers.forEach(({builder,name,addr,lat,lon,marker}) => {
+      marker.on('click', () => {
         routeLayer.clearLayers();
-        currentOrigin={lat,lon};
-        const nearest=markers.filter(m=>m.marker!==marker).map(m=>({...m,dist:map.distance([lat,lon],[m.lat,m.lon])})).sort((a,b)=>a.dist-b.dist).slice(0,5);
-        let html=`<b>${name}</b><br>${addr}<br><strong>Closest Subdivisions:</strong><ul id="nearest-list">`;
-        nearest.forEach((d,i)=>{const mins=Math.round((d.dist/1000)/50*3600/60);const miles=(d.dist/1609.34).toFixed(1);const col=mins>30?'black':mins>20?'red':mins>=15?'orange':'green';html+=`<li data-index="${i}" style="cursor:pointer;color:${col}">${d.name} - ${mins} min (${miles} mi)</li>`;}); html+='</ul>';
-        // Bind click handlers before opening popup
-        map.once('popupopen',()=>{
-          document.querySelectorAll('#nearest-list li').forEach(li=>{
-            li.addEventListener('click',async()=>{
+        currentOrigin = {lat,lon};
+        const nearest = markers.filter(m=>m.marker!==marker).map(m=>({...m,dist:map.distance([lat,lon],[m.lat,m.lon])})).sort((a,b)=>a.dist-b.dist).slice(0,5);
+        let html = `<b>${name}</b><br>${addr}<br><strong>Closest:</strong><ul id="nearest-list">`;
+        nearest.forEach((d,i) => {
+          const mins = Math.round((d.dist/1000)/50*3600/60);
+          const miles = (d.dist/1609.34).toFixed(1);
+          const col = mins>30?'black':mins>20?'red':mins>=15?'orange':'green';
+          html += `<li data-index="${i}" style="cursor:pointer;color:${col}">${d.name} - ${mins} min (${miles} mi)</li>`;
+        }); html += '</ul>';
+
+        map.once('popupopen', () => {
+          document.querySelectorAll('#nearest-list li').forEach(li => {
+            li.addEventListener('click', async () => {
               routeLayer.clearLayers();
-              const d=nearest[li.dataset.index];
-              const url=`https://router.project-osrm.org/route/v1/driving/${currentOrigin.lon},${currentOrigin.lat};${d.lon},${d.lat}?overview=full&geometries=geojson`;
-              try{
-                const res=await fetch(url);const json=await res.json();const coords=json.routes[0].geometry.coordinates.map(c=>[c[1],c[0]]);
+              const d = nearest[li.dataset.index];
+              const url = `https://router.project-osrm.org/route/v1/driving/${currentOrigin.lon},${currentOrigin.lat};${d.lon},${d.lat}?overview=full&geometries=geojson`;
+              try {
+                const res = await fetch(url);
+                const json = await res.json();
+                const coords = json.routes[0].geometry.coordinates.map(c=>[c[1],c[0]]);
                 L.polyline(coords,{color:'blue',weight:8}).addTo(routeLayer);
                 map.fitBounds(L.polyline(coords).getBounds());
-              }catch{
+              } catch {
                 L.polyline([[currentOrigin.lat,currentOrigin.lon],[d.lat,d.lon]],{color:'blue',weight:8,dashArray:'5,5'}).addTo(routeLayer);
               }
             });
           });
         });
-        // Open popup after binding
+
         L.popup().setLatLng([lat,lon]).setContent(html).openOn(map);
       });
     });
 
-    // Toggles UI
-    const togglesDiv=document.getElementById('builderToggles');['Select All','Select None'].forEach(txt=>{const btn=document.createElement('button');btn.textContent=txt;btn.style.marginRight='8px';btn.addEventListener('click',()=>{Object.values(builderGroups).forEach(g=>txt==='Select All'?g.addTo(map):map.removeLayer(g));togglesDiv.querySelectorAll('input').forEach(cb=>cb.checked=(txt==='Select All'));});togglesDiv.appendChild(btn);});togglesDiv.appendChild(document.createElement('br'));
-    Object.entries(builderGroups).forEach(([b,group])=>{const cb=document.createElement('input');cb.type='checkbox';cb.checked=true;cb.addEventListener('change',()=>cb.checked?group.addTo(map):map.removeLayer(group));const lbl=document.createElement('label');lbl.appendChild(cb);lbl.append(` ${b}`);togglesDiv.appendChild(lbl);togglesDiv.appendChild(document.createElement('br'));});
+    // Builder toggles UI
+    ['Select All','Select None'].forEach(txt => {
+      const btn = document.createElement('button'); btn.textContent = txt; btn.style.marginRight='8px';
+      btn.addEventListener('click', () => {
+        Object.values(builderGroups).forEach(group => txt==='Select All' ? group.addTo(map) : map.removeLayer(group));
+        document.querySelectorAll('#builderToggles input').forEach(cb => cb.checked = (txt==='Select All'));
+      });
+      togglesDiv.appendChild(btn);
+    }); togglesDiv.appendChild(document.createElement('br'));
+    Object.entries(builderGroups).forEach(([b,group]) => {
+      const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=true;
+      cb.addEventListener('change', () => cb.checked ? group.addTo(map) : map.removeLayer(group));
+      const lbl = document.createElement('label'); lbl.appendChild(cb); lbl.append(` ${b}`);
+      togglesDiv.appendChild(lbl); togglesDiv.appendChild(document.createElement('br'));
+    });
+
     // Search
-    document.getElementById('searchInput').addEventListener('input',function(){const q=this.value.toLowerCase(),f=markers.find(m=>m.name.toLowerCase().includes(q));if(f)map.setView([f.lat,f.lon],14);});
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const q = this.value.toLowerCase();
+      const f = markers.find(m => m.name.toLowerCase().includes(q));
+      if (f) map.setView([f.lat,f.lon],14);
+    });
   </script>
 </body>
 </html>
