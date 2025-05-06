@@ -42,78 +42,212 @@
     const DROPBOX_CLIENT_ID = 'jn358a9nxupu6rw';
     const REDIRECT_URI = 'https://nmichalski.com/drop';
     const LOG_PATH = '/shared_log.json';
-    // Public shared log direct-download URL (dl=1 for raw JSON)
     const PUBLIC_LOG_URL = 'https://www.dropbox.com/scl/fi/tge5w7tu4u1fhblwgwl28/shared_log.json?rlkey=qx59ir0i35e5t9b6afaancuiv&dl=1';
 
     // === State ===
-    let accessToken, beforeFiles = [], afterFiles = [], isUploading = false;
+    let accessToken = null, beforeFiles = [], afterFiles = [], isUploading = false;
 
+    // Append a log entry to UI
     function appendLogEntry(entry) {
-      const d = document.createElement('div'); d.className='logEntry'; d.textContent=entry;
-      document.getElementById('log').appendChild(d);
+      const div = document.createElement('div');
+      div.className = 'logEntry';
+      div.textContent = entry;
+      document.getElementById('log').appendChild(div);
     }
 
+    // Fetch shared log via public URL or API
     async function fetchSharedLog() {
-      // Try public URL first
       try {
-        const r = await fetch(PUBLIC_LOG_URL);
-        if (r.ok) return await r.json();
-      } catch{}
-      // Fallback to Dropbox API if signed in
+        const res = await fetch(PUBLIC_LOG_URL);
+        if (res.ok) return await res.json();
+      } catch {}
       if (accessToken) {
-        const r = await fetch('https://content.dropboxapi.com/2/files/download',{method:'POST',headers:{'Authorization':'Bearer '+accessToken,'Dropbox-API-Arg':JSON.stringify({path:LOG_PATH})}});
-        if (r.ok) return JSON.parse(await r.text());
+        const res = await fetch('https://content.dropboxapi.com/2/files/download', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+            'Dropbox-API-Arg': JSON.stringify({ path: LOG_PATH })
+          }
+        });
+        if (res.ok) return JSON.parse(await res.text());
       }
       return [];
     }
 
+    // Save shared log via Dropbox API
     async function saveSharedLog(entries) {
-      const blob = new Blob([JSON.stringify(entries)],{type:'application/json'});
-      await fetch('https://content.dropboxapi.com/2/files/upload',{method:'POST',headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/octet-stream','Dropbox-API-Arg':JSON.stringify({path:LOG_PATH,mode:'overwrite',autorename:false,mute:true})}},body:blob);
+      const blob = new Blob([JSON.stringify(entries)], { type: 'application/json' });
+      await fetch('https://content.dropboxapi.com/2/files/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': 'application/octet-stream',
+          'Dropbox-API-Arg': JSON.stringify({ path: LOG_PATH, mode: 'overwrite', autorename: false, mute: true })
+        },
+        body: blob
+      });
     }
 
+    // Load and display shared log
     async function loadLog() {
       const entries = await fetchSharedLog();
       entries.forEach(appendLogEntry);
     }
 
+    // Initialize auth and UI
     async function init() {
+      // Parse OAuth token from hash
+      const hash = window.location.hash;
+      if (hash) {
+        const params = new URLSearchParams(hash.slice(1));
+        const token = params.get('access_token');
+        if (token) {
+          accessToken = token;
+          // Remove hash for clean URL
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      }
+      // Load log
       await loadLog();
-      const params=new URLSearchParams(location.hash.slice(1)); accessToken=params.get('access_token');
-      if(accessToken){ document.getElementById('loginBtn').style.display='none'; ['uploadBeforeBtn','uploadAfterBtn','submitBtn'].forEach(id=>document.getElementById(id).disabled=false); }
+      // If signed in, enable UI
+      if (accessToken) {
+        document.getElementById('loginBtn').style.display = 'none';
+        ['uploadBeforeBtn','uploadAfterBtn','submitBtn'].forEach(id => {
+          document.getElementById(id).disabled = false;
+        });
+      }
     }
 
-    document.addEventListener('DOMContentLoaded',()=>{
+    document.addEventListener('DOMContentLoaded', () => {
       init();
-      document.getElementById('loginBtn').onclick=()=>location.href=
-        `https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=${DROPBOX_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
-      document.getElementById('uploadBeforeBtn').onclick=()=>document.getElementById('beforeInput').click();
-      document.getElementById('beforeInput').onchange=e=>{beforeFiles.push(...e.target.files);showPreviews('beforeZone',beforeFiles);};
-      document.getElementById('uploadAfterBtn').onclick=()=>document.getElementById('afterInput').click();
-      document.getElementById('afterInput').onchange=e=>{afterFiles.push(...e.target.files);showPreviews('afterZone',afterFiles);};
-      ['beforeZone','afterZone'].forEach(id=>setupDropZone(id,id==='beforeZone'?'before':'after'));
-      document.getElementById('submitBtn').onclick=async()=>{
-        if(!accessToken||isUploading)return;isUploading=true;
-        const btn=document.getElementById('submitBtn'); btn.textContent='Uploading...';
-        ['uploadBeforeBtn','uploadAfterBtn'].forEach(id=>document.getElementById(id).disabled=true);
-        const cleaner=document.getElementById('cleanerSelect').value;
-        const jobRaw=document.getElementById('jobInput').value.trim()||'UnnamedJob';
-        const inT=document.getElementById('inTime').value.replace(/:/g,''),outT=document.getElementById('outTime').value.replace(/:/g,'');
-        const jobFolder=inT&&outT?`${jobRaw}_${inT}-${outT}`:jobRaw;
-        await uploadSection('before',beforeFiles,cleaner,jobFolder);
-        await uploadSection('after',afterFiles,cleaner,jobFolder);
-        const t=new Date().toLocaleTimeString(); const entry=`${t} - ${cleaner} - ${jobFolder} (Before:${beforeFiles.length},After:${afterFiles.length})`;
+
+      document.getElementById('loginBtn').onclick = () => {
+        const authUrl =
+          `https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=${DROPBOX_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+        window.location.href = authUrl;
+      };
+
+      document.getElementById('uploadBeforeBtn').onclick = () =>
+        document.getElementById('beforeInput').click();
+      document.getElementById('beforeInput').onchange = e => {
+        beforeFiles.push(...e.target.files);
+        showPreviews('beforeZone', beforeFiles);
+      };
+
+      document.getElementById('uploadAfterBtn').onclick = () =>
+        document.getElementById('afterInput').click();
+      document.getElementById('afterInput').onchange = e => {
+        afterFiles.push(...e.target.files);
+        showPreviews('afterZone', afterFiles);
+      };
+
+      ['beforeZone','afterZone'].forEach(id =>
+        setupDropZone(id, id === 'beforeZone' ? 'before' : 'after')
+      );
+
+      document.getElementById('submitBtn').onclick = async () => {
+        if (!accessToken || isUploading) return;
+        isUploading = true;
+        const btn = document.getElementById('submitBtn');
+        btn.textContent = 'Uploading...';
+        ['uploadBeforeBtn','uploadAfterBtn'].forEach(id =>
+          document.getElementById(id).disabled = true
+        );
+
+        const cleaner = document.getElementById('cleanerSelect').value;
+        const jobRaw = document.getElementById('jobInput').value.trim() || 'UnnamedJob';
+        const inT = document.getElementById('inTime').value.replace(/:/g, '');
+        const outT = document.getElementById('outTime').value.replace(/:/g, '');
+        const jobFolder = inT && outT ? `${jobRaw}_${inT}-${outT}` : jobRaw;
+
+        await uploadSection('before', beforeFiles, cleaner, jobFolder);
+        await uploadSection('after', afterFiles, cleaner, jobFolder);
+
+        const time = new Date().toLocaleTimeString();
+        const entry = `${time} - ${cleaner} - ${jobFolder} (Before: ${beforeFiles.length}, After: ${afterFiles.length})`;
         appendLogEntry(entry);
-        const arr=await fetchSharedLog(); arr.push(entry); await saveSharedLog(arr);
-        clearFields(); btn.textContent='Submit Uploads'; ['uploadBeforeBtn','uploadAfterBtn'].forEach(id=>document.getElementById(id).disabled=false);
-        isUploading=false;
+
+        const logEntries = await fetchSharedLog();
+        logEntries.push(entry);
+        await saveSharedLog(logEntries);
+
+        clearFields();
+        btn.textContent = 'Submit Uploads';
+        ['uploadBeforeBtn','uploadAfterBtn'].forEach(id =>
+          document.getElementById(id).disabled = false
+        );
+        isUploading = false;
       };
     });
 
-    function showPreviews(z,f){const zone=document.getElementById(z);zone.innerHTML=`<strong>${z==='beforeZone'?'Before':'After'} Photos</strong>`;f.forEach(file=>{const r=new FileReader();r.onload=e=>{const i=document.createElement('img');i.src=e.target.result;zone.appendChild(i);} ;r.readAsDataURL(file);});}
-    function clearFields(){beforeFiles=[];afterFiles=[];['beforeZone','afterZone'].forEach(z=>document.getElementById(z).innerHTML=`<strong>${z==='beforeZone'?'Before':'After'} Photos</strong>`);['jobInput','inTime','outTime','beforeInput','afterInput'].forEach(id=>document.getElementById(id).value='');}
-    async function uploadSection(type,files,cleaner,jobFolder){const date=`/${new Date().toISOString().slice(0,10)}`;const parts=[date,'/Cleaning',`/${cleaner}`,`/${jobFolder}`,`/${type}`];let path='';for(const p of parts){path+=p;await fetch('https://api.dropboxapi.com/2/files/create_folder_v2',{method:'POST',headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify({path,autorename:false})}).catch(()=>{});}for(const file of files){await fetch('https://content.dropboxapi.com/2/files/upload',{method:'POST',headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/octet-stream','Dropbox-API-Arg':JSON.stringify({path:path+'/'+file.name,mode:'add',autorename:true,mute:false})},body:file});}}
-    function setupDropZone(id,type){const z=document.getElementById(id);z.addEventListener('dragover',e=>e.preventDefault());z.addEventListener('drop',e=>{e.preventDefault();const f=Array.from(e.dataTransfer.files);if(type==='before'){beforeFiles.push(...f);showPreviews('beforeZone',beforeFiles);}else{afterFiles.push(...f);showPreviews('afterZone',afterFiles);}});}
+    function showPreviews(zoneId, files) {
+      const zone = document.getElementById(zoneId);
+      zone.innerHTML = `<strong>${zoneId === 'beforeZone' ? 'Before' : 'After'} Photos</strong>`;
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          zone.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function clearFields() {
+      beforeFiles = [];
+      afterFiles = [];
+      ['beforeZone','afterZone'].forEach(z =>
+        document.getElementById(z).innerHTML = `<strong>${z === 'beforeZone' ? 'Before' : 'After'} Photos</strong>`
+      );
+      ['jobInput','inTime','outTime','beforeInput','afterInput'].forEach(id =>
+        document.getElementById(id).value = ''
+      );
+    }
+
+    async function uploadSection(type, files, cleaner, jobFolder) {
+      const date = `/${new Date().toISOString().slice(0,10)}`;
+      const parts = [date, '/Cleaning', `/${cleaner}`, `/${jobFolder}`, `/${type}`];
+      let path = '';
+      for (const p of parts) {
+        path += p;
+        await fetch('https://api.dropboxapi.com/2/files/create_folder_v2', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ path, autorename: false })
+        }).catch(() => {});
+      }
+      for (const file of files) {
+        await fetch('https://content.dropboxapi.com/2/files/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + accessToken,
+            'Content-Type': 'application/octet-stream',
+            'Dropbox-API-Arg': JSON.stringify({ path: path + '/' + file.name, mode: 'add', autorename: true, mute: false })
+          },
+          body: file
+        }).catch(err => console.error('Upload error', err));
+      }
+    }
+
+    function setupDropZone(id, type) {
+      const zone = document.getElementById(id);
+      zone.addEventListener('dragover', e => e.preventDefault());
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        const files = Array.from(e.dataTransfer.files);
+        if (type === 'before') {
+          beforeFiles.push(...files);
+          showPreviews('beforeZone', beforeFiles);
+        } else {
+          afterFiles.push(...files);
+          showPreviews('afterZone', afterFiles);
+        }
+      });
+    }
   </script>
 </body>
 </html>
