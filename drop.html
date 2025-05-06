@@ -37,6 +37,10 @@
       font-size: 0.9em;
       margin-bottom: 4px;
     }
+    #loadingIndicator {
+      display: none;
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body>
@@ -45,7 +49,7 @@
     <button id="loginBtn">Sign in with Dropbox</button>
     <label for="cleanerSelect">Cleaner:</label>
     <select id="cleanerSelect">
-      <option value="Ana">Ana</option>
+       <option value="Ana">Ana</option>
       <option value="Aracely">Aracely</option>
       <option value="Barb">Barb</option>
       <option value="Belkis">Belkis</option>
@@ -77,6 +81,7 @@
     <input type="file" id="beforeInput" multiple style="display:none">
     <input type="file" id="afterInput" multiple style="display:none">
     <button id="submitBtn" disabled>Submit Uploads</button>
+    <span id="loadingIndicator">Uploading...</span>
   </div>
   <p>Drop your “before” and “after” pictures in separate zones, or use the buttons above:</p>
   <div id="container">
@@ -90,14 +95,13 @@
   <script>
     // === Configuration ===
     const DROPBOX_CLIENT_ID = 'jn358a9nxupu6rw';
-    // This must exactly match the Redirect URI registered in your Dropbox App settings
-    // Since you'll host this file at https://nmichalski.com/drop, use that URL
     const REDIRECT_URI = 'https://nmichalski.com/drop';
 
     // === State ===
     let accessToken;
     let beforeFiles = [];
     let afterFiles = [];
+    let isUploading = false;
 
     function init() {
       const beforeBtn = document.getElementById('uploadBeforeBtn');
@@ -114,28 +118,40 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      const beforeBtn = document.getElementById('uploadBeforeBtn');
+      const afterBtn = document.getElementById('uploadAfterBtn');
+      const submitBtn = document.getElementById('submitBtn');
+      const loading = document.getElementById('loadingIndicator');
+
       init();
+
       document.getElementById('loginBtn').onclick = () => {
         const authUrl = `https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=${DROPBOX_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
         window.location.href = authUrl;
       };
 
-      document.getElementById('uploadBeforeBtn').onclick = () => document.getElementById('beforeInput').click();
+      beforeBtn.onclick = () => document.getElementById('beforeInput').click();
       document.getElementById('beforeInput').onchange = e => {
         beforeFiles.push(...e.target.files);
         showPreviews('beforeZone', beforeFiles);
       };
 
-      document.getElementById('uploadAfterBtn').onclick = () => document.getElementById('afterInput').click();
+      afterBtn.onclick = () => document.getElementById('afterInput').click();
       document.getElementById('afterInput').onchange = e => {
         afterFiles.push(...e.target.files);
         showPreviews('afterZone', afterFiles);
       };
 
-      ['beforeZone','afterZone'].forEach(id => setupDropZone(id, id==='beforeZone'?'before':'after'));
+      ['beforeZone','afterZone'].forEach(id => setupDropZone(id, id === 'beforeZone' ? 'before' : 'after'));
 
-      document.getElementById('submitBtn').onclick = async () => {
-        if (!accessToken) return alert('Please sign in first');
+      submitBtn.onclick = async () => {
+        if (!accessToken || isUploading) return;
+        isUploading = true;
+        beforeBtn.disabled = true;
+        afterBtn.disabled = true;
+        submitBtn.disabled = true;
+        loading.style.display = 'inline';
+
         const cleaner = document.getElementById('cleanerSelect').value;
         const jobRaw = document.getElementById('jobInput').value.trim() || 'UnnamedJob';
         const inT = document.getElementById('inTime').value.replace(/:/g, '');
@@ -148,13 +164,20 @@
         const time = new Date().toLocaleTimeString();
         addToLog(`${time} - ${cleaner} - ${jobFolder} (Before: ${beforeFiles.length}, After: ${afterFiles.length})`);
         clearFields();
+
+        loading.style.display = 'none';
+        isUploading = false;
+        // Re-enable buttons
+        beforeBtn.disabled = false;
+        afterBtn.disabled = false;
+        submitBtn.disabled = false;
         alert('All uploads complete!');
       };
     });
 
     function showPreviews(zoneId, files) {
       const zone = document.getElementById(zoneId);
-      zone.innerHTML = `<strong>${zoneId==='beforeZone'?'Before':'After'} Photos</strong>`;
+      zone.innerHTML = `<strong>${zoneId === 'beforeZone' ? 'Before' : 'After'} Photos</strong>`;
       files.forEach(file => {
         const reader = new FileReader();
         reader.onload = e => {
@@ -177,7 +200,7 @@
       beforeFiles = [];
       afterFiles = [];
       ['beforeZone','afterZone'].forEach(z => {
-        document.getElementById(z).innerHTML = `<strong>${z==='beforeZone'?'Before':'After'} Photos</strong>`;
+        document.getElementById(z).innerHTML = `<strong>${z === 'beforeZone' ? 'Before' : 'After'} Photos</strong>`;
       });
       ['jobInput','inTime','outTime','beforeInput','afterInput'].forEach(id => {
         document.getElementById(id).value = '';
@@ -219,7 +242,7 @@
       zone.addEventListener('drop', e => {
         e.preventDefault();
         const files = Array.from(e.dataTransfer.files);
-        if (type === 'before') { beforeFiles.push(...files); showPreviews('beforeZone', beforeFiles); } 
+        if (type === 'before') { beforeFiles.push(...files); showPreviews('beforeZone', beforeFiles); }
         else { afterFiles.push(...files); showPreviews('afterZone', afterFiles); }
       });
     }
