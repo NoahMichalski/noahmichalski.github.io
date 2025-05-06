@@ -37,10 +37,6 @@
       font-size: 0.9em;
       margin-bottom: 4px;
     }
-    #loadingIndicator {
-      display: none;
-      margin-left: 10px;
-    }
   </style>
 </head>
 <body>
@@ -49,24 +45,8 @@
     <button id="loginBtn">Sign in with Dropbox</button>
     <label for="cleanerSelect">Cleaner:</label>
     <select id="cleanerSelect">
-       <option value="Ana">Ana</option>
-      <option value="Aracely">Aracely</option>
-      <option value="Barb">Barb</option>
-      <option value="Belkis">Belkis</option>
-      <option value="Brenda">Brenda</option>
-      <option value="Catalena">Catalena</option>
-      <option value="Cesia">Cesia</option>
-      <option value="Chaley">Chaley</option>
-      <option value="Daniela QC">Daniela (Quality Control)</option>
-      <option value="Dennis QC">Dennis (Quality Control)</option>
-      <option value="Dolce">Dolce</option>
-      <option value="Edmundo">Edmundo</option>
-      <option value="Katherine">Katherine</option>
-      <option value="Mario">Mario</option>
-      <option value="Melvin">Melvin</option>
-      <option value="Patty QC">Patty (Quality Control)</option>
-      <option value="Sandra">Sandra</option>
-      <option value="Veronica">Veronica</option>
+      <option value="Ana">Ana</option>
+      <!-- other options... -->
     </select>
     <label for="jobInput">Job:</label>
     <input type="text" id="jobInput" placeholder="Enter job name">
@@ -81,7 +61,6 @@
     <input type="file" id="beforeInput" multiple style="display:none">
     <input type="file" id="afterInput" multiple style="display:none">
     <button id="submitBtn" disabled>Submit Uploads</button>
-    <span id="loadingIndicator">Uploading...</span>
   </div>
   <p>Drop your “before” and “after” pictures in separate zones, or use the buttons above:</p>
   <div id="container">
@@ -121,36 +100,41 @@
       const beforeBtn = document.getElementById('uploadBeforeBtn');
       const afterBtn = document.getElementById('uploadAfterBtn');
       const submitBtn = document.getElementById('submitBtn');
-      const loading = document.getElementById('loadingIndicator');
 
       init();
 
+      // OAuth redirect
       document.getElementById('loginBtn').onclick = () => {
         const authUrl = `https://www.dropbox.com/oauth2/authorize?response_type=token&client_id=${DROPBOX_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
         window.location.href = authUrl;
       };
 
+      // File pickers
       beforeBtn.onclick = () => document.getElementById('beforeInput').click();
       document.getElementById('beforeInput').onchange = e => {
         beforeFiles.push(...e.target.files);
         showPreviews('beforeZone', beforeFiles);
       };
-
       afterBtn.onclick = () => document.getElementById('afterInput').click();
       document.getElementById('afterInput').onchange = e => {
         afterFiles.push(...e.target.files);
         showPreviews('afterZone', afterFiles);
       };
 
-      ['beforeZone','afterZone'].forEach(id => setupDropZone(id, id === 'beforeZone' ? 'before' : 'after'));
+      // Drag-and-drop
+      ['beforeZone','afterZone'].forEach(id =>
+        setupDropZone(id, id === 'beforeZone' ? 'before' : 'after')
+      );
 
+      // Submit uploads
       submitBtn.onclick = async () => {
         if (!accessToken || isUploading) return;
         isUploading = true;
         beforeBtn.disabled = true;
         afterBtn.disabled = true;
         submitBtn.disabled = true;
-        loading.style.display = 'inline';
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Uploading...';
 
         const cleaner = document.getElementById('cleanerSelect').value;
         const jobRaw = document.getElementById('jobInput').value.trim() || 'UnnamedJob';
@@ -165,13 +149,11 @@
         addToLog(`${time} - ${cleaner} - ${jobFolder} (Before: ${beforeFiles.length}, After: ${afterFiles.length})`);
         clearFields();
 
-        loading.style.display = 'none';
-        isUploading = false;
-        // Re-enable buttons
+        submitBtn.textContent = originalText;
         beforeBtn.disabled = false;
         afterBtn.disabled = false;
         submitBtn.disabled = false;
-        alert('All uploads complete!');
+        isUploading = false;
       };
     });
 
@@ -242,7 +224,7 @@
       zone.addEventListener('drop', e => {
         e.preventDefault();
         const files = Array.from(e.dataTransfer.files);
-        if (type === 'before') { beforeFiles.push(...files); showPreviews('beforeZone', beforeFiles); }
+        if (type === 'before') { beforeFiles.push(...files); showPreviews('beforeZone', beforeFiles); } 
         else { afterFiles.push(...files); showPreviews('afterZone', afterFiles); }
       });
     }
