@@ -34,7 +34,7 @@
 
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
-    // Toggle UI controls (legend & checkboxes)
+    // Toggle UI controls
     const toggleBtn = document.getElementById('toggle-ui-btn');
     const togglesDiv = document.getElementById('builderToggles');
     const legendBox = document.getElementById('legendBox');
@@ -46,7 +46,7 @@
       toggleBtn.textContent = controlsVisible ? 'Hide Controls' : 'Show Controls';
     });
 
-    // Subdivisions: [builder, name, address, lat, lon]
+    // Data & config
     const markerData = [ ["Pulte","Abberley","3384 Abberley Drive, New Albany, OH 43054",40.052873,-82.816503],
   ["Pulte","Bloomfield","5002 Roese Ave, South Bloomfield, OH 43103",39.708129,-82.988884],
   ["Pulte","Clarkshaw","3411 Tender Avenue, Powell, OH 43065",40.223191,-83.104699],
@@ -120,88 +120,112 @@
   ["Shottenstein","Cottages At Verbana","11738 Verbena Place, Plain City, OH 43064",40.184323,-83.200862],
   ["Shottenstein","Glacier Pointe","8798 Eliot Drive, Plain City, OH 43064",40.147034, -83.205445],
   ["America Homes 4 Rent","Eastwood","9045 Lucy Drive, Reynoldsburg, OH",39.961474,-82.758526] ];
-    
     const colorMap = { 'Pulte':'green','Ryan':'violet','DR Horton':'black','Epcon':'gold','Shottenstein':'red','Rockford':'blue','3 Pillar':'orange','MI Homes':'grey','America Homes 4 Rent':'yellow' };
 
+    // Initialize map & layers
     const map = L.map('map').setView([40.05, -83.0], 10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'&copy; OpenStreetMap contributors' }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
     const routeLayer = L.layerGroup().addTo(map);
     let currentOrigin = null;
 
     // Build markers
     const builderGroups = {};
-    const markers = markerData.map(([builder,name,addr,lat,lon]) => {
+    const markers = markerData.map(([builder, name, addr, lat, lon]) => {
       const icon = L.icon({ iconUrl:`https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${colorMap[builder]||'blue'}.png`, shadowUrl:'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png', iconSize:[25,41], iconAnchor:[12,41], popupAnchor:[1,-34] });
-      const marker = L.marker([lat,lon],{icon}).addTo(map).bindTooltip(name,{direction:'top'});
-      builderGroups[builder] = builderGroups[builder]||L.layerGroup().addTo(map);
+      const marker = L.marker([lat, lon], { icon }).addTo(map).bindTooltip(name, { direction: 'top' });
+      builderGroups[builder] = builderGroups[builder] || L.layerGroup().addTo(map);
       builderGroups[builder].addLayer(marker);
-      return {builder,name,addr,lat,lon,marker};
+      return { builder, name, addr, lat, lon, marker };
     });
 
-    // Marker click logic
-    markers.forEach(({builder,name,addr,lat,lon,marker}) => {
+    // Marker click: immediate popup + loading spinner, then update with data
+    markers.forEach(({ builder, name, addr, lat, lon, marker }) => {
       marker.on('click', () => {
         routeLayer.clearLayers();
-        currentOrigin = {lat,lon};
-        const nearest = markers.filter(m=>m.marker!==marker).map(m=>({...m,dist:map.distance([lat,lon],[m.lat,m.lon])})).sort((a,b)=>a.dist-b.dist).slice(0,5);
-        // Wrap address in Google Maps link
-        let html = `
-          <b>${name}</b><br>
-          <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="color:inherit;text-decoration:underline;">
-            ${addr}
-          </a><br>
-          <strong>Closest Subdivisions:</strong><ul id="nearest-list">
-        `;
-        nearest.forEach((d,i) => {
-          const mins = Math.round((d.dist/1000)/50*3600/60);
-          const miles = (d.dist/1609.34).toFixed(1);
-          const col = mins>30?'black':mins>20?'red':mins>=15?'orange':'green';
-          html += `<li data-index="${i}" style="cursor:pointer;color:${col}">${d.name} - ${mins} min (${miles} mi)</li>`;
-        }); html += '</ul>';
+        currentOrigin = { lat, lon };
 
-        map.once('popupopen', () => {
+        // determine nearest subs by straight-line
+        const nearest = markers.filter(m => m.marker !== marker)
+          .map(m => ({ ...m, dist: map.distance([lat, lon], [m.lat, m.lon]) }))
+          .sort((a, b) => a.dist - b.dist)
+          .slice(0, 5);
+
+        // show initial popup with spinner
+        const initHtml = `
+          <b>${name}</b><br>
+          <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="color:inherit;text-decoration:underline;">${addr}</a><br>
+          <strong>Closest Subdivisions:</strong>
+          <div id="nearest-list">Loading...</div>
+        `;
+        const popup = L.popup().setLatLng([lat, lon]).setContent(initHtml).openOn(map);
+
+        // fetch actual drive data
+        (async () => {
+          const withRoute = await Promise.all(nearest.map(async d => {
+            const base = `https://router.project-osrm.org/route/v1/driving/${currentOrigin.lon},${currentOrigin.lat};${d.lon},${d.lat}`;
+            try {
+              const r1 = await fetch(`${base}?overview=false`); const j1 = await r1.json();
+              d.duration = j1.routes[0].duration; d.distance = j1.routes[0].distance;
+              const r2 = await fetch(`${base}?overview=full&geometries=geojson`); const j2 = await r2.json();
+              d.geometry = j2.routes[0].geometry;
+            } catch {
+              d.duration = (d.dist/1000)/50*3600; d.distance = d.dist;
+              d.geometry = { coordinates: [[currentOrigin.lon, currentOrigin.lat],[d.lon, d.lat]] };
+            }
+            return d;
+          }));
+
+          // build final list
+          let finalHtml = `
+            <b>${name}</b><br>
+            <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="color:inherit;text-decoration:underline;">${addr}</a><br>
+            <strong>Closest Subdivisions:</strong><ul id="nearest-list">
+          `;
+          withRoute.forEach((d,i) => {
+            const mins = Math.round(d.duration/60);
+            const miles = (d.distance/1609.34).toFixed(1);
+            const col = mins>30?'black':mins>20?'red':mins>=15?'orange':'green';
+            finalHtml += `<li data-index="${i}" style="cursor:pointer;color:${col}">${d.name} - ${mins} min (${miles} mi)</li>`;
+          });
+          finalHtml += '</ul>';
+
+          // update popup content
+          popup.setContent(finalHtml);
+
+          // attach click handlers for route drawing
           document.querySelectorAll('#nearest-list li').forEach(li => {
-            li.addEventListener('click', async () => {
+            li.addEventListener('click', () => {
               routeLayer.clearLayers();
-              const d = nearest[li.dataset.index];
-              const url = `https://router.project-osrm.org/route/v1/driving/${currentOrigin.lon},${currentOrigin.lat};${d.lon},${d.lat}?overview=full&geometries=geojson`;
-              try {
-                const res = await fetch(url);
-                const json = await res.json();
-                const coords = json.routes[0].geometry.coordinates.map(c=>[c[1],c[0]]);
-                L.polyline(coords,{color:'blue',weight:8}).addTo(routeLayer);
-                map.fitBounds(L.polyline(coords).getBounds());
-              } catch {
-                L.polyline([[currentOrigin.lat,currentOrigin.lon],[d.lat,d.lon]],{color:'blue',weight:8,dashArray:'5,5'}).addTo(routeLayer);
-              }
+              const d = withRoute[li.dataset.index];
+              const coords = d.geometry.coordinates.map(c => [c[1], c[0]]);
+              L.polyline(coords, { color: 'blue', weight: 8 }).addTo(routeLayer);
+              map.fitBounds(L.polyline(coords).getBounds());
             });
           });
-        });
-
-        L.popup().setLatLng([lat,lon]).setContent(html).openOn(map);
+        })();
       });
     });
 
-    // Builder toggles UI
+    // Builder toggles UI controls
     ['Select All','Select None'].forEach(txt => {
-      const btn = document.createElement('button'); btn.textContent = txt; btn.style.marginRight='8px';
+      const btn = document.createElement('button'); btn.textContent = txt; btn.style.marginRight = '8px';
       btn.addEventListener('click', () => {
         Object.values(builderGroups).forEach(group => txt==='Select All' ? group.addTo(map) : map.removeLayer(group));
         document.querySelectorAll('#builderToggles input').forEach(cb => cb.checked = (txt==='Select All'));
       });
       togglesDiv.appendChild(btn);
     }); togglesDiv.appendChild(document.createElement('br'));
-    Object.entries(builderGroups).forEach(([b,group]) => {
-      const cb = document.createElement('input'); cb.type='checkbox';cb.checked=true;
+    Object.entries(builderGroups).forEach(([b, group]) => {
+      const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=true;
       cb.addEventListener('change', () => cb.checked ? group.addTo(map) : map.removeLayer(group));
       const lbl = document.createElement('label'); lbl.appendChild(cb); lbl.append(` ${b}`);
       togglesDiv.appendChild(lbl); togglesDiv.appendChild(document.createElement('br'));
     });
 
-    // Search
+    // Search functionality
     document.getElementById('searchInput').addEventListener('input', function() {
       const q = this.value.toLowerCase(); const f = markers.find(m => m.name.toLowerCase().includes(q));
-      if (f) map.setView([f.lat,f.lon],14);
+      if (f) map.setView([f.lat, f.lon], 14);
     });
   </script>
 </body>
