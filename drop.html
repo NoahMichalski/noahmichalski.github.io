@@ -76,9 +76,24 @@
       document.getElementById('log').appendChild(div);
     }
     async function fetchLog() {
-      const res = await fetch('https://dl.dropboxusercontent.com/scl/fi/tge5w7tu4u1fhblwgwl28/shared_log.json?dl=1');
-      if (res.ok) return res.json();
+      // Fetch shared log using Dropbox API and access token
+      const res = await fetch('https://content.dropboxapi.com/2/files/download', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + DROPBOX_ACCESS_TOKEN,
+          'Dropbox-API-Arg': JSON.stringify({ path: LOG_PATH })
+        }
+      });
+      if (res.ok) {
+        try {
+          return JSON.parse(await res.text());
+        } catch {
+          return [];
+        }
+      }
+      console.error('Fetch log failed', res.status, await res.text());
       return [];
+    }
     }
     async function saveLog(entries) {
       const blob = new Blob([JSON.stringify(entries)], { type: 'application/json' });
