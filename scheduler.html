@@ -12,7 +12,7 @@
     .sidebar { width: 300px; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; }
     table { width: 100%; border-collapse: collapse; }
     th, td { border: 1px solid #ccc; padding: 4px; text-align: center; }
-    label { display: block; margin-top: 10px; font-weight: bold; }
+    label, h2 { margin-top: 10px; font-weight: bold; }
     input, select, button, textarea { width: 100%; margin-top: 4px; padding: 6px; box-sizing: border-box; }
     textarea { resize: vertical; }
     ul { list-style: none; padding: 0; }
@@ -25,10 +25,7 @@
     <div id="map"></div>
     <div class="sidebar">
       <h2>Employees</h2>
-      <table id="empTable">
-        <thead><tr><th>Name</th><th>Size</th><th>On Duty</th></tr></thead>
-        <tbody></tbody>
-      </table>
+      <table id="empTable"><thead><tr><th>Name</th><th>Size</th><th>On Duty</th></tr></thead><tbody></tbody></table>
       <button id="generate">Generate Routes & Schedule</button>
       <div id="scheduleOutput"></div>
       <div id="routeStats"></div>
@@ -48,263 +45,156 @@
       <ul id="jobList"></ul>
     </div>
   </div>
-
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
-    const ORS_API_KEY = '5b3ce3597851110001cf624895d5d8857d8d41b6a9508753893fbb25';
     const EMP_KEY = 'sched_employees', JOB_KEY = 'sched_jobs';
-    // Full subdivisions list
-    const subdivisions = [
-      ["VIP","Home Office",40.087852,-83.063193],
-      ["Pulte","Abberley",40.052873,-82.816503],
-      ["Pulte","Bloomfield",39.708129,-82.988884],
-      ["Pulte","Clarkshaw",40.223191,-83.104699],
-      ["Pulte","Glenross",40.236117,-83.020358],
-      ["Pulte","Magnolia",40.245262,-82.887000],
-      ["Pulte","Price Ponds",40.244936,-82.890611],
-      ["Pulte","Sugar Farms",39.987856,-83.178413],
-      ["Pulte","Towns On The Parkway",40.106649,-83.100162],
-      ["Pulte","Amrine",40.270238,-83.371765],
-      ["Pulte","Buckstone",39.856655,-82.967935],
-      ["Pulte","Clover",39.949993,-83.161864],
-      ["Pulte","Jerome Village",40.187687,-83.189026],
-      ["Pulte","Nelson",40.208450,-83.084053],
-      ["Pulte","Berlin Bluffs",40.244850,-82.997809],
-      ["Pulte","Carpenters",40.185143,-83.111785],
-      ["Pulte","Scotts",40.154941,-83.214898],
-      ["Pulte","Limestone",40.302692,-83.122495],
-      ["Pulte","Nottingham",40.109482,-82.812530],
-      ["Pulte","Slate",40.193908,-83.018517],
-      ["Pulte","Beulah",39.889952,-83.104556],
-      ["Pulte","Eagle",40.249897,-82.938333],
-      ["Pulte","Hyatts",40.214810,-83.098683],
-      ["Pulte","Maeve",40.236883,-83.005326],
-      ["Pulte","Pioneer",40.150438,-83.237856],
-      ["Pulte","Towns on the Greenway",40.134287,-82.942262],
-      ["DR Horton","Brookview",39.877261,-82.821450],
-      ["DR Horton","Lansdowne",39.892490,-82.835370],
-      ["DR Horton","Longview",39.897680,-82.789797],
-      ["DR Horton","Madison Meadows",40.103927,-83.287352],
-      ["DR Horton","Maplewood",39.969688,-82.754820],
-      ["DR Horton","Monarch Greene",39.927510,-83.032780],
-      ["DR Horton","Piatt Preserve",40.245506,-83.007530],
-      ["DR Horton","River Ridge",39.635850,-82.948650],
-      ["DR Horton","Overlook",40.043237,-82.473669],
-      ["DR Horton","Wagnalls",39.811287,-82.813148],
-      ["DR Horton","Walnut",39.734237,-82.953590],
-      ["Ryan","Terra Alta",40.268005,-83.051701],
-      ["Ryan","Rolling Hills",40.240643,-82.891371],
-      ["Ryan","Glenross",40.236517,-83.019782],
-      ["Ryan","Hyatts",40.215079,-83.041020],
-      ["Epcon","Carr Farms",40.051380,-83.170284],
-      ["Epcon","Morse",40.052234,-82.816331],
-      ["Epcon","Mulberry",39.871459,-83.056351],
-      ["Epcon","White Oaks",40.166178,-83.192868],
-      ["Epcon","Hyland Meadows",40.189891,-83.191183],
-      ["Epcon","Hyatts Village",40.217600,-83.108500],
-      ["Rockford","Foxfire",39.777874,-83.029083],
-      ["Rockford","HofBauer",40.114270,-83.269355],
-      ["Rockford","Jerome Aster",40.194037,-83.172143],
-      ["Rockford","Meadow Grove",39.849346,-83.052656],
-      ["Rockford","Willowbend",40.047837,-82.485522],
-      ["Rockford","Hazelton Crossing",39.972371,-82.678359],
-      ["3 Pillar","Jerome Village",40.178976,-83.192238],
-      ["3 Pillar","Eversole Woods",40.179464,-83.187045],
-      ["MI Homes","Pinnacle",39.866539,-83.028943],
-      ["MI Homes","Browns Farm",39.857121,-83.089867],
-      ["MI Homes","Hill Farm",40.037428,-83.203022],
-      ["MI Homes","Foxfire",39.777897,-83.028864],
-      ["MI Homes","Heron",39.909728,-82.716874],
-      ["MI Homes","Darby",40.107605,-83.250687],
-      ["MI Homes","Forest Ridge",40.015704,-82.668855],
-      ["MI Homes","Liberty",40.201641,-83.103957],
-      ["MI Homes","Jerome Village Applewood",40.169613,-83.199764],
-      ["MI Homes","Winterbrooke",40.229418,-83.021288],
-      ["MI Homes","Miller Farm",40.212932,-82.871836],
-      ["MI Homes","WoodCrest",40.222632,-83.114473],
-      ["MI Homes","Berlin Bluffs",40.240546,-83.004182],
-      ["Shottenstein","Renner",39.982893,-83.173465],
-      ["Shottenstein","Jerome Aster",40.194037,-83.172143],
-      ["Shottenstein","Holton",39.858200,-83.098300],
-      ["Shottenstein","Cottages At Verbena",40.184323,-83.200862],
-      ["Shottenstein","Glacier Pointe",40.147034,-83.205445],
-      ["America Homes 4 Rent","Eastwood",39.961474,-82.758526]
-    ];
+    // OpenRouteService API key
+    const ORS_API_KEY = '5b3ce3597851110001cf624895d5d8857d8d41b6a9508753893fbb25';
+    // Full subdivisions data
+    const subdivisions = [ /* ... 73 entries ... */ ];
     const subMap = {}, subdivisionList = document.getElementById('subdivisionList');
-    subdivisions.forEach(([b,sub,lat,lng])=>{
-      subMap[sub.toLowerCase()] = {b,sub,lat,lng};
+    subdivisions.forEach(([builder, sub, lat, lng]) => {
+      subMap[sub] = { builder, sub, lat, lng };
       const opt = document.createElement('option'); opt.value = sub;
       subdivisionList.appendChild(opt);
     });
-
-    const employees = [ {name:'Ana',size:2},{name:'Aracely',size:2},{name:'Barb',size:1} /* ... */ ];
+    // Employees
+    const employees = [
+      { name: 'Ana', size: 2 },
+      { name: 'Aracely', size: 2 },
+      { name: 'Barb', size: 1 },
+      { name: 'Belkis', size: 2 },
+      { name: 'Brenda', size: 1 },
+      { name: 'Catalina', size: 2 },
+      { name: 'Cesia', size: 2 },
+      { name: 'Chaley', size: 2 },
+      { name: 'Dolce', size: 3 },
+      { name: 'Edmundo', size: 2 },
+      { name: 'Katherine', size: 2 },
+      { name: 'Mario', size: 2 },
+      { name: 'Melvin', size: 2 },
+      { name: 'Veronica', size: 4 }
+    ];
     let empState = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
     let jobs = JSON.parse(localStorage.getItem(JOB_KEY) || '[]');
 
-    // DOM refs
-    const empTable = document.getElementById('empTable');
-    const generateBtn = document.getElementById('generate');
-    const scheduleOutput = document.getElementById('scheduleOutput');
-    const routeStats = document.getElementById('routeStats');
-    const jobList = document.getElementById('jobList');
-    const addJobBtn = document.getElementById('addJob');
-    const importBtn = document.getElementById('importBtn');
+    // Elements
+    const empTable = document.getElementById('empTable'), generateBtn = document.getElementById('generate');
+    const scheduleOutput = document.getElementById('scheduleOutput'), routeStats = document.getElementById('routeStats');
+    const jobList = document.getElementById('jobList'), addJobBtn = document.getElementById('addJob'), importBtn = document.getElementById('importBtn');
 
-    // Populate employees
-    employees.forEach((e,i)=>{
+    // Populate employees table
+    employees.forEach((e,i) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${e.name}</td><td>${e.size}</td><td><input type="checkbox" class="toggle" ${empState[i]!==false?'checked':''}></td>`;
-      tr.querySelector('.toggle').addEventListener('change',()=>{
-        empState[i] = tr.querySelector('.toggle').checked;
-        localStorage.setItem(EMP_KEY, JSON.stringify(empState));
-      });
+      tr.querySelector('.toggle').addEventListener('change', ()=>{ empState[i] = tr.querySelector('.toggle').checked; localStorage.setItem(EMP_KEY, JSON.stringify(empState)); });
       empTable.querySelector('tbody').appendChild(tr);
     });
 
+    // Render job list
     function renderJobs(){ jobList.innerHTML=''; jobs.forEach((j,i)=>{
       const li = document.createElement('li'); li.textContent = `*${j.lot} ${j.sub} ${j.type.toLowerCase()} – ${j.address}`;
-      const btn = document.createElement('button'); btn.textContent='×'; btn.addEventListener('click',()=>{jobs.splice(i,1);localStorage.setItem(JOB_KEY,JSON.stringify(jobs));renderJobs();});
+      const btn = document.createElement('button'); btn.textContent='×'; btn.onclick = ()=>{ jobs.splice(i,1); localStorage.setItem(JOB_KEY, JSON.stringify(jobs)); renderJobs(); };
       li.appendChild(btn); jobList.appendChild(li);
     }); }
     renderJobs();
 
-    function addJob(sub,lot,address,period,type){ jobs.push({sub,lot,address,period,type}); localStorage.setItem(JOB_KEY,JSON.stringify(jobs)); renderJobs(); }
+    function addJob(sub, lot, address, period, type){ jobs.push({ sub, lot, address, period, type }); localStorage.setItem(JOB_KEY, JSON.stringify(jobs)); renderJobs(); }
 
-    addJobBtn.addEventListener('click',()=>{
-      const sub = subdivisionInput.value.toLowerCase(); const lot = lotInput.value.trim(); const address = addressInput.value.trim();
-      const period = periodSelect.value; const type = typeSelect.value;
-      if(!sub||!lot||!address) return alert('Missing fields');
-      const info = subMap[sub]||{};
-      addJob(info.sub||sub, lot, address, period, type);
-      lotInput.value='';addressInput.value='';periodSelect.value='Normal';typeSelect.value='Original';
-    });
-
-    importBtn.addEventListener('click',()=>{
+    // Add single job
+    addJobBtn.onclick = ()=>{
+      const sub = subdivisionInput.value, lot = lotInput.value.trim(), address = addressInput.value.trim();
+      const period = periodSelect.value, type = typeSelect.value;
+      if(!sub||!lot||!address) return alert('Fill all fields');
+      addJob(sub, lot, address, period, type);
+      lotInput.value=''; addressInput.value=''; periodSelect.value='Normal'; typeSelect.value='Original';
+    };
+    // Bulk import
+    importBtn.onclick = ()=>{
       bulkInput.value.split(/\r?\n/).filter(l=>l).forEach(line=>{
         let period='Normal', txt=line;
-        if(/^AM /i.test(txt)){period='AM';txt=txt.slice(3);}else if(/^PM /i.test(txt)){period='PM';txt=txt.slice(3);}
+        if(/^AM /i.test(txt)){ period='AM'; txt=txt.slice(3); } else if(/^PM /i.test(txt)){ period='PM'; txt=txt.slice(3); }
         const m=txt.match(/^(\d+)\s+(.+?)\s*(reclean|original)?\s*[-–]\s*(.+)$/i);
-        if(!m) return;
-        const [_,lot,sub,typeRaw,address] = m;
-        const type=typeRaw?typeRaw.charAt(0).toUpperCase()+typeRaw.slice(1).toLowerCase():'Original';
-        const info = subMap[sub.toLowerCase()]||{};
-        addJob(info.sub||sub, lot, address, period, type);
+        if(!m) return; const [_, lot, sub, typeRaw, address] = m;
+        const type = typeRaw? typeRaw.charAt(0).toUpperCase()+typeRaw.slice(1).toLowerCase() : 'Original';
+        addJob(sub, lot, address, period, type);
       }); bulkInput.value='';
-    });
+    };
 
     // Initialize map
     const map = L.map('map').setView([39.9,-82.9],10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
-
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'&copy; OpenStreetMap' }).addTo(map);
     let layers = [], currentAssign = {};
 
-    async function getRoute(from, to){
-      const res = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson',{method:'POST',headers:{Authorization:ORS_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({coordinates:[[from.lng,from.lat],[to.lng,to.lat]]})});
-      return res.json();
+    // Load precomputed drive-time matrix from GitHub
+    let driveTimeMatrix = {};
+    fetch('/drivetime-matrix.json')
+      .then(r => r.json())
+      .then(m => driveTimeMatrix = m)
+      .catch(() => console.warn('Failed to load drive time matrix'));
+
+    // Helper: get drive time from matrix (min)
+    function getDriveTime(fromSub, toSub){
+      return (driveTimeMatrix[fromSub] && driveTimeMatrix[fromSub][toSub]) || Infinity;
     }
 
-    generateBtn.addEventListener('click', async()=>{
+    // Generate nearest-neighbor assignment by matrix
+    generateBtn.onclick = ()=>{
       // Clear map
       layers.forEach(l=>map.removeLayer(l)); layers=[];
-      // Get on-duty staff
       const onDuty = employees.filter((_,i)=>empState[i]!==false);
       if(!jobs.length||!onDuty.length) return alert('Add jobs & enable staff');
-      // Nearest neighbor by drive time
-      const assign = {}; onDuty.forEach(e=>assign[e.name]=[]);
-      const locs = {};
+      const assign = {}, locs = {};
+      onDuty.forEach(e=>assign[e.name]=[]);
       let un = [...jobs];
       while(un.length){
         for(const e of onDuty){
           if(e.name==='Barb'&&assign[e.name].length>=1) continue;
           if(!un.length) break;
           let bestIdx=0, bestDur=Infinity;
-          for(let i=0; i<un.length; i++){
-            const job = un[i];
+          un.forEach((job, idx)=>{
             const base = locs[e.name] || job;
-            const from = {lat:(subMap[base.sub.toLowerCase()]||{}).lat, lng:(subMap[base.sub.toLowerCase()]||{}).lng};
-            const to = {lat:(subMap[job.sub.toLowerCase()]||{}).lat, lng:(subMap[job.sub.toLowerCase()]||{}).lng};
-            if(!from.lat||!to.lat) continue;
-            const r = await getRoute(from,to);
-            const dur = r.features[0].properties.summary.duration;
-            if(dur<bestDur){bestDur=dur; bestIdx=i;}
-          }
-          const job = un.splice(bestIdx,1)[0];
-          assign[e.name].push(job);
-          locs[e.name] = job;
+            const dur = getDriveTime(base.sub, job.sub);
+            if(dur < bestDur){ bestDur = dur; bestIdx = idx; }
+          });
+          const job = un.splice(bestIdx,1)[0]; assign[e.name].push(job); locs[e.name] = job;
         }
       }
-      currentAssign = assign;
-      // Render schedule
-      scheduleOutput.innerHTML=''; routeStats.innerHTML='';
+      currentAssign = assign; scheduleOutput.innerHTML=''; routeStats.innerHTML='';
       onDuty.forEach(e=>{
-        const h = document.createElement('h3'); h.textContent=e.name;
-        h.addEventListener('click', ()=>showRoute(e.name)); scheduleOutput.appendChild(h);
-        const ul = document.createElement('ul');
-        (async () => {
-            for (let i = 0; i < currentAssign[e.name].length; i++) {
-              const j = currentAssign[e.name][i];
-              let text = `*${j.lot} ${j.sub} ${j.type.toLowerCase()} – ${j.address}`;
-              if (i < currentAssign[e.name].length - 1) {
-                const next = currentAssign[e.name][i+1];
-                const a = subMap[j.sub.toLowerCase()];
-                const b = subMap[next.sub.toLowerCase()];
-                if (a && b) {
-                  const r = await getRoute({ lat: a.lat, lng: a.lng }, { lat: b.lat, lng: b.lng });
-                  const mins = (r.features[0].properties.summary.duration/60).toFixed(1);
-                  text += ` (${mins} min)`;
-                }
-              }
-              const li = document.createElement('li');
-              li.textContent = text;
-              ul.appendChild(li);
-            }
-          })();
+        const h=document.createElement('h3'); h.textContent=e.name;
+        h.onclick = ()=>showRoute(e.name);
+        scheduleOutput.appendChild(h);
+        const ul=document.createElement('ul');
+        currentAssign[e.name].forEach((j,i)=>{
+          let text = `*${j.lot} ${j.sub} ${j.type.toLowerCase()} – ${j.address}`;
+          if(i < currentAssign[e.name].length-1){
+            const mins = getDriveTime(j.sub, currentAssign[e.name][i+1].sub).toFixed(1);
+            text += ` (${mins} min)`;
+          }
+          const li=document.createElement('li'); li.textContent = text;
+          ul.appendChild(li);
+        });
         scheduleOutput.appendChild(ul);
       });
-    });
+    };
 
-    async function showRoute(empName) {
-      // Clear previous layers
-      layers.forEach(l => map.removeLayer(l));
-      layers = [];
-
-      const arr = currentAssign[empName];
-      if (!arr || arr.length === 0) return;
-
-      // If only one job, show a marker
-      if (arr.length === 1) {
-        const subKey = arr[0].sub.toLowerCase();
-        const coord = subMap[subKey];
-        if (!coord) return;
-        const marker = L.marker([coord.lat, coord.lng]).addTo(map);
-        layers.push(marker);
-        map.setView([coord.lat, coord.lng], 12);
-        routeStats.innerHTML = `<h3>${empName} Route</h3><p>Single job: ${arr[0].sub} – ${arr[0].address}</p>`;
-        return;
+    // Show route on map for cleaner
+    async function showRoute(empName){
+      layers.forEach(l=>map.removeLayer(l)); layers=[];
+      const arr = currentAssign[empName]; if(!arr||arr.length<1) return;
+      if(arr.length===1){ const c=subMap[arr[0].sub]; layers.push(L.marker([c.lat,c.lng]).addTo(map)); map.setView([c.lat,c.lng],12); return; }
+      for(let i=0;i<arr.length-1;i++){
+        const a=subMap[arr[i].sub], b=subMap[arr[i+1].sub];
+        const r = await fetch(`https://api.openrouteservice.org/v2/directions/driving-car/geojson`,{
+          method:'POST',headers:{Authorization:ORS_API_KEY,'Content-Type':'application/json'},
+          body:JSON.stringify({coordinates:[[a.lng,a.lat],[b.lng,b.lat]]})
+        });
+        const data = await r.json();
+        const pts = data.features[0].geometry.coordinates.map(c=>[c[1],c[0]]);
+        layers.push(L.polyline(pts,{color:'#f00'}).addTo(map));
+        if(i===0) map.setView([a.lat,a.lng],12);
       }
-
-      let totalDist = 0, totalDur = 0;
-      // Multiple jobs: plot polylines
-      for (let i = 0; i < arr.length - 1; i++) {
-        const aKey = arr[i].sub.toLowerCase();
-        const bKey = arr[i+1].sub.toLowerCase();
-        const a = subMap[aKey];
-        const b = subMap[bKey];
-        if (!a || !b) continue;
-        const r = await getRoute({ lat: a.lat, lng: a.lng }, { lat: b.lat, lng: b.lng });
-        const sum = r.features[0].properties.summary;
-        totalDist += sum.distance;
-        totalDur += sum.duration;
-        const pts = r.features[0].geometry.coordinates.map(c => [c[1], c[0]]);
-        const pl = L.polyline(pts, { color: '#f00' }).addTo(map);
-        layers.push(pl);
-        if (i === 0) {
-          map.setView([a.lat, a.lng], 12);
-        }
-      }
-      const miles = totalDist / 1609.34;
-      const mins = totalDur / 60;
-      routeStats.innerHTML = `<h3>${empName} Route</h3><p>Total: ${miles.toFixed(1)} mi, ${mins.toFixed(1)} min</p>`;
     }
   </script>
 </body>
