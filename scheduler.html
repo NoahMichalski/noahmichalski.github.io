@@ -7,226 +7,229 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" crossorigin="" />
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
-    .clearfix { display: flex; align-items: flex-start; }
+    .clearfix { display: flex; }
     #map { flex: 1; height: 600px; border: 1px solid #ccc; margin-right: 20px; }
-    .sidebar { flex: 0 0 300px; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; font-size: 14px; }
-    #empTable { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-    #empTable th, #empTable td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    .sidebar { width: 300px; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 4px; text-align: center; }
     label { display: block; margin-top: 10px; font-weight: bold; }
-    input, select, button, textarea { width: 100%; padding: 6px; margin-top: 4px; font-size: 14px; box-sizing: border-box; }
+    input, select, button, textarea { width: 100%; margin-top: 4px; padding: 6px; box-sizing: border-box; }
     textarea { resize: vertical; }
-    input[type="checkbox"] { transform: scale(0.8); margin: 0; vertical-align: middle; }
-    ul#jobList { list-style: none; padding-left: 0; max-height: 150px; overflow-y: auto; border: 1px solid #ccc; margin-top: 10px; }
-    ul#jobList li { padding: 4px; border-bottom: 1px solid #eee; text-align: left; }
-    #scheduleOutput h3 { margin: 10px 0 5px; font-size: 16px; cursor: pointer; }
-    #scheduleOutput ul { list-style: none; padding-left: 0; }
-    #scheduleOutput li { margin-left: 10px; }
-    #routeStats { text-align: left; margin: 10px 0; }
+    ul { list-style: none; padding: 0; }
+    #scheduleOutput h3 { cursor: pointer; margin: 10px 0 5px; }
   </style>
 </head>
 <body>
-  <h1 style="text-align: center;">Daily Cleaning Scheduler</h1>
+  <h1>Daily Cleaning Scheduler</h1>
   <div class="clearfix">
     <div id="map"></div>
     <div class="sidebar">
-      <strong>Employees &amp; Groups</strong>
+      <h2>Employees</h2>
       <table id="empTable">
-        <thead><tr><th>Name</th><th>Size</th><th>On Duty?</th></tr></thead>
+        <thead><tr><th>Name</th><th>Size</th><th>On Duty</th></tr></thead>
         <tbody></tbody>
       </table>
-      <button id="generate">Generate Routes &amp; Schedule</button>
+      <button id="generate">Generate Routes & Schedule</button>
       <div id="scheduleOutput"></div>
       <div id="routeStats"></div>
-      <hr />
-      <strong>Add a Job</strong>
-      <label for="subdivisionInput">Subdivision</label>
-      <input id="subdivisionInput" list="subdivisionList" placeholder="Start typing..." />
-      <datalist id="subdivisionList"></datalist>
-      <label for="lotInput">Lot #</label>
-      <input id="lotInput" placeholder="#" />
-      <label for="addressInput">Address</label>
-      <input id="addressInput" placeholder="123 Main St, City, State" />
-      <label for="periodSelect">Period</label>
-      <select id="periodSelect">
-        <option value="Normal">Regular</option>
-        <option value="AM">AM Clean</option>
-        <option value="PM">PM Clean</option>
-      </select>
-      <label for="typeSelect">Job Type</label>
-      <select id="typeSelect">
-        <option value="Original">Original</option>
-        <option value="Reclean">Reclean</option>
-        <option value="Custom">Custom</option>
-      </select>
-      <label id="noteLabel" for="noteInput" style="display:none;">Note</label>
-      <input id="noteInput" placeholder="Custom job note" style="display:none;" />
+      <hr>
+      <h2>Add Job</h2>
+      <label>Subdivision</label><input id="subdivisionInput" list="subdivisionList"><datalist id="subdivisionList"></datalist>
+      <label>Lot #</label><input id="lotInput">
+      <label>Address</label><input id="addressInput">
+      <label>Period</label><select id="periodSelect"><option>Normal</option><option>AM</option><option>PM</option></select>
+      <label>Type</label><select id="typeSelect"><option>Original</option><option>Reclean</option><option>Custom</option></select>
+      <label id="noteLabel" style="display:none;">Note</label><input id="noteInput" style="display:none;">
       <button id="addJob">Add Job</button>
-      <hr />
-      <strong>Import Jobs</strong>
-      <label for="bulkInput">Paste lines like:<br>AM 4160 Price Ponds reclean - 444 Easy Street</label>
-      <textarea id="bulkInput" rows="4" placeholder="Each line: [AM/PM] Lot Subdivision [type] - Address"></textarea>
+      <hr>
+      <h2>Import Jobs</h2>
+      <textarea id="bulkInput" rows="4" placeholder="[AM/PM] Lot Subdivision [type] - Address"></textarea>
       <button id="importBtn">Import Jobs</button>
       <ul id="jobList"></ul>
     </div>
   </div>
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" crossorigin=""></script>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
     const ORS_API_KEY = '5b3ce3597851110001cf624895d5d8857d8d41b6a9508753893fbb25';
-    const EMP_KEY = 'sched_employees';
-    const JOB_KEY = 'sched_jobs';
-
-    const subdivisions = [
-      ["VIP","Home Office",40.087852,-83.063193],
-      // ... full list omitted for brevity ...
-      ["America Homes 4 Rent","Eastwood",39.961474,-82.758526]
-    ];
-    const subdivisionMap = {}, subNameMap = {};
-    subdivisions.forEach(([b, sub, lat, lng]) => {
-      subdivisionMap[sub] = { b, sub, lat, lng };
-      subNameMap[sub.toLowerCase()] = { b, sub, lat, lng };
-      const option = document.createElement('option');
-      option.value = sub;
-      document.getElementById('subdivisionList').appendChild(option);
+    const EMP_KEY = 'sched_employees', JOB_KEY = 'sched_jobs';
+    // Sample subdivisions
+    const subdivisions = [ ['Pulte','Longview',39.89768,-82.78979], ['Pulte','Bloomfield',39.70813,-82.98888] /* ... */ ];
+    const subMap = {}, subdivisionList = document.getElementById('subdivisionList');
+    subdivisions.forEach(([b,sub,lat,lng])=>{
+      subMap[sub.toLowerCase()] = {b,sub,lat,lng};
+      const opt = document.createElement('option'); opt.value = sub;
+      subdivisionList.appendChild(opt);
     });
 
-    const employees = [
-      { name: 'Ana', size: 2 }, { name: 'Aracely', size: 2 }, { name: 'Barb', size: 1 },
-      { name: 'Belkis', size: 2 }, { name: 'Brenda', size: 1 }, { name: 'Catalina', size: 2 },
-      { name: 'Cesia', size: 2 }, { name: 'Chaley', size: 2 }, { name: 'Dolce', size: 3 },
-      { name: 'Edmundo', size: 2 }, { name: 'Katherine', size: 2 }, { name: 'Mario', size: 2 },
-      { name: 'Melvin', size: 2 }, { name: 'Veronica', size: 4 }
-    ];
-
+    const employees = [ {name:'Ana',size:2},{name:'Aracely',size:2},{name:'Barb',size:1} /* ... */ ];
     let empState = JSON.parse(localStorage.getItem(EMP_KEY) || '[]');
     let jobs = JSON.parse(localStorage.getItem(JOB_KEY) || '[]');
 
-    // Populate employee table
-    const empBody = document.querySelector('#empTable tbody');
-    employees.forEach((e, i) => {
+    // DOM refs
+    const empTable = document.getElementById('empTable');
+    const generateBtn = document.getElementById('generate');
+    const scheduleOutput = document.getElementById('scheduleOutput');
+    const routeStats = document.getElementById('routeStats');
+    const jobList = document.getElementById('jobList');
+    const addJobBtn = document.getElementById('addJob');
+    const importBtn = document.getElementById('importBtn');
+
+    // Populate employees
+    employees.forEach((e,i)=>{
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${e.name}</td><td>${e.size}</td><td><input type="checkbox" ${empState[i] !== false ? 'checked' : ''} class="toggle"></td>`;
-      tr.querySelector('.toggle').addEventListener('change', () => {
+      tr.innerHTML = `<td>${e.name}</td><td>${e.size}</td><td><input type="checkbox" class="toggle" ${empState[i]!==false?'checked':''}></td>`;
+      tr.querySelector('.toggle').addEventListener('change',()=>{
         empState[i] = tr.querySelector('.toggle').checked;
         localStorage.setItem(EMP_KEY, JSON.stringify(empState));
       });
-      empBody.appendChild(tr);
+      empTable.querySelector('tbody').appendChild(tr);
     });
 
-    const jobList = document.getElementById('jobList');
-    function renderJobs() {
-      jobList.innerHTML = '';
-      jobs.forEach((j, idx) => {
-        const li = document.createElement('li');
-        li.textContent = `*${j.lot} ${j.sub} ${j.type.toLowerCase()} – ${j.address}`;
-        const rm = document.createElement('button'); rm.textContent = '×'; rm.style.marginLeft = '8px';
-        rm.addEventListener('click', () => { jobs.splice(idx, 1); localStorage.setItem(JOB_KEY, JSON.stringify(jobs)); renderJobs(); });
-        li.appendChild(rm);
-        jobList.appendChild(li);
-      });
-    }
+    function renderJobs(){ jobList.innerHTML=''; jobs.forEach((j,i)=>{
+      const li = document.createElement('li'); li.textContent = `*${j.lot} ${j.sub} ${j.type.toLowerCase()} – ${j.address}`;
+      const btn = document.createElement('button'); btn.textContent='×'; btn.addEventListener('click',()=>{jobs.splice(i,1);localStorage.setItem(JOB_KEY,JSON.stringify(jobs));renderJobs();});
+      li.appendChild(btn); jobList.appendChild(li);
+    }); }
     renderJobs();
 
-    function addJob(sub, lot, address, period, type, note) {
-      jobs.push({ sub, lot, address, period, type, note });
-      localStorage.setItem(JOB_KEY, JSON.stringify(jobs));
-      renderJobs();
-    }
+    function addJob(sub,lot,address,period,type){ jobs.push({sub,lot,address,period,type}); localStorage.setItem(JOB_KEY,JSON.stringify(jobs)); renderJobs(); }
 
-    // Single job
-    document.getElementById('addJob').addEventListener('click', () => {
-      const sub = document.getElementById('subdivisionInput').value;
-      const lot = document.getElementById('lotInput').value.trim();
-      const address = document.getElementById('addressInput').value.trim();
-      const period = document.getElementById('periodSelect').value;
-      const type = document.getElementById('typeSelect').value;
-      if (!sub || !lot || !address) return alert('Fill in all fields');
-      addJob(sub, lot, address, period, type, '');
-      document.getElementById('lotInput').value = '';
-      document.getElementById('addressInput').value = '';
-      document.getElementById('periodSelect').value = 'Normal';
-      document.getElementById('typeSelect').value = 'Original';
+    addJobBtn.addEventListener('click',()=>{
+      const sub = subdivisionInput.value.toLowerCase(); const lot = lotInput.value.trim(); const address = addressInput.value.trim();
+      const period = periodSelect.value; const type = typeSelect.value;
+      if(!sub||!lot||!address) return alert('Missing fields');
+      const info = subMap[sub]||{};
+      addJob(info.sub||sub, lot, address, period, type);
+      lotInput.value='';addressInput.value='';periodSelect.value='Normal';typeSelect.value='Original';
     });
 
-    // Bulk import
-    document.getElementById('importBtn').addEventListener('click', () => {
-      const lines = document.getElementById('bulkInput').value.split(/\r?\n/).filter(l => l.trim());
-      lines.forEach(line => {
-        let period = 'Normal';
-        const up = line.toUpperCase();
-        if (up.startsWith('AM ')) { period = 'AM'; line = line.slice(3); }
-        else if (up.startsWith('PM ')) { period = 'PM'; line = line.slice(3); }
-        const m = line.match(/^(\d+)\s+(.+?)\s*(reclean|original)?\s*[-–]\s*(.+)$/i);
-        if (!m) return;
-        const lot = m[1]; const sub = m[2].trim();
-        const type = m[3] ? m[3].charAt(0).toUpperCase() + m[3].slice(1).toLowerCase() : 'Original';
-        const address = m[4].trim();
-        addJob(sub, lot, address, period, type, '');
-      });
-      document.getElementById('bulkInput').value = '';
+    importBtn.addEventListener('click',()=>{
+      bulkInput.value.split(/\r?\n/).filter(l=>l).forEach(line=>{
+        let period='Normal', txt=line;
+        if(/^AM /i.test(txt)){period='AM';txt=txt.slice(3);}else if(/^PM /i.test(txt)){period='PM';txt=txt.slice(3);}
+        const m=txt.match(/^(\d+)\s+(.+?)\s*(reclean|original)?\s*[-–]\s*(.+)$/i);
+        if(!m) return;
+        const [_,lot,sub,typeRaw,address] = m;
+        const type=typeRaw?typeRaw.charAt(0).toUpperCase()+typeRaw.slice(1).toLowerCase():'Original';
+        const info = subMap[sub.toLowerCase()]||{};
+        addJob(info.sub||sub, lot, address, period, type);
+      }); bulkInput.value='';
     });
 
-    // Map & routing
-    const map = L.map('map').setView([39.9, -82.9], 10);
+    // Initialize map
+    const map = L.map('map').setView([39.9,-82.9],10);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
-    let layers = [], currentAssign = {}, currentOnDuty = [];
 
-    async function getRoute(a, b) {
-      const res = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
-        method: 'POST', headers: { Authorization: ORS_API_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ coordinates: [[a.lng, a.lat], [b.lng, b.lat]] })
-      });
+    let layers = [], currentAssign = {};
+
+    async function getRoute(from, to){
+      const res = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson',{method:'POST',headers:{Authorization:ORS_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({coordinates:[[from.lng,from.lat],[to.lng,to.lat]]})});
       return res.json();
     }
 
-    document.getElementById('generate').addEventListener('click', async () => {
-      layers.forEach(l => map.removeLayer(l)); layers = [];
-      const onDuty = employees.map((e, i) => empState[i] !== false ? { name: e.name, size: e.size, color: ['#e6194b','#3cb44b','#ffe119','#4363d8','#f58231','#911eb4','#46f0f0','#f032e6','#bcf60c','#fabebe','#008080','#e6beff','#9a6324','#800000'][i] } : null).filter(e => e);
-      if (!jobs.length || !onDuty.length) return alert('Add jobs & enable staff.');
-      // Simple nearest based on drive time omitted here for clarity
-      const assign = {};
-      onDuty.forEach(e => assign[e.name] = jobs.filter((_, idx) => idx % onDuty.length === onDuty.indexOf(e)));
-      currentAssign = assign; currentOnDuty = onDuty;
-      const scheduleDiv = document.getElementById('scheduleOutput'); scheduleDiv.innerHTML = '';
-      const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-      onDuty.forEach(emp => {
-        const h3 = document.createElement('h3'); h3.textContent = emp.name; h3.addEventListener('click', () => showRoute(emp.name)); scheduleDiv.appendChild(h3);
-        const d = document.createElement('div'); d.textContent = dayName; scheduleDiv.appendChild(d);
+    generateBtn.addEventListener('click', async()=>{
+      // Clear map
+      layers.forEach(l=>map.removeLayer(l)); layers=[];
+      // Get on-duty staff
+      const onDuty = employees.filter((_,i)=>empState[i]!==false);
+      if(!jobs.length||!onDuty.length) return alert('Add jobs & enable staff');
+      // Nearest neighbor by drive time
+      const assign = {}; onDuty.forEach(e=>assign[e.name]=[]);
+      const locs = {};
+      let un = [...jobs];
+      while(un.length){
+        for(const e of onDuty){
+          if(e.name==='Barb'&&assign[e.name].length>=1) continue;
+          if(!un.length) break;
+          let bestIdx=0, bestDur=Infinity;
+          for(let i=0; i<un.length; i++){
+            const job = un[i];
+            const base = locs[e.name] || job;
+            const from = {lat:(subMap[base.sub.toLowerCase()]||{}).lat, lng:(subMap[base.sub.toLowerCase()]||{}).lng};
+            const to = {lat:(subMap[job.sub.toLowerCase()]||{}).lat, lng:(subMap[job.sub.toLowerCase()]||{}).lng};
+            if(!from.lat||!to.lat) continue;
+            const r = await getRoute(from,to);
+            const dur = r.features[0].properties.summary.duration;
+            if(dur<bestDur){bestDur=dur; bestIdx=i;}
+          }
+          const job = un.splice(bestIdx,1)[0];
+          assign[e.name].push(job);
+          locs[e.name] = job;
+        }
+      }
+      currentAssign = assign;
+      // Render schedule
+      scheduleOutput.innerHTML=''; routeStats.innerHTML='';
+      onDuty.forEach(e=>{
+        const h = document.createElement('h3'); h.textContent=e.name;
+        h.addEventListener('click', ()=>showRoute(e.name)); scheduleOutput.appendChild(h);
         const ul = document.createElement('ul');
-        currentAssign[emp.name].forEach(j => { const li = document.createElement('li'); li.textContent = `*${j.lot} ${j.sub} ${j.type.toLowerCase()} – ${j.address}`; ul.appendChild(li); });
-        scheduleDiv.appendChild(ul);
+        (async () => {
+            for (let i = 0; i < currentAssign[e.name].length; i++) {
+              const j = currentAssign[e.name][i];
+              let text = `*${j.lot} ${j.sub} ${j.type.toLowerCase()} – ${j.address}`;
+              if (i < currentAssign[e.name].length - 1) {
+                const next = currentAssign[e.name][i+1];
+                const a = subMap[j.sub.toLowerCase()];
+                const b = subMap[next.sub.toLowerCase()];
+                if (a && b) {
+                  const r = await getRoute({ lat: a.lat, lng: a.lng }, { lat: b.lat, lng: b.lng });
+                  const mins = (r.features[0].properties.summary.duration/60).toFixed(1);
+                  text += ` (${mins} min)`;
+                }
+              }
+              const li = document.createElement('li');
+              li.textContent = text;
+              ul.appendChild(li);
+            }
+          })();
+        scheduleOutput.appendChild(ul);
       });
     });
 
     async function showRoute(empName) {
-      layers.forEach(l => map.removeLayer(l)); layers = [];
+      // Clear previous layers
+      layers.forEach(l => map.removeLayer(l));
+      layers = [];
+
       const arr = currentAssign[empName];
       if (!arr || arr.length === 0) return;
-      let totalDist = 0, totalDur = 0;
-      // If only one job, just show a marker
+
+      // If only one job, show a marker
       if (arr.length === 1) {
-        const coords = subdivisionMap[arr[0].sub] || subNameMap[arr[0].sub.toLowerCase()];
-        layers.push(L.marker([coords.lat, coords.lng]).addTo(map));
-        document.getElementById('routeStats').innerHTML = `<h3>${empName} Route</h3><p>Single job at ${arr[0].sub} – ${arr[0].address}</p>`;
-        map.setView([coords.lat, coords.lng], 13);
+        const subKey = arr[0].sub.toLowerCase();
+        const coord = subMap[subKey];
+        if (!coord) return;
+        const marker = L.marker([coord.lat, coord.lng]).addTo(map);
+        layers.push(marker);
+        map.setView([coord.lat, coord.lng], 12);
+        routeStats.innerHTML = `<h3>${empName} Route</h3><p>Single job: ${arr[0].sub} – ${arr[0].address}</p>`;
         return;
       }
-      // Multiple jobs: plot routes
+
+      let totalDist = 0, totalDur = 0;
+      // Multiple jobs: plot polylines
       for (let i = 0; i < arr.length - 1; i++) {
-        const fromCoords = subdivisionMap[arr[i].sub] || subNameMap[arr[i].sub.toLowerCase()];
-        const toCoords = subdivisionMap[arr[i+1].sub] || subNameMap[arr[i+1].sub.toLowerCase()];
-        const r = await getRoute({ lat: fromCoords.lat, lng: fromCoords.lng }, { lat: toCoords.lat, lng: toCoords.lng });
+        const aKey = arr[i].sub.toLowerCase();
+        const bKey = arr[i+1].sub.toLowerCase();
+        const a = subMap[aKey];
+        const b = subMap[bKey];
+        if (!a || !b) continue;
+        const r = await getRoute({ lat: a.lat, lng: a.lng }, { lat: b.lat, lng: b.lng });
         const sum = r.features[0].properties.summary;
         totalDist += sum.distance;
         totalDur += sum.duration;
         const pts = r.features[0].geometry.coordinates.map(c => [c[1], c[0]]);
-        layers.push(L.polyline(pts, { color: currentOnDuty.find(e => e.name === empName).color }).addTo(map));
+        const pl = L.polyline(pts, { color: '#f00' }).addTo(map);
+        layers.push(pl);
+        if (i === 0) {
+          map.setView([a.lat, a.lng], 12);
+        }
       }
-      // Center map on first job
-      const start = subdivisionMap[arr[0].sub] || subNameMap[arr[0].sub.toLowerCase()];
-      map.setView([start.lat, start.lng], 13);
       const miles = totalDist / 1609.34;
       const mins = totalDur / 60;
-      document.getElementById('routeStats').innerHTML = `<h3>${empName} Route</h3><p>Total: ${miles.toFixed(1)} mi, ${mins.toFixed(1)} min</p>`;
+      routeStats.innerHTML = `<h3>${empName} Route</h3><p>Total: ${miles.toFixed(1)} mi, ${mins.toFixed(1)} min</p>`;
     }
   </script>
 </body>
