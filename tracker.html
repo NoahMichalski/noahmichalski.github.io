@@ -6,54 +6,29 @@
   <title>Real-time Group Tracker</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <style>
-    /* Reset and base */
     *, *::before, *::after { box-sizing: border-box; }
     body, html { margin: 0; padding: 0; height: 100%; font-family: Arial, sans-serif; }
-
-    /* Login screen styles */
+    #mapContainer { display: none; height: 100%; flex-direction: row; }
+    #sidebar { width: 200px; background: #f4f4f4; border-right: 1px solid #ddd; padding: 8px; overflow-y: auto; }
+    #sidebar h3 { margin-top: 0; }
+    #sidebar ul { list-style: none; padding: 0; }
+    #sidebar li { margin-bottom: 8px; font-size: 0.9rem; }
+    #main { flex: 1; display: flex; flex-direction: column; }
+    #controls { display: flex; flex-wrap: wrap; align-items: center; padding: 8px; background: #f8f8f8; border-bottom: 1px solid #ddd; }
+    #controls > * { margin: 4px 8px 4px 0; }
+    #map { flex: 1; }
     #login { display: flex; flex-direction: column; align-items: stretch; justify-content: center; height: 100%; padding: 0 16px; }
     #login h2 { text-align: center; margin-bottom: 16px; font-size: 1.5rem; }
-    #login input { margin: 8px 0; padding: 12px; font-size: 1rem; }
-    #login button { padding: 12px; font-size: 1rem; margin-top: 8px; }
+    #login input, #login button { margin: 8px 0; padding: 12px; font-size: 1rem; }
     #loginError { color: red; margin-top: 8px; text-align: center; }
-
-    /* Main container hidden initially */
-    #mapContainer { display: none; height: 100%; flex-direction: column; }
-
-    /* Controls bar */
-    #controls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      padding: 8px;
-      background: #f8f8f8;
-      border-bottom: 1px solid #ddd;
-    }
-    #controls label { flex: 1 1 auto; margin-right: 8px; font-size: 1rem; }
-    #controls select, #controls button {
-      flex: 1 1 48%;
-      margin: 4px 1%;
-      padding: 12px;
-      font-size: 1rem;
-    }
-    #controls button#logoutBtn { margin-left: auto; flex: 1 1 auto; background: #d9534f; color: white; }
-
-    /* Map takes remaining space */
-    #map { width: 100%; flex: 1 1 auto; }
-
-    /* Media query for larger screens */
-    @media (min-width: 600px) {
-      #controls {
-        flex-wrap: nowrap;
-      }
-      #controls select { flex: 0 0 20%; margin-right: 8px; }
-      #controls button { flex: 0 0 auto; margin: 0 8px 0 0; }
-      #controls button#logoutBtn { margin-left: auto; }
+    @media (max-width: 600px) {
+      #mapContainer { flex-direction: column; }
+      #sidebar { width: 100%; height: 120px; border-right: none; border-bottom: 1px solid #ddd; }
+      #main { height: calc(100% - 120px); }
     }
   </style>
 </head>
 <body>
-  <!-- Login Screen -->
   <div id="login">
     <h2>Tracker Login</h2>
     <input type="text" id="username" placeholder="Username" />
@@ -61,129 +36,123 @@
     <button id="loginBtn">Login</button>
     <div id="loginError"></div>
   </div>
-
-  <!-- Main Map Container -->
   <div id="mapContainer">
-    <div id="controls">
-      <label for="groupSelect">Select Group</label>
-      <select id="groupSelect"></select>
-      <button id="startTrack">Clock In</button>
-      <button id="stopTrack" disabled>Clock Out</button>
-      <button id="logoutBtn">Logout</button>
+    <div id="sidebar">
+      <h3>Crews</h3>
+      <button id="requestUpdate" style="width:100%; padding:8px; margin-bottom:8px;">Request Update</button>
+      <ul id="crewList"></ul>
     </div>
-    <div id="map"></div>
+    <div id="main">
+      <div id="controls">
+        <label for="groupSelect" id="groupLabel">Select Group</label>
+        <select id="groupSelect"></select>
+        <button id="startTrack">Clock In</button>
+        <button id="stopTrack" disabled>Clock Out</button>
+        <button id="logoutBtn">Logout</button>
+      </div>
+      <div id="map"></div>
+    </div>
   </div>
-
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
     const ORS_KEY = '5b3ce3597851110001cf624895d5d8857d8d41b6a9508753893fbb25';
     const users = {
       'lead1': { password: 'pass1', role: 'lead', group: 'group-1' },
-      'lead2': { password: 'pass2', role: 'lead', group: 'group-2' },
-      // ... up to lead8
+      'lead8': { password: 'pass8', role: 'lead', group: 'group-8' },
       'supervisor': { password: 'adminpass', role: 'supervisor' }
     };
-
-    // Elements
+    let currentUser = null, watchId = null, lastCoords = null;
+    let map, marker, routeLayer, positionsLayer;
     const loginDiv = document.getElementById('login');
     const mapContainer = document.getElementById('mapContainer');
+    const sidebar = document.getElementById('sidebar');
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const loginError = document.getElementById('loginError');
     const userSelect = document.getElementById('groupSelect');
+    const groupLabel = document.getElementById('groupLabel');
     const startBtn = document.getElementById('startTrack');
     const stopBtn = document.getElementById('stopTrack');
-
-    let currentUser = null;
-    let watchId = null;
-    let lastCoords = null;
-    let map, marker, routeLayer;
-
+    const updateBtn = document.getElementById('requestUpdate');
+    const crewList = document.getElementById('crewList');
     function initMap() {
       map = L.map('map').setView([0, 0], 2);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
       marker = L.marker([0, 0]).addTo(map);
       routeLayer = L.layerGroup().addTo(map);
+      positionsLayer = L.layerGroup().addTo(map);
     }
-
-    function populateGroups() {
-      userSelect.innerHTML = '';
+    function resetUI() {
+      if (crewList) crewList.innerHTML = '';
+      if (routeLayer) routeLayer.clearLayers();
+      if (positionsLayer) positionsLayer.clearLayers();
+      lastCoords = null;
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    }
+    function populateUI() {
       if (currentUser.role === 'supervisor') {
-        for (let i = 1; i <= 8; i++) {
-          const opt = document.createElement('option');
-          opt.value = `group-${i}`;
-          opt.textContent = `Group ${i}`;
-          userSelect.appendChild(opt);
-        }
+        sidebar.style.display = 'block'; groupLabel.style.display = 'none'; userSelect.style.display = 'none'; startBtn.style.display = 'none'; stopBtn.style.display = 'none'; updateBtn.style.display = 'block';
       } else {
-        const opt = document.createElement('option');
-        opt.value = currentUser.group;
-        opt.textContent = currentUser.group.replace('-', ' ').toUpperCase();
-        userSelect.appendChild(opt);
+        sidebar.style.display = 'none'; groupLabel.style.display = 'inline'; userSelect.style.display = 'inline'; startBtn.style.display = 'inline'; stopBtn.style.display = 'inline'; updateBtn.style.display = 'none';
+        userSelect.innerHTML = `<option value="${currentUser.group}">${currentUser.group.replace('-', ' ').toUpperCase()}</option>`;
         userSelect.disabled = true;
       }
     }
-
     loginBtn.addEventListener('click', () => {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const user = users[username];
-      if (user && user.password === password) {
+      const user = users[document.getElementById('username').value];
+      const pass = document.getElementById('password').value;
+      if (user && user.password === pass) {
         currentUser = user;
         loginDiv.style.display = 'none';
         mapContainer.style.display = 'flex';
         initMap();
-        populateGroups();
+        resetUI();
+        populateUI();
       } else {
         loginError.textContent = 'Invalid username or password';
       }
     });
-
     logoutBtn.addEventListener('click', () => {
-      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-      map && map.remove();
-      currentUser = null;
-      loginDiv.style.display = 'flex';
-      mapContainer.style.display = 'none';
-      document.getElementById('username').value = '';
-      document.getElementById('password').value = '';
-      loginError.textContent = '';
+      resetUI(); map && map.remove(); loginDiv.style.display = 'flex'; mapContainer.style.display = 'none'; loginError.textContent = ''; currentUser = null;
     });
-
     startBtn.addEventListener('click', () => {
-      const groupId = userSelect.value;
-      lastCoords = null;
-      routeLayer.clearLayers();
-      watchId = navigator.geolocation.watchPosition(async (pos) => {
+      watchId = navigator.geolocation.watchPosition(async pos => {
         const { latitude: lat, longitude: lon } = pos.coords;
-        marker.setLatLng([lat, lon]);
-        map.setView([lat, lon], 14);
-        fetch('/track', {
-          method: 'POST', headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ groupId, lat, lon, timestamp: new Date().toISOString() })
-        }).catch(console.error);
+        marker.setLatLng([lat, lon]); map.setView([lat, lon], 14);
+        fetch('/track', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ groupId: currentUser.group, lat, lon, timestamp: new Date().toISOString() }) });
         if (lastCoords) {
           try {
-            const res = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
-              method: 'POST', headers: {'Content-Type':'application/json','Authorization':ORS_KEY},
-              body: JSON.stringify({ coordinates: [[lastCoords.lon, lastCoords.lat],[lon,lat]] })
-            });
-            const geojson = await res.json();
-            L.geoJSON(geojson, { weight: 4 }).addTo(routeLayer);
+            const res = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson',{ method:'POST', headers:{'Content-Type':'application/json','Authorization':ORS_KEY}, body:JSON.stringify({coordinates:[[lastCoords.lon,lastCoords.lat],[lon,lat]]})});
+            const geo = await res.json(); L.geoJSON(geo,{ weight: 4 }).addTo(routeLayer);
           } catch (e) { console.error(e); }
         }
         lastCoords = { lat, lon };
-      }, err => alert('Location error: '+err.message), { enableHighAccuracy:true, maximumAge:0, timeout:10000 });
+      }, err => alert('Location error:' + err.message), { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 });
       startBtn.disabled = true; stopBtn.disabled = false;
     });
-
-    stopBtn.addEventListener('click', () => {
-      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-      watchId = null;
-      startBtn.disabled = false; stopBtn.disabled = true;
+    stopBtn.addEventListener('click', () => { if (watchId !== null) navigator.geolocation.clearWatch(watchId); watchId = null; startBtn.disabled = false; stopBtn.disabled = true; });
+    updateBtn.addEventListener('click', async () => {
+      resetUI();
+      for (let i = 1; i <= 8; i++) {
+        try {
+          const groupId = `group-${i}`;
+          const res = await fetch(`/positions?group=${groupId}`);
+          const points = await res.json();
+          if (points && points.length) {
+            const last = points[points.length - 1];
+            L.marker([last.lat, last.lon]).addTo(positionsLayer).bindPopup(`${groupId} - ${new Date(last.timestamp).toLocaleTimeString()}`);
+            const li = document.createElement('li'); li.textContent = `${groupId}: ${new Date(last.timestamp).toLocaleTimeString()}`; crewList.appendChild(li);
+          } else {
+            const li = document.createElement('li'); li.textContent = `${groupId}: no data`; crewList.appendChild(li);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      const bounds = positionsLayer.getBounds(); if (bounds.isValid()) map.fitBounds(bounds.pad(0.2));
     });
   </script>
 </body>
