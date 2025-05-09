@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Today's Jobs & Crew Assignment</title>
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css" />
+  <style>
+    body { display: flex; font-family: Arial, sans-serif; margin: 0; height: 100vh; }
+    #crew-sidebar { width: 300px; background: #f4f4f4; padding: 10px; border-right: 1px solid #ccc; overflow-y: auto; }
+    .form-control, .crew-member { display: block; width: 100%; margin: 5px 0; padding: 8px; border: 1px solid #aaa; border-radius: 4px; background: #fff; box-sizing: border-box; }
+    .crew-member { cursor: grab; }
+    #add-job-btn, #save-btn { width: 100%; margin-top: 10px; padding: 8px; }
+    #jobs-container { flex: 1; padding: 10px; }
+    #jobs-table tbody tr.drag-over { background-color: #e0f7fa; }
+    a { color: #0066cc; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div id="crew-sidebar">
+    <h3>Today's Job Setup</h3>
+    <label for="job-select">Select Subdivision:</label>
+    <select id="job-select" class="form-control"></select>
+    <label for="lot-input">Lot Number:</label>
+    <input id="lot-input" type="text" class="form-control" placeholder="Enter lot number" />
+    <button id="add-job-btn">Add Job</button>
+    <h3>Crews</h3>
+    <div id="crew-list">
+      <div class="crew-member" draggable="true" data-crew="Crew A">Crew A</div>
+      <div class="crew-member" draggable="true" data-crew="Crew B">Crew B</div>
+      <div class="crew-member" draggable="true" data-crew="Crew C">Crew C</div>
+    </div>
+    <button id="save-btn">Save Assignments</button>
+  </div>
+
+  <div id="jobs-container">
+    <table id="jobs-table" class="display" style="width:100%">
+      <thead>
+        <tr>
+          <th>Builder</th>
+          <th>Subdivision</th>
+          <th>Lot</th>
+          <th>Coordinates</th>
+          <th>Lot Map</th>
+          <th>Assigned Crew</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+  <!-- Dropbox SDK -->
+  <script src="https://unpkg.com/dropbox/dist/Dropbox-sdk.min.js"></script>
+  <!-- Jobs data module -->
+  <script type="module">
+    import { jobs } from './jobs.js';
+    window.jobs = jobs;
+  </script>
+  <script>
+    $(function() {
+      const DROPBOX_TOKEN = 'sl.u.AFs2inAQwySRzpof7lPQFvC3JNg3WDaLyIWEExO7vC6-ybrwc-jESHFVMneuClTFnRwhtdYD7pLYyWX463RCsy0Ym2EqhFNMZJtPW2pgILb63bs1yvC_j3iycUMJg1Dypg3S6kc6n4jfzbba62qkdI5UjrX7Rdg5Wb7hvqMpprtEb0f9fh6CgOSTBzw1FhdAFtzgbL_Y8vQkDIc1Zy0FsxjBaWwBtfAFf5hpyah8Alc3ie1K0a7FG0PQkDbGFjxsl99zwsYkyA9R3GzqKqKGZegz0ur3LuaJIMBwxjcZ1SFVqGKVrqRk2UOGZroit65kJVNEOwHK96VsIsuQBGsgxHcXakR6T988P_JsqlI3-lPpH9VMdeovsfr2WWUI3osTBt76G7WCm-ajvt8zJZq45B-lmA6ZE73njkrAr1BLaaj0lEcQunkoNT06t3IkEZ1zEKCQ6jk3Bq5bcXGoKKv9TpFMDFKCGJ8zVwh-fKY5SPM2m3m0oUKJppXKmFkIv15kK83df1aZhfeIDnvVEOli50kADWg4ynrqINes1I1nL3qtQ3iT-t7bbvBJf1shOaHW2fMPqiwwZTF2sqKhk20JmScYVuXHDP3liZFFq0I7WwL1_f6IaKBqgvV7HAro6EvCjr0cZJDIxvu1KmJk76x5zXFFcLaPyxLpjsB6t5GuLRKvvYDKQHw0hDRv8xHO2TfumqhZpTzLMTyQFBB3Aoia8NjmDVShYfZhXC7f6YlRmsNYrEze2oiezTuVhrcil7qg60LubxMJ293TA7BCvwgaaGAYUIjrhNZLlf5ES4Yv36xv85C33oWkFSmYT6ZsofQOazC_blmaraDc8X6dvSRfurjEAxbWcyYkD473IcGMBFNj9o1-jRTZaAB5r8HuqxSXojbvBvF1_7NeYt268CdUQ7jk67gGhtJIO4Ia16FVr_tbvOx-VGS018vnHjBjF6MNRbFkRu1kp9MLMNJ-LRhoCoWPA-tvs93gKsBWI2-3cCJs0lRh2Bm9kTJd1w3BGJIoyst1uHZ6piLMJ6er58R8FvK60cr1nYWV39MIHi5wGW3BH17heyB3SvkXzmVCIOADz4qflOYsF_GoEPXJ_osMsaS5OMWLNaOP8opR6BD9mND8luw38l6cUHtnaS0Xor5kB5XBIVzl61ZTe1KKZroNJi29SxZ9nsemgVOeUlXprnVVmqd7rZR9JVlTzpQXSpCk33_rzVWmkjQb8kbcmQr0eIOrEwe7jb5bJ0mC5aVQaxuQTdde2fDZNS30Ipy0yNIQ7eJOWf9mSffHS9ih_zCA4-zvHVz4xlLkOD4c37dcp-NFDv_1XzUaBnupSkdoenkLvPRTSVBa3Te0pr9WuXNgeIKHlWYzLMgsxQhQUQnofBdDE7D1BK6ana4lL7WV4NBnu-ydno39ND3uljYWWdy8BwicdfYJaxT2dnRLIRWJTgiImg';
+      const dbx = new Dropbox.Dropbox({ fetch: fetch, accessToken: DROPBOX_TOKEN });
+
+      const table = $('#jobs-table').DataTable({ paging: false, info: false });
+
+      // Populate subdivision dropdown
+      window.jobs.forEach(job => {
+        $('#job-select').append(`<option value="${job.id}">${job.builder} - ${job.subdivision}</option>`);
+      });
+
+      // Load existing schedule
+      dbx.filesDownload({ path: '/todayAssignments.json' })
+        .then(res => res.fileBlob.text())
+        .then(text => JSON.parse(text))
+        .then(saved => saved.forEach(item => addRow(item.jobId, item.lot, item.crew)))
+        .catch(() => console.log('No existing schedule'));
+
+      function addRow(id, lot, crew) {
+        const job = window.jobs.find(j => j.id === id);
+        if (!job) return;
+        const coordLink = `<a href="https://www.google.com/maps?q=${job.lat},${job.lng}" target="_blank">${job.lat}, ${job.lng}</a>`;
+        const mapCell = job.lotMap ? `<a href="${job.lotMap}" target="_blank">View Map</a>` : 'No map available';
+        const rowNode = table.row.add([job.builder, job.subdivision, lot||'', coordLink, mapCell, crew||'']).draw(false).node();
+        $(rowNode).attr('data-job', id).find('td:last').addClass('assignment-cell');
+      }
+
+      // Add new job
+      $('#add-job-btn').on('click', () => {
+        const id = +$('#job-select').val();
+        const lot = $('#lot-input').val().trim();
+        addRow(id, lot, null);
+        $('#lot-input').val('');
+      });
+
+      // Crew assignment drag & drop
+      let dragged;
+      $('.crew-member').on('dragstart', e => dragged = e.target.dataset.crew);
+      $('#jobs-table tbody')
+        .on('dragover', 'tr', e => { e.preventDefault(); $(e.currentTarget).addClass('drag-over'); })
+        .on('dragleave', 'tr', e => $(e.currentTarget).removeClass('drag-over'))
+        .on('drop', 'tr', function(e) {
+          e.preventDefault(); $(this).removeClass('drag-over');
+          $(this).find('.assignment-cell').text(dragged);
+        });
+
+      // Save to Dropbox
+      $('#save-btn').on('click', () => {
+        const assignments = table.rows().data().toArray().map((r,i) => ({ jobId: +$(table.row(i).node()).attr('data-job'), lot: r[2], crew: r[5]||null }));
+        const content = JSON.stringify(assignments, null, 2);
+        dbx.filesUpload({ path: '/todayAssignments.json', contents: content, mode: { '.tag': 'overwrite' } })
+          .then(() => alert('Schedule saved to Dropbox'))
+          .catch(err => alert('Save error: '+err));
+      });
+    });
+  </script>
+</body>
+</html>
