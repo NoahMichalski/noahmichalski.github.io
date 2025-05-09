@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job List & Crew Assignment</title>
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css" />
+  <style>
+    body { display: flex; font-family: Arial, sans-serif; margin: 0; height: 100vh; }
+    #crew-sidebar { width: 220px; background: #f4f4f4; padding: 10px; border-right: 1px solid #ccc; overflow-y: auto; }
+    .crew-member { background: #fff; margin: 5px 0; padding: 8px; border: 1px solid #aaa; border-radius: 4px; cursor: grab; }
+    #jobs-container { flex: 1; padding: 10px; }
+    #jobs-table tbody tr.drag-over { background-color: #e0f7fa; }
+    #save-btn { margin-top: 10px; padding: 8px 16px; }
+    a { color: #0066cc; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div id="crew-sidebar">
+    <h3>Crews</h3>
+    <div id="crew-list">
+      <div class="crew-member" draggable="true" data-crew="Crew A">Crew A</div>
+      <div class="crew-member" draggable="true" data-crew="Crew B">Crew B</div>
+      <div class="crew-member" draggable="true" data-crew="Crew C">Crew C</div>
+    </div>
+    <button id="save-btn">Save Assignments</button>
+  </div>
+
+  <div id="jobs-container">
+    <table id="jobs-table" class="display" style="width:100%">
+      <thead>
+        <tr>
+          <th>Builder</th>
+          <th>Subdivision</th>
+          <th>Coordinates</th>
+          <th>Lot Map</th>
+          <th>Assigned Crew</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Load jQuery & DataTables -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+
+  <!-- Import jobs array as module and attach to window -->
+  <script type="module">
+    import { jobs } from './jobs.js';
+    window.jobs = jobs;
+  </script>
+
+  <!-- Main script -->
+  <script>
+    $(document).ready(function () {
+      const table = $('#jobs-table').DataTable({ paging: false, info: false });
+
+      if (!Array.isArray(window.jobs)) {
+        console.error('jobs.js not loaded or jobs array missing');
+        return;
+      }
+
+      window.jobs.forEach(job => {
+        const coordLink = `<a href="https://www.google.com/maps?q=${job.lat},${job.lng}" target="_blank">${job.lat}, ${job.lng}</a>`;
+        const mapCell = job.lotMap ? `<a href="${job.lotMap}" target="_blank">View Map</a>` : 'No map available';
+
+        const rowNode = table.row.add([
+          job.builder,
+          job.subdivision,
+          coordLink,
+          mapCell,
+          ''
+        ]).draw(false).node();
+
+        $(rowNode).attr('data-job', job.id).find('td:last').addClass('assignment-cell');
+      });
+
+      let draggedCrew = null;
+      $('.crew-member').on('dragstart', function (e) {
+        draggedCrew = $(this).data('crew');
+        e.originalEvent.dataTransfer.setData('text/plain', draggedCrew);
+      });
+
+      $('#jobs-table tbody')
+        .on('dragover', 'tr', function (e) { e.preventDefault(); $(this).addClass('drag-over'); })
+        .on('dragleave', 'tr', function () { $(this).removeClass('drag-over'); })
+        .on('drop', 'tr', function (e) {
+          e.preventDefault();
+          $(this).removeClass('drag-over');
+          const crew = e.originalEvent.dataTransfer.getData('text/plain');
+          $(this).find('.assignment-cell').text(crew);
+        });
+
+      $('#save-btn').on('click', () => {
+        const assignments = window.jobs.map(job => ({ jobId: job.id, crew: $(`[data-job="${job.id}"] .assignment-cell`).text() || null }));
+        localStorage.setItem('jobAssignments', JSON.stringify(assignments));
+        alert('Assignments saved!');
+      });
+
+      const saved = JSON.parse(localStorage.getItem('jobAssignments') || '[]');
+      saved.forEach(item => {
+        $(`[data-job="${item.jobId}"] .assignment-cell`).text(item.crew);
+      });
+    });
+  </script>
+</body>
+</html>
