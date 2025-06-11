@@ -2,41 +2,152 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Builder Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <style>
-    #map { width: 100vw; height: 100vh; }
-    .search-box { position: absolute; top:10px; left:50%; transform:translateX(-50%); z-index:1001; background:white; padding:6px 10px; border:1px solid #ccc; border-radius:6px; }
-    .builder-toggles { position: absolute; top:50px; right:10px; z-index:1001; background:white; padding:12px 16px; border:1px solid #aaa; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.2); max-height:70vh; overflow-y:auto; font-family:sans-serif; }
-    .legend { position:absolute; bottom:10px; right:10px; z-index:1001; background:white; padding:12px 16px; border:1px solid #aaa; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.2); font-family:sans-serif; }
-    #toggle-ui-btn { position:absolute; top:10px; right:10px; z-index:1002; padding:6px 10px; background:#fff; border:1px solid #aaa; border-radius:4px; cursor:pointer; }
+    /* Base Styles */
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+    #map { width: 100%; height: 100%; }
+
+    /* Search Box */
+    .search-box {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1001;
+      width: 90vw;
+      max-width: 360px;
+    }
+    #searchInput {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    .search-results {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      z-index: 1002;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .search-results li {
+      padding: 12px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .search-results li:hover {
+      background: #f0f0f0;
+    }
+
+    /* Toggle Buttons */
+    #toggle-ui-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1002;
+      padding: 10px 14px;
+      font-size: 1em;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #aaa;
+      border-radius: 6px;
+    }
+
+    /* Builder Toggles & Legend */
+    .builder-toggles, .legend {
+      position: absolute;
+      z-index: 1001;
+      background: rgba(255,255,255,0.95);
+      padding: 12px;
+      border: 1px solid #aaa;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      font-family: sans-serif;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    .builder-toggles {
+      top: 60px;
+      right: 10px;
+      width: 200px;
+    }
+    .legend {
+      bottom: 10px;
+      right: 10px;
+      width: 140px;
+      font-size: 0.9em;
+    }
+
+    /* Mobile Adjustments */
+    @media (max-width: 600px) {
+      .builder-toggles {
+        bottom: 60px;
+        top: auto;
+        right: 5%;
+        left: 5%;
+        width: 90%;
+        max-height: 30vh;
+        overflow-y: scroll;
+      }
+      .legend {
+        bottom: 10px;
+        right: auto;
+        left: 5%;
+        width: 90%;
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .legend span { flex: 1 1 50%; margin-bottom: 4px; }
+      #toggle-ui-btn {
+        top: 10px;
+        right: 10px;
+        padding: 12px 16px;
+        font-size: 1.1em;
+      }
+      .search-box {
+        top: 10px;
+        width: 95vw;
+      }
+      #searchInput { font-size: 1.1em; padding: 10px 14px; }
+      .search-results li { padding: 14px; font-size: 1.1em; }
+    }
   </style>
 </head>
 <body>
   <button id="toggle-ui-btn">Hide Controls</button>
   <div class="search-box">
-    <input id="searchInput" list="subdivisionList" placeholder="🔍 Search subdivisions..." style="width:250px;padding:4px;" />
-    <datalist id="subdivisionList"></datalist>
+    <input id="searchInput" type="text" placeholder="🔍 Search subdivisions..." autocomplete="off" />
+    <ul id="searchResults" class="search-results"></ul>
   </div>
   <div class="builder-toggles" id="builderToggles"></div>
   <div class="legend" id="legendBox">
     <strong>Builder Legend</strong><br>
-    <span style="color:green;">●</span> Pulte<br>
-    <span style="color:violet;">●</span> Ryan<br>
-    <span style="color:black;">●</span> DR Horton<br>
-    <span style="color:gold;">●</span> Epcon<br>
-    <span style="color:red;">●</span> Shottenstein<br>
-    <span style="color:blue;">●</span> Rockford<br>
-    <span style="color:orange;">●</span> 3 Pillar<br>
-    <span style="color:grey;">●</span> MI Homes<br>
-    <span style="color:yellow;">●</span> America Homes 4 Rent
+    <span style="color:green;">● Pulte</span>
+    <span style="color:violet;">● Ryan</span>
+    <span style="color:black;">● DR Horton</span>
+    <span style="color:gold;">● Epcon</span>
+    <span style="color:red;">● Shottenstein</span>
+    <span style="color:blue;">● Rockford</span>
+    <span style="color:orange;">● 3 Pillar</span>
+    <span style="color:grey;">● MI Homes</span>
+    <span style="color:yellow;">● America Homes 4 Rent</span>
   </div>
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
-    // UI toggles
     const toggleBtn = document.getElementById('toggle-ui-btn');
     const togglesDiv = document.getElementById('builderToggles');
     const legendBox = document.getElementById('legendBox');
@@ -48,8 +159,7 @@
       toggleBtn.textContent = controlsVisible ? 'Hide Controls' : 'Show Controls';
     });
 
-    // Lot map links (replace with your entries)
-    const lotMapLinks = {"Pulte|Abberley": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=85575928-6f84-4406-9f8d-d3218f666398&noheader",
+    const lotMapLinks = { "Pulte|Abberley": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=85575928-6f84-4406-9f8d-d3218f666398&noheader",
   "Pulte|Bloomfield": "https://apps.alpha-vision.com/alphamap/index.html?OLAId=a16b941a-1563-49de-9c54-fdb6ff3c0d00&noheader",
   "Pulte|Clarkshaw": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=cec414d9-3a84-47b6-8cf4-ad0e8ac23475&noheader",
   "Pulte|Glenross": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=cvaQ4NvhexgNTDjDz5OFxw==&languageId=1&noheader",
@@ -123,11 +233,8 @@
   "Shottenstein|Cottages At Verbana": "https://schottensteinhomes.com/wp-content/uploads/2022/12/cottages-at-verbena-siteplan.jpg",
   "Shottenstein|Glacier Pointe": "https://schottensteinhomes.com/wp-content/uploads/2024/09/Glacier-Pointe-View-Available-Lots.png",
   "America Homes 4 Rent|Eastwood": "No Map",
-                        
                         };
-
-    // Marker data (replace with your entries)
-    const markerData = [["VIP","Home Office","6407 Nicholas Dr",40.087852,-83.063193],
+    const markerData = [ ["VIP","Home Office","6407 Nicholas Dr",40.087852,-83.063193],
       ["Pulte","Abberley","3384 Abberley Drive, New Albany, OH 43054",40.052873,-82.816503],
   ["Pulte","Bloomfield","5002 Roese Ave, South Bloomfield, OH 43103",39.708129,-82.988884],
   ["Pulte","Clarkshaw","3411 Tender Avenue, Powell, OH 43065",40.223191,-83.104699],
@@ -201,150 +308,105 @@
   ["Shottenstein","Holton","3600 Whirla Way, Grove City, OH",39.858200,-83.098300],
   ["Shottenstein","Cottages At Verbana","11738 Verbena Place, Plain City, OH 43064",40.184323,-83.200862],
   ["Shottenstein","Glacier Pointe","8798 Eliot Drive, Plain City, OH 43064",40.147034, -83.205445],
-  ["America Homes 4 Rent","Eastwood","9045 Lucy Drive, Reynoldsburg, OH",39.961474,-82.758526] ];
+  ["America Homes 4 Rent","Eastwood","9045 Lucy Drive, Reynoldsburg, OH",39.961474,-82.758526]
+                       ];
+    const colorMap = { 'Pulte':'green','Ryan':'violet','DR Horton':'black','Epcon':'gold','Shottenstein':'red','Rockford':'blue','3 Pillar':'orange','MI Homes':'grey','America Homes 4 Rent':'yellow' };
 
-    const colorMap = {
-      'Pulte':'green','Ryan':'violet','DR Horton':'black','Epcon':'gold',
-      'Shottenstein':'red','Rockford':'blue','3 Pillar':'orange',
-      'MI Homes':'grey','America Homes 4 Rent':'yellow'
-    };
-
-    // Initialize map
     const map = L.map('map').setView([40.05, -83.0], 10);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
     const routeLayer = L.layerGroup().addTo(map);
-    let currentOrigin;
 
-    // Build markers and groups
     const builderGroups = {};
     const markers = markerData.map(item => {
       const [builder, name, addr, lat, lon] = item || [];
       if (![builder,name,addr,lat,lon].every(v => v !== undefined)) return null;
-      const icon = L.icon({
-        iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${colorMap[builder]||'blue'}.png`,
-        shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-        iconSize:[25,41], iconAnchor:[12,41], popupAnchor:[1,-34]
-      });
+      const icon = L.icon({ iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${colorMap[builder]||'blue'}.png`, shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png', iconSize:[25,41], iconAnchor:[12,41], popupAnchor:[1,-34] });
       const marker = L.marker([lat, lon], { icon }).addTo(map).bindTooltip(name, { direction: 'top' });
-      if (!builderGroups[builder]) builderGroups[builder] = L.layerGroup().addTo(map);
+      builderGroups[builder] = builderGroups[builder] || L.layerGroup().addTo(map);
       builderGroups[builder].addLayer(marker);
       return { builder, name, addr, lat, lon, marker };
     }).filter(m => m);
 
-    // Populate search suggestions
-    const datalist = document.getElementById('subdivisionList');
-    markers.forEach(m => {
-      const option = document.createElement('option');
-      option.value = m.name;
-      datalist.appendChild(option);
+    const searchInput = document.getElementById('searchInput');
+    const searchResults = document.getElementById('searchResults');
+    searchInput.addEventListener('input', function() {
+      const query = this.value.toLowerCase().trim();
+      searchResults.innerHTML = '';
+      if (!query) return;
+      const matches = markers.filter(m => m.name.toLowerCase().includes(query));
+      matches.forEach(m => {
+        const li = document.createElement('li');
+        li.textContent = m.name;
+        li.addEventListener('mousedown', () => {
+          searchInput.value = m.name;
+          searchResults.innerHTML = '';
+          map.setView([m.lat, m.lon], 14);
+          m.marker.fire('click');
+        });
+        searchResults.appendChild(li);
+      });
     });
+    searchInput.addEventListener('blur', () => setTimeout(() => { searchResults.innerHTML = ''; }, 100));
 
-    // Marker click handler (full routing and link logic)
-    markers.forEach(m => {
-      const { builder, name, addr, lat, lon, marker } = m;
+    markers.forEach(({ builder, name, addr, lat, lon, marker }) => {
       marker.on('click', () => {
         routeLayer.clearLayers();
-        currentOrigin = { lat, lon };
-
-        const nearest = markers
-          .filter(x => x.marker !== marker)
+        const origin = { lat, lon };
+        const nearest = markers.filter(x => x.marker !== marker)
           .map(x => ({ ...x, dist: map.distance([lat, lon], [x.lat, x.lon]) }))
-          .sort((a,b) => a.dist - b.dist)
-          .slice(0,5);
-
+          .sort((a,b) => a.dist - b.dist).slice(0,5);
         const lotLink = lotMapLinks[`${builder}|${name}`];
         const lotHtml = lotLink && lotLink !== 'No Map'
           ? `<a href="${lotLink}" target="_blank" style="display:block;margin-bottom:6px;">View Lot Map</a>`
           : `<div style="margin-bottom:6px;font-style:italic;">No lot map available</div>`;
-
-        const initHtml = `
-          <b>${name}</b><br>
-          ${lotHtml}
-          <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="color:inherit;text-decoration:underline;">${addr}</a><br>
-          <strong>Closest:</strong><div id="nearest-list">Loading...</div>
-        `;
-        const popup = L.popup().setLatLng([lat, lon]).setContent(initHtml).openOn(map);
-
+        let popup = L.popup().setLatLng([lat, lon]).setContent(
+          `<b>${name}</b><br>${lotHtml}<a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="text-decoration:underline;">${addr}</a><br><strong>Closest:</strong><div id="nearest-list">Loading...</div>`
+        ).openOn(map);
         (async () => {
           const withRoute = await Promise.all(nearest.map(async d => {
-            const base = `https://router.project-osrm.org/route/v1/driving/${currentOrigin.lon},${currentOrigin.lat};${d.lon},${d.lat}`;
+            const base = `https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${d.lon},${d.lat}`;
             try {
-              const r1 = await fetch(`${base}?overview=false`);
-              const j1 = await r1.json();
-              d.duration = j1.routes[0].duration;
-              d.distance = j1.routes[0].distance;
-              const r2 = await fetch(`${base}?overview=full&geometries=geojson`);
-              const j2 = await r2.json();
-              d.geometry = j2.routes[0].geometry;
+              const r1 = await fetch(`${base}?overview=false`), j1 = await r1.json(); d.duration = j1.routes[0].duration; d.distance = j1.routes[0].distance;
+              const r2 = await fetch(`${base}?overview=full&geometries=geojson`), j2 = await r2.json(); d.geometry = j2.routes[0].geometry;
             } catch {
-              d.duration = (d.dist/1000)/50*3600;
-              d.distance = d.dist;
-              d.geometry = { coordinates: [[currentOrigin.lon,currentOrigin.lat],[d.lon,d.lat]] };
+              d.duration = (d.dist/1000)/50*3600; d.distance = d.dist;
+              d.geometry = { coordinates: [[origin.lon,origin.lat],[d.lon,d.lat]] };
             }
             return d;
           }));
-
           let listHtml = '<ul id="nearest-list">';
           withRoute.forEach((d,i) => {
-            const mins = Math.round(d.duration/60);
-            const miles = (d.distance/1609.34).toFixed(1);
-            const col = mins>30?'black':mins>20?'red':mins>=15?'orange':'green';
+            const mins = Math.round(d.duration/60), miles = (d.distance/1609.34).toFixed(1), col = mins>30?'black':mins>20?'red':mins>=15?'orange':'green';
             listHtml += `<li data-index="${i}" style="cursor:pointer;color:${col};margin-bottom:4px;">${d.name} - ${mins} min (${miles} mi)</li>`;
           });
           listHtml += '</ul>';
-
-          popup.setContent(`
-            <b>${name}</b><br>
-            ${lotHtml}
-            <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="color:inherit;text-decoration:underline;">${addr}</a><br>
-            <strong>Closest:</strong>${listHtml}
-          `);
-
-          document.querySelectorAll('#nearest-list li').forEach(li => {
-            li.addEventListener('click', () => {
-              routeLayer.clearLayers();
-              const d = withRoute[li.dataset.index];
-              const coords = d.geometry.coordinates.map(c => [c[1],c[0]]);
-              L.polyline(coords, { color: 'blue', weight: 8 }).addTo(routeLayer);
-              map.fitBounds(L.polyline(coords).getBounds());
-            });
-          });
+          popup.setContent(`<b>${name}</b><br>${lotHtml}<a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="text-decoration:underline;">${addr}</a><br><strong>Closest:</strong>${listHtml}`);
+          document.querySelectorAll('#nearest-list li').forEach(li => li.addEventListener('click', () => {
+            routeLayer.clearLayers();
+            const d = withRoute[li.dataset.index];
+            const coords = d.geometry.coordinates.map(c => [c[1],c[0]]);
+            L.polyline(coords, { weight:8 }).addTo(routeLayer);
+            map.fitBounds(L.polyline(coords).getBounds());
+          }));
         })();
       });
     });
 
-    // Builder toggles UI (unchanged)
     ['Select All','Select None'].forEach(txt => {
       const btn = document.createElement('button'); btn.textContent = txt; btn.style.marginRight = '8px';
       btn.addEventListener('click', () => {
-        Object.values(builderGroups).forEach(group => txt==='Select All'?group.addTo(map):map.removeLayer(group));
-        document.querySelectorAll('#builderToggles input').forEach(cb => cb.checked = (txt==='Select All'));
+        Object.values(builderGroups).forEach(g => txt==='Select All'?g.addTo(map):map.removeLayer(g));
+        document.querySelectorAll('#builderToggles input').forEach(cb => cb.checked=(txt==='Select All'));
       });
       togglesDiv.appendChild(btn);
     });
     togglesDiv.appendChild(document.createElement('br'));
-    Object.entries(builderGroups).forEach(([b, group]) => {
+    Object.entries(builderGroups).forEach(([b,g]) => {
       const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=true;
-      cb.addEventListener('change', () => cb.checked?group.addTo(map):map.removeLayer(group));
+      cb.addEventListener('change', () => cb.checked?g.addTo(map):map.removeLayer(g));
       const lbl = document.createElement('label'); lbl.appendChild(cb); lbl.append(` ${b}`);
       togglesDiv.appendChild(lbl);
       togglesDiv.appendChild(document.createElement('br'));
-    });
-
-    // Search functionality
-    const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', function() {
-      const query = this.value.toLowerCase();
-      const found = markers.find(m => m.name.toLowerCase().includes(query));
-      if (found) map.setView([found.lat, found.lon], 14);
-    });
-    searchInput.addEventListener('change', function() {
-      const name = this.value;
-      const found = markers.find(m => m.name===name);
-      if (found) {
-        map.setView([found.lat, found.lon], 14);
-        found.marker.fire('click');
-      }
     });
   </script>
 </body>
