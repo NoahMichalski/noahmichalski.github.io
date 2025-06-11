@@ -48,11 +48,9 @@
       cursor: pointer;
       font-size: 1em;
     }
-    .search-results li:hover {
-      background: #f0f0f0;
-    }
+    .search-results li:hover { background: #f0f0f0; }
 
-    /* Toggle Buttons */
+    /* Toggle Button */
     #toggle-ui-btn {
       position: absolute;
       top: 10px;
@@ -66,62 +64,42 @@
     }
 
     /* Builder Toggles & Legend */
-    .builder-toggles, .legend {
-      position: absolute;
-      z-index: 1001;
-      background: rgba(255,255,255,0.95);
-      padding: 12px;
-      border: 1px solid #aaa;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      font-family: sans-serif;
-      max-height: 60vh;
-      overflow-y: auto;
-    }
+    .builder-toggles, .legend { background: rgba(255,255,255,0.95); border: 1px solid #aaa; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); font-family: sans-serif; }
     .builder-toggles {
+      position: absolute;
       top: 60px;
       right: 10px;
+      z-index: 1001;
       width: 200px;
+      max-height: 60vh;
+      overflow-y: auto;
+      padding: 12px;
     }
     .legend {
+      position: absolute;
       bottom: 10px;
       right: 10px;
+      z-index: 1001;
       width: 140px;
       font-size: 0.9em;
+      padding: 12px;
     }
 
     /* Mobile Adjustments */
     @media (max-width: 600px) {
       .builder-toggles {
-        bottom: 60px;
-        top: auto;
-        right: 5%;
-        left: 5%;
-        width: 90%;
-        max-height: 30vh;
-        overflow-y: scroll;
-      }
-      .legend {
-        bottom: 10px;
-        right: auto;
-        left: 5%;
-        width: 90%;
-        display: flex;
-        flex-wrap: wrap;
-      }
-      .legend span { flex: 1 1 50%; margin-bottom: 4px; }
-      #toggle-ui-btn {
-        top: 10px;
-        right: 10px;
-        padding: 12px 16px;
-        font-size: 1.1em;
-      }
-      .search-box {
-        top: 10px;
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
         width: 95vw;
+        max-height: 35vh;
+        overflow-y: auto;
+        border-radius: 10px 10px 0 0;
+        padding: 16px;
       }
-      #searchInput { font-size: 1.1em; padding: 10px 14px; }
-      .search-results li { padding: 14px; font-size: 1.1em; }
+      .legend { display: none; }
+      #toggle-ui-btn { padding: 12px 16px; font-size: 1.1em; }
     }
   </style>
 </head>
@@ -155,9 +133,20 @@
     toggleBtn.addEventListener('click', () => {
       controlsVisible = !controlsVisible;
       togglesDiv.style.display = controlsVisible ? 'block' : 'none';
-      legendBox.style.display = controlsVisible ? 'block' : 'none';
+      if (window.innerWidth > 600) legendBox.style.display = controlsVisible ? 'block' : 'none';
       toggleBtn.textContent = controlsVisible ? 'Hide Controls' : 'Show Controls';
     });
+
+    // For mobile, move legend into toggles panel
+    if (window.innerWidth <= 600) {
+      const legendHTML = legendBox.innerHTML;
+      const legendSection = document.createElement('div');
+      legendSection.innerHTML = legendHTML;
+      legendSection.style.marginTop = '10px';
+      legendSection.style.borderTop = '1px solid #ccc';
+      togglesDiv.appendChild(legendSection);
+      legendBox.style.display = 'none';
+    }
 
     const lotMapLinks = { "Pulte|Abberley": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=85575928-6f84-4406-9f8d-d3218f666398&noheader",
   "Pulte|Bloomfield": "https://apps.alpha-vision.com/alphamap/index.html?OLAId=a16b941a-1563-49de-9c54-fdb6ff3c0d00&noheader",
@@ -232,8 +221,7 @@
   "Shottenstein|Holton": "https://schottensteinhomes.com/wp-content/uploads/2024/04/SH_Holton-Run_Map-1-pdf.jpg",
   "Shottenstein|Cottages At Verbana": "https://schottensteinhomes.com/wp-content/uploads/2022/12/cottages-at-verbena-siteplan.jpg",
   "Shottenstein|Glacier Pointe": "https://schottensteinhomes.com/wp-content/uploads/2024/09/Glacier-Pointe-View-Available-Lots.png",
-  "America Homes 4 Rent|Eastwood": "No Map",
-                        };
+  "America Homes 4 Rent|Eastwood": "No Map", };
     const markerData = [ ["VIP","Home Office","6407 Nicholas Dr",40.087852,-83.063193],
       ["Pulte","Abberley","3384 Abberley Drive, New Albany, OH 43054",40.052873,-82.816503],
   ["Pulte","Bloomfield","5002 Roese Ave, South Bloomfield, OH 43103",39.708129,-82.988884],
@@ -352,9 +340,7 @@
       marker.on('click', () => {
         routeLayer.clearLayers();
         const origin = { lat, lon };
-        const nearest = markers.filter(x => x.marker !== marker)
-          .map(x => ({ ...x, dist: map.distance([lat, lon], [x.lat, x.lon]) }))
-          .sort((a,b) => a.dist - b.dist).slice(0,5);
+        const nearest = markers.filter(x => x.marker !== marker).map(x => ({ ...x, dist: map.distance([lat, lon], [x.lat, x.lon]) })).sort((a,b) => a.dist - b.dist).slice(0,5);
         const lotLink = lotMapLinks[`${builder}|${name}`];
         const lotHtml = lotLink && lotLink !== 'No Map'
           ? `<a href="${lotLink}" target="_blank" style="display:block;margin-bottom:6px;">View Lot Map</a>`
@@ -369,8 +355,7 @@
               const r1 = await fetch(`${base}?overview=false`), j1 = await r1.json(); d.duration = j1.routes[0].duration; d.distance = j1.routes[0].distance;
               const r2 = await fetch(`${base}?overview=full&geometries=geojson`), j2 = await r2.json(); d.geometry = j2.routes[0].geometry;
             } catch {
-              d.duration = (d.dist/1000)/50*3600; d.distance = d.dist;
-              d.geometry = { coordinates: [[origin.lon,origin.lat],[d.lon,d.lat]] };
+              d.duration = (d.dist/1000)/50*3600; d.distance = d.dist; d.geometry = { coordinates: [[origin.lon,origin.lat],[d.lon,d.lat]] };
             }
             return d;
           }));
