@@ -14,10 +14,8 @@
     #loading { font-size: 1rem; color: #555; display: none; margin-left: 10px; }
     #previewList { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 20px; padding: 10px; background: #fff; border: 1px solid #ccc; margin: 10px; }
     .preview-area { flex: 0 0 auto; min-width: 200px; }
-    .preview-area h4 { margin: 0 0 5px; }
-    .preview-area ul { margin: 0; padding-left: 20px; }
     #routesTable { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 20px; padding: 10px; }
-    .area-container { display: flex; flex-direction: column; flex: 0 0 auto; min-width: 200px; }
+    .area-container { flex: 0 0 auto; min-width: 200px; display: flex; flex-direction: column; }
     .route-table { border-collapse: collapse; width: 100%; }
     .route-table th, .route-table td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
     .route-table th { background: #e9e9e9; }
@@ -26,11 +24,19 @@
 <body>
   <div id="map"></div>
   <div id="controls">
+    <!-- Depot controls -->
+    <input id="depotLat" type="number" step="any" placeholder="Depot Lat" style="max-width:120px;" />
+    <input id="depotLng" type="number" step="any" placeholder="Depot Lng" style="max-width:120px;" />
+    <button id="updateDepot">Update Depot</button>
+
+    <!-- Add Subdivision -->
     <select id="newArea"></select>
     <input id="newName" type="text" placeholder="Subdivision Name" />
     <input id="newLat" type="number" step="any" placeholder="Latitude" />
     <input id="newLng" type="number" step="any" placeholder="Longitude" />
     <button id="addSubdivision">Add Subdivision</button>
+
+    <!-- Actions -->
     <span id="loading">Loading...</span>
     <button id="clearRoutes">Clear Routes</button>
   </div>
@@ -144,7 +150,7 @@
           { name: "Ludlow Ridge", coords: [-83.745493, 40.339108] },
         ],
       };
-      const depot = [-83.063289, 40.087882];
+      let depot = [-83.063289, 40.087882];
       const colors = ['#FF0000','#008080','#00AA00','#FFA500','#A52A2A'];
       let layerControl, routeLayers = [];
       const builtAreas = new Set();
@@ -158,23 +164,24 @@
         return 6371 * c * 0.621371;
       }
 
-      const map = L.map('map').setView([39.9612, -82.9988], 12);
+      const map = L.map('map').setView([depot[1], depot[0]], 12);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'&copy; OSM' }).addTo(map);
+      // Depot marker
+      let depotMarker = L.marker([depot[1], depot[0]], { draggable: false }).addTo(map).bindTooltip('Depot');
 
-      // DOM refs
       const newAreaSel = document.getElementById('newArea');
       const previewList = document.getElementById('previewList');
       const loadingEl = document.getElementById('loading');
       const routesTableEl = document.getElementById('routesTable');
       const controlsDiv = document.getElementById('controls');
 
-      // populate selector
+      // Populate area selector
       Object.keys(areaStops).forEach(area => {
         const opt = document.createElement('option'); opt.value = area; opt.textContent = area;
         newAreaSel.appendChild(opt);
       });
 
-      // preview all areas
+      // Preview update
       function updatePreview() {
         previewList.innerHTML = '';
         Object.keys(areaStops).forEach(area => {
@@ -184,8 +191,7 @@
           div.appendChild(h4);
           const ul = document.createElement('ul');
           areaStops[area].forEach((s,i) => {
-            const li = document.createElement('li');
-            li.textContent = `${i+1}. ${s.name}`;
+            const li = document.createElement('li'); li.textContent = `${i+1}. ${s.name}`;
             ul.appendChild(li);
           });
           div.appendChild(ul);
@@ -195,7 +201,18 @@
       updatePreview();
       newAreaSel.addEventListener('change', updatePreview);
 
-      // add sub
+      // Update depot handler
+      document.getElementById('updateDepot').addEventListener('click', () => {
+        const lat = parseFloat(document.getElementById('depotLat').value);
+        const lng = parseFloat(document.getElementById('depotLng').value);
+        if (isNaN(lat) || isNaN(lng)) return alert('Enter valid lat/lng');
+        depot = [lng, lat];
+        depotMarker.setLatLng([lat, lng]);
+        map.setView([lat, lng]);
+        alert(`Depot moved to ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+      });
+
+      // Add subdivision
       document.getElementById('addSubdivision').addEventListener('click', () => {
         const area = newAreaSel.value;
         const name = document.getElementById('newName').value.trim();
@@ -204,7 +221,6 @@
         if (!name || isNaN(lat) || isNaN(lng)) return alert('Fill all fields');
         const stop = { name, coords: [lng, lat] };
         areaStops[area].push(stop);
-        // persist
         const stored = JSON.parse(localStorage.getItem('customStops')||'{}');
         stored[area] = stored[area]||[]; stored[area].push(stop);
         localStorage.setItem('customStops', JSON.stringify(stored));
@@ -214,7 +230,7 @@
         updatePreview();
       });
 
-      // build buttons
+      // Build buttons
       Object.keys(areaStops).forEach((area,idx) => {
         const btn = document.createElement('button');
         btn.textContent = `Build ${area}`;
@@ -223,26 +239,24 @@
         controlsDiv.insertBefore(btn, loadingEl);
       });
 
-      // clear
+      // Clear routes
       document.getElementById('clearRoutes').addEventListener('click', () => {
         routeLayers.forEach(l=>map.removeLayer(l)); routeLayers=[];
         if(layerControl) layerControl.remove(); routesTableEl.innerHTML='';
       });
 
-      // build
+      // Build route for area
       async function buildArea(area) {
         loadingEl.style.display='inline';
         builtAreas.add(area); updatePreview();
-        // remove old layer
-        if(layerControl&&layerControl._layers) {
+        // Remove old layer
+        if(layerControl && layerControl._layers) {
           const tgt = layerControl._layers.find(l=>l.name===area);
-          if(tgt&&tgt.layer) map.removeLayer(tgt.layer);
+          if(tgt && tgt.layer) map.removeLayer(tgt.layer);
         }
-        // clear old table
-        const old = document.querySelector(`.area-container[data-area="${area}"]`);
-        if(old) old.remove();
+        const oldDiv = document.querySelector(`.area-container[data-area="${area}"]`);
+        if(oldDiv) oldDiv.remove();
 
-        // optimize
         const stops = areaStops[area];
         const unique = [...new Map(stops.map(s=>[s.name,s])).values()];
         const jobs = unique.map((s,i)=>({id:i,location:s.coords}));
@@ -250,35 +264,29 @@
         const optRes = await fetch('https://api.openrouteservice.org/optimization',{method:'POST',mode:'cors',headers:{'Accept':'application/json','Content-Type':'application/json','Authorization':API_KEY},body:JSON.stringify({jobs,vehicles,options:{g:false}})});
         const optData = await optRes.json();
         const order = optData.routes[0].steps.filter(s=>s.type==='job').map(s=>s.job);
-        areaStops[area]=order.map(i=>unique[i]);
+        areaStops[area] = order.map(i=>unique[i]);
 
-        // directions
-        const coordsSeq=[depot,...areaStops[area].map(s=>s.coords)];
+        const coordsSeq = [depot, ...areaStops[area].map(s=>s.coords)];
         const dirRes = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson',{method:'POST',mode:'cors',headers:{'Accept':'application/json, application/geo+json','Content-Type':'application/json','Authorization':API_KEY},body:JSON.stringify({coordinates:coordsSeq})});
-        const dirGeo=await dirRes.json();
+        const dirGeo = await dirRes.json();
 
-        // draw
-        const group=L.layerGroup();
+        const group = L.layerGroup();
         L.geoJSON(dirGeo,{style:{color:colors[Object.keys(areaStops).indexOf(area)%colors.length],weight:5}}).addTo(group);
-        L.marker([depot[1],depot[0]]).addTo(group).bindTooltip('Start');
+        L.marker([depot[1], depot[0]]).addTo(group).bindTooltip('Start');
         areaStops[area].forEach(s=>L.marker([s.coords[1],s.coords[0]]).addTo(group).bindTooltip(s.name));
         group.addTo(map); routeLayers.push(group);
 
-        // layer control
         if(layerControl) layerControl.remove();
-        layerControl=L.control.layers(null,Object.fromEntries(Object.entries(areaStops).map(([a],i)=>[a,a===area?group:L.layerGroup()])),{collapsed:false}).addTo(map);
+        layerControl = L.control.layers(null, Object.fromEntries(Object.entries(areaStops).map(([a],i)=>[a, a===area?group:L.layerGroup()])), {collapsed:false}).addTo(map);
 
-        // table
-        const areaDiv=document.createElement('div'); areaDiv.className='area-container'; areaDiv.dataset.area=area;
-        const title=document.createElement('h3'); title.textContent=area; areaDiv.appendChild(title);
-        const table=document.createElement('table'); table.className='route-table';
-        const hdr=table.insertRow(); ['#','Name','Dist to next (mi)'].forEach(h=>{const th=hdr.insertCell();th.textContent=h;});
-        const tbody=document.createElement('tbody'); table.appendChild(tbody);
-        areaStops[area].forEach((s,i)=>{const row=tbody.insertRow();const next=areaStops[area][i+1];const dist=next? haversine(s.coords,next.coords).toFixed(2):'';[i+1,s.name,dist].forEach(txt=>{const td=row.insertCell();td.textContent=txt;});});
+        const areaDiv = document.createElement('div'); areaDiv.className='area-container'; areaDiv.dataset.area=area;
+        const title = document.createElement('h3'); title.textContent=area; areaDiv.appendChild(title);
+        const table = document.createElement('table'); table.className='route-table';
+        const hdr = table.insertRow(); ['#','Name','Dist from prev (mi)'].forEach(h=>{const th=hdr.insertCell();th.textContent=h;});
+        const tbody = document.createElement('tbody'); table.appendChild(tbody);
+        areaStops[area].forEach((s,i)=>{const row=tbody.insertRow();const prevCoords = i>0 ? areaStops[area][i-1].coords : depot;const dist = haversine(prevCoords, s.coords).toFixed(2); [i+1,s.name,dist].forEach(txt=>{const td=row.insertCell();td.textContent=txt;});});
         areaDiv.appendChild(table); routesTableEl.appendChild(areaDiv);
-        new Sortable(tbody,{animation:150,onEnd:()=>buildArea(area)});
-        // Refresh preview to reflect optimized order
-        updatePreview();
+        new Sortable(tbody,{animation:150,onEnd:()=>{ buildArea(area); updatePreview(); }});
 
         loadingEl.style.display='none';
       }
