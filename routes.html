@@ -8,7 +8,8 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     html, body { height: 100%; margin: 0; padding: 0; }
-    #map { width: 100%; height: 60%; }
+    #map { position: relative; width: 100%; height: 60%; }
+    #logo { position: absolute; top: 10px; left: 10px; width: 120px; z-index: 1000; pointer-events: none; }
     #controls { padding: 10px; background: #f9e9f9; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     button, select, input { font-size: 1rem; padding: 6px 10px; }
     #loading { font-size: 1rem; color: #555; display: none; margin-left: 10px; }
@@ -22,9 +23,9 @@
   </style>
 </head>
 <body>
-  <!-- Company Logo -->
-  <img src="/images/logo-VIP.png" alt="VIP Logo" style="height:50px; margin:10px;" />
-  <div id="map"></div>
+  <div id="map">
+    <img id="logo" src="/images/logo-VIP.png" alt="VIP Logo" />
+  </div>
   <div id="controls">
     <!-- Depot controls -->
     <input id="depotLat" type="number" step="any" placeholder="Depot Lat" style="max-width:120px;" />
@@ -51,7 +52,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const API_KEY = '5b3ce3597851110001cf624895d5d8857d8d41b6a9508753893fbb25';
-      const areaStops = {
+       const areaStops = {
         "East": [
           { name: "Eastwood", coords: [-82.758526, 39.961474] },
           { name: "Brookview", coords: [-82.82145, 39.877261] },
@@ -168,8 +169,7 @@
 
       const map = L.map('map').setView([depot[1], depot[0]], 12);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'&copy; OSM' }).addTo(map);
-      // Depot marker
-      let depotMarker = L.marker([depot[1], depot[0]], { draggable: false }).addTo(map).bindTooltip('Depot');
+      let depotMarker = L.marker([depot[1], depot[0]]).addTo(map).bindTooltip('Depot');
 
       const newAreaSel = document.getElementById('newArea');
       const previewList = document.getElementById('previewList');
@@ -177,13 +177,11 @@
       const routesTableEl = document.getElementById('routesTable');
       const controlsDiv = document.getElementById('controls');
 
-      // Populate area selector
       Object.keys(areaStops).forEach(area => {
         const opt = document.createElement('option'); opt.value = area; opt.textContent = area;
         newAreaSel.appendChild(opt);
       });
 
-      // Preview update
       function updatePreview() {
         previewList.innerHTML = '';
         Object.keys(areaStops).forEach(area => {
@@ -203,7 +201,6 @@
       updatePreview();
       newAreaSel.addEventListener('change', updatePreview);
 
-      // Update depot handler
       document.getElementById('updateDepot').addEventListener('click', () => {
         const lat = parseFloat(document.getElementById('depotLat').value);
         const lng = parseFloat(document.getElementById('depotLng').value);
@@ -214,7 +211,6 @@
         alert(`Depot moved to ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
       });
 
-      // Add subdivision
       document.getElementById('addSubdivision').addEventListener('click', () => {
         const area = newAreaSel.value;
         const name = document.getElementById('newName').value.trim();
@@ -232,7 +228,6 @@
         updatePreview();
       });
 
-      // Build buttons
       Object.keys(areaStops).forEach((area,idx) => {
         const btn = document.createElement('button');
         btn.textContent = `Build ${area}`;
@@ -241,17 +236,14 @@
         controlsDiv.insertBefore(btn, loadingEl);
       });
 
-      // Clear routes
       document.getElementById('clearRoutes').addEventListener('click', () => {
         routeLayers.forEach(l=>map.removeLayer(l)); routeLayers=[];
         if(layerControl) layerControl.remove(); routesTableEl.innerHTML='';
       });
 
-      // Build route for area
       async function buildArea(area) {
         loadingEl.style.display='inline';
         builtAreas.add(area); updatePreview();
-        // Remove old layer
         if(layerControl && layerControl._layers) {
           const tgt = layerControl._layers.find(l=>l.name===area);
           if(tgt && tgt.layer) map.removeLayer(tgt.layer);
@@ -279,18 +271,16 @@
         group.addTo(map); routeLayers.push(group);
 
         if(layerControl) layerControl.remove();
-        layerControl = L.control.layers(null, Object.fromEntries(Object.entries(areaStops).map(([a],i)=>[a, a===area?group:L.layerGroup()])), {collapsed:false}).addTo(map);
+        layerControl = L.control.layers(null, Object.fromEntries(Object.entries(areaStops).map(([a],i)=>[a,a===area?group:L.layerGroup()])), {collapsed:false}).addTo(map);
 
         const areaDiv = document.createElement('div'); areaDiv.className='area-container'; areaDiv.dataset.area=area;
         const title = document.createElement('h3'); title.textContent=area; areaDiv.appendChild(title);
         const table = document.createElement('table'); table.className='route-table';
         const hdr = table.insertRow(); ['#','Name','Dist from prev (mi)'].forEach(h=>{const th=hdr.insertCell();th.textContent=h;});
         const tbody = document.createElement('tbody'); table.appendChild(tbody);
-        areaStops[area].forEach((s,i)=>{const row=tbody.insertRow();const prevCoords = i>0 ? areaStops[area][i-1].coords : depot;const dist = haversine(prevCoords, s.coords).toFixed(2); [i+1,s.name,dist].forEach(txt=>{const td=row.insertCell();td.textContent=txt;});});
+        areaStops[area].forEach((s,i)=>{const row=tbody.insertRow();const prevCoords = i>0 ? areaStops[area][i-1].coords : depot;const dist = haversine(prevCoords, s.coords).toFixed(2);[i+1,s.name,dist].forEach(txt=>{const td=row.insertCell();td.textContent=txt;});});
         areaDiv.appendChild(table); routesTableEl.appendChild(areaDiv);
         new Sortable(tbody,{animation:150,onEnd:()=>{ buildArea(area); updatePreview(); }});
-        // Ensure preview updates after building
-        updatePreview();
 
         loadingEl.style.display='none';
       }
