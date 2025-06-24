@@ -9,11 +9,15 @@
   <style>
     html, body { height: 100%; margin: 0; padding: 0; }
     #map { width: 100%; height: 60%; }
-    #controls { padding: 10px; background: #f9f9f9; display: flex; flex-wrap: wrap; gap: 8px; }
-    button { font-size: 1rem; padding: 6px 10px; }
+    #controls { padding: 10px; background: #f9e9f9; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    button, select, input { font-size: 1rem; padding: 6px 10px; }
     #loading { font-size: 1rem; color: #555; display: none; margin-left: 10px; }
-    #routesTable { display: flex; flex-wrap: wrap; gap: 20px; padding: 10px; }
-    .area-container { display: flex; flex-direction: column; flex: 1 1 200px; }
+    #previewList { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 20px; padding: 10px; background: #fff; border: 1px solid #ccc; margin: 10px; }
+    .preview-area { flex: 0 0 auto; min-width: 200px; }
+    .preview-area h4 { margin: 0 0 5px; }
+    .preview-area ul { margin: 0; padding-left: 20px; }
+    #routesTable { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 20px; padding: 10px; }
+    .area-container { display: flex; flex-direction: column; flex: 0 0 auto; min-width: 200px; }
     .route-table { border-collapse: collapse; width: 100%; }
     .route-table th, .route-table td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
     .route-table th { background: #e9e9e9; }
@@ -22,19 +26,24 @@
 <body>
   <div id="map"></div>
   <div id="controls">
-    <!-- Build area buttons will be inserted here -->
+    <select id="newArea"></select>
+    <input id="newName" type="text" placeholder="Subdivision Name" />
+    <input id="newLat" type="number" step="any" placeholder="Latitude" />
+    <input id="newLng" type="number" step="any" placeholder="Longitude" />
+    <button id="addSubdivision">Add Subdivision</button>
     <span id="loading">Loading...</span>
     <button id="clearRoutes">Clear Routes</button>
   </div>
+  <div id="previewList"></div>
   <div id="routesTable"></div>
 
   <!-- Dependencies -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener('DOMContentLoaded', () => {
       const API_KEY = '5b3ce3597851110001cf624895d5d8857d8d41b6a9508753893fbb25';
-            const areaStops = {
+      const areaStops = {
         "East": [
           { name: "Eastwood", coords: [-82.758526, 39.961474] },
           { name: "Brookview", coords: [-82.82145, 39.877261] },
@@ -136,117 +145,142 @@
         ],
       };
       const depot = [-83.063289, 40.087882];
-      const colors = ['#FF0000', '#008080', '#00AA00', '#FFA500', '#A52A2A'];
+      const colors = ['#FF0000','#008080','#00AA00','#FFA500','#A52A2A'];
+      let layerControl, routeLayers = [];
+      const builtAreas = new Set();
 
       function haversine(c1, c2) {
-        const toRad = d => d * Math.PI / 180;
-        const [lon1, lat1] = c1;
-        const [lon2, lat2] = c2;
-        const dLat = toRad(lat2 - lat1);
-        const dLon = toRad(lon2 - lon1);
-        const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+        const toRad = d => d * Math.PI/180;
+        const [lon1, lat1] = c1, [lon2, lat2] = c2;
+        const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return 6371 * c * 0.621371;
       }
 
-      const map = L.map("map").setView([39.9612, -82.9988], 12);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OSM" }).addTo(map);
-      let layerControl;
-      const routeLayers = []; // track all drawn route groups
+      const map = L.map('map').setView([39.9612, -82.9988], 12);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{ attribution:'&copy; OSM' }).addTo(map);
 
-      const controlsDiv = document.getElementById('controls');
+      // DOM refs
+      const newAreaSel = document.getElementById('newArea');
+      const previewList = document.getElementById('previewList');
       const loadingEl = document.getElementById('loading');
       const routesTableEl = document.getElementById('routesTable');
+      const controlsDiv = document.getElementById('controls');
 
-      // Create Build buttons for each area
-      Object.keys(areaStops).forEach((area, idx) => {
+      // populate selector
+      Object.keys(areaStops).forEach(area => {
+        const opt = document.createElement('option'); opt.value = area; opt.textContent = area;
+        newAreaSel.appendChild(opt);
+      });
+
+      // preview all areas
+      function updatePreview() {
+        previewList.innerHTML = '';
+        Object.keys(areaStops).forEach(area => {
+          const div = document.createElement('div'); div.className = 'preview-area';
+          const h4 = document.createElement('h4');
+          h4.textContent = area + (builtAreas.has(area)? ' (Optimized)' : '');
+          div.appendChild(h4);
+          const ul = document.createElement('ul');
+          areaStops[area].forEach((s,i) => {
+            const li = document.createElement('li');
+            li.textContent = `${i+1}. ${s.name}`;
+            ul.appendChild(li);
+          });
+          div.appendChild(ul);
+          previewList.appendChild(div);
+        });
+      }
+      updatePreview();
+      newAreaSel.addEventListener('change', updatePreview);
+
+      // add sub
+      document.getElementById('addSubdivision').addEventListener('click', () => {
+        const area = newAreaSel.value;
+        const name = document.getElementById('newName').value.trim();
+        const lat = parseFloat(document.getElementById('newLat').value);
+        const lng = parseFloat(document.getElementById('newLng').value);
+        if (!name || isNaN(lat) || isNaN(lng)) return alert('Fill all fields');
+        const stop = { name, coords: [lng, lat] };
+        areaStops[area].push(stop);
+        // persist
+        const stored = JSON.parse(localStorage.getItem('customStops')||'{}');
+        stored[area] = stored[area]||[]; stored[area].push(stop);
+        localStorage.setItem('customStops', JSON.stringify(stored));
+        document.getElementById('newName').value = '';
+        document.getElementById('newLat').value = '';
+        document.getElementById('newLng').value = '';
+        updatePreview();
+      });
+
+      // build buttons
+      Object.keys(areaStops).forEach((area,idx) => {
         const btn = document.createElement('button');
         btn.textContent = `Build ${area}`;
-        btn.style.background = colors[idx % colors.length];
+        btn.style.background = colors[idx%colors.length];
         btn.addEventListener('click', () => buildArea(area));
         controlsDiv.insertBefore(btn, loadingEl);
       });
 
-      // Clear all routes (including markers)
+      // clear
       document.getElementById('clearRoutes').addEventListener('click', () => {
-        // Remove each stored layer
-        routeLayers.forEach(layer => map.removeLayer(layer));
-        routeLayers.length = 0;
-        if (layerControl) layerControl.remove();
-        routesTableEl.innerHTML = '';
+        routeLayers.forEach(l=>map.removeLayer(l)); routeLayers=[];
+        if(layerControl) layerControl.remove(); routesTableEl.innerHTML='';
       });
 
-      // Build a single area's route
+      // build
       async function buildArea(area) {
-        loadingEl.style.display = 'inline';
-        // Remove previous layer for this area if exists
-        if (layerControl && layerControl._layers) {
-          const existing = layerControl._layers.find(l => l.name === area);
-          if (existing && existing.layer) map.removeLayer(existing.layer);
+        loadingEl.style.display='inline';
+        builtAreas.add(area); updatePreview();
+        // remove old layer
+        if(layerControl&&layerControl._layers) {
+          const tgt = layerControl._layers.find(l=>l.name===area);
+          if(tgt&&tgt.layer) map.removeLayer(tgt.layer);
         }
-        // Clear previous table for this area
-        const prevDiv = document.querySelector(`.area-container[data-area='${area}']`);
-        if (prevDiv) prevDiv.remove();
+        // clear old table
+        const old = document.querySelector(`.area-container[data-area="${area}"]`);
+        if(old) old.remove();
 
-        // Optimization request
+        // optimize
         const stops = areaStops[area];
-        const unique = [...new Map(stops.map(s => [s.name, s])).values()];
-        const jobs = unique.map((s, i) => ({ id: i, location: s.coords }));
-        const vehicles = [{ id: 0, profile: 'driving-car', start: depot }];
-        const optRes = await fetch('https://api.openrouteservice.org/optimization', {
-          method: 'POST', mode: 'cors',
-          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': API_KEY },
-          body: JSON.stringify({ jobs, vehicles, options: { g: false } })
-        });
+        const unique = [...new Map(stops.map(s=>[s.name,s])).values()];
+        const jobs = unique.map((s,i)=>({id:i,location:s.coords}));
+        const vehicles=[{id:0,profile:'driving-car',start:depot}];
+        const optRes = await fetch('https://api.openrouteservice.org/optimization',{method:'POST',mode:'cors',headers:{'Accept':'application/json','Content-Type':'application/json','Authorization':API_KEY},body:JSON.stringify({jobs,vehicles,options:{g:false}})});
         const optData = await optRes.json();
-        const order = optData.routes[0].steps.filter(s => s.type === 'job').map(s => s.job);
-        areaStops[area] = order.map(i => unique[i]);
+        const order = optData.routes[0].steps.filter(s=>s.type==='job').map(s=>s.job);
+        areaStops[area]=order.map(i=>unique[i]);
 
-        // Draw Directions
-        const coordsSeq = [depot, ...areaStops[area].map(s => s.coords)];
-        const dirRes = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
-          method: 'POST', mode: 'cors',
-          headers: { 'Accept': 'application/json, application/geo+json', 'Content-Type': 'application/json', 'Authorization': API_KEY },
-          body: JSON.stringify({ coordinates: coordsSeq })
-        });
-        const dirGeo = await dirRes.json();
+        // directions
+        const coordsSeq=[depot,...areaStops[area].map(s=>s.coords)];
+        const dirRes = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson',{method:'POST',mode:'cors',headers:{'Accept':'application/json, application/geo+json','Content-Type':'application/json','Authorization':API_KEY},body:JSON.stringify({coordinates:coordsSeq})});
+        const dirGeo=await dirRes.json();
 
-        // Create layer group and add to map & tracking array
-        const group = L.layerGroup();
-        L.geoJSON(dirGeo, { style: { color: colors[Object.keys(areaStops).indexOf(area) % colors.length], weight: 5 } }).addTo(group);
-        L.marker([depot[1], depot[0]]).addTo(group).bindTooltip('Start');
-        areaStops[area].forEach(s => L.marker([s.coords[1], s.coords[0]]).addTo(group).bindTooltip(s.name));
-        group.addTo(map);
-        routeLayers.push(group);
+        // draw
+        const group=L.layerGroup();
+        L.geoJSON(dirGeo,{style:{color:colors[Object.keys(areaStops).indexOf(area)%colors.length],weight:5}}).addTo(group);
+        L.marker([depot[1],depot[0]]).addTo(group).bindTooltip('Start');
+        areaStops[area].forEach(s=>L.marker([s.coords[1],s.coords[0]]).addTo(group).bindTooltip(s.name));
+        group.addTo(map); routeLayers.push(group);
 
-        // Update layer control
-        if (layerControl) layerControl.remove();
-        layerControl = L.control.layers(null, Object.fromEntries(
-          Object.entries(areaStops).map(([a], i) => [a, a === area ? group : L.layerGroup()])
-        ), { collapsed: false }).addTo(map);
+        // layer control
+        if(layerControl) layerControl.remove();
+        layerControl=L.control.layers(null,Object.fromEntries(Object.entries(areaStops).map(([a],i)=>[a,a===area?group:L.layerGroup()])),{collapsed:false}).addTo(map);
 
-        // Render table
-        const areaDiv = document.createElement('div');
-        areaDiv.className = 'area-container';
-        areaDiv.dataset.area = area;
-        const title = document.createElement('h3'); title.textContent = area;
-        areaDiv.appendChild(title);
-        const table = document.createElement('table'); table.className = 'route-table';
-        const hdr = table.insertRow(); ['#', 'Name', 'Dist to next (mi)'].forEach(h => { const th = hdr.insertCell(); th.textContent = h; });
-        const tbody = document.createElement('tbody'); table.appendChild(tbody);
-        areaStops[area].forEach((s, i) => {
-          const row = tbody.insertRow();
-          const next = areaStops[area][i+1];
-          const dist = next ? haversine(s.coords, next.coords).toFixed(2) : '';
-          [i + 1, s.name, dist].forEach(txt => { const td = row.insertCell(); td.textContent = txt; });
-        });
-        areaDiv.appendChild(table);
-        routesTableEl.appendChild(areaDiv);
+        // table
+        const areaDiv=document.createElement('div'); areaDiv.className='area-container'; areaDiv.dataset.area=area;
+        const title=document.createElement('h3'); title.textContent=area; areaDiv.appendChild(title);
+        const table=document.createElement('table'); table.className='route-table';
+        const hdr=table.insertRow(); ['#','Name','Dist to next (mi)'].forEach(h=>{const th=hdr.insertCell();th.textContent=h;});
+        const tbody=document.createElement('tbody'); table.appendChild(tbody);
+        areaStops[area].forEach((s,i)=>{const row=tbody.insertRow();const next=areaStops[area][i+1];const dist=next? haversine(s.coords,next.coords).toFixed(2):'';[i+1,s.name,dist].forEach(txt=>{const td=row.insertCell();td.textContent=txt;});});
+        areaDiv.appendChild(table); routesTableEl.appendChild(areaDiv);
+        new Sortable(tbody,{animation:150,onEnd:()=>buildArea(area)});
+        // Refresh preview to reflect optimized order
+        updatePreview();
 
-        // Enable drag to reorder
-        new Sortable(tbody, { animation: 150, onEnd: () => buildArea(area) });
-
-        loadingEl.style.display = 'none';
+        loadingEl.style.display='none';
       }
     });
   </script>
