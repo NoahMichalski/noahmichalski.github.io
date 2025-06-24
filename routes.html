@@ -9,12 +9,17 @@
   <style>
     html, body { height: 100%; margin: 0; padding: 0; }
     #map { position: relative; width: 100%; height: 60%; }
-    #logo { position: absolute; top: 10px; left: 10px; width: 120px; z-index: 1000; pointer-events: none; }
-    #controls { padding: 10px; background: #f9e9f9; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    /* Logo positioned top-right on the map */
+    #logo { position: absolute; top: 10px; right: 10px; width: 120px; z-index: 1000; pointer-events: none; }
+    /* Controls container */
+    #controls { padding: 10px; background: #f9e9f9; display: flex; flex-direction: column; gap: 8px; }
+    .controls-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     button, select, input { font-size: 1rem; padding: 6px 10px; }
     #loading { font-size: 1rem; color: #555; display: none; margin-left: 10px; }
+    /* Preview pane styling */
     #previewList { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 20px; padding: 10px; background: #fff; border: 1px solid #ccc; margin: 10px; }
     .preview-area { flex: 0 0 auto; min-width: 200px; }
+    /* Routing tables styling */
     #routesTable { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 20px; padding: 10px; }
     .area-container { flex: 0 0 auto; min-width: 200px; display: flex; flex-direction: column; }
     .route-table { border-collapse: collapse; width: 100%; }
@@ -27,21 +32,23 @@
     <img id="logo" src="/images/logo-VIP.png" alt="VIP Logo" />
   </div>
   <div id="controls">
-    <!-- Depot controls -->
-    <input id="depotLat" type="number" step="any" placeholder="Depot Lat" style="max-width:120px;" />
-    <input id="depotLng" type="number" step="any" placeholder="Depot Lng" style="max-width:120px;" />
-    <button id="updateDepot">Update Depot</button>
-
-    <!-- Add Subdivision -->
-    <select id="newArea"></select>
-    <input id="newName" type="text" placeholder="Subdivision Name" />
-    <input id="newLat" type="number" step="any" placeholder="Latitude" />
-    <input id="newLng" type="number" step="any" placeholder="Longitude" />
-    <button id="addSubdivision">Add Subdivision</button>
-
-    <!-- Actions -->
-    <span id="loading">Loading...</span>
-    <button id="clearRoutes">Clear Routes</button>
+    <!-- First row: Depot & Subdivision inputs -->
+    <div class="controls-row">
+      <input id="depotLat" type="number" step="any" placeholder="Depot Lat" style="max-width:120px;" />
+      <input id="depotLng" type="number" step="any" placeholder="Depot Lng" style="max-width:120px;" />
+      <button id="updateDepot">Update Depot</button>
+      <select id="newArea"></select>
+      <input id="newName" type="text" placeholder="Subdivision Name" />
+      <input id="newLat" type="number" step="any" placeholder="Latitude" />
+      <input id="newLng" type="number" step="any" placeholder="Longitude" />
+      <button id="addSubdivision">Add Subdivision</button>
+    </div>
+    <!-- Second row: Build & Clear buttons -->
+    <div class="controls-row">
+      <span id="loading">Loading...</span>
+      <button id="clearRoutes">Clear Routes</button>
+      <!-- Build buttons will be injected here -->
+    </div>
   </div>
   <div id="previewList"></div>
   <div id="routesTable"></div>
@@ -52,7 +59,7 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const API_KEY = '5b3ce3597851110001cf624895d5d8857d8d41b6a9508753893fbb25';
-       const areaStops = {
+      const areaStops = {
         "East": [
           { name: "Eastwood", coords: [-82.758526, 39.961474] },
           { name: "Brookview", coords: [-82.82145, 39.877261] },
@@ -175,13 +182,15 @@
       const previewList = document.getElementById('previewList');
       const loadingEl = document.getElementById('loading');
       const routesTableEl = document.getElementById('routesTable');
-      const controlsDiv = document.getElementById('controls');
+      const controlsDiv = document.getElementById('controls').querySelectorAll('.controls-row')[1];
 
+      // Populate area selector
       Object.keys(areaStops).forEach(area => {
         const opt = document.createElement('option'); opt.value = area; opt.textContent = area;
         newAreaSel.appendChild(opt);
       });
 
+      // Preview update
       function updatePreview() {
         previewList.innerHTML = '';
         Object.keys(areaStops).forEach(area => {
@@ -201,6 +210,7 @@
       updatePreview();
       newAreaSel.addEventListener('change', updatePreview);
 
+      // Update depot
       document.getElementById('updateDepot').addEventListener('click', () => {
         const lat = parseFloat(document.getElementById('depotLat').value);
         const lng = parseFloat(document.getElementById('depotLng').value);
@@ -211,6 +221,7 @@
         alert(`Depot moved to ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
       });
 
+      // Add subdivision
       document.getElementById('addSubdivision').addEventListener('click', () => {
         const area = newAreaSel.value;
         const name = document.getElementById('newName').value.trim();
@@ -228,61 +239,64 @@
         updatePreview();
       });
 
-      Object.keys(areaStops).forEach((area,idx) => {
+      // Create build buttons in second controls row
+      Object.keys(areaStops).forEach((area, idx) => {
         const btn = document.createElement('button');
         btn.textContent = `Build ${area}`;
-        btn.style.background = colors[idx%colors.length];
+        btn.style.background = colors[idx % colors.length];
         btn.addEventListener('click', () => buildArea(area));
         controlsDiv.insertBefore(btn, loadingEl);
       });
 
+      // Clear routes
       document.getElementById('clearRoutes').addEventListener('click', () => {
-        routeLayers.forEach(l=>map.removeLayer(l)); routeLayers=[];
-        if(layerControl) layerControl.remove(); routesTableEl.innerHTML='';
+        routeLayers.forEach(l => map.removeLayer(l)); routeLayers = [];
+        if (layerControl) layerControl.remove(); routesTableEl.innerHTML = '';
       });
 
+      // Build logic
       async function buildArea(area) {
-        loadingEl.style.display='inline';
+        loadingEl.style.display = 'inline';
         builtAreas.add(area); updatePreview();
-        if(layerControl && layerControl._layers) {
-          const tgt = layerControl._layers.find(l=>l.name===area);
-          if(tgt && tgt.layer) map.removeLayer(tgt.layer);
+        if (layerControl && layerControl._layers) {
+          const tgt = layerControl._layers.find(l => l.name === area);
+          if (tgt && tgt.layer) map.removeLayer(tgt.layer);
         }
         const oldDiv = document.querySelector(`.area-container[data-area="${area}"]`);
-        if(oldDiv) oldDiv.remove();
+        if (oldDiv) oldDiv.remove();
 
         const stops = areaStops[area];
-        const unique = [...new Map(stops.map(s=>[s.name,s])).values()];
-        const jobs = unique.map((s,i)=>({id:i,location:s.coords}));
-        const vehicles=[{id:0,profile:'driving-car',start:depot}];
-        const optRes = await fetch('https://api.openrouteservice.org/optimization',{method:'POST',mode:'cors',headers:{'Accept':'application/json','Content-Type':'application/json','Authorization':API_KEY},body:JSON.stringify({jobs,vehicles,options:{g:false}})});
+        const unique = [...new Map(stops.map(s => [s.name, s])).values()];
+        const jobs = unique.map((s, i) => ({ id: i, location: s.coords }));
+        const vehicles = [{ id: 0, profile: 'driving-car', start: depot }];
+        const optRes = await fetch('https://api.openrouteservice.org/optimization', { method: 'POST', mode: 'cors', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': API_KEY }, body: JSON.stringify({ jobs, vehicles, options: { g: false } }) });
         const optData = await optRes.json();
-        const order = optData.routes[0].steps.filter(s=>s.type==='job').map(s=>s.job);
-        areaStops[area] = order.map(i=>unique[i]);
+        const order = optData.routes[0].steps.filter(s => s.type === 'job').map(s => s.job);
+        areaStops[area] = order.map(i => unique[i]);
 
-        const coordsSeq = [depot, ...areaStops[area].map(s=>s.coords)];
-        const dirRes = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson',{method:'POST',mode:'cors',headers:{'Accept':'application/json, application/geo+json','Content-Type':'application/json','Authorization':API_KEY},body:JSON.stringify({coordinates:coordsSeq})});
+        const coordsSeq = [depot, ...areaStops[area].map(s => s.coords)];
+        const dirRes = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', { method: 'POST', mode: 'cors', headers: { 'Accept': 'application/json, application/geo+json', 'Content-Type': 'application/json', 'Authorization': API_KEY }, body: JSON.stringify({ coordinates: coordsSeq }) });
         const dirGeo = await dirRes.json();
 
         const group = L.layerGroup();
-        L.geoJSON(dirGeo,{style:{color:colors[Object.keys(areaStops).indexOf(area)%colors.length],weight:5}}).addTo(group);
+        L.geoJSON(dirGeo, { style: { color: colors[Object.keys(areaStops).indexOf(area) % colors.length], weight: 5 } }).addTo(group);
         L.marker([depot[1], depot[0]]).addTo(group).bindTooltip('Start');
-        areaStops[area].forEach(s=>L.marker([s.coords[1],s.coords[0]]).addTo(group).bindTooltip(s.name));
+        areaStops[area].forEach(s => L.marker([s.coords[1], s.coords[0]]).addTo(group).bindTooltip(s.name));
         group.addTo(map); routeLayers.push(group);
 
-        if(layerControl) layerControl.remove();
-        layerControl = L.control.layers(null, Object.fromEntries(Object.entries(areaStops).map(([a],i)=>[a,a===area?group:L.layerGroup()])), {collapsed:false}).addTo(map);
+        if (layerControl) layerControl.remove();
+        layerControl = L.control.layers(null, Object.fromEntries(Object.entries(areaStops).map(([a], i) => [a, a === area ? group : L.layerGroup()])), { collapsed: false }).addTo(map);
 
-        const areaDiv = document.createElement('div'); areaDiv.className='area-container'; areaDiv.dataset.area=area;
-        const title = document.createElement('h3'); title.textContent=area; areaDiv.appendChild(title);
-        const table = document.createElement('table'); table.className='route-table';
-        const hdr = table.insertRow(); ['#','Name','Dist from prev (mi)'].forEach(h=>{const th=hdr.insertCell();th.textContent=h;});
+        const areaDiv = document.createElement('div'); areaDiv.className = 'area-container'; areaDiv.dataset.area = area;
+        const title = document.createElement('h3'); title.textContent = area; areaDiv.appendChild(title);
+        const table = document.createElement('table'); table.className = 'route-table';
+        const hdr = table.insertRow(); ['#','Name','Dist from prev (mi)'].forEach(h => { const th = hdr.insertCell(); th.textContent = h; });
         const tbody = document.createElement('tbody'); table.appendChild(tbody);
-        areaStops[area].forEach((s,i)=>{const row=tbody.insertRow();const prevCoords = i>0 ? areaStops[area][i-1].coords : depot;const dist = haversine(prevCoords, s.coords).toFixed(2);[i+1,s.name,dist].forEach(txt=>{const td=row.insertCell();td.textContent=txt;});});
+        areaStops[area].forEach((s, i) => { const row = tbody.insertRow(); const prevCoords = i > 0 ? areaStops[area][i-1].coords : depot; const dist = haversine(prevCoords, s.coords).toFixed(2); [i+1, s.name, dist].forEach(txt => { const td = row.insertCell(); td.textContent = txt; }); });
         areaDiv.appendChild(table); routesTableEl.appendChild(areaDiv);
-        new Sortable(tbody,{animation:150,onEnd:()=>{ buildArea(area); updatePreview(); }});
+        new Sortable(tbody, { animation: 150, onEnd: () => { buildArea(area); updatePreview(); } });
 
-        loadingEl.style.display='none';
+        loadingEl.style.display = 'none';
       }
     });
   </script>
