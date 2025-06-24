@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Route Builder</title>
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    #map { width: 100%; height: 60%; }
+    #controls { padding: 10px; background: #f9f9f9; display: flex; flex-wrap: wrap; gap: 8px; }
+    button { font-size: 1rem; padding: 6px 10px; }
+    #loading { font-size: 1rem; color: #555; display: none; margin-left: 10px; }
+    #routesTable { display: flex; flex-wrap: wrap; gap: 20px; padding: 10px; }
+    .area-container { display: flex; flex-direction: column; flex: 1 1 200px; }
+    .route-table { border-collapse: collapse; width: 100%; }
+    .route-table th, .route-table td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
+    .route-table th { background: #e9e9e9; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="controls">
+    <!-- Build area buttons will be inserted here -->
+    <span id="loading">Loading...</span>
+    <button id="clearRoutes">Clear Routes</button>
+  </div>
+  <div id="routesTable"></div>
+
+  <!-- Dependencies -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const API_KEY = '5b3ce3597851110001cf624895d5d8857d8d41b6a9508753893fbb25';
+            const areaStops = {
+        "East": [
+          { name: "Eastwood", coords: [-82.758526, 39.961474] },
+          { name: "Brookview", coords: [-82.82145, 39.877261] },
+          { name: "Longview", coords: [-82.789797, 39.89768] },
+          { name: "Maplewood", coords: [-82.75482, 39.969688] },
+          { name: "Overlook", coords: [-82.473669, 40.043237] },
+          { name: "Wagnalls", coords: [-82.813148, 39.811287] },
+          { name: "Forest Ridge", coords: [-82.668855, 40.015704] },
+          { name: "Heron", coords: [-82.716874, 39.909728] },
+          { name: "SpringHill Farms", coords: [-82.792604, 39.97291] },
+          { name: "Willowbend", coords: [-82.485522, 40.047837] },
+          { name: "Wellington Park", coords: [-82.751744, 39.895545] },
+          { name: "Heron", coords: [-82.716874, 39.909728] },
+          { name: "Lansdowne", coords: [-82.83537, 39.89249] },
+          { name: "Hazelton Crossing", coords: [-82.678359, 39.972371] },
+        ],
+        "North East of 23": [
+          { name: "Nook At Highland Lakes", coords: [-82.928911, 40.181095] },
+          { name: "Piatt Preserve", coords: [-83.00753, 40.245506] },
+          { name: "Morse", coords: [-82.816331, 40.052234] },
+          { name: "Berlin Farm MI Homes", coords: [-83.004182, 40.240546] },
+          { name: "Winterbrooke", coords: [-83.021288, 40.229418] },
+          { name: "Abberley", coords: [-82.816503, 40.052873] },
+          { name: "Berlin Bluffs Pulte", coords: [-82.997809, 40.24485] },
+          { name: "Eagle", coords: [-82.938333, 40.249897] },
+          { name: "Glenross Pulte", coords: [-83.020358, 40.236117] },
+          { name: "Jefferson Manor", coords: [-82.787034, 40.036095] },
+          { name: "Maeve", coords: [-83.005326, 40.236883] },
+          { name: "Magnolia", coords: [-82.887, 40.245262] },
+          { name: "Nottingham", coords: [-82.81253, 40.109482] },
+          { name: "Price Ponds Summit", coords: [-82.890611, 40.244936] },
+          { name: "Price Ponds Highlands", coords: [-82.890611, 40.244936] },
+          { name: "Slate Reserve", coords: [-83.018517, 40.193908] },
+          { name: "Slate Retreat", coords: [-83.018517, 40.193908] },
+          { name: "Towns on the Greenway", coords: [-82.942262, 40.134287] },
+          { name: "Glenross Ryan", coords: [-83.019782, 40.236517] },
+          { name: "Terra Alta", coords: [-83.051701, 40.268005] },
+          { name: "Rolling Hills", coords: [-82.891371, 40.240643] },
+          { name: "Miller Farm", coords: [-82.871836, 40.212932] },
+          { name: "Rutherford", coords: [-83.088637, 40.320409] },
+        ],
+        "North West of 23": [
+          { name: "Liberty Bluff", coords: [-83.064067, 40.209338] },
+          { name: "Parkview", coords: [-83.092585, 40.317609] },
+          { name: "Springer Woods", coords: [-83.120107, 40.310277] },
+          { name: "Courtyards at Hyatts", coords: [-83.099814, 40.217012] },
+          { name: "Hyatts Village", coords: [-83.1085, 40.2176] },
+          { name: "Liberty", coords: [-83.103957, 40.201641] },
+          { name: "WoodCrest", coords: [-83.114473, 40.222632] },
+          { name: "Clarkshaw Pulte", coords: [-83.104699, 40.223191] },
+          { name: "Hyatts Pulte", coords: [-83.098683, 40.21481] },
+          { name: "Limestone", coords: [-83.122495, 40.302692] },
+          { name: "Nelson", coords: [-83.084053, 40.20845] },
+          { name: "Hyatts Ryan", coords: [-83.04102, 40.215079] },
+          { name: "Harpers Pointe", coords: [-83.071413, 40.160454] },
+        ],
+        "Southwest": [
+          { name: "Chase Landing", coords: [-83.163537, 39.918362] },
+          { name: "Walnut", coords: [-82.95359, 39.734237] },
+          { name: "Browns Farm", coords: [-83.089867, 39.857121] },
+          { name: "Foxfire", coords: [-83.028864, 39.777897] },
+          { name: "Pinnacle", coords: [-83.028943, 39.866539] },
+          { name: "Beulah", coords: [-83.104556, 39.889952] },
+          { name: "Bloomfield", coords: [-82.988884, 39.708129] },
+          { name: "Buckstone", coords: [-82.967935, 39.856655] },
+          { name: "Clover", coords: [-83.161864, 39.949993] },
+          { name: "Foxfire", coords: [-83.029083, 39.777874] },
+          { name: "Holton", coords: [-83.0983, 39.8582] },
+          { name: "Monarch Greene", coords: [-83.03278, 39.92751] },
+          { name: "River Ridge", coords: [-82.94865, 39.63585] },
+          { name: "Mulberry", coords: [-83.056351, 39.871459] },
+        ],
+        "West": [
+          { name: "Towns On The Parkway", coords: [-83.100162, 40.106649] },
+          { name: "Jerome Village Pulte", coords: [-83.189026, 40.187687] },
+          { name: "Eversole Woods", coords: [-83.187045, 40.179464] },
+          { name: "Jerome Village 3 Pillar", coords: [-83.192238, 40.178976] },
+          { name: "Madison Meadows", coords: [-83.287352, 40.103927] },
+          { name: "Renner", coords: [-83.173465, 39.982893] },
+          { name: "Carr Farms", coords: [-83.170284, 40.05138] },
+          { name: "Hyland Meadows", coords: [-83.191183, 40.189891] },
+          { name: "White Oaks", coords: [-83.192868, 40.166178] },
+          { name: "Darby", coords: [-83.250687, 40.107605] },
+          { name: "Glacier Pointe", coords: [-83.205445, 40.147034] },
+          { name: "Hill Farm", coords: [-83.203022, 40.037428] },
+          { name: "Amrine", coords: [-83.371765, 40.270238] },
+          { name: "Scotts", coords: [-83.214898, 40.154941] },
+          { name: "Pioneer", coords: [-83.237856, 40.150438] },
+          { name: "Sugar Farms", coords: [-83.178413, 39.987856] },
+          { name: "HofBauer", coords: [-83.269355, 40.11427] },
+          { name: "Jerome Aster Rockford", coords: [-83.172143, 40.194037] },
+          { name: "Jerome Aster Schottenstein", coords: [-83.172143, 40.194037] },
+          { name: "Cottages At Verbana", coords: [-83.200862, 40.184323] },
+          { name: "Hyland Glen", coords: [-83.175554, 40.114383] },
+          { name: "Jerome Village Applewood", coords: [-83.199764, 40.169613] },
+          { name: "Jerome Village Meadowlark", coords: [-83.20899, 40.187822] },
+          { name: "Mitchell Highlands", coords: [-83.22626, 40.148096] },
+          { name: "Ludlow Ridge", coords: [-83.745493, 40.339108] },
+        ],
+      };
+      const depot = [-83.063289, 40.087882];
+      const colors = ['#FF0000', '#008080', '#00AA00', '#FFA500', '#A52A2A'];
+
+      function haversine(c1, c2) {
+        const toRad = d => d * Math.PI / 180;
+        const [lon1, lat1] = c1;
+        const [lon2, lat2] = c2;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return 6371 * c * 0.621371;
+      }
+
+      const map = L.map("map").setView([39.9612, -82.9988], 12);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OSM" }).addTo(map);
+      let layerControl;
+      const routeLayers = []; // track all drawn route groups
+
+      const controlsDiv = document.getElementById('controls');
+      const loadingEl = document.getElementById('loading');
+      const routesTableEl = document.getElementById('routesTable');
+
+      // Create Build buttons for each area
+      Object.keys(areaStops).forEach((area, idx) => {
+        const btn = document.createElement('button');
+        btn.textContent = `Build ${area}`;
+        btn.style.background = colors[idx % colors.length];
+        btn.addEventListener('click', () => buildArea(area));
+        controlsDiv.insertBefore(btn, loadingEl);
+      });
+
+      // Clear all routes (including markers)
+      document.getElementById('clearRoutes').addEventListener('click', () => {
+        // Remove each stored layer
+        routeLayers.forEach(layer => map.removeLayer(layer));
+        routeLayers.length = 0;
+        if (layerControl) layerControl.remove();
+        routesTableEl.innerHTML = '';
+      });
+
+      // Build a single area's route
+      async function buildArea(area) {
+        loadingEl.style.display = 'inline';
+        // Remove previous layer for this area if exists
+        if (layerControl && layerControl._layers) {
+          const existing = layerControl._layers.find(l => l.name === area);
+          if (existing && existing.layer) map.removeLayer(existing.layer);
+        }
+        // Clear previous table for this area
+        const prevDiv = document.querySelector(`.area-container[data-area='${area}']`);
+        if (prevDiv) prevDiv.remove();
+
+        // Optimization request
+        const stops = areaStops[area];
+        const unique = [...new Map(stops.map(s => [s.name, s])).values()];
+        const jobs = unique.map((s, i) => ({ id: i, location: s.coords }));
+        const vehicles = [{ id: 0, profile: 'driving-car', start: depot }];
+        const optRes = await fetch('https://api.openrouteservice.org/optimization', {
+          method: 'POST', mode: 'cors',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': API_KEY },
+          body: JSON.stringify({ jobs, vehicles, options: { g: false } })
+        });
+        const optData = await optRes.json();
+        const order = optData.routes[0].steps.filter(s => s.type === 'job').map(s => s.job);
+        areaStops[area] = order.map(i => unique[i]);
+
+        // Draw Directions
+        const coordsSeq = [depot, ...areaStops[area].map(s => s.coords)];
+        const dirRes = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
+          method: 'POST', mode: 'cors',
+          headers: { 'Accept': 'application/json, application/geo+json', 'Content-Type': 'application/json', 'Authorization': API_KEY },
+          body: JSON.stringify({ coordinates: coordsSeq })
+        });
+        const dirGeo = await dirRes.json();
+
+        // Create layer group and add to map & tracking array
+        const group = L.layerGroup();
+        L.geoJSON(dirGeo, { style: { color: colors[Object.keys(areaStops).indexOf(area) % colors.length], weight: 5 } }).addTo(group);
+        L.marker([depot[1], depot[0]]).addTo(group).bindTooltip('Start');
+        areaStops[area].forEach(s => L.marker([s.coords[1], s.coords[0]]).addTo(group).bindTooltip(s.name));
+        group.addTo(map);
+        routeLayers.push(group);
+
+        // Update layer control
+        if (layerControl) layerControl.remove();
+        layerControl = L.control.layers(null, Object.fromEntries(
+          Object.entries(areaStops).map(([a], i) => [a, a === area ? group : L.layerGroup()])
+        ), { collapsed: false }).addTo(map);
+
+        // Render table
+        const areaDiv = document.createElement('div');
+        areaDiv.className = 'area-container';
+        areaDiv.dataset.area = area;
+        const title = document.createElement('h3'); title.textContent = area;
+        areaDiv.appendChild(title);
+        const table = document.createElement('table'); table.className = 'route-table';
+        const hdr = table.insertRow(); ['#', 'Name', 'Dist to next (mi)'].forEach(h => { const th = hdr.insertCell(); th.textContent = h; });
+        const tbody = document.createElement('tbody'); table.appendChild(tbody);
+        areaStops[area].forEach((s, i) => {
+          const row = tbody.insertRow();
+          const next = areaStops[area][i+1];
+          const dist = next ? haversine(s.coords, next.coords).toFixed(2) : '';
+          [i + 1, s.name, dist].forEach(txt => { const td = row.insertCell(); td.textContent = txt; });
+        });
+        areaDiv.appendChild(table);
+        routesTableEl.appendChild(areaDiv);
+
+        // Enable drag to reorder
+        new Sortable(tbody, { animation: 150, onEnd: () => buildArea(area) });
+
+        loadingEl.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
