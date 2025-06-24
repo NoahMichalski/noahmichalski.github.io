@@ -287,6 +287,8 @@
         areaStops[area].forEach((s,i)=>{const row=tbody.insertRow();const prevCoords = i>0 ? areaStops[area][i-1].coords : depot;const dist = haversine(prevCoords, s.coords).toFixed(2); [i+1,s.name,dist].forEach(txt=>{const td=row.insertCell();td.textContent=txt;});});
         areaDiv.appendChild(table); routesTableEl.appendChild(areaDiv);
         new Sortable(tbody,{animation:150,onEnd:()=>{ buildArea(area); updatePreview(); }});
+        // Ensure preview updates after building
+        updatePreview();
 
         loadingEl.style.display='none';
       }
