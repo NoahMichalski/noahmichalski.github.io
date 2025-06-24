@@ -9,8 +9,8 @@
   <style>
     html, body { height: 100%; margin: 0; padding: 0; }
     #map { position: relative; width: 100%; height: 60%; }
-    /* Logo positioned top-right on the map */
-    #logo { position: absolute; top: 10px; right: 10px; width: 120px; z-index: 1000; pointer-events: none; }
+    /* Logo positioned bottom-left on the map */
+    #logo { position: absolute; bottom: 10px; left: 10px; width: 120px; z-index: 1000; pointer-events: none; }
     /* Controls container */
     #controls { padding: 10px; background: #f9e9f9; display: flex; flex-direction: column; gap: 8px; }
     .controls-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -256,7 +256,7 @@
 
       // Build logic
       async function buildArea(area) {
-        loadingEl.style.display = 'inline';
+        loadingEl.style.display='inline';
         builtAreas.add(area); updatePreview();
         if (layerControl && layerControl._layers) {
           const tgt = layerControl._layers.find(l => l.name === area);
@@ -275,7 +275,7 @@
         areaStops[area] = order.map(i => unique[i]);
 
         const coordsSeq = [depot, ...areaStops[area].map(s => s.coords)];
-        const dirRes = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', { method: 'POST', mode: 'cors', headers: { 'Accept': 'application/json, application/geo+json', 'Content-Type': 'application/json', 'Authorization': API_KEY }, body: JSON.stringify({ coordinates: coordsSeq }) });
+        const dirRes = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', { method: 'POST', mode: 'configs', headers: { 'Accept': 'application/json, application/geo+json', 'Content-Type': 'application/json', 'Authorization': API_KEY }, body: JSON.stringify({ coordinates: coordsSeq }) });
         const dirGeo = await dirRes.json();
 
         const group = L.layerGroup();
