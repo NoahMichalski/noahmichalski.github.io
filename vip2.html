@@ -10,6 +10,29 @@
     html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
     #map { width: 100%; height: 100%; }
 
+    /* Revision number, top-left */
+#revision-number {
+  position: absolute;
+  bottom: 10px;        /* move down to bottom */
+  left: 50%;           /* center horizontally */
+  transform: translateX(-50%);
+  z-index: 1003;
+  background: rgba(255,255,255,0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: sans-serif;
+}
+/* Logo, bottom-left */
+#company-logo {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 1003;
+  width: 80px;
+  height: auto;
+}
+
     /* Search Box */
     .search-box {
       position: absolute;
@@ -124,6 +147,9 @@
   <div><span style="color:grey;">●</span> Bob Webb</div>
   </div>
   <div id="map"></div>
+
+  <div id="revision-number">Revision: 1.10</div>
+<img id="company-logo" src="/images/logo-VIP.png" alt="Company Logo" />
 
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script>
