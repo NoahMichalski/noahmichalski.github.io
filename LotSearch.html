@@ -11,26 +11,81 @@
   <!-- Dropbox SDK -->
   <script src="https://unpkg.com/dropbox/dist/Dropbox-sdk.min.js"></script>
   <style>
-    body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; }
-    .lot-search { display: flex; flex-direction: column; height: 100vh; }
-    .search-input { flex: 1 1 auto; padding: 0.8em; font-size: 1.1em; margin: 0.2em; border: 1px solid #ccc; }
-    .results { flex: 1 1 auto; overflow: hidden; }
-    .clusterize-scroll { max-height: 100%; overflow-y: auto; }
-    .clusterize-content { padding: 0; margin: 0; list-style: none; }
-    .lot-item { padding: 1em; border-bottom: 1px solid #eee; font-size: 1.1em; }
-    .lot-item a { text-decoration: none; color: #007AFF; }
-    form#addForm { display: flex; flex-wrap: wrap; align-items: center; padding: 0 0.5em; }
-    form#addForm button { flex: 0 0 auto; padding: 0.8em 1em; font-size: 1.1em; margin: 0.2em; }
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: sans-serif;
+    }
+    .lot-search {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    /* Search box styles */
+    #searchInput {
+      flex: 0 0 auto;
+      padding: 0.6em;
+      font-size: 1.1em;
+      margin: 0.5em auto;
+      width: 90%;
+      max-width: 600px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    /* Add form inputs flex */
+    form#addForm {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 0 0.5em;
+    }
+    form#addForm input {
+      flex: 1 1 auto;
+      padding: 0.6em;
+      font-size: 1em;
+      margin: 0.2em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    form#addForm button {
+      flex: 0 0 auto;
+      padding: 0.8em 1em;
+      font-size: 1.1em;
+      margin: 0.2em;
+    }
+    .results {
+      flex: 1 1 auto;
+      overflow: hidden;
+    }
+    .clusterize-scroll {
+      max-height: 100%;
+      overflow-y: auto;
+    }
+    .clusterize-content {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    .lot-item {
+      padding: 1em;
+      border-bottom: 1px solid #eee;
+      font-size: 1.1em;
+    }
+    .lot-item a {
+      text-decoration: none;
+      color: #007AFF;
+    }
   </style>
 </head>
 <body>
   <div class="lot-search">
-    <input id="searchInput" class="search-input" placeholder="Search builder, subdivision or lot...">
+    <input id="searchInput" placeholder="Search builder, subdivision or lot...">
     <form id="addForm">
-      <input name="builder"     class="search-input" placeholder="Builder" required>
-      <input name="subdivision" class="search-input" placeholder="Subdivision" required>
-      <input name="lot"         class="search-input" placeholder="Lot #" required>
-      <input name="address"     class="search-input" placeholder="Full address" required>
+      <input name="builder"     placeholder="Builder" required>
+      <input name="subdivision" placeholder="Subdivision" required>
+      <input name="lot"         placeholder="Lot #" required>
+      <input name="address"     placeholder="Full address" required>
       <button type="submit">Add Subdivision</button>
     </form>
     <div class="results">
@@ -43,25 +98,36 @@
   <script>
     // == Configuration ==
     const DROPBOX_ACCESS_TOKEN = 'sl.u.AF2ixtZb17iBgkSr30UlqqSFzvMHTVQp5R2VFO4n3ktPEY_PBnHIaZKvgXGe9mGAiJK8wsoW0P_-hIB0UVnbHpmioBoor5NPYUlZbN2BIV13tTzuilG-gZU1FhSG05OCN1yMl4UghkHyg_IIG5fjmVv9mlKbbeaWdU8dwrOn4JznyZSqzalvKyKGKawSbEltXeEuIAvDzKk3jITM43fIkY7U-zVKKoOdT497ueROxY1Rliz05Jas1vABWJhMsCeMxYFvsO40Y3BGvm4QtZaFDwLnfP-7rzxSMSjq8L4uMuvC1M2VrLbUSFj6MoIsNfPM4o-j3tf_cddcFpk5N5pd7A2GjU3sTETVxzDOQNJQ1YN_GU-zkJxUxOe560p2beqK1F8MkxPg5Uomytqoo_gI_qJvyllXz-t0lcpg-e17ytp2wxlQSUCm8FzhBkQ3Xc82RpZwVBhxJWWOdYx_siwrWVPusW7Ojib8DUS6_qnlvAnitN4y4o__o6522zwqNK6cECoH7Sg0v5pPv4Alc-q0A2h7VUXryqhl-a7uW9LtXvl49S1wAwcW3WLzTde-VOlgzb0yUXpzZ67IIfevyhD2vEvMYydwUy7nGrMGyAGgL7MfsY_prNOiL1CL2N35Mpyp2eb5x7kW6O9oWjJ_iq2U0cObFnPjCVc5Cfdijgcy-SQvgT5ZSASwqVF74ZLIeA6U7BzfRd2TLZWzVGyKvZgFJUODki42FHNhXAUKoRpRynfAhutM3lxCxPHt-7N_egahtqruaNG0K_f-EVpZT74v-VV_KObwS_mJcxJFbL-8-xeOd41Rw-RNpC9_kzG1JTKiQ3YubUo0FutBj15e5UscecMlUlK2jS7PCXnb_9gdWfke4J-EIbMp3KY49oRmRe8vxun_9d9BryXrt8WAnhmHreM1R-tQuh4zzDGLarfkvBqU1AuKueUpT85QMZ-RT1EkHGz56DquQ7bNswgcxuGOYMp6dIM6z6isRL90dzcF0QqfTlzMHAF7ZoWeiC1_fUEsicFpY5NZRlp9U0A1eJq-Nw6C6GqZSe4G5bNxJf86b9svmXPmxFUYfhRoZazuIj1chQswujXqPcZ0ci5hcBnXD480uX0H0Stjpj2yhxnHX-AZVfKYUtP1NwIm5ruQe5Td3-ULUII2F8OiVO_KQzoBzIlu-saJaa0QevW3Qkwu1j44PpMILMlbuI7S6pfQSKa0S1SquO3IzrkNmcAKdEP4h8Ff0U7l8Wsji8WVslheU-GsaiDOoUvuWKkSGeAJmdlWZVZWFxTMwtfBcUmjAV2v9go6JtSFl8NsfMbcIw6Mh8wlZpOdG9FYOK6aqYhg7stK9cv4QfhhqKjVWn4FkzHE77a4OjJL9e2P1_UdflbRj-YTIgJkwuLibX5exHnQ9uVP-K0eO468Zki8xqvl6_QqmNQSxpPbcYuUVtQ1xivfdsTPIQ';
-    const DROPBOX_FILE_PATH   = '/Apps/Lot Search2/lots.json'; // adjust to your Dropbox path
+    const DROPBOX_FILE_PATH   = '/Apps/Lot Search2/lots.json';
 
     // Initialize Dropbox client
     const dbx = new Dropbox.Dropbox({ accessToken: DROPBOX_ACCESS_TOKEN, fetch });
 
     // Helper: load lots.json from Dropbox
     async function loadLotsFromDropbox() {
-      const res = await dbx.filesDownload({ path: DROPBOX_FILE_PATH });
-      const text = await res.fileBlob.text();
-      return JSON.parse(text);
+      try {
+        const res = await dbx.filesDownload({ path: DROPBOX_FILE_PATH });
+        const text = await res.fileBlob.text();
+        return JSON.parse(text);
+      } catch (err) {
+        console.error('Error fetching lots.json:', err);
+        alert('Could not load lot data. Check your Dropbox path and token.');
+        return [];
+      }
     }
 
     // Helper: save lots.json back to Dropbox
     async function saveLotsToDropbox(lots) {
-      await dbx.filesUpload({
-        path:      DROPBOX_FILE_PATH,
-        mode:      { '.tag': 'overwrite' },
-        contents:  JSON.stringify(lots, null, 2)
-      });
+      try {
+        await dbx.filesUpload({
+          path:      DROPBOX_FILE_PATH,
+          mode:      { '.tag': 'overwrite' },
+          contents:  JSON.stringify(lots, null, 2)
+        });
+      } catch (err) {
+        console.error('Error saving lots.json:', err);
+        alert('Could not save lot data.');
+      }
     }
 
     // Debounce helper
@@ -86,4 +152,43 @@
 
         // Render function
         function renderList(items) {
-          const rows = items.map(item =>\``
+          const rows = items.map(item =>
+            `<li class="lot-item">
+              <strong>${item.builder}</strong> — 
+              <em>${item.subdivision} Lot ${item.lot}</em><br>
+              <a href="https://maps.google.com/?q=${encodeURIComponent(item.address)}" target="_blank">${item.address}</a>
+            </li>`
+          );
+          clusterize.update(rows);
+        }
+
+        // Initial render
+        renderList(lots);
+
+        // Search handler
+        document.getElementById('searchInput')
+          .addEventListener('input', debounce(e => {
+            const q = e.target.value.trim();
+            renderList(q ? fuse.search(q).map(r => r.item) : lots);
+          }, 300));
+
+        // Add form handler
+        document.getElementById('addForm').addEventListener('submit', async e => {
+          e.preventDefault();
+          const form = e.target;
+          const newItem = {
+            builder:     form.builder.value.trim(),
+            subdivision: form.subdivision.value.trim(),
+            lot:         form.lot.value.trim(),
+            address:     form.address.value.trim()
+          };
+          lots.push(newItem);
+          await saveLotsToDropbox(lots);
+          renderList(lots);
+          form.reset();
+          alert('Subdivision added!');
+        });
+      });
+  </script>
+</body>
+</html>
