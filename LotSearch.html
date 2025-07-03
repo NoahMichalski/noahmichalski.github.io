@@ -8,86 +8,28 @@
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
   <!-- Clusterize.js for virtual scrolling -->
   <script src="https://cdn.jsdelivr.net/npm/clusterize.js@0.18.1/clusterize.min.js"></script>
-  <!-- Dropbox SDK -->
-  <script src="https://unpkg.com/dropbox/dist/Dropbox-sdk.min.js"></script>
   <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: sans-serif;
-    }
-    .lot-search {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    /* Search box styles */
+    body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; }
+    .lot-search { display: flex; flex-direction: column; height: 100vh; }
     #searchInput {
       flex: 0 0 auto;
       padding: 0.6em;
       font-size: 1.1em;
       margin: 0.5em auto;
-      width: 80%;
-      max-width: 400px;
+      width: 80%; max-width: 300px;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    /* Add form inputs flex */
-    form#addForm {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      padding: 0 0.5em;
-    }
-    form#addForm input {
-      flex: 1 1 auto;
-      padding: 0.6em;
-      font-size: 1em;
-      margin: 0.2em;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    form#addForm button {
-      flex: 0 0 auto;
-      padding: 0.8em 1em;
-      font-size: 1.1em;
-      margin: 0.2em;
-    }
-    .results {
-      flex: 1 1 auto;
-      overflow: hidden;
-    }
-    .clusterize-scroll {
-      max-height: 100%;
-      overflow-y: auto;
-    }
-    .clusterize-content {
-      padding: 0;
-      margin: 0;
-      list-style: none;
-    }
-    .lot-item {
-      padding: 1em;
-      border-bottom: 1px solid #eee;
-      font-size: 1.1em;
-    }
-    .lot-item a {
-      text-decoration: none;
-      color: #007AFF;
-    }
+    .results { flex: 1 1 auto; overflow: hidden; }
+    .clusterize-scroll { max-height: 100%; overflow-y: auto; }
+    .clusterize-content { padding: 0; margin: 0; list-style: none; }
+    .lot-item { padding: 1em; border-bottom: 1px solid #eee; font-size: 1.1em; }
+    .lot-item a { text-decoration: none; color: #007AFF; }
   </style>
 </head>
 <body>
   <div class="lot-search">
     <input id="searchInput" placeholder="Search builder, subdivision or lot...">
-    <form id="addForm">
-      <input name="builder"     placeholder="Builder" required>
-      <input name="subdivision" placeholder="Subdivision" required>
-      <input name="lot"         placeholder="Lot #" required>
-      <input name="address"     placeholder="Full address" required>
-      <button type="submit">Add Subdivision</button>
-    </form>
     <div class="results">
       <div id="scrollArea" class="clusterize-scroll">
         <ul id="resultsList" class="clusterize-content"></ul>
@@ -97,36 +39,19 @@
 
   <script>
     // == Configuration ==
-    const DROPBOX_ACCESS_TOKEN = 'sl.u.AF2B4EiEtF5mI8K12TgGpibdtDQFn-cQa54GqKbUIqDIpLgJw9307l65i6JIABuI_OkvWXjuQ7rUt-M7ZLD4Qzlwf-ZYcIPiLTkOVxK95XZboHn7fPriH2BeDgdFPu9-23tD7NtsYM_UBCfBZ2jjmJFJ58Scr42ZhkIZ9mHerMEQOw33zp_--3JrD6ZCbatH7uYJKhfjXnuEusOcZJO2_sapO39FY3L5vB3TbdqWnKwGvB84y87e86L_ulss3REgX8JDjQ216HZNvH4FkdRQIHw3GME-_GYADdZ-tsC8djcRd9uNgEyDAqXyrNGYhm1N7dQOARdfE96y0OXOdl446ZqnGLPWbEwo_N7ive58ydyh54x4yFR5ZN6jmNdfbeMeUSE-aUbywAEjUy6-H8uOhxeOnekq4GN6XmKCJh6ayAKO2Hsd4zcDKLVA9Nmj7DVRtNaXawbqyPHK8uz2HHVqDKrZqhm-cpvFo4uo5fZVETab16hljajV59As8Tucs9mv_BKYYb7nbm_Uu3--Byno8zex3Dm3ctPROmJHagj7gOKtUeEuSzdnPV1NpMtsYKhU7L_L_XjXJup9UWUepqLEdz9ymGcTfQPcyZiFF_l4iLM6usn1TFPe0lvUXzEZpSwZBbFE6oB7-SHploGKy6xk8fDxPQlmeo1v_HUeFZiUmCF14Onx0FLq2almM_Y0ZJt2z2DWdvXF-dT9HWJb0EES1Kt7GzA-DBg9GIbDazcWQdzqhtGtzt02D0Lp-FGe4rOFmdvbt2_lOEk_gLo7OoiPK8WbzHNvnCnsKsuJmsXlLBwNnxOlIjl2BTnwAOChbwN8ePV2Uogh09AdQeJhHV7vzngwegRz6Xv8Wr5iZzXVXxHj1bnJqR6Tc8-Hn2Mus1GDB9v9adIPUHohcT7ilcpQviwkqLlgvrBYnL55YDdYri2COZZulfk2qHmLk0nQhVziWzGjqMdppAC6dkxg55_yezhgNpP-bMiVQbriPQnxC_4FWhfeA2Iy9BXywdiin2ooUzQ9UfInX-uMGZ4-kY9MWXLVnyCOzYKKiiiT43V_d3QzA4dLYgHKbSz_V4JIMs5gV4zptxBd9mKaM4YVSQHp-Fpe8XigufzAxO2JbPqUw0xgoCY32w1IUuIEwntMBjMFeRVtyHFR-cK2xDYYfPpCrM6tPUnOE3kVPtZEVUYAZyMuPP3fFZwcquYFfJ4pW2Y9Ck_I-xekCybuHbQjhFqA9mhIRepKK_NaG0lzpIPVQFHVwbUcicXIzz0_3r0lnQs4O7n0E7O_U3E_EQUZUfs_nyt8_wGv8vsk_gE4B2InwEiGo1RaZEkA9ld-ImHqVndyQZ1uckimKeoAxTfBmbJsa2xEbNU9VyAdXSXB95WX3r_LMkZm2lwsE0LkBdT4-h2VhmM7xUzFn0PcqBtqFXA-Kpsem9gcdrwcywUKdLUZCU90nSF13pq4Vm4ENL5ZQivW73o';
-    const DROPBOX_FILE_PATH   = '/LotSearch2/lots.json';
+    // Provide your raw DropBox shared link to lots.json here (e.g. https://dl.dropboxusercontent.com/s/xxxxx/lots.json)
+    const RAW_LOTS_URL = 'https://dl.dropboxusercontent.com/scl/fi/lws53jgq5h5f54fnkt7dd/lots.json?rlkey=b3646pn6ze1lzuzjo22odac58&st=syxlguup&dl=1';
 
-    // Initialize Dropbox client
-    const dbx = new Dropbox.Dropbox({ accessToken: DROPBOX_ACCESS_TOKEN, fetch });
-
-    // Helper: load lots.json from Dropbox
-    async function loadLotsFromDropbox() {
+    // Helper: load lots data via simple fetch
+    async function loadLots() {
       try {
-        const res = await dbx.filesDownload({ path: DROPBOX_FILE_PATH });
-        const text = await res.fileBlob.text();
-        return JSON.parse(text);
+        const res = await fetch(RAW_LOTS_URL);
+        if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
+        return await res.json();
       } catch (err) {
         console.error('Error fetching lots.json:', err);
-        alert('Could not load lot data. Check your Dropbox path and token.');
+        alert('Could not load lot data. Check your RAW_LOTS_URL and network.');
         return [];
-      }
-    }
-
-    // Helper: save lots.json back to Dropbox
-    async function saveLotsToDropbox(lots) {
-      try {
-        await dbx.filesUpload({
-          path:      DROPBOX_FILE_PATH,
-          mode:      { '.tag': 'overwrite' },
-          contents:  JSON.stringify(lots, null, 2)
-        });
-      } catch (err) {
-        console.error('Error saving lots.json:', err);
-        alert('Could not save lot data.');
       }
     }
 
@@ -139,56 +64,137 @@
       };
     }
 
-    // Main initialization
-    loadLotsFromDropbox()
-      .then(async initialLots => {
-        let lots = initialLots;
+    // Main
+    loadLots().then(lots => {
+      // Fuse.js setup
+      const fuse = new Fuse(lots, { keys: ['builder','subdivision','lot'], threshold: 0.3 });
+      // Clusterize.js setup
+      const clusterize = new Clusterize({ rows: [], scrollId: 'scrollArea', contentId: 'resultsList' });
 
-        // Fuse.js setup
-        const fuse = new Fuse(lots, { keys: ['builder','subdivision','lot'], threshold: 0.3 });
+      // Render function
+      function renderList(items) {
+        const rows = items.map(item =>
+          `<li class="lot-item">
+             <strong>${item.builder}</strong> — 
+             <em>${item.subdivision} Lot ${item.lot}</em><br>
+             <a href="https://maps.google.com/?q=${encodeURIComponent(item.address)}" target="_blank" rel="noopener">
+               ${item.address}
+             </a>
+           </li>`
+        );
+        clusterize.update(rows);
+      }
 
-        // Clusterize.js setup
-        const clusterize = new Clusterize({ rows: [], scrollId: 'scrollArea', contentId: 'resultsList' });
+      // Initial render
+      renderList(lots);
 
-        // Render function
-        function renderList(items) {
-          const rows = items.map(item =>
-            `<li class="lot-item">
-              <strong>${item.builder}</strong> — 
-              <em>${item.subdivision} Lot ${item.lot}</em><br>
-              <a href="https://maps.google.com/?q=${encodeURIComponent(item.address)}" target="_blank" rel="noopener">${item.address}</a>
-            </li>`
-          );
-          clusterize.update(rows);
-        }
+      // Search handler
+      document.getElementById('searchInput')
+        .addEventListener('input', debounce(e => {
+          const q = e.target.value.trim();
+          renderList(q ? fuse.search(q).map(r => r.item) : lots);
+        }, 200));
+    });
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lot Search</title>
+  <!-- Fuse.js for fuzzy searching -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+  <!-- Clusterize.js for virtual scrolling -->
+  <script src="https://cdn.jsdelivr.net/npm/clusterize.js@0.18.1/clusterize.min.js"></script>
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; }
+    .lot-search { display: flex; flex-direction: column; height: 100vh; }
+    #searchInput {
+      flex: 0 0 auto;
+      padding: 0.6em;
+      font-size: 1.1em;
+      margin: 0.5em auto;
+      width: 80%; max-width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .results { flex: 1 1 auto; overflow: hidden; }
+    .clusterize-scroll { max-height: 100%; overflow-y: auto; }
+    .clusterize-content { padding: 0; margin: 0; list-style: none; }
+    .lot-item { padding: 1em; border-bottom: 1px solid #eee; font-size: 1.1em; }
+    .lot-item a { text-decoration: none; color: #007AFF; }
+  </style>
+</head>
+<body>
+  <div class="lot-search">
+    <input id="searchInput" placeholder="Search builder, subdivision or lot...">
+    <div class="results">
+      <div id="scrollArea" class="clusterize-scroll">
+        <ul id="resultsList" class="clusterize-content"></ul>
+      </div>
+    </div>
+  </div>
 
-        // Initial render
-        renderList(lots);
+  <script>
+    // == Configuration ==
+    // Provide your raw DropBox shared link to lots.json here (e.g. https://dl.dropboxusercontent.com/s/xxxxx/lots.json)
+    const RAW_LOTS_URL = 'https://dl.dropboxusercontent.com/scl/fi/lws53jgq5h5f54fnkt7dd/lots.json?rlkey=b3646pn6ze1lzuzjo22odac58&st=syxlguup&dl=1';
 
-        // Search handler
-        document.getElementById('searchInput')
-          .addEventListener('input', debounce(e => {
-            const q = e.target.value.trim();
-            renderList(q ? fuse.search(q).map(r => r.item) : lots);
-          }, 300));
+    // Helper: load lots data via simple fetch
+    async function loadLots() {
+      try {
+        const res = await fetch(RAW_LOTS_URL);
+        if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
+        return await res.json();
+      } catch (err) {
+        console.error('Error fetching lots.json:', err);
+        alert('Could not load lot data. Check your RAW_LOTS_URL and network.');
+        return [];
+      }
+    }
 
-        // Add form handler
-        document.getElementById('addForm').addEventListener('submit', async e => {
-          e.preventDefault();
-          const form = e.target;
-          const newItem = {
-            builder:     form.builder.value.trim(),
-            subdivision: form.subdivision.value.trim(),
-            lot:         form.lot.value.trim(),
-            address:     form.address.value.trim()
-          };
-          lots.push(newItem);
-          await saveLotsToDropbox(lots);
-          renderList(lots);
-          form.reset();
-          alert('Subdivision added!');
-        });
-      });
+    // Debounce helper
+    function debounce(fn, delay) {
+      let timer;
+      return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), delay);
+      };
+    }
+
+    // Main
+    loadLots().then(lots => {
+      // Fuse.js setup
+      const fuse = new Fuse(lots, { keys: ['builder','subdivision','lot'], threshold: 0.3 });
+      // Clusterize.js setup
+      const clusterize = new Clusterize({ rows: [], scrollId: 'scrollArea', contentId: 'resultsList' });
+
+      // Render function
+      function renderList(items) {
+        const rows = items.map(item =>
+          `<li class="lot-item">
+             <strong>${item.builder}</strong> — 
+             <em>${item.subdivision} Lot ${item.lot}</em><br>
+             <a href="https://maps.google.com/?q=${encodeURIComponent(item.address)}" target="_blank" rel="noopener">
+               ${item.address}
+             </a>
+           </li>`
+        );
+        clusterize.update(rows);
+      }
+
+      // Initial render
+      renderList(lots);
+
+      // Search handler
+      document.getElementById('searchInput')
+        .addEventListener('input', debounce(e => {
+          const q = e.target.value.trim();
+          renderList(q ? fuse.search(q).map(r => r.item) : lots);
+        }, 200));
+    });
   </script>
 </body>
 </html>
