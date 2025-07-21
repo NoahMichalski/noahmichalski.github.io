@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIP Contractor Services Knowledge Base</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    header { background: #2c3e50; color: white; padding: 1rem; display: flex; align-items: center; }
+    #company-logo { height: 50px; margin-right: 1rem; }
+    nav { background: #34495e; padding: 0.5rem; }
+    nav ul { list-style: none; margin: 0; padding: 0; display: flex; }
+    nav li { position: relative; margin-right: 1rem; }
+    nav a { color: white; text-decoration: none; }
+    nav ul ul { display: none; position: absolute; top: 100%; left: 0; background: #3b536b; padding: 0.5rem; }
+    nav li:hover > ul { display: block; }
+    nav ul ul li { margin: 0; }
+    nav ul ul a { white-space: nowrap; }
+    main { padding: 1.5rem; }
+    section { margin-bottom: 2rem; }
+    h2 { border-bottom: 2px solid #ccc; padding-bottom: 0.5rem; }
+    h3 { margin-top: 1.5rem; }
+    h4 { margin-top: 1rem; }
+    h5 { margin-top: 1rem; font-weight: bold; }
+    img { max-width: 100%; border: 1px solid #ddd; margin: 0.5rem 0; }
+    code { background: #f4f4f4; padding: 0.2rem 0.4rem; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="PLACEHOLDER_LOGO" alt="VIP Contractor Services Logo" id="company-logo" />
+    <div><h1>VIP Contractor Services Knowledge Base</h1></div>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li>
+        <a href="visual-planning.html">Visual Planning</a>
+        <ul>
+          <li><a href="visual-planning.html#vpdesk">VPDesk (Desktop)</a></li>
+          <li><a href="visual-planning.html#vpgo">VPGO (Field/Phone)</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+  <main>
+    <article>
+      <h2>Program: Visual Planning</h2>
+      <!-- VPDesk Section -->
+      <section id="vpdesk">
+        <h3>VPDesk (Desktop Version)</h3>
+        <section id="vpdesk-installation">
+          <h4>Installation</h4>
+          <ol>
+            <li>Go to the VPDesk download page (<a href="https://www.visual-planning.com/en/support-portal/vpdesk-new-launcher" target="_blank">visual-planning.com/support-portal/vpdesk-new-launcher</a>) and click <strong>Download</strong>.<br><img src="/images/vpdesk_download.png" alt="VPDesk Download Screen" /></li>
+            <li>Double-click the installer and follow on-screen prompts until the launcher appears.<br><img src="/images/vpdesk_launcher.png" alt="VPDesk Launcher" /></li>
+            <li>Click the three-dot menu (⋮) in the launcher’s top-right.<br><img src="/images/vpdesk_menu.png" alt="VPDesk Menu" /></li>
+            <li>Select <strong>Add URL</strong>, enter <code>us2.visual-planning.com/provantage/index.jsp</code>.<br><img src="/images/vpdesk_add_url.png" alt="Add URL Dialog" /></li>
+            <li>Back in the launcher, click <strong>Planner</strong> and sign in with your credentials.<br><img src="/images/vpdesk_planner_tile.png" alt="Planner Tile" /></li>
+          </ol>
+        </section>
+        <section id="vpdesk-usage">
+          <h4>Usage Features</h4>
+          <h5>Add a Job to Tomorrow’s Schedule</h5>
+          <ol>
+            <li>Select the department (Cleaning, Labor, Windows &amp; Commercial) from the left sidebar.<br><img src="/images/vpdesk_departments.png" alt="Department Selection" /></li>
+            <li>Ensure the date at top is tomorrow; if not, click <strong>Planner</strong> and press &#8594; to advance.<br><img src="/images/vpdesk_next_day.png" alt="Advance to Next Day" /></li>
+            <li>In the LOTS toolbar, right-click, open <strong>Search</strong> → <strong>Lot</strong>.<br><img src="/images/vpdesk_lots_dropdown.png" alt="Lots Dropdown" /></li>
+            <li>Enter the lot number in search.<br><img src="/images/vpdesk_search_lot.png" alt="Search Lot Number" /></li>
+            <li>Drag the desired task from the task pane onto the lot entry.<br><img src="/images/vpdesk_drag_task.png" alt="Drag and Drop Task" /></li>
+          </ol>
+          <h5>Add a Lot to Planner if Not Loaded</h5>
+          <ol>
+            <li>If the lot isn’t found in search, right-click anywhere in the left planner pane.<br><img src="/images/vpdesk_right_click_panel.png" alt="Right-Click Planner Pane" /></li>
+            <li>Hover over the <strong>+</strong> icon and click <strong>Lot</strong>.<br><img src="/images/vpdesk_click_add_lot.png" alt="Click Add Lot" /></li>
+            <li>Fill out all fields: Floorplan, Builder, Subdivision, City, Zip, Address.<br><img src="/images/vpdesk_add_lot_form.png" alt="Add Lot Form" /></li>
+            <li>Click <strong>OK</strong> to save. The new lot will update and appear for scheduling.<br><img src="/images/vpdesk_save_lot.png" alt="Save Lot Confirmation" /></li>
+          </ol>
+          <h5>Change a Task Type</h5>
+          <ol>
+            <li>Click the task you want to modify in the schedule.<br><img src="/images/vpdesk_click_task.png" alt="Click Task" /></li>
+            <li>In the Task Details pane, click on the current task name.<br><img src="/images/vpdesk_task_details.png" alt="Task Details Pane" /></li>
+            <li>Select the new task type (e.g., Original Dry Clean) from the dropdown menu.<br><img src="/images/vpdesk_select_task_type.png" alt="Select New Task Type" /></li>
+            <li>Click <strong>OK</strong> to save the change.<br><img src="/images/vpdesk_save_task.png" alt="Save Task Change" /></li>
+          </ol>
+          <h5>Edit Crew Sizes &amp; Members</h5>
+          <ol>
+            <li>Navigate to <strong>Crew Schedule</strong> via the top nav bar for your department.<br><img src="/images/vpdesk_crew_schedule_nav.png" alt="Navigate to Crew Schedule" /></li>
+            <li>Click the crew you want to update.<br><img src="/images/vpdesk_select_crew.png" alt="Select Crew" /></li>
+            <li>In the right panel, adjust:<ul>
+                <li><strong>Active Tomorrow:</strong> toggle on/off.<br><img src="/images/vpdesk_active_tomorrow.png" alt="Active Tomorrow Toggle" /></li>
+                <li><strong>Total Man Hours:</strong> enter available hours.<br><img src="/images/vpdesk_man_hours.png" alt="Total Man Hours" /></li>
+                <li><strong>Crew Size:</strong> set number of members.<br><img src="/images/vpdesk_crew_size.png" alt="Crew Size Input" /></li>
+              </ul></li>
+            <li>Under <strong>Crew Members</strong>, add or remove team members. If a name isn’t listed, contact Noah or Becky to add them.<br><img src="/images/vpdesk_crew_members.png" alt="Crew Members Section" /></li>
+            <li>Click <strong>OK</strong> to save changes.<br><img src="/images/vpdesk_save_crew.png" alt="Save Crew Settings" /></li>
+          </ol>
+          <h5>AutoScheduling</h5>
+          <ol>
+            <li>After updating all crews and tomorrow’s schedule, navigate to <strong>Crew Schedule</strong> from the top nav bar.<br><img src="/images/vpdesk_crew_schedule_nav.png" alt="Navigate to Crew Schedule" /></li>
+            <li>In the list of <strong>TBD</strong> jobs, right-click any job entry.<br><img src="/images/vpdesk_tbd_jobs.png" alt="TBD Jobs List" /></li>
+            <li>Hover over <strong>Exchange</strong> → <strong>Export events</strong> → <strong>Automatic Scheduling</strong>.<br><img src="/images/vpdesk_auto_schedule.png" alt="Automatic Scheduling Menu" /></li>
+            <li>The automatic scheduling process will run for about one minute. Wait until it completes before making further changes.</li>
+          </ol>
+        </section>
+        <section id="vpdesk-troubleshooting">
+          <h4>Troubleshooting &amp; FAQ</h4>
+          <p class="placeholder">[Common desktop issues and fixes]</p>
+        </section>
+      </section>
+      <!-- VPGO Section -->
+      <section id="vpgo">
+        <h3>VPGO (Field/Phone Version)</h3>
+        <section id="vpgo-installation">
+          <h4>Installation</h4>
+          <ol>
+            <li>Download and install VPGO U from the <a href="https://apps.apple.com/us/app/vpgo-u/id1598862750" target="_blank">App Store</a> or <a href="https://play.google.com/store/apps/details?id=com.stilog.VPGOU&pcampaignid=web_share" target="_blank">Google Play Store</a>.<br><img src="/images/vpgo_download.png" alt="VPGO Download Screen" /></li>
+            <li>Open VPGO U, then tap the <strong>+ </strong>icon at the bottom of the screen.<br><img src="/images/vpgo_plus_icon.png" alt="Add Context Icon" /></li>
+            <li>Select <strong>Flash QR Code</strong>.<br><img src="/images/vpgo_flash_qr.png``
+
