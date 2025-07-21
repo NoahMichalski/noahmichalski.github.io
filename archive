@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Schedule Archive</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    #controls { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 20px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 10px; flex: 1 1 60%; }
+    .filters input { padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; }
+    #search { flex: 1; min-width: 150px; }
+    .uploader { flex: 1 1 35%; display: flex; flex-direction: column; gap: 10px; }
+    .uploader input, .uploader select, .uploader textarea, .uploader button { padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; }
+    #importText { width: 100%; height: 200px; resize: vertical; }
+    .tabs { display: flex; justify-content: center; gap: 2px; margin-bottom: 10px; }
+    .tabs div { padding: 10px 20px; background: #ddd; cursor: pointer; }
+    .tabs .active { background: #fff; border-bottom: 2px solid #fff; }
+    .tab-content { max-width: 800px; margin: 0 auto; background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 15px; display: none; }
+    .tab-content.active { display: block; }
+    .entry { border-bottom: 1px solid #eee; padding: 10px 0; }
+    .entry:last-child { border-bottom: none; }
+    .entry h2 { margin: 0 0 10px; font-size: 1em; color: #555; }
+    .entry pre { white-space: pre-wrap; margin: 0; font-family: inherit; line-height: 1.4; }
+    .hidden { display: none; }
+    #status { text-align: center; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Labor & Cleaning Schedule Archive</h1>
+
+  <div id="controls">
+    <div class="filters">
+      <input type="date" id="datePicker" title="Select date">
+      <input type="text" id="search" placeholder="Search entries...">
+    </div>
+    <div class="uploader">
+      <input type="date" id="uploadDate" title="Upload date">
+      <select id="uploadType">
+        <option value="labor">Labor</option>
+        <option value="cleaning">Cleaning</option>
+      </select>
+      <textarea id="importText" placeholder="Paste full schedule text here to upload"></textarea>
+      <button id="uploadBtn">Upload Schedule</button>
+    </div>
+  </div>
+
+  <div id="status"></div>
+
+  <div class="tabs">
+    <div data-tab="labor" class="active">Labor</div>
+    <div data-tab="cleaning">Cleaning</div>
+  </div>
+
+  <div id="labor" class="tab-content active">
+    <div id="laborContainer"></div>
+  </div>
+  <div id="cleaning" class="tab-content">
+    <div id="cleaningContainer"></div>
+  </div>
+
+  <script>
+    // GitHub repo settings
+    const GITHUB_OWNER = 'NoahMichalski';
+    const GITHUB_REPO  = 'schedule-archive';
+
+    // Use provided token
+    const TOKEN = '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';
+
+    // Elements
+    const datePicker = document.getElementById('datePicker');
+    const searchInput = document.getElementById('search');
+    const uploadDate = document.getElementById('uploadDate');
+    const uploadType = document.getElementById('uploadType');
+    const importText  = document.getElementById('importText');
+    const uploadBtn   = document.getElementById('uploadBtn');
+    const statusDiv   = document.getElementById('status');
+    const laborContainer    = document.getElementById('laborContainer');
+    const cleaningContainer = document.getElementById('cleaningContainer');
+
+    // Tab switching
+    document.querySelectorAll('.tabs div').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tabs div').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.tab).classList.add('active');
+        loadSchedule();
+      });
+    });
+
+    // Event listeners
+    datePicker.addEventListener('change', loadSchedule);
+    searchInput.addEventListener('input', filterEntries);
+    uploadBtn.addEventListener('click', importSchedule);
+
+    async function loadSchedule() {
+      const date = datePicker.value;
+      const activeTab = document.querySelector('.tabs .active').dataset.tab;
+      if (!date) return;
+      const container = activeTab === 'labor' ? laborContainer : cleaningContainer;
+      container.innerHTML = '<p>Loading...</p>';
+      statusDiv.textContent = '';
+
+      const path = `${activeTab}/${date}.json`;
+      const url  = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`;
+      const headers = { Authorization: `token ${TOKEN}` };
+
+      try {
+        const res = await fetch(url, { headers });
+        if (!res.ok) throw new Error('No schedule for this date');
+        const data = await res.json();
+        const content = atob(data.content.trim());
+        const schedule = JSON.parse(content);
+        renderEntries(container, schedule.entries, schedule.date || date);
+      } catch (err) {
+        container.innerHTML = `<p>${err.message}</p>`;
+      }
+    }
+
+    function renderEntries(container, entries, date) {
+      container.innerHTML = `<h2>${date}</h2>`;
+      entries.forEach(e => {
+        const div = document.createElement('div'); div.className = 'entry';
+        div.innerHTML = `<h2>${e.crew}</h2><pre>${e.tasks}</pre>`;
+        container.appendChild(div);
+      });
+      filterEntries();
+    }
+
+    function filterEntries() {
+      const q = searchInput.value.toLowerCase();
+      document.querySelectorAll('.entry').forEach(entry => {
+        entry.classList.toggle('hidden', !entry.textContent.toLowerCase().includes(q));
+      });
+    }
+
+    async function importSchedule() {
+      const date = uploadDate.value;
+      const type = uploadType.value;
+      const raw  = importText.value.trim();
+      if (!date || !raw) {
+        statusDiv.textContent = 'Select date and paste schedule text.';
+        return;
+      }
+      statusDiv.style.color = '#000';
+      statusDiv.textContent = 'Uploading...';
+
+      const blocks = raw.split(/\n\s*\n/).filter(b => b.trim());
+      const entries = blocks.map(b => {
+        const lines = b.split(/\r?\n/).map(l => l.trim());
+        return { crew: lines[0] || '', tasks: lines.slice(1).join('\n') || '' };
+      });
+      const scheduleObj = { date, entries };
+      const contentB64 = btoa(unescape(encodeURIComponent(JSON.stringify(scheduleObj, null, 2))));
+
+      const path = `${type}/${date}.json`;
+      const url  = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`;
+      const headers = { 'Content-Type': 'application/json', 'Authorization': `token ${TOKEN}` };
+
+      let sha;
+      try {
+        const res1 = await fetch(url, { headers });
+        if (res1.ok) {
+          const d1 = await res1.json(); sha = d1.sha;
+        }
+      } catch {}
+
+      const body = { message: `Add schedule ${path}`, content: contentB64 };
+      if (sha) body.sha = sha;
+
+      try {
+        const res2 = await fetch(url, { method: 'PUT', headers, body: JSON.stringify(body) });
+        const result = await res2.json();
+        if (!res2.ok) throw new Error(result.message || 'Upload failed');
+        statusDiv.style.color = '#080';
+        statusDiv.textContent = 'Upload successful!';
+        importText.value = '';
+        if (uploadDate.value === datePicker.value) loadSchedule();
+      } catch (err) {
+        statusDiv.style.color = '#d00';
+        statusDiv.textContent = `Error: ${err.message}`;
+      }
+    }
+
+    // Initialize
+    const today = new Date().toISOString().slice(0,10);
+    datePicker.value = today;
+    uploadDate.value = today;
+    loadSchedule();
+  </script>
+</body>
+</html>
