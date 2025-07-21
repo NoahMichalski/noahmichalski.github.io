@@ -27,10 +27,17 @@
   </style>
 </head>
 <body>
+  <!-- TODO: If content was lost, paste:
+       - VPDesk installation steps into <section id="vpdesk-installation"> 
+       - All VPDesk usage features (Add Job, Add Lot, Change Task, Edit Crew, AutoScheduling, Reset Schedule, Check Timeline) into <section id="vpdesk-usage">
+       - VPGO installation steps into <section id="vpgo-installation">
+       - VPGO usage steps into <section id="vpgo-usage">
+     -->
   <header>
     <img src="PLACEHOLDER_LOGO" alt="VIP Contractor Services Logo" id="company-logo" />
     <div><h1>VIP Contractor Services Knowledge Base</h1></div>
   </header>
+
   <nav>
     <ul>
       <li><a href="index.html">Home</a></li>
@@ -43,12 +50,15 @@
       </li>
     </ul>
   </nav>
+
   <main>
     <article>
       <h2>Program: Visual Planning</h2>
+
       <!-- VPDesk Section -->
       <section id="vpdesk">
         <h3>VPDesk (Desktop Version)</h3>
+
         <section id="vpdesk-installation">
           <h4>Installation</h4>
           <ol>
@@ -59,6 +69,7 @@
             <li>Back in the launcher, click <strong>Planner</strong> and sign in with your credentials.<br><img src="/images/vpdesk_planner_tile.png" alt="Planner Tile" /></li>
           </ol>
         </section>
+
         <section id="vpdesk-usage">
           <h4>Usage Features</h4>
           <h5>Add a Job to Tomorrow’s Schedule</h5>
@@ -102,41 +113,63 @@
             <li>Hover over <strong>Exchange</strong> → <strong>Export events</strong> → <strong>Automatic Scheduling</strong>.<br><img src="/images/vpdesk_auto_schedule.png" alt="Automatic Scheduling Menu" /></li>
             <li>The automatic scheduling process will run for about one minute. Wait until it completes before making further changes.</li>
           </ol>
+
+          <h5>Reset Schedule</h5>
+          <ol>
+            <li>Go to Crew Schedule.<br><img src="/images/vpdesk_crew_schedule_nav.png" alt="Navigate to Crew Schedule" /></li>
+            <li>Right-click a TBD job.<br><img src="/images/vpdesk_tbd_jobs.png" alt="TBD Jobs List" /></li>
+            <li>Exchange → Export events → Reset Schedule.<br><img src="/images/vpdesk_reset_schedule.png" alt="Reset Schedule Menu" /></li>
+            <li>This clears assignments so you can adjust off-days/hours before rerunning.</li>
+          </ol>
+
+          <h5>Checking a Lot’s Timeline</h5>
+          <ol>
+            <li>On Cleaning or Labor schedule, search for the lot.<br><img src="/images/vpdesk_search_lot.png" alt="Search Lot Number" /></li>
+            <li>Double-click the lot.<br><img src="/images/vpdesk_double_click_lot.png" alt="Double Click Lot Entry" /></li>
+            <li>Select Lot Timeline.<br><img src="/images/vpdesk_lot_timeline.png" alt="Lot Timeline View" /></li>
+            <li>Switch to Cleaning Record.<br><img src="/images/vpdesk_cleaning_record.png" alt="Cleaning Record View" /></li>
+          </ol>
         </section>
+
         <section id="vpdesk-troubleshooting">
           <h4>Troubleshooting &amp; FAQ</h4>
           <p class="placeholder">[Common desktop issues and fixes]</p>
         </section>
       </section>
+
       <!-- VPGO Section -->
       <section id="vpgo">
         <h3>VPGO (Field/Phone Version)</h3>
+
         <section id="vpgo-installation">
           <h4>Installation</h4>
           <ol>
             <li>Download and install VPGO U from the <a href="https://apps.apple.com/us/app/vpgo-u/id1598862750" target="_blank">App Store</a> or <a href="https://play.google.com/store/apps/details?id=com.stilog.VPGOU&pcampaignid=web_share" target="_blank">Google Play Store</a>.<br><img src="/images/vpgo_download.png" alt="VPGO Download Screen" /></li>
-            <li>Open VPGO U, then tap the <strong>+ </strong>icon at the bottom of the screen.<br><img src="/images/vpgo_plus_icon.png" alt="Add Context Icon" /></li>
-            <li>Select <strong>Flash QR Code</strong>.<br><img src="/images/vpgo_flash_qr.png" alt="Flash QR Code Screen" /></li>
-            <li>Scan the QR Code displayed below to add the planning context.<br><img src="/images/vpgo_qrcode.png" alt="VPGO QR Code" /></li>
-            <li>After scanning, sign in with your VPDesk credentials to sync with the planner.<br><img src="/images/vpgo_sign_in.png" alt="VPGO Sign In Screen" /></li>
+            <li>Open VPGO U and tap the + icon.<br><img src="/images/vpgo_plus_icon.png" alt="Add Context Icon" /></li>
+            <li>Select Flash QR Code.<br><img src="/images/vpgo_flash_qr.png" alt="Flash QR Code Screen" /></li>
+            <li>Scan QR Code below.<br><img src="/images/vpgo_qrcode.png" alt="VPGO QR Code" /></li>
+            <li>Sign in with your VPDesk credentials.<br><img src="/images/vpgo_sign_in.png" alt="VPGO Sign In Screen" /></li>
           </ol>
         </section>
+
         <section id="vpgo-usage">
           <h4>Usage</h4>
           <ol>
-            <li><strong>Sign In:</strong> Enter your VPDesk username and password, then tap <em>Sign In</em>.<br><img src="/images/sign_in.png" alt="Sign In Screen" /></li>
-            <li><strong>View Jobs:</strong> Tap the <em>Jobs</em> tab to see all assignments for the day.<br><img src="/images/jobs_list.png" alt="Jobs List Screen" /></li>
-            <li><strong>Select a Job:</strong> Tap the job to view details and workflow.<br><img src="/images/job_details.png" alt="Job Details Screen" /></li>
-            <li><strong>Navigate:</strong> Tap the map icon to open the job location in your maps app.<br><img src="/images/map_icon.png" alt="Map Icon Screen" /></li>
-            <li><strong>Check In:</strong> Tap <em>Check In</em>, validate your location, then tap the checkmark.<br><img src="/images/check_in.png" alt="Check In Screen" /></li>
-            <li><strong>Check Out:</strong> After completing work, tap <em>Check Out</em>, validate, and save.<br><img src="/images/check_out.png" alt="Check Out Screen" /></li>
+            <li><strong>Sign In:</strong> Enter username/password and tap Sign In.<br><img src="/images/sign_in.png" alt="Sign In Screen" /></li>
+            <li><strong>View Jobs:</strong> Tap Jobs tab.<br><img src="/images/jobs_list.png" alt="Jobs List Screen" /></li>
+            <li><strong>Select a Job:</strong> Tap a job.<br><img src="/images/job_details.png" alt="Job Details Screen" /></li>
+            <li><strong>Navigate:</strong> Tap map icon.<br><img src="/images/map_icon.png" alt="Map Icon Screen" /></li>
+            <li><strong>Check In:</strong> Tap Check In, confirm, save.<br><img src="/images/check_in.png" alt="Check In Screen" /></li>
+            <li><strong>Check Out:</strong> Tap Check Out, confirm, save.<br><img src="/images/check_out.png" alt="Check Out Screen" /></li>
           </ol>
         </section>
+
         <section id="vpgo-troubleshooting">
           <h4>Troubleshooting &amp; FAQ</h4>
           <p class="placeholder">[Common mobile issues and fixes]</p>
         </section>
       </section>
+
     </article>
   </main>
 </body>
