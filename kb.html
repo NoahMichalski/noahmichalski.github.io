@@ -6,60 +6,56 @@
   <title>VIP Contractor Services Knowledge Base</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    header { background: #2c3e50; color: white; padding: 1rem; display: flex; align-items: center; }
+    header { background: #2c3e50; color: white; padding: 1rem; display: flex; align-items: center; justify-content: space-between; }
     #company-logo { height: 50px; margin-right: 1rem; }
     nav { background: #34495e; padding: 0.5rem; }
     nav ul { list-style: none; margin: 0; padding: 0; display: flex; }
     nav li { position: relative; margin-right: 1rem; }
     nav a { color: white; text-decoration: none; }
-    nav ul ul { display: none; position: absolute; top: 100%; left: 0; background: #3b536b; padding: 0.5rem; }
-    nav li:hover > ul { display: block; }
-    nav ul ul li { margin: 0; }
-    nav ul ul a { white-space: nowrap; }
+    .index-dropdown { padding: 1rem; background: #ecf0f1; }
+    .index-dropdown select { font-size: 1rem; padding: 0.5rem; }
     main { padding: 1.5rem; }
     section { margin-bottom: 2rem; }
-    h2 { border-bottom: 2px solid #ccc; padding-bottom: 0.5rem; }
-    h3 { margin-top: 1.5rem; }
-    h4 { margin-top: 1rem; }
-    h5 { margin-top: 1rem; font-weight: bold; }
+    h2, h3, h4, h5 { margin-top: 1rem; }
     img { max-width: 100%; border: 1px solid #ddd; margin: 0.5rem 0; }
     code { background: #f4f4f4; padding: 0.2rem 0.4rem; border-radius: 4px; }
   </style>
 </head>
 <body>
-  <!-- TODO: If content was lost, paste:
-       - VPDesk installation steps into <section id="vpdesk-installation"> 
-       - All VPDesk usage features (Add Job, Add Lot, Change Task, Edit Crew, AutoScheduling, Reset Schedule, Check Timeline) into <section id="vpdesk-usage">
-       - VPGO installation steps into <section id="vpgo-installation">
-       - VPGO usage steps into <section id="vpgo-usage">
-     -->
   <header>
-    <img src="PLACEHOLDER_LOGO" alt="VIP Contractor Services Logo" id="company-logo" />
-    <div><h1>VIP Contractor Services Knowledge Base</h1></div>
+    <div style="display: flex; align-items: center;">
+      <img src="PLACEHOLDER_LOGO" alt="VIP Contractor Services Logo" id="company-logo" />
+      <h1>VIP Contractor Services Knowledge Base</h1>
+    </div>
+    <!-- Google Translate widget -->
+    <div id="google_translate_element"></div>
   </header>
 
   <nav>
     <ul>
       <li><a href="index.html">Home</a></li>
-      <li>
-        <a href="visual-planning.html">Visual Planning</a>
-        <ul>
-          <li><a href="visual-planning.html#vpdesk">VPDesk (Desktop)</a></li>
-          <li><a href="visual-planning.html#vpgo">VPGO (Field/Phone)</a></li>
-        </ul>
-      </li>
+      <li><a href="#vpdesk">VPDesk (Desktop)</a></li>
+      <li><a href="#vpgo">VPGO (Field/Phone)</a></li>
     </ul>
   </nav>
 
+  <!-- Dropdown index for quick navigation -->
+  <div class="index-dropdown">
+    <label for="section-select">Jump to:</label>
+    <select id="section-select" onchange="if(this.value) document.querySelector(this.value).scrollIntoView({behavior:'smooth'});">
+      <option value="">Select a section...</option>
+      <option value="#vpdesk-installation">VPDesk - Installation</option>
+      <option value="#vpdesk-usage">VPDesk - Usage Features</option>
+      <option value="#vpdesk-troubleshooting">VPDesk - Troubleshooting</option>
+      <option value="#vpgo-installation">VPGO - Installation</option>
+      <option value="#vpgo-usage">VPGO - Usage</option>
+      <option value="#vpgo-troubleshooting">VPGO - Troubleshooting</option>
+    </select>
+  </div>
+
   <main>
-    <article>
-      <h2>Program: Visual Planning</h2>
-
-      <!-- VPDesk Section -->
-      <section id="vpdesk">
-        <h3>VPDesk (Desktop Version)</h3>
-
-        <section id="vpdesk-installation">
+ <section 
+   id="vpdesk-installation">
           <h4>Installation</h4>
           <ol>
             <li>Go to the VPDesk download page (<a href="https://www.visual-planning.com/en/support-portal/vpdesk-new-launcher" target="_blank">visual-planning.com/support-portal/vpdesk-new-launcher</a>) and click <strong>Download</strong>.<br><img src="/images/vpdesk_download.png" alt="VPDesk Download Screen" /></li>
@@ -129,9 +125,7 @@
             <li>Select Lot Timeline.<br><img src="/images/vpdesk_lot_timeline.png" alt="Lot Timeline View" /></li>
             <li>Switch to Cleaning Record.<br><img src="/images/vpdesk_cleaning_record.png" alt="Cleaning Record View" /></li>
           </ol>
-        </section>
-
-        <section id="vpdesk-troubleshooting">
+           <section id="vpdesk-troubleshooting">
           <h4>Troubleshooting &amp; FAQ</h4>
           <p class="placeholder">[Common desktop issues and fixes]</p>
         </section>
@@ -155,22 +149,31 @@
         <section id="vpgo-usage">
           <h4>Usage</h4>
           <ol>
-            <li><strong>Sign In:</strong> Enter username/password and tap Sign In.<br><img src="/images/sign_in.png" alt="Sign In Screen" /></li>
-            <li><strong>View Jobs:</strong> Tap Jobs tab.<br><img src="/images/jobs_list.png" alt="Jobs List Screen" /></li>
-            <li><strong>Select a Job:</strong> Tap a job.<br><img src="/images/job_details.png" alt="Job Details Screen" /></li>
-            <li><strong>Navigate:</strong> Tap map icon.<br><img src="/images/map_icon.png" alt="Map Icon Screen" /></li>
-            <li><strong>Check In:</strong> Tap Check In, confirm, save.<br><img src="/images/check_in.png" alt="Check In Screen" /></li>
-            <li><strong>Check Out:</strong> Tap Check Out, confirm, save.<br><img src="/images/check_out.png" alt="Check Out Screen" /></li>
+            <li><strong>Sign In:</strong> Enter your VPDesk username and password, then tap <em>Sign In</em>.<br><img src="/images/sign_in.png" alt="Sign In Screen" /></li>
+            <li><strong>View Jobs:</strong> Tap the <em>Jobs</em> tab to see all assignments for the day.<br><img src="/images/jobs_list.png" alt="Jobs List Screen" /></li>
+            <li><strong>Select a Job:</strong> Tap the job to view details and workflow.<br><img src="/images/job_details.png" alt="Job Details Screen" /></li>
+            <li><strong>Navigate:</strong> Tap the map icon to open the job location in your maps app.<br><img src="/images/map_icon.png" alt="Map Icon Screen" /></li>
+            <li><strong>Check In:</strong> Tap <em>Check In</em>, validate your location, then tap the checkmark.<br><img src="/images/check_in.png" alt="Check In Screen" /></li>
+            <li><strong>Check Out:</strong> After completing work, tap <em>Check Out</em>, validate, and save.<br><img src="/images/check_out.png" alt="Check Out Screen" /></li>
           </ol>
         </section>
-
-        <section id="vpgo-troubleshooting">
-          <h4>Troubleshooting &amp; FAQ</h4>
-          <p class="placeholder">[Common mobile issues and fixes]</p>
         </section>
-      </section>
-
     </article>
   </main>
+
+  <!-- Google Translate default language setting -->
+  <script type="text/javascript">
+    // Set default language: 'en' for English, 'es' for Spanish
+    var defaultLang = 'en';
+    document.cookie = 'googtrans=/en/' + defaultLang + ';path=/';
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,es',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      }, 'google_translate_element');
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
