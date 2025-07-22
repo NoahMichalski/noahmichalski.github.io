@@ -61,7 +61,7 @@
             userMarker.setLatLng(userLatLng);
           } else {
             userMarker = L.marker(userLatLng).addTo(map).bindPopup('You are here').openPopup();
-            map.setView(userLatLng, 18);
+            // map.setView(userLatLng, 18); // removed auto-centering
           }
         },
         function (err) {
