@@ -24,7 +24,7 @@
 <body>
   <header>
     <div style="display: flex; align-items: center;">
-      <img src="/images/logo-VIP.png" alt="VIP Contractor Services Logo" id="company-logo" />
+      <img src="PLACEHOLDER_LOGO" alt="VIP Contractor Services Logo" id="company-logo" />
       <h1>VIP Contractor Services Knowledge Base</h1>
     </div>
     <!-- Google Translate widget -->
@@ -125,6 +125,13 @@
             <li>Select Lot Timeline.<br><img src="/images/vpdesk_lot_timeline.png" alt="Lot Timeline View" /></li>
             <li>Switch to Cleaning Record.<br><img src="/images/vpdesk_cleaning_record.png" alt="Cleaning Record View" /></li>
           </ol>
+          <h5>Adding a Model to the Planner</h5>
+        <ol>
+          <li>Go to your department’s schedule (Cleaning, Labor, etc.).<br><img src="/images/vpdesk_departments.png" alt="Department Selection" /></li>
+          <li>Right-click the <strong>LOTS</strong> bar → <strong>Search</strong> → <strong>Letter</strong>, then type <code>Model</code>.<br><img src="/images/vpdesk_search_model.png" alt="Search Letter Model" /></li>
+          <li>If <em>Model</em> doesn’t appear, right-click the planner pane → hover <strong>+</strong> → click <strong>Lot</strong>.<br><img src="/images/vpdesk_click_add_lot.png" alt="Click Add Lot" /></li>
+          <li>In the Add Lot form, enter <code>0</code> for Lot Number and <code>Model</code> for Letter; fill other fields as needed and click <strong>OK</strong>.<br><img src="/images/vpdesk_add_model_lot.png" alt="Add Model Lot Form" /></li>
+        </ol>
            <section id="vpdesk-troubleshooting">
           <h4>Troubleshooting &amp; FAQ</h4>
           <p class="placeholder">[Common desktop issues and fixes]</p>
@@ -161,16 +168,12 @@
     </article>
   </main>
 
-  <!-- Google Translate default language setting -->
   <script type="text/javascript">
-    // Set default language: 'en' for English, 'es' for Spanish
     var defaultLang = 'en';
     document.cookie = 'googtrans=/en/' + defaultLang + ';path=/';
     function googleTranslateElementInit() {
       new google.translate.TranslateElement({
-        pageLanguage: 'en',
-        includedLanguages: 'en,es',
-        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        pageLanguage: 'en', includedLanguages: 'en,es', layout: google.translate.TranslateElement.InlineLayout.SIMPLE
       }, 'google_translate_element');
     }
   </script>
