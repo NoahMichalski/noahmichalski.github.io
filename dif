@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dublin Irish Festival Map</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #map { height: 100vh; }
+    .upload-box { position: absolute; top: 10px; right: 10px; z-index: 999; background: white; padding: 10px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="upload-box">
+    <input type="file" id="upload" accept="image/*" />
+    <button onclick="uploadImage()">Upload</button>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    const center = [40.10469910125423, -83.13789900434165];
+    const map = L.map('map').setView(center, 17);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const imageUrl = 'https://www.dropbox.com/scl/fi/yvibirzcf47lf05aq1x8g/dublin_festival_map_large-1.jpg?rlkey=d59ngn39r5s20nk4zm7a2oc8g&raw=1';
+
+    // Updated bottom-left bound for improved alignment
+    const imageBounds = [
+      [40.108558, -83.141769], // updated top left
+      [40.101636, -83.132236]  // updated bottom right
+    ];
+
+    L.imageOverlay(imageUrl, imageBounds, { opacity: 0.7 }).addTo(map);
+
+    // Right-click coordinate alert
+    map.on("contextmenu", function (e) {
+      const { lat, lng } = e.latlng;
+      alert(`Right-clicked at:
+Latitude: ${lat}
+Longitude: ${lng}`);
+    });
+
+    // GPS Location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function (pos) {
+          const userLatLng = [pos.coords.latitude, pos.coords.longitude];
+          L.marker(userLatLng).addTo(map).bindPopup('You are here').openPopup();
+          map.setView(userLatLng, 18);
+        },
+        function (err) {
+          console.warn(`ERROR(${err.code}): ${err.message}`);
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      console.warn("Geolocation is not supported by this browser.");
+    }
+
+    // Sample clickable zone
+    const testBox = L.rectangle([
+      [40.1048, -83.1383],
+      [40.1046, -83.1381]
+    ], {
+      color: "blue",
+      weight: 1
+    }).addTo(map).on("click", () => {
+      window.open("layout-map-placeholder.jpg", "_blank");
+    });
+
+    function uploadImage() {
+      const fileInput = document.getElementById('upload');
+      const file = fileInput.files[0];
+      if (file) {
+        alert('Uploaded: ' + file.name);
+        // Image handling code would go here
+      }
+    }
+  </script>
+</body>
+</html>
