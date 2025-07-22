@@ -30,10 +30,10 @@
 
     const imageUrl = 'https://www.dropbox.com/scl/fi/yvibirzcf47lf05aq1x8g/dublin_festival_map_large-1.jpg?rlkey=d59ngn39r5s20nk4zm7a2oc8g&raw=1';
 
-    // Updated bottom-left bound for improved alignment
+    // Updated bounds for overlay
     const imageBounds = [
-      [40.108558, -83.141769], // updated top left
-      [40.101636, -83.132236]  // updated bottom right
+      [40.108558, -83.141769], // top left
+      [40.101636, -83.132236]  // bottom right
     ];
 
     L.imageOverlay(imageUrl, imageBounds, { opacity: 0.7 }).addTo(map);
@@ -41,23 +41,33 @@
     // Right-click coordinate alert
     map.on("contextmenu", function (e) {
       const { lat, lng } = e.latlng;
-      alert(`Right-clicked at:
-Latitude: ${lat}
-Longitude: ${lng}`);
+      const popupContent = document.createElement("div");
+      popupContent.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      popupContent.style.fontFamily = 'monospace';
+      popupContent.style.userSelect = 'all';
+      L.popup()
+        .setLatLng(e.latlng)
+        .setContent(popupContent)
+        .openOn(map);
     });
 
-    // GPS Location
+    // Live GPS Tracking
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
+      let userMarker;
+      navigator.geolocation.watchPosition(
         function (pos) {
           const userLatLng = [pos.coords.latitude, pos.coords.longitude];
-          L.marker(userLatLng).addTo(map).bindPopup('You are here').openPopup();
-          map.setView(userLatLng, 18);
+          if (userMarker) {
+            userMarker.setLatLng(userLatLng);
+          } else {
+            userMarker = L.marker(userLatLng).addTo(map).bindPopup('You are here').openPopup();
+            map.setView(userLatLng, 18);
+          }
         },
         function (err) {
           console.warn(`ERROR(${err.code}): ${err.message}`);
         },
-        { enableHighAccuracy: true }
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
       );
     } else {
       console.warn("Geolocation is not supported by this browser.");
