@@ -19,6 +19,14 @@
       box-shadow: 0 1px 4px rgba(0,0,0,0.3);
       font-size: 16px;
     }
+    .spot-marker {
+      background: #007BFF;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      display: block;
+      border: 2px solid white;
+    }
   </style>
 </head>
 <body>
@@ -36,12 +44,10 @@
     }).addTo(map);
 
     const imageUrl = 'https://www.dropbox.com/scl/fi/byh77pqhstzn8hau3tv3s/dif_full_festival_map_2025_large-1.jpg?rlkey=mqpay1jhhssyagyjepv5riep3&st=704u2cdq&raw=1';
-
     const imageBounds = [
       [40.108558, -83.141769],
       [40.101636, -83.132236]
     ];
-
     L.imageOverlay(imageUrl, imageBounds, { opacity: 0.7 }).addTo(map);
 
     map.on("contextmenu", function (e) {
@@ -53,102 +59,101 @@
       L.popup().setLatLng(e.latlng).setContent(popupContent).openOn(map);
     });
 
-    const booths = [
-{ name: "Celtic Rock Backstage", lat: 40.101952, lng: -83.137402 },
-{ name: "Celtic Rock Stage", lat: 40.102231, lng: -83.137488 },
-{ name: "Celtic Rock Club", lat: 40.102383, lng: -83.137815 },
-{ name: "Celtic Rock Bar", lat: 40.102318, lng: -83.137981 },
-{ name: "Temple Bar Marketplace", lat: 40.102732, lng: -83.136388 },
-{ name: "Dining Tent Temple Bar", lat: 40.103278, lng: -83.137697 },
-{ name: "SouthEast Enterence", lat: 40.102564, lng: -83.135337 },
-{ name: "IdentiKid", lat: 40.102523, lng: -83.135540 },
-{ name: "Whiskey bar", lat: 40.102785, lng: -83.135718 },
-{ name: "Self Service Bar", lat: 40.102847, lng: -83.135809 },
-{ name: "South Enterence", lat: 40.102346, lng: -83.138373 },
-{ name: "RCS Tent", lat: 40.102457, lng: -83.138528 },
-{ name: "ATM Tent", lat: 40.103007, lng: -83.136088 },
-{ name: "Cell Charger", lat: 40.102744, lng: -83.135986 },
-{ name: "Pot of Gold Wristbands", lat: 40.103286, lng: -83.136061 },
-{ name: "Police South", lat: 40.102958, lng: -83.138738 },
-{ name: "Sustainability Tent", lat: 40.103261, lng: -83.135862 },
-{ name: "Pot of gold playland", lat: 40.103610, lng: -83.137026 },
-{ name: "Bar", lat: 40.103278, lng: -83.137091 },
-{ name: "Supply Tent", lat: 40.103245, lng: -83.136914 },
-{ name: "Ticket Booth Southeast", lat: 40.102695, lng: -83.134972 },
-{ name: "South West Enterence", lat: 40.104517, lng: -83.139011 },
-{ name: "Tickets South West", lat: 40.104611, lng: -83.138995 },
-{ name: "Bike Parking", lat: 40.105128, lng: -83.139081 },
-{ name: "Sorting Center", lat: 40.104812, lng: -83.138705 },
-{ name: "South West Identikid", lat: 40.104558, lng: -83.138813 },
-{ name: "Spots Hospitality", lat: 40.104226, lng: -83.138646 },
-{ name: "Celtic Music House", lat: 40.103733, lng: -83.135964 },
-{ name: "Dining Tent Creekside", lat: 40.103524, lng: -83.135106 },
-{ name: "Celtic Music House Bar", lat: 40.104004, lng: -83.136013 },
-{ name: "Wee Folk Stage", lat: 40.103659, lng: -83.134553 },
-{ name: "Wee Folk Crafts", lat: 40.103811, lng: -83.134553 },
-{ name: "Baby Changing", lat: 40.103770, lng: -83.133990 },
-{ name: "Dining tent Tennis Court", lat: 40.104152, lng: -83.135594 },
-{ name: "Ward Irish Music Archives", lat: 40.104262, lng: -83.135583 },
-{ name: "Darts and Sports Pub", lat: 40.104443, lng: -83.135610 },
-{ name: "Cieli Stage", lat: 40.104427, lng: -83.135272 },
-{ name: "Whiskey Tastings", lat: 40.104500, lng: -83.134886 },
-{ name: "Celtic Canines", lat: 40.104250, lng: -83.134248 },
-{ name: "Individual Dog Tents", lat: 40.104381, lng: -83.134312 },
-{ name: "Shamrock Stage", lat: 40.104693, lng: -83.136238 },
-{ name: "Heritage Forge", lat: 40.104500, lng: -83.136093 },
-{ name: "Spoken Word", lat: 40.104820, lng: -83.135691 },
-{ name: "East Enterence Tickets", lat: 40.105046, lng: -83.133904 },
-{ name: "Baby Changing East", lat: 40.105022, lng: -83.134087 },
-{ name: "Music workshops", lat: 40.104833, lng: -83.134253 },
-{ name: "Irish Tradisional", lat: 40.104706, lng: -83.134580 },
-{ name: "Book Loft", lat: 40.104820, lng: -83.134537 },
-{ name: "VR and Displays", lat: 40.104935, lng: -83.134494 },
-{ name: "Info", lat: 40.105001, lng: -83.134709 },
-{ name: "East Identikid", lat: 40.105112, lng: -83.134682 },
-{ name: "First Aid", lat: 40.105095, lng: -83.134789 },
-{ name: "Festival Merchandise", lat: 40.105038, lng: -83.135744 },
-{ name: "Steeltown", lat: 40.105112, lng: -83.135975 },
-{ name: "Brian Boru Ireland", lat: 40.105387, lng: -83.136565 },
-{ name: "Defenders Den", lat: 40.105813, lng: -83.136930 },
-{ name: "Irish Thunder Bar", lat: 40.105953, lng: -83.137241 },
-{ name: "Irish thunder CD Sales", lat: 40.105805, lng: -83.137439 },
-{ name: "Irish Thunder Dancer Tent", lat: 40.105518, lng: -83.137558 },
-{ name: "Irish Thunder Stage", lat: 40.105694, lng: -83.137397 },
-{ name: "Identikid", lat: 40.107750, lng: -83.137547 },
-{ name: "First Aid", lat: 40.107725, lng: -83.137617 },
-{ name: "Tickets", lat: 40.107656, lng: -83.137820 },
-{ name: "Accessibility Tent", lat: 40.107611, lng: -83.137729 },
-{ name: "North Info", lat: 40.107586, lng: -83.137681 },
-{ name: "Self Service bar", lat: 40.107533, lng: -83.137756 },
-{ name: "Dub Club", lat: 40.107684, lng: -83.137177 },
-{ name: "Dublin Stage", lat: 40.107409, lng: -83.137118 },
-{ name: "Dublin Bar", lat: 40.107221, lng: -83.136774 },
-{ name: "Dublin Dining Tent", lat: 40.107176, lng: -83.137187 },
-{ name: "Grafton Street Marketplace", lat: 40.106983, lng: -83.137177 },
-{ name: "Trinity Dining Tent", lat: 40.106753, lng: -83.137520 },
-{ name: "Irish Tea Room", lat: 40.106581, lng: -83.137493 },
-{ name: "Music Exhibitors", lat: 40.106458, lng: -83.137477 },
-{ name: "Wake house", lat: 40.106330, lng: -83.137354 },
-{ name: "Harpest", lat: 40.106265, lng: -83.137536 },
-{ name: "West Enterence", lat: 40.106031, lng: -83.138443 },
-{ name: "Emerald Club", lat: 40.106330, lng: -83.137000 },
-{ name: "Scessions Tent", lat: 40.106261, lng: -83.136839 },
-{ name: "Sampling Tent", lat: 40.106363, lng: -83.136656 },
-{ name: "Whiskey bar", lat: 40.106486, lng: -83.136662 },
-{ name: "Baby Changing", lat: 40.106355, lng: -83.136560 },
-{ name: "Trinity Stage", lat: 40.106745, lng: -83.137144 },
-{ name: "Supply Tent", lat: 40.107344, lng: -83.136656 },
-    ];
+    const booths = [{ name: "Celtic Rock Backstage", lat: 40.101952, lng: -83.137402, layout: "" },
+{ name: "Celtic Rock Stage", lat: 40.102231, lng: -83.137488, layout: "" },
+{ name: "Celtic Rock Club", lat: 40.102383, lng: -83.137815, layout: "" },
+{ name: "Celtic Rock Bar", lat: 40.102318, lng: -83.137981, layout: "" },
+{ name: "Temple Bar Marketplace", lat: 40.102732, lng: -83.136388, layout: "" },
+{ name: "Dining Tent Temple Bar", lat: 40.103278, lng: -83.137697, layout: "" },
+{ name: "SouthEast Enterence", lat: 40.102564, lng: -83.135337, layout: "" },
+{ name: "IdentiKid", lat: 40.102523, lng: -83.135540, layout: "" },
+{ name: "Whiskey bar", lat: 40.102785, lng: -83.135718, layout: "" },
+{ name: "Self Service Bar", lat: 40.102847, lng: -83.135809, layout: "" },
+{ name: "South Enterence", lat: 40.102346, lng: -83.138373, layout: "" },
+{ name: "RCS Tent", lat: 40.102457, lng: -83.138528, layout: "" },
+{ name: "ATM Tent", lat: 40.103007, lng: -83.136088, layout: "" },
+{ name: "Cell Charger", lat: 40.102744, lng: -83.135986, layout: "" },
+{ name: "Pot of Gold Wristbands", lat: 40.103286, lng: -83.136061, layout: "" },
+{ name: "Police South", lat: 40.102958, lng: -83.138738, layout: "" },
+{ name: "Sustainability Tent", lat: 40.103261, lng: -83.135862, layout: "" },
+{ name: "Pot of gold playland", lat: 40.103610, lng: -83.137026, layout: "" },
+{ name: "Bar", lat: 40.103278, lng: -83.137091, layout: "" },
+{ name: "Supply Tent", lat: 40.103245, lng: -83.136914, layout: "" },
+{ name: "Ticket Booth Southeast", lat: 40.102695, lng: -83.134972, layout: "" },
+{ name: "South West Enterence", lat: 40.104517, lng: -83.139011, layout: "" },
+{ name: "Tickets South West", lat: 40.104611, lng: -83.138995, layout: "" },
+{ name: "Bike Parking", lat: 40.105128, lng: -83.139081, layout: "" },
+{ name: "Sorting Center", lat: 40.104812, lng: -83.138705, layout: "" },
+{ name: "South West Identikid", lat: 40.104558, lng: -83.138813, layout: "" },
+{ name: "Spots Hospitality", lat: 40.104226, lng: -83.138646, layout: "" },
+{ name: "Celtic Music House", lat: 40.103733, lng: -83.135964, layout: "" },
+{ name: "Dining Tent Creekside", lat: 40.103524, lng: -83.135106, layout: "" },
+{ name: "Celtic Music House Bar", lat: 40.104004, lng: -83.136013, layout: "" },
+{ name: "Wee Folk Stage", lat: 40.103659, lng: -83.134553, layout: "" },
+{ name: "Wee Folk Crafts", lat: 40.103811, lng: -83.134553, layout: "" },
+{ name: "Baby Changing", lat: 40.103770, lng: -83.133990, layout: "" },
+{ name: "Dining tent Tennis Court", lat: 40.104152, lng: -83.135594, layout: "" },
+{ name: "Ward Irish Music Archives", lat: 40.104262, lng: -83.135583, layout: "" },
+{ name: "Darts and Sports Pub", lat: 40.104443, lng: -83.135610, layout: "" },
+{ name: "Cieli Stage", lat: 40.104427, lng: -83.135272, layout: "" },
+{ name: "Whiskey Tastings", lat: 40.104500, lng: -83.134886, layout: "" },
+{ name: "Celtic Canines", lat: 40.104250, lng: -83.134248, layout: "" },
+{ name: "Individual Dog Tents", lat: 40.104381, lng: -83.134312, layout: "" },
+{ name: "Shamrock Stage", lat: 40.104693, lng: -83.136238, layout: "" },
+{ name: "Heritage Forge", lat: 40.104500, lng: -83.136093, layout: "" },
+{ name: "Spoken Word", lat: 40.104820, lng: -83.135691, layout: "" },
+{ name: "East Enterence Tickets", lat: 40.105046, lng: -83.133904, layout: "" },
+{ name: "Baby Changing East", lat: 40.105022, lng: -83.134087, layout: "" },
+{ name: "Music workshops", lat: 40.104833, lng: -83.134253, layout: "" },
+{ name: "Irish Tradisional", lat: 40.104706, lng: -83.134580, layout: "" },
+{ name: "Book Loft", lat: 40.104820, lng: -83.134537, layout: "" },
+{ name: "VR and Displays", lat: 40.104935, lng: -83.134494, layout: "" },
+{ name: "Info", lat: 40.105001, lng: -83.134709, layout: "" },
+{ name: "East Identikid", lat: 40.105112, lng: -83.134682, layout: "" },
+{ name: "First Aid", lat: 40.105095, lng: -83.134789, layout: "" },
+{ name: "Festival Merchandise", lat: 40.105038, lng: -83.135744, layout: "" },
+{ name: "Steeltown", lat: 40.105112, lng: -83.135975, layout: "" },
+{ name: "Brian Boru Ireland", lat: 40.105387, lng: -83.136565, layout: "" },
+{ name: "Defenders Den", lat: 40.105813, lng: -83.136930, layout: "" },
+{ name: "Irish Thunder Bar", lat: 40.105953, lng: -83.137241, layout: "" },
+{ name: "Irish thunder CD Sales", lat: 40.105805, lng: -83.137439, layout: "" },
+{ name: "Irish Thunder Dancer Tent", lat: 40.105518, lng: -83.137558, layout: "" },
+{ name: "Irish Thunder Stage", lat: 40.105694, lng: -83.137397, layout: "" },
+{ name: "Identikid", lat: 40.107750, lng: -83.137547, layout: "" },
+{ name: "First Aid", lat: 40.107725, lng: -83.137617, layout: "" },
+{ name: "Tickets", lat: 40.107656, lng: -83.137820, layout: "" },
+{ name: "Accessibility Tent", lat: 40.107611, lng: -83.137729, layout: "" },
+{ name: "North Info", lat: 40.107586, lng: -83.137681, layout: "" },
+{ name: "Self Service bar", lat: 40.107533, lng: -83.137756, layout: "" },
+{ name: "Dub Club", lat: 40.107684, lng: -83.137177, layout: "" },
+{ name: "Dublin Stage", lat: 40.107409, lng: -83.137118, layout: "" },
+{ name: "Dublin Bar", lat: 40.107221, lng: -83.136774, layout: "" },
+{ name: "Dublin Dining Tent", lat: 40.107176, lng: -83.137187, layout: "" },
+{ name: "Grafton Street Marketplace", lat: 40.106983, lng: -83.137177, layout: "" },
+{ name: "Trinity Dining Tent", lat: 40.106753, lng: -83.137520, layout: "" },
+{ name: "Irish Tea Room", lat: 40.106581, lng: -83.137493, layout: "" },
+{ name: "Music Exhibitors", lat: 40.106458, lng: -83.137477, layout: "" },
+{ name: "Wake house", lat: 40.106330, lng: -83.137354, layout: "" },
+{ name: "Harpest", lat: 40.106265, lng: -83.137536, layout: "" },
+{ name: "West Enterence", lat: 40.106031, lng: -83.138443, layout: "" },
+{ name: "Emerald Club", lat: 40.106330, lng: -83.137000, layout: "" },
+{ name: "Scessions Tent", lat: 40.106261, lng: -83.136839, layout: "" },
+{ name: "Sampling Tent", lat: 40.106363, lng: -83.136656, layout: "" },
+{ name: "Whiskey bar", lat: 40.106486, lng: -83.136662, layout: "" },
+{ name: "Baby Changing", lat: 40.106355, lng: -83.136560, layout: "" },
+{ name: "Trinity Stage", lat: 40.106745, lng: -83.137144, layout: "" },
+{ name: "Supply Tent", lat: 40.107344, lng: -83.136656, layout: "" }];
 
     const markers = booths.map(booth => {
-      const layoutLink = `https://example.com/layouts/${booth.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.jpg`;
+      const layoutLink = booth.layout || `https://example.com/layouts/${booth.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.jpg`;
       const gmapsLink = `https://www.google.com/maps/search/?api=1&query=${booth.lat},${booth.lng}`;
       const popupHTML = `
         <b>${booth.name}</b><br>
         <a href="${layoutLink}" target="_blank">View Layout</a><br>
         <a href="${gmapsLink}" target="_blank">Open in Google Maps</a>
       `;
-      const marker = L.marker([booth.lat, booth.lng]).addTo(map).bindPopup(popupHTML);
+      const icon = L.divIcon({ className: 'spot-marker' });
+      const marker = L.marker([booth.lat, booth.lng], { icon }).addTo(map).bindPopup(popupHTML);
       marker.boothName = booth.name.toLowerCase();
       return marker;
     });
