@@ -59,7 +59,8 @@
       L.popup().setLatLng(e.latlng).setContent(popupContent).openOn(map);
     });
 
-    const booths = [{ name: "Celtic Rock Backstage", lat: 40.101952, lng: -83.137402, layout: "" },
+    const booths = [
+      { name: "Celtic Rock Backstage", lat: 40.101952, lng: -83.137402, layout: "" },
 { name: "Celtic Rock Stage", lat: 40.102231, lng: -83.137488, layout: "https://www.dropbox.com/scl/fi/qmudwxd0owh25aok6tni5/CELTIC-ROCK-STAGE-338.pdf?rlkey=nge6avwtcii171yp35f9ykcbk&st=tkjqn717&dl=0" },
 { name: "Celtic Rock Club", lat: 40.102383, lng: -83.137815, layout: "https://www.dropbox.com/scl/fi/pimj23bo7gfi73f7s6ajv/Celtic-Rock-Club-339.pdf?rlkey=xl1pq4zmvuqstbydfydg4j6au&st=f8mrbnw4&dl=0" },
 { name: "Celtic Rock Bar", lat: 40.102318, lng: -83.137981, layout: "" },
@@ -145,7 +146,7 @@
 { name: "Trinity Stage", lat: 40.106745, lng: -83.137144, layout: "https://www.dropbox.com/scl/fi/srrfovjild784bhgbg4pp/Trinity-Stage-107.pdf?rlkey=zv6ouebi12dli3jw60pud7ueh&st=gbqvmpvm&dl=0" },
 { name: "Supply Tent", lat: 40.107344, lng: -83.136656, layout: "" },
 { name: "ALL DATA", lat: 40.107932, lng: -83.137109, layout: "https://www.dropbox.com/scl/fo/ffpd5up94nfd31s8kw751/ADyI_j7UMcSG-Tah31VmRL8?rlkey=h21p19q39azsf3ss7qh56b3dq&st=817x9kut&dl=0" }
-                   ];
+    ];
 
     const markers = booths.map(booth => {
       const layoutLink = booth.layout || `https://example.com/layouts/${booth.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.jpg`;
