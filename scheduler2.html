@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cleaning Schedule Site</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 1rem;
+    }
+    input, select {
+      margin: 0.25rem;
+      padding: 0.5rem;
+      font-size: 1rem;
+      width: 200px;
+    }
+    optgroup {
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <!-- Required input fields for script functionality -->
+  <input id="lot" placeholder="Lot #" />
+  <input id="subdivision" list="subdivisionOptions" placeholder="Subdivision" />
+  <input id="builder" placeholder="Builder" />
+  <input id="city" placeholder="City" />
+  <input id="address" placeholder="Address" />
+
+  <br>
+  <label for="crew">Select Crew:</label>
+  <select id="crew">
+    <optgroup label="Solo Cleaners">
+      <option>Barb</option>
+      <option>Brenda</option>
+      <option>Marina</option>
+      <option>Indira</option>
+      <option>Chaley</option>
+    </optgroup>
+    <optgroup label="Groups">
+      <option>Ana/Azalia</option>
+      <option>Aracely/Israel</option>
+      <option>Belkis/Alexis</option>
+      <option>Catalina/Carolina</option>
+      <option>Cesia/Juan</option>
+      <option>Dolce/Sofia/Darlin</option>
+      <option>Gabriela/Yajaira</option>
+      <option>Edmundo/Fabiola</option>
+      <option>Mario/Odalis</option>
+      <option>Melvin/Vilma</option>
+      <option>Veronica/Gabriel/Jose/Eva</option>
+      <option>Alondra/Socorro</option>
+      <option>Daniela/Ada</option>
+    </optgroup>
+    <optgroup label="Quality Control">
+      <option>Dennis</option>
+    </optgroup>
+    <optgroup label="Supervisor">
+      <option>Patty</option>
+    </optgroup>
+  </select>
+
+  <datalist id="subdivisionOptions"></datalist>
+
+  <script>
+    let lotData = {};
+    let builderData = {};
+
+    fetch("lotData.json")
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to load lotData.json");
+        return res.json();
+      })
+      .then(data => lotData = data)
+      .catch(err => console.error("Error loading lotData:", err));
+
+    fetch("builderData.json")
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to load builderData.json");
+        return res.json();
+      })
+      .then(data => {
+        builderData = data;
+        populateSubdivisionOptions();
+      })
+      .catch(err => console.error("Error loading builderData:", err));
+
+    function populateSubdivisionOptions() {
+      const datalist = document.getElementById("subdivisionOptions");
+      if (datalist) {
+        Object.keys(builderData).sort().forEach(name => {
+          const option = document.createElement("option");
+          option.value = name;
+          datalist.appendChild(option);
+        });
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const lotInputEl = document.getElementById("lot");
+      if (lotInputEl) {
+        lotInputEl.addEventListener("input", () => {
+          handleSubdivisionInput(document.getElementById("subdivision").value);
+        });
+      }
+    });
+
+    const crewJobs = {};
+    const amJobs = [];
+    const pmJobs = [];
+
+    function handleSubdivisionInput(value) {
+      const builderInput = document.getElementById("builder");
+      const cityInput = document.getElementById("city");
+      const subdivisionInput = document.getElementById("subdivision");
+      const lotInput = document.getElementById("lot");
+      const addressInput = document.getElementById("address");
+
+      if (!builderData || !subdivisionInput || !lotInput) return;
+
+      const lowerVal = value.toLowerCase();
+      const match = Object.keys(builderData).find(name => name.toLowerCase() === lowerVal);
+      if (match && builderData[match]) {
+        builderInput.value = builderData[match].builder;
+        cityInput.value = builderData[match].city;
+      } else {
+        builderInput.value = "";
+        cityInput.value = "";
+      }
+
+      const key = `${lotInput.value.trim()}|${subdivisionInput.value.trim()}`;
+      if (lotData[key]) {
+        addressInput.value = lotData[key].address;
+        if (lotData[key].builder) builderInput.value = lotData[key].builder;
+      }
+    }
+  </script>
+</body>
+</html>
