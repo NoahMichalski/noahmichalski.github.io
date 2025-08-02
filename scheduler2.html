@@ -61,7 +61,7 @@
   <div id="loadingMessage">Loading lot data...</div>
   <div id="formSection" style="display: none;">
     <input id="lot" placeholder="Lot #" oninput="handleSubdivisionInput(document.getElementById('subdivision').value)" />
-    <input id="subdivision" list="subdivisionOptions" placeholder="Subdivision" oninput="handleSubdivisionInput(this.value); showSubdivisionSuggestions(this.value)" />
+    <input id="subdivision" placeholder="Subdivision" oninput="handleSubdivisionInput(this.value); showSubdivisionSuggestions(this.value)" />
     <div id="suggestions"></div>
     <input id="builder" placeholder="Builder" />
     <input id="city" placeholder="City" />
@@ -99,8 +99,6 @@
         <option>Patty</option>
       </optgroup>
     </select>
-
-    <datalist id="subdivisionOptions"></datalist>
     <br>
     <button onclick="addJob()">Add Job</button>
 
@@ -131,12 +129,6 @@
       .then(res => res.ok ? res.json() : Promise.reject("builderData fetch failed"))
       .then(data => {
         builderData = data;
-        const datalist = document.getElementById("subdivisionOptions");
-        Object.keys(builderData).forEach(sub => {
-          const option = document.createElement("option");
-          option.value = sub;
-          datalist.appendChild(option);
-        });
         builderDataLoaded = true;
         checkIfReady();
       })
