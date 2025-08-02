@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -25,6 +25,11 @@
       white-space: pre-wrap;
       background: #222;
       padding: 1rem;
+    }
+    #warning {
+      margin-top: 0.5rem;
+      color: orange;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -73,6 +78,7 @@
   <button onclick="addJob()">Add Job</button>
 
   <div id="scheduleOutput"></div>
+  <div id="warning"></div>
 
   <script>
     let lotData = {};
@@ -103,6 +109,8 @@
       const lot = document.getElementById("lot").value.trim().toUpperCase();
       const address = document.getElementById("address");
       const subdivision = value.trim();
+      const warning = document.getElementById("warning");
+      warning.textContent = "";
 
       const match = Object.keys(builderData).find(s => s.toLowerCase() === subdivision.toLowerCase());
       if (match && builderData[match]) {
@@ -113,18 +121,22 @@
         city.value = "";
       }
 
-      // Normalize keys in lotData to compare
-      const keyMatch = Object.keys(lotData).find(key => {
+      // Fuzzy lot match
+      const fuzzyMatches = Object.keys(lotData).filter(key => {
         const [lotKey, subKey] = key.split("|");
-        return lotKey.toUpperCase() === lot && subKey.toLowerCase() === subdivision.toLowerCase();
+        return lotKey.toUpperCase().startsWith(lot) && subKey.toLowerCase() === subdivision.toLowerCase();
       });
 
-      if (keyMatch && lotData[keyMatch]) {
-        address.value = lotData[keyMatch].address || "";
-        if (lotData[keyMatch].builder) builder.value = lotData[keyMatch].builder;
-      } else {
+      if (fuzzyMatches.length === 1) {
+        const entry = lotData[fuzzyMatches[0]];
+        address.value = entry.address || "";
+        if (entry.builder) builder.value = entry.builder;
+      } else if (fuzzyMatches.length > 1) {
+        warning.textContent = `⚠️ Multiple matches found for lot ${lot} in ${subdivision}`;
         address.value = "";
-        console.warn("Lot key not found:", lot + "|" + subdivision);
+      } else {
+        warning.textContent = `⚠️ No match found for lot ${lot} in ${subdivision}`;
+        address.value = "";
       }
     }
 
