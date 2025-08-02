@@ -11,7 +11,7 @@
       font-family: sans-serif;
       padding: 1rem;
     }
-    input, select {
+    input, select, button {
       margin: 0.25rem;
       padding: 0.5rem;
       font-size: 1rem;
@@ -20,16 +20,21 @@
     optgroup {
       color: #000;
     }
+    #scheduleOutput {
+      margin-top: 1rem;
+      white-space: pre-wrap;
+      background: #222;
+      padding: 1rem;
+    }
   </style>
 </head>
 <body>
-  <!-- Required input fields for script functionality -->
   <input id="lot" placeholder="Lot #" />
-  <input id="subdivision" list="subdivisionOptions" placeholder="Subdivision" />
+  <input id="subdivision" list="subdivisionOptions" placeholder="Subdivision" oninput="handleSubdivisionInput(this.value)" />
   <input id="builder" placeholder="Builder" />
   <input id="city" placeholder="City" />
   <input id="address" placeholder="Address" />
-
+  <input id="note" placeholder="Note (optional)" />
   <br>
   <label for="crew">Select Crew:</label>
   <select id="crew">
@@ -64,78 +69,82 @@
   </select>
 
   <datalist id="subdivisionOptions"></datalist>
+  <br>
+  <button onclick="addJob()">Add Job</button>
+
+  <div id="scheduleOutput"></div>
 
   <script>
     let lotData = {};
     let builderData = {};
+    const crewJobs = {};
 
     fetch("lotData.json")
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to load lotData.json");
-        return res.json();
-      })
+      .then(res => res.ok ? res.json() : Promise.reject("lotData fetch failed"))
       .then(data => lotData = data)
-      .catch(err => console.error("Error loading lotData:", err));
+      .catch(err => console.error("lotData error:", err));
 
     fetch("builderData.json")
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to load builderData.json");
-        return res.json();
-      })
+      .then(res => res.ok ? res.json() : Promise.reject("builderData fetch failed"))
       .then(data => {
         builderData = data;
-        populateSubdivisionOptions();
-      })
-      .catch(err => console.error("Error loading builderData:", err));
-
-    function populateSubdivisionOptions() {
-      const datalist = document.getElementById("subdivisionOptions");
-      if (datalist) {
-        Object.keys(builderData).sort().forEach(name => {
+        const datalist = document.getElementById("subdivisionOptions");
+        Object.keys(builderData).forEach(sub => {
           const option = document.createElement("option");
-          option.value = name;
+          option.value = sub;
           datalist.appendChild(option);
         });
+      })
+      .catch(err => console.error("builderData error:", err));
+
+    function handleSubdivisionInput(value) {
+      const builder = document.getElementById("builder");
+      const city = document.getElementById("city");
+      const lot = document.getElementById("lot").value.trim();
+      const address = document.getElementById("address");
+      const key = `${lot}|${value}`;
+
+      const match = Object.keys(builderData).find(s => s.toLowerCase() === value.toLowerCase());
+      if (match && builderData[match]) {
+        builder.value = builderData[match].builder;
+        city.value = builderData[match].city;
+      } else {
+        builder.value = "";
+        city.value = "";
+      }
+
+      if (lotData[key]) {
+        address.value = lotData[key].address;
+        if (lotData[key].builder) builder.value = lotData[key].builder;
       }
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const lotInputEl = document.getElementById("lot");
-      if (lotInputEl) {
-        lotInputEl.addEventListener("input", () => {
-          handleSubdivisionInput(document.getElementById("subdivision").value);
-        });
+    function addJob() {
+      const lot = document.getElementById("lot").value.trim();
+      const subdivision = document.getElementById("subdivision").value.trim();
+      const builder = document.getElementById("builder").value.trim();
+      const city = document.getElementById("city").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const note = document.getElementById("note").value.trim();
+      const crew = document.getElementById("crew").value.trim();
+
+      if (!lot || !subdivision || !crew || !address) return alert("Lot, subdivision, address, and crew are required.");
+
+      const job = `*${lot} ${subdivision} *${builder} reclean${note ? "** (" + note + ")" : "*"} – ${address}/${city}`;
+      if (!crewJobs[crew]) crewJobs[crew] = [];
+      crewJobs[crew].push(job);
+
+      renderSchedule();
+    }
+
+    function renderSchedule() {
+      const output = document.getElementById("scheduleOutput");
+      let result = "";
+      for (const crew in crewJobs) {
+        result += `\n${crew}\n`;
+        crewJobs[crew].forEach(job => result += `${job}\n`);
       }
-    });
-
-    const crewJobs = {};
-    const amJobs = [];
-    const pmJobs = [];
-
-    function handleSubdivisionInput(value) {
-      const builderInput = document.getElementById("builder");
-      const cityInput = document.getElementById("city");
-      const subdivisionInput = document.getElementById("subdivision");
-      const lotInput = document.getElementById("lot");
-      const addressInput = document.getElementById("address");
-
-      if (!builderData || !subdivisionInput || !lotInput) return;
-
-      const lowerVal = value.toLowerCase();
-      const match = Object.keys(builderData).find(name => name.toLowerCase() === lowerVal);
-      if (match && builderData[match]) {
-        builderInput.value = builderData[match].builder;
-        cityInput.value = builderData[match].city;
-      } else {
-        builderInput.value = "";
-        cityInput.value = "";
-      }
-
-      const key = `${lotInput.value.trim()}|${subdivisionInput.value.trim()}`;
-      if (lotData[key]) {
-        addressInput.value = lotData[key].address;
-        if (lotData[key].builder) builderInput.value = lotData[key].builder;
-      }
+      output.textContent = result.trim();
     }
   </script>
 </body>
