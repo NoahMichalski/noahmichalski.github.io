@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -121,10 +121,9 @@
         city.value = "";
       }
 
-      // Fuzzy lot match
       const fuzzyMatches = Object.keys(lotData).filter(key => {
         const [lotKey, subKey] = key.split("|");
-        return lotKey.toUpperCase().startsWith(lot) && subKey.toLowerCase() === subdivision.toLowerCase();
+        return lotKey.replace(/[^\d]/g, '') === lot.replace(/[^\d]/g, '') && subKey.toLowerCase() === subdivision.toLowerCase();
       });
 
       if (fuzzyMatches.length === 1) {
