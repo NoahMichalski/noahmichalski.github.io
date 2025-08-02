@@ -102,9 +102,9 @@
       const city = document.getElementById("city");
       const lot = document.getElementById("lot").value.trim().toUpperCase();
       const address = document.getElementById("address");
-      const key = `${lot}|${value.trim()}`;
+      const subdivision = value.trim();
 
-      const match = Object.keys(builderData).find(s => s.toLowerCase() === value.toLowerCase());
+      const match = Object.keys(builderData).find(s => s.toLowerCase() === subdivision.toLowerCase());
       if (match && builderData[match]) {
         builder.value = builderData[match].builder;
         city.value = builderData[match].city;
@@ -113,12 +113,18 @@
         city.value = "";
       }
 
-      if (lotData.hasOwnProperty(key)) {
-        address.value = lotData[key].address;
-        if (lotData[key].builder) builder.value = lotData[key].builder;
+      // Normalize keys in lotData to compare
+      const keyMatch = Object.keys(lotData).find(key => {
+        const [lotKey, subKey] = key.split("|");
+        return lotKey.toUpperCase() === lot && subKey.toLowerCase() === subdivision.toLowerCase();
+      });
+
+      if (keyMatch && lotData[keyMatch]) {
+        address.value = lotData[keyMatch].address || "";
+        if (lotData[keyMatch].builder) builder.value = lotData[keyMatch].builder;
       } else {
         address.value = "";
-        console.warn("Lot key not found:", key);
+        console.warn("Lot key not found:", lot + "|" + subdivision);
       }
     }
 
