@@ -100,9 +100,9 @@
     function handleSubdivisionInput(value) {
       const builder = document.getElementById("builder");
       const city = document.getElementById("city");
-      const lot = document.getElementById("lot").value.trim();
+      const lot = document.getElementById("lot").value.trim().toUpperCase();
       const address = document.getElementById("address");
-      const key = `${lot}|${value}`;
+      const key = `${lot}|${value.trim()}`;
 
       const match = Object.keys(builderData).find(s => s.toLowerCase() === value.toLowerCase());
       if (match && builderData[match]) {
@@ -113,9 +113,12 @@
         city.value = "";
       }
 
-      if (lotData[key]) {
+      if (lotData.hasOwnProperty(key)) {
         address.value = lotData[key].address;
         if (lotData[key].builder) builder.value = lotData[key].builder;
+      } else {
+        address.value = "";
+        console.warn("Lot key not found:", key);
       }
     }
 
