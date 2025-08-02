@@ -34,60 +34,70 @@
   </style>
 </head>
 <body>
-  <input id="lot" placeholder="Lot #" />
-  <input id="subdivision" list="subdivisionOptions" placeholder="Subdivision" oninput="handleSubdivisionInput(this.value)" />
-  <input id="builder" placeholder="Builder" />
-  <input id="city" placeholder="City" />
-  <input id="address" placeholder="Address" />
-  <input id="note" placeholder="Note (optional)" />
-  <br>
-  <label for="crew">Select Crew:</label>
-  <select id="crew">
-    <optgroup label="Solo Cleaners">
-      <option>Barb</option>
-      <option>Brenda</option>
-      <option>Marina</option>
-      <option>Indira</option>
-      <option>Chaley</option>
-    </optgroup>
-    <optgroup label="Groups">
-      <option>Ana/Azalia</option>
-      <option>Aracely/Israel</option>
-      <option>Belkis/Alexis</option>
-      <option>Catalina/Carolina</option>
-      <option>Cesia/Juan</option>
-      <option>Dolce/Sofia/Darlin</option>
-      <option>Gabriela/Yajaira</option>
-      <option>Edmundo/Fabiola</option>
-      <option>Mario/Odalis</option>
-      <option>Melvin/Vilma</option>
-      <option>Veronica/Gabriel/Jose/Eva</option>
-      <option>Alondra/Socorro</option>
-      <option>Daniela/Ada</option>
-    </optgroup>
-    <optgroup label="Quality Control">
-      <option>Dennis</option>
-    </optgroup>
-    <optgroup label="Supervisor">
-      <option>Patty</option>
-    </optgroup>
-  </select>
+  <div id="loadingMessage">Loading lot data...</div>
+  <div id="formSection" style="display: none;">
+    <input id="lot" placeholder="Lot #" oninput="handleSubdivisionInput(document.getElementById('subdivision').value)" />
+    <input id="subdivision" list="subdivisionOptions" placeholder="Subdivision" oninput="handleSubdivisionInput(this.value)" />
+    <input id="builder" placeholder="Builder" />
+    <input id="city" placeholder="City" />
+    <input id="address" placeholder="Address" />
+    <input id="note" placeholder="Note (optional)" />
+    <br>
+    <label for="crew">Select Crew:</label>
+    <select id="crew">
+      <optgroup label="Solo Cleaners">
+        <option>Barb</option>
+        <option>Brenda</option>
+        <option>Marina</option>
+        <option>Indira</option>
+        <option>Chaley</option>
+      </optgroup>
+      <optgroup label="Groups">
+        <option>Ana/Azalia</option>
+        <option>Aracely/Israel</option>
+        <option>Belkis/Alexis</option>
+        <option>Catalina/Carolina</option>
+        <option>Cesia/Juan</option>
+        <option>Dolce/Sofia/Darlin</option>
+        <option>Gabriela/Yajaira</option>
+        <option>Edmundo/Fabiola</option>
+        <option>Mario/Odalis</option>
+        <option>Melvin/Vilma</option>
+        <option>Veronica/Gabriel/Jose/Eva</option>
+        <option>Alondra/Socorro</option>
+        <option>Daniela/Ada</option>
+      </optgroup>
+      <optgroup label="Quality Control">
+        <option>Dennis</option>
+      </optgroup>
+      <optgroup label="Supervisor">
+        <option>Patty</option>
+      </optgroup>
+    </select>
 
-  <datalist id="subdivisionOptions"></datalist>
-  <br>
-  <button onclick="addJob()">Add Job</button>
+    <datalist id="subdivisionOptions"></datalist>
+    <br>
+    <button onclick="addJob()">Add Job</button>
 
-  <div id="scheduleOutput"></div>
-  <div id="warning"></div>
+    <div id="scheduleOutput"></div>
+    <div id="warning"></div>
+  </div>
 
   <script>
     let lotData = {};
     let builderData = {};
     const crewJobs = {};
 
+    let lotDataLoaded = false;
+    let builderDataLoaded = false;
+
     fetch("lotData.json")
       .then(res => res.ok ? res.json() : Promise.reject("lotData fetch failed"))
-      .then(data => lotData = data)
+      .then(data => {
+        lotData = data;
+        lotDataLoaded = true;
+        checkIfReady();
+      })
       .catch(err => console.error("lotData error:", err));
 
     fetch("builderData.json")
@@ -100,8 +110,17 @@
           option.value = sub;
           datalist.appendChild(option);
         });
+        builderDataLoaded = true;
+        checkIfReady();
       })
       .catch(err => console.error("builderData error:", err));
+
+    function checkIfReady() {
+      if (lotDataLoaded && builderDataLoaded) {
+        document.getElementById("loadingMessage").style.display = "none";
+        document.getElementById("formSection").style.display = "block";
+      }
+    }
 
     function handleSubdivisionInput(value) {
       const builder = document.getElementById("builder");
@@ -121,15 +140,20 @@
         city.value = "";
       }
 
+      const normalizedLot = lot.replace(/[^\d]/g, '').replace(/^0+/, '');
       const fuzzyMatches = Object.keys(lotData).filter(key => {
-        const [lotKey, subKey] = key.split("|");
-        return lotKey.replace(/[^\d]/g, '') === lot.replace(/[^\d]/g, '') && subKey.toLowerCase() === subdivision.toLowerCase();
+        const [lotKey, subKey] = key.split("|").map(s => s.trim().toLowerCase());
+        return (
+          lotKey.replace(/[^\d]/g, '').replace(/^0+/, '') === normalizedLot.toLowerCase() &&
+          subKey === subdivision.toLowerCase()
+        );
       });
 
       if (fuzzyMatches.length === 1) {
         const entry = lotData[fuzzyMatches[0]];
         address.value = entry.address || "";
         if (entry.builder) builder.value = entry.builder;
+        if (entry.city) city.value = entry.city;
       } else if (fuzzyMatches.length > 1) {
         warning.textContent = `⚠️ Multiple matches found for lot ${lot} in ${subdivision}`;
         address.value = "";
