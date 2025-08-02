@@ -40,13 +40,29 @@
       overflow-y: auto;
       font-size: 0.85rem;
     }
+    #suggestions {
+      background: #333;
+      color: white;
+      max-height: 150px;
+      overflow-y: auto;
+      margin: 0.25rem 0;
+      border: 1px solid #555;
+    }
+    .suggestion-item {
+      padding: 0.3rem;
+      cursor: pointer;
+    }
+    .suggestion-item:hover {
+      background: #555;
+    }
   </style>
 </head>
 <body>
   <div id="loadingMessage">Loading lot data...</div>
   <div id="formSection" style="display: none;">
     <input id="lot" placeholder="Lot #" oninput="handleSubdivisionInput(document.getElementById('subdivision').value)" />
-    <input id="subdivision" list="subdivisionOptions" placeholder="Subdivision" oninput="handleSubdivisionInput(this.value)" />
+    <input id="subdivision" list="subdivisionOptions" placeholder="Subdivision" oninput="handleSubdivisionInput(this.value); showSubdivisionSuggestions(this.value)" />
+    <div id="suggestions"></div>
     <input id="builder" placeholder="Builder" />
     <input id="city" placeholder="City" />
     <input id="address" placeholder="Address" />
@@ -138,6 +154,27 @@
       display.textContent = JSON.stringify(lotData, null, 2);
     }
 
+    function showSubdivisionSuggestions(input) {
+      const suggestionsBox = document.getElementById("suggestions");
+      suggestionsBox.innerHTML = "";
+      const query = input.trim().toLowerCase();
+      if (!query) return;
+
+      const matches = Object.keys(builderData).filter(sub => sub.toLowerCase().includes(query));
+
+      matches.slice(0, 10).forEach(match => {
+        const div = document.createElement("div");
+        div.className = "suggestion-item";
+        div.textContent = match;
+        div.onclick = () => {
+          document.getElementById("subdivision").value = match;
+          suggestionsBox.innerHTML = "";
+          handleSubdivisionInput(match);
+        };
+        suggestionsBox.appendChild(div);
+      });
+    }
+
     function handleSubdivisionInput(value) {
       const builder = document.getElementById("builder");
       const city = document.getElementById("city");
@@ -161,7 +198,7 @@
         const [lotKey, subKey] = key.split("|").map(s => s.trim().toLowerCase());
         return (
           lotKey.replace(/[^\d]/g, '').replace(/^0+/, '') === normalizedLot.toLowerCase() &&
-          subKey === subdivision.toLowerCase()
+          subKey.includes(subdivision.toLowerCase())
         );
       });
 
