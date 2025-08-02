@@ -31,6 +31,15 @@
       color: orange;
       font-weight: bold;
     }
+    #lotDataBox {
+      margin-top: 1rem;
+      background-color: #222;
+      color: #ccc;
+      padding: 1rem;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+    }
   </style>
 </head>
 <body>
@@ -81,6 +90,7 @@
 
     <div id="scheduleOutput"></div>
     <div id="warning"></div>
+    <div id="lotDataBox"></div>
   </div>
 
   <script>
@@ -96,6 +106,7 @@
       .then(data => {
         lotData = data;
         lotDataLoaded = true;
+        displayLotData();
         checkIfReady();
       })
       .catch(err => console.error("lotData error:", err));
@@ -120,6 +131,11 @@
         document.getElementById("loadingMessage").style.display = "none";
         document.getElementById("formSection").style.display = "block";
       }
+    }
+
+    function displayLotData() {
+      const display = document.getElementById("lotDataBox");
+      display.textContent = JSON.stringify(lotData, null, 2);
     }
 
     function handleSubdivisionInput(value) {
