@@ -1,0 +1,86 @@
+{
+  "Abberley": {
+    "builder": "Pulte",
+    "city": "New Albany"
+  },
+  "Amrine": {
+    "builder": "Pulte",
+    "city": "Marysville"
+  },
+  "Berlin": {
+    "builder": "Pulte",
+    "city": "Delaware"
+  },
+  "Beulah": {
+    "builder": "Pulte",
+    "city": "Grove City"
+  },
+  "Bloomfield": {
+    "builder": "Pulte",
+    "city": "South Bloomfield"
+  },
+  "Buckstone": {
+    "builder": "Pulte",
+    "city": "Lockbourne"
+  },
+  "Eagle": {
+    "builder": "Pulte",
+    "city": "Galena"
+  },
+  "Hyatts": {
+    "builder": "Pulte",
+    "city": "Delaware"
+  },
+  "Jerome Village": {
+    "builder": "Pulte",
+    "city": "Plain City"
+  },
+  "Limestone": {
+    "builder": "Pulte",
+    "city": "Delaware"
+  },
+  "Maeve": {
+    "builder": "Pulte",
+    "city": "Delaware"
+  },
+  "Magnolia": {
+    "builder": "Pulte",
+    "city": "Sunbury"
+  },
+  "Nelson": {
+    "builder": "Pulte",
+    "city": "Delaware"
+  },
+  "Nottingham": {
+    "builder": "Pulte",
+    "city": "New Albany"
+  },
+  "Pioneer": {
+    "builder": "Pulte",
+    "city": "Plain City"
+  },
+  "Price Ponds": {
+    "builder": "Pulte",
+    "city": "Sunbury"
+  },
+  "Scotts Farm": {
+    "builder": "Pulte",
+    "city": "Plain City"
+  },
+  "Sugar Farms": {
+    "builder": "Pulte",
+    "city": "Hilliard"
+  },
+  "Towns on the Greenway": {
+    "builder": "Pulte",
+    "city": "Westerville"
+  },
+  "Towns on the Parkway": {
+    "builder": "Pulte",
+    "city": "Dublin"
+  },
+  "Cherry Glen": {
+    "builder": "Compass",
+    "city": "Powell"
+  }
+}
