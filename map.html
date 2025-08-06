@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Builder Map</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    #map { height: 100vh; width: 100vw; }
+    .gm-style .custom-info {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 6px 10px 7px 10px;
+      min-width: 120px;
+      max-width: 200px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+      margin: auto;
+      background: #fff;
+    }
+    .gm-style .builder-tag {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 9px;
+      margin: 5px 0 5px 0;
+      font-weight: bold;
+      font-size: 0.95em;
+      letter-spacing: 0.01em;
+    }
+    .gm-style .custom-info strong { font-size: .98em; display: block; margin-bottom: 2px; }
+    .gm-style .custom-info .lot-btn {
+      margin-top: 8px;
+      background: #1286d3;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      padding: 4px 11px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: .90em;
+    }
+    .gm-style .custom-info .lot-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+    a.map-link { color: #2186eb; text-decoration: underline; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    // --- Your subdivision map links ---
+    const lotMapLinks = {/* ... (same as before, omitted for brevity) ... */};
+    // --- Your markerData array ---
+    const markerData = [  ["VIP","Home Office","6407 Nicholas Dr",40.087852,-83.063193],
+  ["VIP","DO NOT USE","1110 Claycraft Rd, Gahanna, OH 43230",39.992860,-82.843525],
+  ["Pulte","Abberley Park","3384 Abberley Drive, New Albany, OH 43054",40.052873,-82.816503],
+  ["Pulte","Bloomfield Hills","5002 Roese Ave, South Bloomfield, OH 43103",39.708129,-82.988884],
+  ["Pulte","Clarkshaw Pulte","3411 Tender Avenue, Powell, OH 43065",40.223191,-83.104699],
+  ["Pulte","Glenross Pulte","106 E Wind Rd, Delaware, OH 43015",40.236117,-83.020358],
+  ["Pulte","Magnolia Park","582 Weatherby Drive Sunbury , OH 43074",40.245373, -82.883716],
+  ["Pulte","Price Ponds - Highlands","1026 Ping Lane, Sunbury, OH 43074",40.244527, -82.885731],
+  ["Pulte","Price Ponds - Summit ","953 Mill Stone Dr, Sunbury, OH 43074",40.244204, -82.886893],
+  ["Pulte","Sugar Farms - Highlands","2040 Limone Drive, Hilliard, OH 43026",39.992456,-83.174284],
+  ["Pulte","Sugar Farms - Retreat","1820 Melanzana Dr, Hilliard, OH 43026",39.987505,-83.173131],
+  ["Pulte","Sugar Farms - Summit","2019 Fragola Drive, Hillard, OH 43026",39.991552,-83.177803],
+  ["Pulte","Towns On The Parkway","4128 John Shields Pkwy, Dublin, OH 43017",40.106649,-83.100162],
+  ["Pulte","Amrine","334 Amrine Wy, Marysville, OH 43040",40.270238,-83.371765],
+  ["Pulte","Buckstone","4918 Ranger Dr, Lockbourne, OH 43137",39.856655,-82.967935],
+  ["Pulte","Clover","40 Reneau Ave, Galloway, OH 43119",39.949993,-83.161864],
+  ["Pulte","Jerome Village Pulte","8768 Apricot Wy, Plain City, OH 43064",40.187687,-83.189026],
+  ["Pulte","Nelson","2538 Nelson Ln, Delaware, OH 43015",40.208450,-83.084053],
+  ["Pulte","Berlin Bluffs Pulte","2651 Cleo St, Delaware, OH 43015",40.244850,-82.997809],
+  ["Pulte","Carpenters","4448 Ruppert Trl, Powell, OH 43065",40.185143,-83.111785],
+  ["Pulte","Scotts","9556 Burghley Dr, Plain City, OH 43064",40.154941,-83.214898],
+  ["Pulte","Limestone","101 Franks Field Dr, Delaware, OH 43015",40.302692,-83.122495],
+  ["Pulte","Nottingham Trace","7715 Nottingham Blvd, New Albany, OH 43054",40.109482,-82.812530],
+  ["Pulte","Slate Ridge - Preserve","1258 Ashlar Lane Lewis Center , OH 43035",40.193030,-83.013688],
+  ["Pulte","Slate Ridge - Retreat","1121 Oldcastle Road, Lewis Center, OH 43035",40.193908,-83.018517],
+  ["Pulte","Beulah","3655 Glacial Ln, Grove City, OH 43123",39.889952,-83.104556],
+  ["Pulte","Eagle","7002 Crown Drive, Galena, OH 43021",40.249897,-82.938333],
+  ["Pulte","Hyatts Pulte","6176 Bishop Blvd, Powell, OH 43065",40.214810,-83.098683],
+  ["Pulte","Maeve","2598 McKenna Dr, Delaware, OH 43015",40.236883,-83.005326],
+  ["Pulte","Pioneer","9569 Coach Line Ave, Plain City, OH 43064",40.150438,-83.237856],
+  ["Pulte","Towns on the Greenway","337 Hockberry Ave, Westerville, OH 43081",40.134287,-82.942262],
+  ["Pulte","Jefferson Manor","8488 Ben Hale Ct, Blacklick, OH 43004",40.036095,-82.787034],
+  ["DR Horton","Brookview","6541 Pfeifer Ash Dr, Canal Winchester, OH 43110",39.877261,-82.821450],
+  ["DR Horton","Lansdowne","4213 Sycamore Oak Avenue, Canal Winchester, OH 43110",39.892490,-82.835370],
+  ["DR Horton","Longview","102 Cedarhurst Ct, Pickerington, OH 43147",39.897680,-82.789797],
+  ["DR Horton","Madison Meadows","403 Madison Wy, Plain City, OH 43064",40.103927,-83.287352],
+  ["DR Horton","Maplewood","1159 Mueller Dr, Reynoldsburg, OH 43068",39.969688,-82.754820],
+  ["DR Horton","Monarch Greene","1414 Chrisman Drive, Columbus, OH 43223",39.927510,-83.032780], 
+  ["DR Horton","Piatt Preserve","2780 Aldengate Ln, Delaware, OH 43015",40.245506,-83.007530],
+  ["DR Horton","River Ridge","1797 Jacko Lane, Circleville, OH 43113",39.635850,-82.948650],
+  ["DR Horton","Overlook","2100 Overlook Wy, Newark, OH 43055",40.043237,-82.473669],
+  ["DR Horton","Wagnalls","1390 Hansberry Dr, Lithopolis, OH 43136",39.811287,-82.813148],
+  ["DR Horton","Walnut","5 Walnut Mill Way, Ashville, OH 43103",39.734237,-82.953590],
+  ["DR Horton","Ludlow Ridge","819 Sherwood Loop, Bellefontaine, OH 43311 ",40.339108,-83.745493],
+  ["DR Horton","Parkview","557 Park Vista Dr, Delaware, OH 43015 ",40.317609,-83.092585],
+  ["DR Horton","Springer Woods","693 Penwell Dr, Delaware, OH 43015 ",40.310277,-83.120107],
+  ["DR Horton","Chase Landing","6351 Ballast Rd, Galloway, OH 43119 ",39.918362,-83.163537],
+  ["Ryan","Terra Alta","581 Pisa Lp, Delaware, OH 43015",40.268005,-83.051701],
+  ["Ryan","Addison Farms","50 Allenhurst Way, Delaware, OH 43015",40.322743,-83.085124],
+  ["Ryan","Rolling Hills","1503 Cypress Pt Dr, Sunbury, OH 43074",40.240643,-82.891371],
+  ["Ryan","Glenross Ryan","191 Sycamore Ln, Delaware, OH 43015",40.236517,-83.019782],
+  ["Ryan","Hyatts Ryan","250 Alicia Kelton Dr, Delaware, OH 43015",40.215079,-83.041020],
+  ["Ryan","Rutherford","572 Rutherford Ave, Delaware, OH 43015",40.320409,-83.088637],
+  ["Epcon","Hyland Meadows","8027 Grassland Dr, Plain City, OH 43064",40.189891,-83.191183],
+  ["Epcon","Carr Farms","5755 Arcadian Ave, Hilliard, OH 43026",40.051380,-83.170284],
+  ["Epcon","Mulberry","4416 Marilyn Ct, Grove City, OH 43123",39.871459,-83.056351],
+  ["Epcon","White Oaks","8400 Ryan Pkwy, Plain City, OH 43064",40.166178,-83.192868],
+  ["Epcon","Hyatts Village","3372 Hyatts Rd, Powell, OH 43065",40.217600,-83.108500],
+  ["Epcon","Courtyards on Hyatts","3200 Korg St, Powell, OH 43065",40.217012,-83.099814],
+  ["Rockford","Foxfire","440 Bethpage Blvd, Commercial Point, OH 43116",39.777874, -83.029083],
+  ["Rockford","HofBauer","2223 Ashby Wy, Plain City, OH 43064",40.114270,-83.269355],
+  ["Rockford","Jerome Aster Rockford","6981 Aster Wy, Plain City, OH 43064",40.194037, -83.172143],
+  ["Rockford","Meadow Grove","1813 Silverlawn Dr, Grove City, OH 43123",39.849346,-83.052656],
+  ["Rockford","Willowbend","228 Willow Bnd Dr, Newark, OH 43055",40.047837,-82.485522],
+  ["Rockford","Hazelton Crossing","208 Scotsgrove Drive, Pataskala, OH 43062",39.972371,-82.678359],
+  ["Rockford","Mitchell Highlands","9511 Camberly Avenue Plain City, Ohio 43064",40.148096,-83.226260],
+  ["Rockford","Jerome Village Meadowlark","8868 Meadowlark Drive Plain City, Ohio 43064",40.187822,-83.208990],
+  ["3 Pillar","Jerome Village 3 Pillar","11451 Winterberry Dr, Plain City, OH 43064",40.178976,-83.192238],
+  ["3 Pillar","Eversole Woods","11451 Winterberry Drive, Plain City, OH 43064",40.179464,-83.187045],
+  ["MI Homes","Pinnacle","899 Heimat Haus Dr, Grove City, OH 43123",39.866539,-83.028943],
+  ["MI Homes","Browns Farm","3215 Farmhouse Ln, Grove City, OH 43123",39.857121,-83.089867],
+  ["MI Homes","Hill Farm","6960 Gelderland Dr, Hilliard, OH 43026",40.037428,-83.203022],
+  ["MI Homes","Foxfire","444 Bethpage Blvd, Commercial Point, OH 43116",39.777897,-83.028864],
+  ["MI Homes","Heron","12146 Prairie View Dr NW, Pickerington, OH 43147",39.909728,-82.716874],
+  ["MI Homes","Darby","537 Conductor Dr, Plain City, OH 43064",40.107605,-83.250687],
+  ["MI Homes","Forest Ridge","106 Ruby Rd SW, Pataskala, OH 43062",40.015704,-82.668855],
+  ["MI Homes","Liberty","3777 Shoal Way, Powell, OH 43065",40.201641,-83.103957],
+  ["MI Homes","Jerome Village Applewood","10715 Pearl Creek Dr, Plain City, OH 43064",40.169613,-83.199764],
+  ["MI Homes","Winterbrooke","43 Sienna Glenn Dr, Lewis Center, OH 43035",40.229418,-83.021288],
+  ["MI Homes","Miller Farm","2799 Sunbury Rd, Galena, OH 43021",40.212932,-82.871836],
+  ["MI Homes","WoodCrest","6443 Bluejay Rdg Dr, Powell, OH 43065",40.222632,-83.114473],
+  ["MI Homes","Berlin Farm MI Homes","2651 Cleo St, Delaware, OH 43015",40.240546,-83.004182],
+  ["MI Homes","Hyland Glen","6986 Stillhouse Ln, Dublin, OH 43016",40.114383,-83.175554],
+  ["MI Homes","Spring Hill Farm","7820 Oldham Dr., Reynoldsburg, OH 43068",39.972910,-82.792604],
+  ["Shottenstein","Renner","6186 Renner Park Drive, Columbus, OH 43228",39.982893,-83.173465],
+  ["Shottenstein","Jerome Aster Schottenstein","6971 Aster Way, Plain City, OH 43064",40.194037,-83.172143],
+  ["Shottenstein","Holton","3600 Whirla Way, Grove City, OH",39.858200,-83.098300],
+  ["Shottenstein","Cottages At Verbana","11738 Verbena Place, Plain City, OH 43064",40.184323,-83.200862],
+  ["Shottenstein","Glacier Pointe","8798 Eliot Drive, Plain City, OH 43064",40.147034,-83.205445],
+  ["Shottenstein","Wellington Park","598 Courtright Dr, Pickerington, OH 43147",39.895545,-82.751744],
+  ["America Homes 4 Rent","Eastwood","9045 Lucy Drive, Reynoldsburg, OH",39.961474,-82.758526],
+  ["Bob Webb","Nook At Highland Lakes","6089 Victory Gate, Westerville, OH 43082",40.181095,-82.928911],
+  ["Bob Webb","Harpers Pointe","188 Chedworth Row, Powell, OH 43065",40.160454,-83.071413],
+  ["Bob Webb","Liberty Bluff","1608 Liberty Bluff Dr, Delaware, OH 43015",40.209338, -83.064067],/* ... (same as before, omitted for brevity) ... */];
+
+    // Map builder to color
+    const builderColors = {
+      "DR Horton": "#1a1a1a", // black
+      "Pulte": "#29b80e",    // green
+      "Ryan": "#8338ec",     // purple
+      "Epcon": "#ff6d6a",    // light red
+      "Shottenstein": "#8b0000", // dark red
+      "Schottenstein": "#8b0000", // support both spellings
+      "MI Homes": "#ffe066",   // yellow
+      "Rockford": "#ffe066",   // yellow
+      "America Homes 4 Rent": "#ffe066", // yellow
+      "Bob Webb": "#ffe066"
+    };
+
+    // Helper to build info window HTML
+    function buildInfoContent(builder, subdivision, address, lat, lng) {
+      const mapKey = builder + "|" + subdivision.trim();
+      const lotMap = lotMapLinks[mapKey];
+      let btnHtml = '';
+      if (lotMap && lotMap !== "No Map") {
+        btnHtml = `<a href="${lotMap}" target="_blank"><button class='lot-btn'>View Lot Map</button></a>`;
+      } else {
+        btnHtml = `<button class='lot-btn' disabled>No Lot Map</button>`;
+      }
+      // Builder color box
+      let color = builderColors[builder] || '#aaa';
+      let builderTag = `<span class="builder-tag" style="background:${color};color:${color==='#ffe066'||color==='#ffeb3b'? '#333':'#fff'};">${builder}</span>`;
+      // Address is a hyperlink to its coordinates on Google Maps
+      const addrLink = `<a class="map-link" href="https://www.google.com/maps?q=${lat},${lng}" target="_blank">${address}</a>`;
+      return `
+        <div class="custom-info">
+          ${builderTag}
+          <strong>${subdivision}</strong>
+          <span style="display:block; font-size:.95em; color:#444; margin-bottom:2px;">${addrLink}</span>
+          ${btnHtml}
+        </div>
+      `;
+    }
+
+    // Small colored circle marker
+    function dotIcon(color) {
+      const svg = `
+      <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="9" cy="9" r="8" fill="${color}" stroke="#202124" stroke-width="1.5"/>
+      </svg>`;
+      return {
+        url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
+        scaledSize: new google.maps.Size(18,18),
+        anchor: new google.maps.Point(9, 18)
+      };
+    }
+
+    // --- Google Maps Loader ---
+    window.initMap = function() {
+      // Center roughly on Central Ohio
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 10,
+        center: { lat: 40.1, lng: -83.1 },
+        mapTypeId: 'roadmap',
+        streetViewControl: false,
+        fullscreenControl: true
+      });
+
+      // Add markers
+      const infoWindow = new google.maps.InfoWindow();
+      markerData.forEach(([builder, subdivision, address, lat, lng]) => {
+        if (!lat || !lng) return;
+        let pinColor = builderColors[builder] || '#3477db';
+        const marker = new google.maps.Marker({
+          position: { lat: Number(lat), lng: Number(lng) },
+          map,
+          title: `${subdivision} (${builder})`,
+          icon: dotIcon(pinColor),
+        });
+        marker.addListener('click', () => {
+          infoWindow.setContent(buildInfoContent(builder, subdivision, address, lat, lng));
+          infoWindow.open(map, marker);
+        });
+      });
+    }
+  </script>
+  <!-- Load Google Maps JS API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQ_d-MX0awI1v7220aiSEHAqOqmV-QcT4&callback=initMap" async defer></script>
+</body>
+</html>
