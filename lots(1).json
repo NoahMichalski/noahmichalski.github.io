@@ -1,0 +1,5042 @@
+[
+  {
+    "subdivision": "Longview Highlands",
+    "address": "184 Kidbrooke Drive",
+    "lotNumber": "335",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "32 Cider Mill Drive",
+    "lotNumber": "46",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "567 Eastman Avenue",
+    "lotNumber": "323",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "597 Eastman Avenue",
+    "lotNumber": "320",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "517 Eastman Avenue",
+    "lotNumber": "328",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "The Overlook",
+    "address": "2190 Overlook Way",
+    "lotNumber": "13786",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "129 Wheatley Street",
+    "lotNumber": "332",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "585 Madison Way",
+    "lotNumber": "167",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "482 Darliene Drive",
+    "lotNumber": "348",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "489 Ashley Drive",
+    "lotNumber": "350",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "485 Ashley Drive",
+    "lotNumber": "349",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1445 Gimbles Drive",
+    "lotNumber": "48",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "585 Morrison Street",
+    "lotNumber": "445",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "527 Eastman Avenue",
+    "lotNumber": "327",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "537 Eastman Avenue",
+    "lotNumber": "326",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "618 Faulkner Drive",
+    "lotNumber": "315",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "119 Wheatley Street",
+    "lotNumber": "331",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1486 Chrisman Drive",
+    "lotNumber": "39",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "183 Kidbrooke Drive",
+    "lotNumber": "323",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "479 Darliene Drive",
+    "lotNumber": "327",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "770 Leslie Drive",
+    "lotNumber": "120",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "285 Sterndale Drive",
+    "lotNumber": "267",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "192 Kidbrooke Drive",
+    "lotNumber": "331",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "483 Darliene Drive",
+    "lotNumber": "328",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "The Overlook",
+    "address": "183 Badger Pass",
+    "lotNumber": "13743",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "610 Morrison Street",
+    "lotNumber": "432",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "The Overlook",
+    "address": "2130 Overlook Way",
+    "lotNumber": "13792",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "28 Cider Mill Drive",
+    "lotNumber": "44",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4221 Sycamore Oak Avenue",
+    "lotNumber": "125",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4216 Sycamore Oak Avenue",
+    "lotNumber": "5",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2677 Carrowmore Drive",
+    "lotNumber": "3350",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "36 Cider Mill Drive",
+    "lotNumber": "48",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "24 Cider Mill Drive",
+    "lotNumber": "42",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "34 Cider Mill Drive",
+    "lotNumber": "47",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "547 Eastman Avenue",
+    "lotNumber": "325",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "1650 Hansberry Drive",
+    "lotNumber": "418",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1432 Chrisman Drive",
+    "lotNumber": "35",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "475 Ashley Drive",
+    "lotNumber": "326",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "290 Sterndale Drive",
+    "lotNumber": "342",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "176 Kidbrooke Drive",
+    "lotNumber": "339",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "275 Sterndale Drive",
+    "lotNumber": "263",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "186 Kidbrooke Drive",
+    "lotNumber": "334",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2691 Carrowmore Drive",
+    "lotNumber": "3349",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1426 Chrisman Drive",
+    "lotNumber": "34",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "2 Mead Mill Drive",
+    "lotNumber": "37",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "515 Keller Avenue",
+    "lotNumber": "389",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2900 Piatt Crest Drive",
+    "lotNumber": "2969",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1444 Chrisman Drive",
+    "lotNumber": "37",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1480 Chrisman Drive",
+    "lotNumber": "38",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "898 Sherwood Loop",
+    "lotNumber": "5292",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "312 Angely Drive",
+    "lotNumber": "199",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "622 Florence Drive",
+    "lotNumber": "84",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "1073 Sherwood Loop",
+    "lotNumber": "5260",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North",
+    "address": "850 Allegro Drive",
+    "lotNumber": "58",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "370 Greenland Pass",
+    "lotNumber": "13682",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "109 Wheatley Street",
+    "lotNumber": "330",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Springer Woods",
+    "address": "664 Penwell Drive",
+    "lotNumber": "13266",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Springer Woods",
+    "address": "675 Penwell Drive",
+    "lotNumber": "13246",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North",
+    "address": "880 Allegro Drive",
+    "lotNumber": "62",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "316 Angely Drive",
+    "lotNumber": "198",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "180 Kidbrooke Drive",
+    "lotNumber": "337",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "139 Wheatley Street",
+    "lotNumber": "333",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1433 Gimbles Drive",
+    "lotNumber": "50",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North",
+    "address": "872 Allegro Drive",
+    "lotNumber": "61",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "589 Madison Way",
+    "lotNumber": "168",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "168 Lorrimore Drive",
+    "lotNumber": "309",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4229 Sycamore Oak Avenue",
+    "lotNumber": "124",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4237 Sycamore Oak Avenue",
+    "lotNumber": "123",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4224 Sycamore Oak Avenue",
+    "lotNumber": "6",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4197 Sycamore Oak Avenue",
+    "lotNumber": "128",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4205 Sycamore Oak Avenue",
+    "lotNumber": "127",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "30 Cider Mill Drive",
+    "lotNumber": "45",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "587 Eastman Avenue",
+    "lotNumber": "321",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "540 Eastman Avenue",
+    "lotNumber": "339",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "577 Eastman Avenue",
+    "lotNumber": "322",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1438 Chrisman Drive",
+    "lotNumber": "36",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2964 Piatt Crest Drive",
+    "lotNumber": "2973",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1427 Gimbles Drive",
+    "lotNumber": "51",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "304 Angely Drive",
+    "lotNumber": "201",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1439 Gimbles Drive",
+    "lotNumber": "49",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "550 Morrison Street",
+    "lotNumber": "426",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "500 Eastman Avenue",
+    "lotNumber": "335",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "550 Eastman Avenue",
+    "lotNumber": "340",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "530 Eastman Avenue",
+    "lotNumber": "338",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "308 Angely Drive",
+    "lotNumber": "200",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1420 Chrisman Drive",
+    "lotNumber": "33",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "190 Kidbrooke Drive",
+    "lotNumber": "332",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "145 Lorrimore Drive",
+    "lotNumber": "343",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "794 Capriconus Drive",
+    "lotNumber": "106",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "810 Capriconus Drive",
+    "lotNumber": "108",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "830 Capriconus Drive",
+    "lotNumber": "113",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "778 Capriconus Drive",
+    "lotNumber": "102",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "786 Capriconus Drive",
+    "lotNumber": "104",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "790 Capriconus Drive",
+    "lotNumber": "105",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "798 Capriconus Drive",
+    "lotNumber": "107",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "657 Faulkner Drive",
+    "lotNumber": "348",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1421 Gimbles Drive",
+    "lotNumber": "52",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "826 Capriconus Drive",
+    "lotNumber": "112",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "647 Faulkner Drive",
+    "lotNumber": "349",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "44 Cider Mill Drive",
+    "lotNumber": "52",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "822 Capriconus Drive",
+    "lotNumber": "111",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "818 Capriconus Drive",
+    "lotNumber": "110",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "491 Darliene Drive",
+    "lotNumber": "330",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "174 Kidbrooke Drive",
+    "lotNumber": "340",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "814 Capriconus Drive",
+    "lotNumber": "109",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "862 Capriconus Drive",
+    "lotNumber": "120",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "870 Capriconus Drive",
+    "lotNumber": "122",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "874 Capriconus Drive",
+    "lotNumber": "123",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "866 Capriconus Drive",
+    "lotNumber": "121",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "882 Capriconus Drive",
+    "lotNumber": "125",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "836 Capriconus Drive",
+    "lotNumber": "114",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "840 Capriconus Drive",
+    "lotNumber": "115",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "844 Capriconus Drive",
+    "lotNumber": "116",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "848 Capriconus Drive",
+    "lotNumber": "117",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "852 Capriconus Drive",
+    "lotNumber": "118",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "856 Capriconus Drive",
+    "lotNumber": "119",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North TH",
+    "address": "878 Capriconus Drive",
+    "lotNumber": "124",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "37 Cider Mill Drive",
+    "lotNumber": "77",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "490 Darliene Drive",
+    "lotNumber": "346",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "182 Kidbrooke Drive",
+    "lotNumber": "336",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "487 Darliene Drive",
+    "lotNumber": "329",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North",
+    "address": "904 Allegro Drive",
+    "lotNumber": "65",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "486 Darliene Drive",
+    "lotNumber": "347",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2761 Aldengate Lane",
+    "lotNumber": "2713",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2719 Carrowmore Drive",
+    "lotNumber": "3347",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "41 Cider Mill Drive",
+    "lotNumber": "75",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "43 Cider Mill Drive",
+    "lotNumber": "74",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4245 Sycamore Oak Avenue",
+    "lotNumber": "122",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4232 Sycamore Oak Avenue",
+    "lotNumber": "7",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4253 Sycamore Oak Avenue",
+    "lotNumber": "121",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4240 Sycamore Oak Avenue",
+    "lotNumber": "8",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4261 Sycamore Oak Avenue",
+    "lotNumber": "120",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Lansdowne Farms 50's",
+    "address": "4269 Sycamore Oak Avenue",
+    "lotNumber": "119",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "River Ridge",
+    "address": "1761 Jacko Lane",
+    "lotNumber": "56",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "River Ridge",
+    "address": "1757 Jacko Lane",
+    "lotNumber": "57",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "1615 Hansberry Drive",
+    "lotNumber": "457",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "355 Greenland Pass",
+    "lotNumber": "13671",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2614 Carrowmore Drive",
+    "lotNumber": "3330",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1415 Gimbles Drive",
+    "lotNumber": "30",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1408 Chrisman Drive",
+    "lotNumber": "31",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "570 Eastman Avenue",
+    "lotNumber": "342",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "560 Eastman Avenue",
+    "lotNumber": "341",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "580 Eastman Avenue",
+    "lotNumber": "343",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2705 Carrowmore Drive",
+    "lotNumber": "3348",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "203 Preserve Drive",
+    "lotNumber": "71",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "197 Preserve Drive",
+    "lotNumber": "99",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "199 Preserve Drive",
+    "lotNumber": "100",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "201 Preserve Drive",
+    "lotNumber": "70",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "377 Greenland Pass",
+    "lotNumber": "13674",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "520 Eastman Avenue",
+    "lotNumber": "337",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "637 Faulkner Drive",
+    "lotNumber": "350",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "409 Samantha Drive",
+    "lotNumber": "205",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "1081 Sherwood Loop",
+    "lotNumber": "5261",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "628 Faulkner Drive",
+    "lotNumber": "316",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "47 Cider Mill Drive",
+    "lotNumber": "72",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "River Ridge",
+    "address": "1764 Jacko Lane",
+    "lotNumber": "97",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "289 Sterndale Drive",
+    "lotNumber": "292",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "River Ridge",
+    "address": "1768 Jacko Lane",
+    "lotNumber": "98",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2784 Piatt Crest Drive",
+    "lotNumber": "2962",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "151 Lorrimore Drive",
+    "lotNumber": "346",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "147 Lorrimore Drive",
+    "lotNumber": "344",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "371 Greenland Pass",
+    "lotNumber": "13673",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North",
+    "address": "1167 Mueller Drive",
+    "lotNumber": "1",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "149 Lorrimore Drive",
+    "lotNumber": "345",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Villas at Renner Park",
+    "address": "1486 Cardinez Way",
+    "lotNumber": "64",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Villas at Renner Park",
+    "address": "1484 Cardinez Way",
+    "lotNumber": "65",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Villas at Renner Park",
+    "address": "1482 Cardinez Way",
+    "lotNumber": "66",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Villas at Renner Park",
+    "address": "1480 Cardinez Way",
+    "lotNumber": "67",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Villas at Renner Park",
+    "address": "1478 Cardinez Way",
+    "lotNumber": "68",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "26 Cider Mill Drive",
+    "lotNumber": "43",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "46 Cider Mill Drive",
+    "lotNumber": "53",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Villas at Renner Park",
+    "address": "1476 Cardinez Way",
+    "lotNumber": "69",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "363 Greenland Pass",
+    "lotNumber": "13672",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "383 Greenland Pass",
+    "lotNumber": "13675",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "153 Lorrimore Drive",
+    "lotNumber": "347",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Orchard Lakes",
+    "address": "7088 Selva Trail Drive",
+    "lotNumber": "16",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "510 Eastman Avenue",
+    "lotNumber": "336",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "315 Angely Drive",
+    "lotNumber": "183",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "River Ridge",
+    "address": "1760 Jacko Lane",
+    "lotNumber": "96",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "578 Madison Way",
+    "lotNumber": "182",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "River Ridge",
+    "address": "122 Vine Grove Drive",
+    "lotNumber": "59",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "395 Greenland Pass",
+    "lotNumber": "13677",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "906 Sherwood Loop",
+    "lotNumber": "5291",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "915 Sherwood Loop",
+    "lotNumber": "5246",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "907 Sherwood Loop",
+    "lotNumber": "5245",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "157 Lorrimore Drive",
+    "lotNumber": "349",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "155 Lorrimore Drive",
+    "lotNumber": "348",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2804 Piatt Crest Drive",
+    "lotNumber": "2963",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2841 Piatt Crest Drive",
+    "lotNumber": "2956",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North",
+    "address": "1054 Allegro Drive",
+    "lotNumber": "22",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "River Ridge",
+    "address": "116 Vine Grove Drive",
+    "lotNumber": "58",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Monarch Greene",
+    "address": "1414 Chrisman Drive",
+    "lotNumber": "32",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Orchard Lakes",
+    "address": "7047 Royalton Ridge Avenue",
+    "lotNumber": "25",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2948 Piatt Crest Drive",
+    "lotNumber": "2972",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "914 Sherwood Loop",
+    "lotNumber": "5290",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "923 Sherwood Loop",
+    "lotNumber": "5247",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "667 Faulkner Drive",
+    "lotNumber": "347",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "677 Faulkner Drive",
+    "lotNumber": "346",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "River Ridge",
+    "address": "101 Vine Grove Drive",
+    "lotNumber": "90",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "582 Madison Way",
+    "lotNumber": "181",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "593 Madison Way",
+    "lotNumber": "169",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "159 Lorrimore Drive",
+    "lotNumber": "350",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "161 Lorrimore Drive",
+    "lotNumber": "351",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows 00000",
+    "address": "750 Maria Drive",
+    "lotNumber": "185A",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows 00000",
+    "address": "754 Maria Drive",
+    "lotNumber": "185B",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North",
+    "address": "1151 Mueller Drive",
+    "lotNumber": "3",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North",
+    "address": "1143 Mueller Drive",
+    "lotNumber": "4",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "The Overlook",
+    "address": "2245 Overlook Way",
+    "lotNumber": "13766",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows 00000",
+    "address": "709 Maria Drive",
+    "lotNumber": "179B",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows 00000",
+    "address": "713 Maria Drive",
+    "lotNumber": "179A",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "931 Sherwood Loop",
+    "lotNumber": "5248",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "617 Faulkner Drive",
+    "lotNumber": "352",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "627 Faulkner Drive",
+    "lotNumber": "351",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North",
+    "address": "809 Allegro Drive",
+    "lotNumber": "53",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "The Overlook",
+    "address": "2255 Overlook Way",
+    "lotNumber": "13767",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "993 Sherwood Loop",
+    "lotNumber": "5250",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "961 Sherwood Loop",
+    "lotNumber": "5249",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "406 Garnet Ranch Drive",
+    "lotNumber": "13667",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "400 Garnet Ranch Drive",
+    "lotNumber": "13668",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "507 Darliene Drive",
+    "lotNumber": "334",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows 00000",
+    "address": "742 Maria Drive",
+    "lotNumber": "184A",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows 00000",
+    "address": "746 Maria Drive",
+    "lotNumber": "184B",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Springer Woods",
+    "address": "20 Colquitt Court",
+    "lotNumber": "13251",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows 00000",
+    "address": "398 Emily Drive",
+    "lotNumber": "190B",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows 00000",
+    "address": "402 Emily Drive",
+    "lotNumber": "190A",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2741 Carrowmore Court",
+    "lotNumber": "3327",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Orchard Lakes",
+    "address": "5670 Orchard Lakes Trail Drive",
+    "lotNumber": "35",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Chase Landings",
+    "address": "6344 Pandrol Street",
+    "lotNumber": "92",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Orchard Lakes",
+    "address": "5676 Orchard Lakes Trail Drive",
+    "lotNumber": "36",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2765 Bellgrove Place",
+    "lotNumber": "3346",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "167 Lorrimore Drive",
+    "lotNumber": "354",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "165 Lorrimore Drive",
+    "lotNumber": "353",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "324 Angely Drive",
+    "lotNumber": "196",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows 00000",
+    "address": "410 Emily Drive",
+    "lotNumber": "189A",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows 00000",
+    "address": "406 Emily Drive",
+    "lotNumber": "189B",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "394 Garnet Ranch Drive",
+    "lotNumber": "13669",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "388 Garnet Ranch Drive",
+    "lotNumber": "13670",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Orchard Lakes",
+    "address": "5688 Orchard Lakes Trail Drive",
+    "lotNumber": "38",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Orchard Lakes",
+    "address": "5682 Orchard Lakes Trail Drive",
+    "lotNumber": "37",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "320 Angely Drive",
+    "lotNumber": "197",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "56 Cider Mill Drive",
+    "lotNumber": "58",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "54 Cider Mill Drive",
+    "lotNumber": "57",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Springer Woods",
+    "address": "714 Penwell Drive",
+    "lotNumber": "13250",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "1009 Sherwood Loop",
+    "lotNumber": "5252",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "1001 Sherwood Loop",
+    "lotNumber": "5251",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Johnson's Creek",
+    "address": "1252 Eagleton Blvd",
+    "lotNumber": "2",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Johnson's Creek",
+    "address": "1128 Stratford Way",
+    "lotNumber": "1",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "163 Lorrimore Drive",
+    "lotNumber": "352",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "The Overlook",
+    "address": "180 Badger Pass",
+    "lotNumber": "13757",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "1033 Sherwood Loop",
+    "lotNumber": "5255",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Ludlow Ridge",
+    "address": "1025 Sherwood Loop",
+    "lotNumber": "5254",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "291 Sterndale Drive",
+    "lotNumber": "293",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "700 Faulkner Drive",
+    "lotNumber": "354",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "710 Faulkner Drive",
+    "lotNumber": "355",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "The Overlook",
+    "address": "2285 Overlook Way",
+    "lotNumber": "13769",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "515 Darliene Drive",
+    "lotNumber": "336",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "511 Darliene Drive",
+    "lotNumber": "335",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "730 Faulkner Drive",
+    "lotNumber": "357",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Maplewood North",
+    "address": "1047 Allegro Drive",
+    "lotNumber": "24",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "142 Lorrimore Drive",
+    "lotNumber": "296",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Longview Highlands",
+    "address": "140 Robinette Street",
+    "lotNumber": "295",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "577 Madison Way",
+    "lotNumber": "165",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "581 Madison Way",
+    "lotNumber": "166",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "740 Faulkner Drive",
+    "lotNumber": "358",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Wagnalls Run",
+    "address": "750 Faulkner Drive",
+    "lotNumber": "359",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2889 Piatt Crest Drive",
+    "lotNumber": "2953",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "395 Garnet Ranch Drive",
+    "lotNumber": "13648",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Park View",
+    "address": "389 Garnet Ranch Drive",
+    "lotNumber": "13647",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "The Overlook",
+    "address": "2275 Overlook Way",
+    "lotNumber": "13768",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "The Overlook",
+    "address": "2235 Overlook Way",
+    "lotNumber": "13765",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Orchard Lakes",
+    "address": "5694 Orchard Lakes Trail Drive",
+    "lotNumber": "39",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Orchard Lakes",
+    "address": "7102 Rome Beauty Drive",
+    "lotNumber": "63",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Springer Woods",
+    "address": "687 Penwell Drive",
+    "lotNumber": "13248",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "The Overlook",
+    "address": "2100 Overlook Way",
+    "lotNumber": "13795",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Madison Meadows",
+    "address": "471 Ashley Drive",
+    "lotNumber": "325",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "The Overlook",
+    "address": "2200 Overlook Way",
+    "lotNumber": "13784",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Walnut Mill",
+    "address": "5 Walnut Mill Way",
+    "lotNumber": "2",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Piatt Preserve West",
+    "address": "2579 Carrowmore Drive",
+    "lotNumber": "3354",
+    "builder": "DR Horton"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6535 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "101",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6531 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "102",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6527 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "103",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6525 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "104",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6521 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "105",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6577 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "403",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6540 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "701",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6544 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "702",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6548 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "703",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6550 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "704",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6554 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "705",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6522 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "801",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6526 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "802",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6528 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "803",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "6532 Wheatly Road New Albany , OH 43054",
+    "lotNumber": "804",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "3375 Abberley Drive New Albany , OH 43054",
+    "lotNumber": "901",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "3377 Abberley Drive New Albany , OH 43054",
+    "lotNumber": "902",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "3381 Abberley Drive New Albany , OH 43054",
+    "lotNumber": "903",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Abberley Park",
+    "address": "3385 Abberley Drive New Albany , OH 43054",
+    "lotNumber": "904",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "211 Figleaf Lane Marysville , OH 43040",
+    "lotNumber": "38",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "191 Figleaf Lane Marysville , OH 43040",
+    "lotNumber": "40",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "181 Figleaf Lane Marysville , OH 43040",
+    "lotNumber": "41",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "171 Figleaf Lane Marysville , OH 43040",
+    "lotNumber": "42",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "161 Figleaf Lane Marysville , OH 43040",
+    "lotNumber": "43",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "194 Figleaf Lane Marysville , OH 43040",
+    "lotNumber": "52",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "204 Figleaf Lane Marysville , OH 43040",
+    "lotNumber": "53",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "224 Figleaf Lane Marysville , OH 43040",
+    "lotNumber": "55",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "234 Figleaf Lane Marysville , OH 43040",
+    "lotNumber": "56",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "2373 Hubbard Road Marysville , OH 43040",
+    "lotNumber": "59",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "2363 Hubbard Road Marysville , OH 43040",
+    "lotNumber": "60",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "2353 Hubbard Road Marysville , OH 43040",
+    "lotNumber": "61",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "2343 Hubbard Road Marysville , OH 43040",
+    "lotNumber": "62",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "2230 Hubbard Road Marysville , OH 43040",
+    "lotNumber": "77",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "2260 Hubbard Road Marysville , OH 43040",
+    "lotNumber": "80",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "2270 Hubbard Road Marysville , OH 43040",
+    "lotNumber": "81",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Amrine Meadows",
+    "address": "2330 Hubbard Road Marysville , OH 43040",
+    "lotNumber": "87",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "2707 Cleo Street Delaware , OH 43015",
+    "lotNumber": "3515",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "2723 Cleo Street Delaware , OH 43015",
+    "lotNumber": "3516",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "2759 Cleo Street Delaware , OH 43015",
+    "lotNumber": "3517",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "2893 Cleo Street Delaware , OH 43015",
+    "lotNumber": "3523",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "2890 Eastwick Road Delaware , OH 43015",
+    "lotNumber": "3527",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "2889 Eastwick Road Delaware , OH 43015",
+    "lotNumber": "3528",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "2914 Cleo Street Delaware , OH 43015",
+    "lotNumber": "3536",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "2882 Cleo Street Delaware , OH 43015",
+    "lotNumber": "3538",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "2842 Cleo Street Delaware , OH 43015",
+    "lotNumber": "3540",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "2782 Cleo Street Delaware , OH 43015",
+    "lotNumber": "3544",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "3110 Cleo Street Delaware , OH 43015",
+    "lotNumber": "3572",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "3166 Cleo Street Delaware , OH 43015",
+    "lotNumber": "3575",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Berlin Bluffs",
+    "address": "3198 Cleo Street Delaware , OH 43015",
+    "lotNumber": "3576",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Beulah Park",
+    "address": "3647 Glacial Lane Grove City , OH 43123",
+    "lotNumber": "98",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Beulah Park",
+    "address": "3752 Park Street Grove City , OH 43123",
+    "lotNumber": "153",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Beulah Park",
+    "address": "3758 Park Street Grove City , OH 43123",
+    "lotNumber": "154",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Beulah Park",
+    "address": "3764 Park Street Grove City , OH 43123",
+    "lotNumber": "155",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Beulah Park",
+    "address": "3747 Brody Drive Grove City , OH 43123",
+    "lotNumber": "219",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Beulah Park",
+    "address": "3735 Brody Drive Grove City , OH 43123",
+    "lotNumber": "221",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Beulah Park",
+    "address": "3729 Brody Drive Grove City , OH 43123",
+    "lotNumber": "222",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5427 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "331",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5429 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "332",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5431 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "333",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5433 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "334",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5435 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "335",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5437 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "336",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5439 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "337",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5441 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "338",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5443 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "339",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5445 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "340",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "276 Dowler Drive South Bloomfield , OH 43103",
+    "lotNumber": "341",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "274 Dowler Drive South Bloomfield , OH 43103",
+    "lotNumber": "342",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "291 Dowler Drive South Bloomfield , OH 43103",
+    "lotNumber": "346",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "293 Dowler Drive South Bloomfield , OH 43103",
+    "lotNumber": "347",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "278 Dowler Drive South Bloomfield , OH 43103",
+    "lotNumber": "350",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5446 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "351",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5444 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "352",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5442 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "353",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5440 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "354",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5438 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "355",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5436 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "356",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5434 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "357",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5432 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "358",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5430 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "359",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5428 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "360",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5426 Morning Glory Street South Bloomfield , OH 43103",
+    "lotNumber": "361",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5537 Violet Street South Bloomfield , OH 43103",
+    "lotNumber": "367",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5541 Violet Street South Bloomfield , OH 43103",
+    "lotNumber": "369",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Bloomfield Hills",
+    "address": "5547 Violet Street South Bloomfield , OH 43103",
+    "lotNumber": "372",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1299 Andean Drive Lockbourne , OH 43137",
+    "lotNumber": "67",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1283 Andean Drive Lockbourne , OH 43137",
+    "lotNumber": "69",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "5028 Ranger Drive Lockbourne , OH 43137",
+    "lotNumber": "71",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1362 Acuff Avenue Lockbourne , OH 43137",
+    "lotNumber": "75",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1346 Acuff Avenue Lockbourne , OH 43137",
+    "lotNumber": "77",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1332 Webb Drive Lockbourne , OH 43137",
+    "lotNumber": "78",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1324 Webb Drive Lockbourne , OH 43137",
+    "lotNumber": "79",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1316 Webb Drive Lockbourne , OH 43137",
+    "lotNumber": "80",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1308 Webb Drive Lockbourne , OH 43137",
+    "lotNumber": "81",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1300 Webb Drive Lockbourne , OH 43137",
+    "lotNumber": "82",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1292 Webb Drive Lockbourne , OH 43137",
+    "lotNumber": "83",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1284 Webb Drive Lockbourne , OH 43137",
+    "lotNumber": "84",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "5036 Ranger Drive Lockbourne , OH 43137",
+    "lotNumber": "85",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "5044 Ranger Drive Lockbourne , OH 43137",
+    "lotNumber": "86",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "5068 Ranger Drive Lockbourne , OH 43137",
+    "lotNumber": "88",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1283 Webb Drive Lockbourne , OH 43137",
+    "lotNumber": "89",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1291 Webb Drive Lockbourne , OH 43137",
+    "lotNumber": "90",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1299 Webb Drive Lockbourne , OH 43137",
+    "lotNumber": "91",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1315 Webb Drive Lockbourne , OH 43137",
+    "lotNumber": "93",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1330 Acuff Avenue Lockbourne , OH 43137",
+    "lotNumber": "94",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1255 Acuff Avenue Lockbourne , OH 43137",
+    "lotNumber": "102",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1263 Acuff Avenue Lockbourne , OH 43137",
+    "lotNumber": "103",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1271 Acuff Avenue Lockbourne , OH 43137",
+    "lotNumber": "104",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1311 Acuff Avenue Lockbourne , OH 43137",
+    "lotNumber": "109",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1319 Acuff Avenue Lockbourne , OH 43137",
+    "lotNumber": "110",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1335 Acuff Avenue Lockbourne , OH 43137",
+    "lotNumber": "112",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1359 Acuff Avenue Lockbourne , OH 43137",
+    "lotNumber": "115",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Buckstone Bend",
+    "address": "1367 Acuff Avenue Lockbourne , OH 43137",
+    "lotNumber": "116",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clark Shaw Reserve",
+    "address": "3428 Tender Avenue Powell , OH 43065",
+    "lotNumber": "7143",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clark Shaw Reserve",
+    "address": "3440 Tender Avenue Powell , OH 43065",
+    "lotNumber": "7144",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clark Shaw Reserve",
+    "address": "3450 Tender Avenue Powell , OH 43065",
+    "lotNumber": "7145",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clark Shaw Reserve",
+    "address": "3460 Tender Avenue Powell , OH 43065",
+    "lotNumber": "7146",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clark Shaw Reserve",
+    "address": "3468 Tender Avenue Powell , OH 43065",
+    "lotNumber": "7147",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clark Shaw Reserve",
+    "address": "3481 Tender Avenue Powell , OH 43065",
+    "lotNumber": "7153",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clark Shaw Reserve",
+    "address": "3393 Tender Avenue Powell , OH 43065",
+    "lotNumber": "7161",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clark Shaw Reserve",
+    "address": "3355 Tender Avenue Powell , OH 43065",
+    "lotNumber": "7163",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "109 Reneau Ave Galloway , OH 43119",
+    "lotNumber": "31",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "115 Reneau Ave Galloway , OH 43119",
+    "lotNumber": "32",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "121 Reneau Ave Galloway , OH 43119",
+    "lotNumber": "33",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "127 Reneau Ave Galloway , OH 43119",
+    "lotNumber": "34",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "133 Reneau Ave Galloway , OH 43119",
+    "lotNumber": "35",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "244 Fortune Drive Galloway , OH 43119",
+    "lotNumber": "43",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "272 Rye Street Galloway , OH 43119",
+    "lotNumber": "44",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "278 Rye Street Galloway , OH 43119",
+    "lotNumber": "45",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "284 Rye Street Galloway , OH 43119",
+    "lotNumber": "46",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "290 Rye Street Galloway , OH 43119",
+    "lotNumber": "47",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "296 Rye Street Galloway , OH 43119",
+    "lotNumber": "48",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "308 Rye Street Galloway , OH 43119",
+    "lotNumber": "49",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "314 Rye Street Galloway , OH 43119",
+    "lotNumber": "50",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "320 Rye Street Galloway , OH 43119",
+    "lotNumber": "51",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "326 Rye Street Galloway , OH 43119",
+    "lotNumber": "52",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "332 Rye Street Galloway , OH 43119",
+    "lotNumber": "53",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "281 Fortune Drive Galloway , OH 43119",
+    "lotNumber": "114",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "273 Fortune Drive Galloway , OH 43119",
+    "lotNumber": "115",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "265 Fortune Drive Galloway , OH 43119",
+    "lotNumber": "116",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "260 Fortune Drive Galloway , OH 43119",
+    "lotNumber": "117",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "295 Rye Street Galloway , OH 43119",
+    "lotNumber": "118",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "301 Rye Street Galloway , OH 43119",
+    "lotNumber": "119",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "307 Rye Street Galloway , OH 43119",
+    "lotNumber": "120",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "315 Rye Street Galloway , OH 43119",
+    "lotNumber": "121",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "319 Rye Street Galloway , OH 43119",
+    "lotNumber": "122",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "325 Rye Street Galloway , OH 43119",
+    "lotNumber": "123",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "331 Rye Street Galloway , OH 43119",
+    "lotNumber": "124",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "337 Rye Street Galloway , OH 43119",
+    "lotNumber": "125",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "278 Fortune Drive Galloway , OH 43119",
+    "lotNumber": "146",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Clover Run",
+    "address": "270 Fortune Drive Galloway , OH 43119",
+    "lotNumber": "147",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1534 Crest Drive Galena , OH 43021",
+    "lotNumber": "2525",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1510 Crest Drive Galena , OH 43021",
+    "lotNumber": "2528",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1565 Crest Drive Galena , OH 43021",
+    "lotNumber": "2561",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1315 Red Tail Place Galena , OH 43021",
+    "lotNumber": "2563",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1486 Crest Drive Galena , OH 43021",
+    "lotNumber": "2571",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1478 Crest Drive Galena , OH 43021",
+    "lotNumber": "2572",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1470 Crest Drive Galena , OH 43021",
+    "lotNumber": "2573",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1462 Crest Drive Galena , OH 43021",
+    "lotNumber": "2574",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1454 Crest Drive Galena , OH 43021",
+    "lotNumber": "2575",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1245 Steller Drive Galena , OH 43021",
+    "lotNumber": "2576",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1237 Steller Drive Galena , OH 43021",
+    "lotNumber": "2577",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1229 Steller Drive Galena , OH 43021",
+    "lotNumber": "2578",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1221 Steller Drive Galena , OH 43021",
+    "lotNumber": "2579",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1213 Steller Drive Galena , OH 43021",
+    "lotNumber": "2580",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1205 Steller Drive Galena , OH 43021",
+    "lotNumber": "2581",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "7420 Steppe Court Galena , OH 43021",
+    "lotNumber": "2582",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "7428 Steppe Court Galena , OH 43021",
+    "lotNumber": "2583",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "7436 Steppe Court Galena , OH 43021",
+    "lotNumber": "2584",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1074 Solitary Street Galena , OH 43021",
+    "lotNumber": "2586",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1094 Solitary Street Galena , OH 43021",
+    "lotNumber": "2589",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1102 Solitary Street Galena , OH 43021",
+    "lotNumber": "2590",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1110 Solitary Street Galena , OH 43021",
+    "lotNumber": "2591",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1118 Solitary Street Galena , OH 43021",
+    "lotNumber": "2592",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1126 Solitary Street Galena , OH 43021",
+    "lotNumber": "2593",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1134 Solitary Street Galena , OH 43021",
+    "lotNumber": "2594",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1415 Crest Drive Galena , OH 43021",
+    "lotNumber": "2598",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1423 Crest Drive Galena , OH 43021",
+    "lotNumber": "2599",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1240 Steller Drive Galena , OH 43021",
+    "lotNumber": "2600",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1248 Steller Drive Galena , OH 43021",
+    "lotNumber": "2601",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1447 Crest Drive Galena , OH 43021",
+    "lotNumber": "2603",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1455 Crest Drive Galena , OH 43021",
+    "lotNumber": "2604",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1463 Crest Drive Galena , OH 43021",
+    "lotNumber": "2605",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Eagle Creek",
+    "address": "1477 Crest Drive Galena , OH 43021",
+    "lotNumber": "2606",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "416 Cardinal Point Drive Delaware , OH 43015",
+    "lotNumber": "13978",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "409 Cardinal Point Drive Delaware , OH 43015",
+    "lotNumber": "13980",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "391 Cardinal Point Drive Delaware , OH 43015",
+    "lotNumber": "13983",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "440 Cardinal Point Drive Delaware , OH 43015",
+    "lotNumber": "14006",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "434 Cardinal Point Drive Delaware , OH 43015",
+    "lotNumber": "14007",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "65 Harvest Moon Road Delaware , OH 43015",
+    "lotNumber": "14017",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "71 Harvest Moon Road Delaware , OH 43015",
+    "lotNumber": "14018",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "138 Shadow Oak Loop Delaware , OH 43015",
+    "lotNumber": "14025",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "132 Shadow Oak Loop Delaware , OH 43015",
+    "lotNumber": "14026",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "108 Shadow Oak Loop Delaware , OH 43015",
+    "lotNumber": "14030",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "70 Harvest Moon Road Delaware , OH 43015",
+    "lotNumber": "14056",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "62 Harvest Moon Road Delaware , OH 43015",
+    "lotNumber": "14057",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "52 Harvest Moon Road Delaware , OH 43015",
+    "lotNumber": "14059",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9390 Red Cherry Lane Plain City , OH 43064",
+    "lotNumber": "13",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9533 Red Cherry Lane Plain City , OH 43064",
+    "lotNumber": "23",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9932 Glenfield Court Plain City , OH 43064",
+    "lotNumber": "50",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9896 Glenfield Court Plain City , OH 43064",
+    "lotNumber": "53",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9884 Glenfield Court Plain City , OH 43064",
+    "lotNumber": "54",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9872 Glenfield Avenue Plain City , OH 43064",
+    "lotNumber": "55",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9860 Glenfield Avenue Plain City , OH 43064",
+    "lotNumber": "56",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9720 Glenfield Avenue Plain City , OH 43064",
+    "lotNumber": "60",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9690 Glenfield Avenue Plain City , OH 43064",
+    "lotNumber": "154",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9670 Glenfield Avenue Plain City , OH 43064",
+    "lotNumber": "156",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9660 Glenfield Avenue Plain City , OH 43064",
+    "lotNumber": "157",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9650 Glenfield Avenue Plain City , OH 43064",
+    "lotNumber": "158",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9649 Glenfield Avenue Plain City , OH 43064",
+    "lotNumber": "219",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9669 Glenfield Avenue Plain City , OH 43064",
+    "lotNumber": "221",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9679 Glenfield Avenue Plain City , OH 43064",
+    "lotNumber": "222",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9689 Glenfield Avenue Plain City , OH 43064",
+    "lotNumber": "223",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9638 Rosemont Road Plain City , OH 43064",
+    "lotNumber": "224",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9567 Rosemont Road Plain City , OH 43064",
+    "lotNumber": "233",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9617 Rosemont Road Plain City , OH 43064",
+    "lotNumber": "238",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9627 Rosemont Road Plain City , OH 43064",
+    "lotNumber": "239",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9637 Rosemont Road Plain City , OH 43064",
+    "lotNumber": "240",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9647 Rosemont Road Plain City , OH 43064",
+    "lotNumber": "241",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Homestead at Scotts Farm",
+    "address": "9719 Glenfield Avenue Plain City , OH 43064",
+    "lotNumber": "244",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Jerome Village 5-35",
+    "address": "8760 Apricot Way Jerome Township , OH 43064",
+    "lotNumber": "1917",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "430 Penwell Drive Delaware , OH 43015",
+    "lotNumber": "13859",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "412 Penwell Drive Delaware , OH 43015",
+    "lotNumber": "13862",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "227 Franks Field Drive Delaware , OH 43015",
+    "lotNumber": "13879",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "56 Poppy Place Delaware , OH 43015",
+    "lotNumber": "13884",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "50 Poppy Place Delaware , OH 43015",
+    "lotNumber": "13885",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "23 Honey Court Delaware , OH 43015",
+    "lotNumber": "13887",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "544 Penwell Drive Delaware , OH 43015",
+    "lotNumber": "13893",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "526 Penwell Drive Delaware , OH 43015",
+    "lotNumber": "13896",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "520 Penwell Drive Delaware , OH 43015",
+    "lotNumber": "13897",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "514 Penwell Drive Delaware , OH 43015",
+    "lotNumber": "13898",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "508 Penwell Drive Delaware , OH 43015",
+    "lotNumber": "13899",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "502 Penwell Drive Delaware , OH 43015",
+    "lotNumber": "13900",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "490 Penwell Drive Delaware , OH 43015",
+    "lotNumber": "13901",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "484 Penwell Drive Delaware , OH 43015",
+    "lotNumber": "13902",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "478 Penwell Drive Delaware , OH 43015",
+    "lotNumber": "13903",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Limestone Ridge",
+    "address": "466 Penwell Drive Delaware , OH 43015",
+    "lotNumber": "13905",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Maeve Meadows",
+    "address": "2611 McKenna Drive Delaware , OH 43015",
+    "lotNumber": "3375",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Magnolia Park",
+    "address": "582 Weatherby Drive Sunbury , OH 43074",
+    "lotNumber": "2374",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Magnolia Park",
+    "address": "572 Weatherby Drive Sunbury , OH 43074",
+    "lotNumber": "2375",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Magnolia Park",
+    "address": "780 Buckeye Circle Sunbury , OH 43074",
+    "lotNumber": "2377",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Magnolia Park",
+    "address": "761 Buckeye Circle Sunbury , OH 43074",
+    "lotNumber": "2392",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Magnolia Park",
+    "address": "771 Buckeye Circle Sunbury , OH 43074",
+    "lotNumber": "2393",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Magnolia Park",
+    "address": "781 Buckeye Circle Sunbury , OH 43074",
+    "lotNumber": "2394",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Magnolia Park",
+    "address": "635 Fairland Drive Sunbury , OH 43074",
+    "lotNumber": "2400",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Magnolia Park",
+    "address": "645 Fairland Drive Sunbury , OH 43074",
+    "lotNumber": "2401",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Magnolia Park",
+    "address": "503 Weatherby Drive Sunbury , OH 43074",
+    "lotNumber": "2406",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Magnolia Park",
+    "address": "509 Weatherby Drive Sunbury , OH 43074",
+    "lotNumber": "2407",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "6361 Muellen Trace Delaware , OH 43015",
+    "lotNumber": "7072",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2610 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7076",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2562 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7079",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2530 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7081",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2514 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7082",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2498 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7083",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2482 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7084",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2466 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7085",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2457 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7086",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2473 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7087",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2489 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7088",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2521 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7090",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2537 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7091",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2569 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7092",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2585 Rangeland Drive Delaware , OH 43015",
+    "lotNumber": "7093",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2603 Hammersley Loop Delaware , OH 43015",
+    "lotNumber": "7096",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nelson Farms",
+    "address": "2587 Hammersley Loop Delaware , OH 43015",
+    "lotNumber": "7097",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "6399 Callaway Square East New Albany , OH 43054",
+    "lotNumber": "130",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "6423 Callaway Square East New Albany , OH 43054",
+    "lotNumber": "134",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7600 Brinsley Lane New Albany , OH 43054",
+    "lotNumber": "156",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7606 Brinsley Lane New Albany , OH 43054",
+    "lotNumber": "157",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7612 Brinsley Lane New Albany , OH 43054",
+    "lotNumber": "158",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7624 Brinsley Lane New Albany , OH 43054",
+    "lotNumber": "160",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7648 Brinsley Lane New Albany , OH 43054",
+    "lotNumber": "164",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7436 Bailey Walk New Albany , OH 43054",
+    "lotNumber": "165",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7430 Bailey Walk New Albany , OH 43054",
+    "lotNumber": "166",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7424 Bailey Walk New Albany , OH 43054",
+    "lotNumber": "167",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7418 Bailey Walk New Albany , OH 43054",
+    "lotNumber": "168",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7412 Bailey Walk New Albany , OH 43054",
+    "lotNumber": "169",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7406 Bailey Walk New Albany , OH 43054",
+    "lotNumber": "170",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7400 Bailey Walk New Albany , OH 43054",
+    "lotNumber": "171",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7557 Bullock Lane New Albany , OH 43054",
+    "lotNumber": "172",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7527 Bullock Lane New Albany , OH 43054",
+    "lotNumber": "177",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7521 Bullock Lane New Albany , OH 43054",
+    "lotNumber": "178",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7512 Bullock Lane New Albany , OH 43054",
+    "lotNumber": "183",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7530 Bullock Lane New Albany , OH 43054",
+    "lotNumber": "186",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7548 Bullock Lane New Albany , OH 43054",
+    "lotNumber": "189",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7641 Brinsley Lane New Albany , OH 43054",
+    "lotNumber": "190",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7639 Brinsley Lane New Albany , OH 43054",
+    "lotNumber": "191",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7609 Brinsley Lane New Albany , OH 43054",
+    "lotNumber": "196",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Nottingham Trace",
+    "address": "7603 Brinsley Lane New Albany , OH 43054",
+    "lotNumber": "197",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9208 Horseshoe Street Plain City , OH 43064",
+    "lotNumber": "96",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9200 Horseshoe Street Plain City , OH 43064",
+    "lotNumber": "97",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9622 Bluestem Drive Plain City , OH 43064",
+    "lotNumber": "104",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9417 Coach Line Avenue Plain City , OH 43064",
+    "lotNumber": "118",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9602 Bur Oak Drive Plain City , OH 43064",
+    "lotNumber": "119",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9592 Bur Oak Drive Plain City , OH 43064",
+    "lotNumber": "120",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9562 Bur Oak Drive Plain City , OH 43064",
+    "lotNumber": "123",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9176 Horseshoe Street Plain City , OH 43064",
+    "lotNumber": "125",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9500 Wagon Trail Lane Plain City , OH 43064",
+    "lotNumber": "128",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9490 Wagon Trail Lane Plain City , OH 43064",
+    "lotNumber": "129",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9480 Wagon Trail Lane Plain City , OH 43064",
+    "lotNumber": "130",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9470 Wagon Trail Lane Plain City , OH 43064",
+    "lotNumber": "131",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9460 Wagon Trail Lane Plain City , OH 43064",
+    "lotNumber": "132",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9553 Wagon Trail Lane Plain City , OH 43064",
+    "lotNumber": "141",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9603 Wagon Trail Lane Plain City , OH 43064",
+    "lotNumber": "146",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9601 Bur Oak Drive Plain City , OH 43064",
+    "lotNumber": "148",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9581 Bur Oak Drive Plain City , OH 43064",
+    "lotNumber": "150",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9561 Bur Oak Drive Plain City , OH 43064",
+    "lotNumber": "152",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9520 Wagon Trail Lane Plain City , OH 43064",
+    "lotNumber": "153",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9540 Wagon Trail Lane Plain City , OH 43064",
+    "lotNumber": "155",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Pioneer Crossing",
+    "address": "9560 Wagon Trail Lane Plain City , OH 43064",
+    "lotNumber": "156",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "1083 Portrush Drive Sunbury , OH 43074",
+    "lotNumber": "2146",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "1104 Portrush Drive Sunbury , OH 43074",
+    "lotNumber": "2151",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "728 Callaway Lane Sunbury , OH 43074",
+    "lotNumber": "2415",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "736 Callaway Lane Sunbury , OH 43074",
+    "lotNumber": "2416",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "744 Callaway Lane Sunbury , OH 43074",
+    "lotNumber": "2417",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "872 Callaway Lane Sunbury , OH 43074",
+    "lotNumber": "2428",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "880 Callaway Lane Sunbury , OH 43074",
+    "lotNumber": "2429",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "857 Callaway Lane Sunbury , OH 43074",
+    "lotNumber": "2435",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "845 Callaway Lane Sunbury , OH 43074",
+    "lotNumber": "2437",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "854 Ping Lane Sunbury , OH 43074",
+    "lotNumber": "2445",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "860 Ping Lane Sunbury , OH 43074",
+    "lotNumber": "2446",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "866 Ping Lane Sunbury , OH 43074",
+    "lotNumber": "2447",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "870 Ping Lane Sunbury , OH 43074",
+    "lotNumber": "2448",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "878 Ping Lane Sunbury , OH 43074",
+    "lotNumber": "2449",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "886 Ping Lane Sunbury , OH 43074",
+    "lotNumber": "2450",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "853 Ping Lane Sunbury , OH 43074",
+    "lotNumber": "2459",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "413 Weatherby Drive Sunbury , OH 43074",
+    "lotNumber": "2211",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "635 Mill Stone Drive Sunbury , OH 43074",
+    "lotNumber": "2261",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "659 Mill Stone Drive Sunbury , OH 43074",
+    "lotNumber": "2264",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "665 Mill Stone Drive Sunbury , OH 43074",
+    "lotNumber": "2265",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "437 Weatherby Drive Sunbury , OH 43074",
+    "lotNumber": "2476",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "425 Weatherby Drive Sunbury , OH 43074",
+    "lotNumber": "2478",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "419 Weatherby Drive Sunbury , OH 43074",
+    "lotNumber": "2479",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "426 Weatherby Drive Sunbury , OH 43074",
+    "lotNumber": "2480",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "438 Weatherby Drive Sunbury , OH 43074",
+    "lotNumber": "2482",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "394 Nike Way Sunbury , OH 43074",
+    "lotNumber": "2484",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "382 Nike Way Sunbury , OH 43074",
+    "lotNumber": "2486",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "376 Nike Way Sunbury , OH 43074",
+    "lotNumber": "2487",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "370 Nike Way Sunbury , OH 43074",
+    "lotNumber": "2488",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "364 Nike Way Sunbury , OH 43074",
+    "lotNumber": "2489",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "460 Weatherby Drive Sunbury , OH 43074",
+    "lotNumber": "2496",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "468 Weatherby Drive Sunbury , OH 43074",
+    "lotNumber": "2497",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "708 Eagle Court Sunbury , OH 43074",
+    "lotNumber": "2500",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "702 Eagle Court Sunbury , OH 43074",
+    "lotNumber": "2501",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "696 Eagle Court Sunbury , OH 43074",
+    "lotNumber": "2502",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "690 Eagle Court Sunbury , OH 43074",
+    "lotNumber": "2503",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Price Ponds",
+    "address": "652 Eagle Court Sunbury , OH 43074",
+    "lotNumber": "2509",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Slate Ridge",
+    "address": "1327 Fairstone Drive Lewis Center , OH 43035",
+    "lotNumber": "30022",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Slate Ridge",
+    "address": "1267 Fairstone Drive Lewis Center , OH 43035",
+    "lotNumber": "30027",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Slate Ridge",
+    "address": "921 Oldcastle Road Lewis Center , OH 43035",
+    "lotNumber": "12",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Slate Ridge",
+    "address": "885 Oldcastle Road Lewis Center , OH 43035",
+    "lotNumber": "14",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Slate Ridge",
+    "address": "819 Oldcastle Road Lewis Center , OH 43035",
+    "lotNumber": "18",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Slate Ridge",
+    "address": "721 Oldcastle Road Lewis Center , OH 43035",
+    "lotNumber": "24",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Slate Ridge",
+    "address": "6258 Montauk Road Lewis Center , OH 43035",
+    "lotNumber": "38",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Slate Ridge",
+    "address": "6280 Montauk Road Lewis Center , OH 43035",
+    "lotNumber": "41",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Slate Ridge",
+    "address": "6321 Montauk Road Lewis Center , OH 43035",
+    "lotNumber": "68",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6360 Zuccaro Drive Hilliard , OH 43026",
+    "lotNumber": "137",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2067 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "361",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2099 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "365",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2107 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "366",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2115 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "367",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2123 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "368",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2139 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "370",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6083 Pisello Drive Hilliard , OH 43026",
+    "lotNumber": "400",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2085 Broccoli Drive Hilliard , OH 43026",
+    "lotNumber": "407",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2093 Broccoli Drive Hilliard , OH 43026",
+    "lotNumber": "408",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2110 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "411",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2102 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "412",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2086 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "414",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2078 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "415",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2038 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "420",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2032 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "421",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2026 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "422",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2014 Melone Drive Hilliard , OH 43026",
+    "lotNumber": "424",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6137 Dever Lane Hilliard , OH 43026",
+    "lotNumber": "427",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6096 Pisello Drive Hilliard , OH 43026",
+    "lotNumber": "440",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6128 Pisello Drive Hilliard , OH 43026",
+    "lotNumber": "444",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6144 Pisello Drive Hilliard , OH 43026",
+    "lotNumber": "446",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6344 Zuccaro Drive Hilliard , OH 43026",
+    "lotNumber": "136",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "1829 Zucchina Drive Hilliard , OH 43026",
+    "lotNumber": "164",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "1835 Zucchina Drive Hilliard , OH 43026",
+    "lotNumber": "165",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "1841 Zucchina Drive Hilliard , OH 43026",
+    "lotNumber": "166",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "1853 Zucchina Drive Hilliard , OH 43026",
+    "lotNumber": "168",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "1952 Melanzana Drive Hilliard , OH 43026",
+    "lotNumber": "183",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "1936 Melanzana Drive Hilliard , OH 43026",
+    "lotNumber": "185",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "1922 Melanzana Drive Hilliard , OH 43026",
+    "lotNumber": "187",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "1830 Zucchina Drive Hilliard , OH 43026",
+    "lotNumber": "204",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "1848 Zucchina Drive Hilliard , OH 43026",
+    "lotNumber": "207",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "1837 Melanzana Drive Hilliard , OH 43026",
+    "lotNumber": "226",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "1828 Pomodoro Drive Hilliard , OH 43026",
+    "lotNumber": "138",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "1854 Pomodora Drive Hilliard , OH 43026",
+    "lotNumber": "140",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6347 Patata Drive Hilliard , OH 43026",
+    "lotNumber": "143",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2002 Ceduna Drive Hilliard , OH 43026",
+    "lotNumber": "242",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6320 Anguria Drive Hilliard , OH 43026",
+    "lotNumber": "245",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6314 Anguria Drive Hilliard , OH 43026",
+    "lotNumber": "246",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6308 Anguria Drive Hilliard , OH 43026",
+    "lotNumber": "247",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6277 Lampone Drive Hilliard , OH 43026",
+    "lotNumber": "301",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6283 Lampone Drive Hilliard , OH 43026",
+    "lotNumber": "302",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6289 Lampone Drive Hilliard , OH 43026",
+    "lotNumber": "303",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6301 Lampone Drive Hilliard , OH 43026",
+    "lotNumber": "305",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6325 Lampone Drive Hilliard , OH 43026",
+    "lotNumber": "309",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6331 Lampone Drive Hilliard , OH 43026",
+    "lotNumber": "310",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2030 Ceduna Drive Hilliard , OH 43026",
+    "lotNumber": "311",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2020 Ceduna Drive Hilliard , OH 43026",
+    "lotNumber": "312",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2010 Ceduna Drive Hilliard , OH 43026",
+    "lotNumber": "313",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2072 Fragola Drive Hilliard , OH 43026",
+    "lotNumber": "324",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2066 Fragola Drive Hilliard , OH 43026",
+    "lotNumber": "325",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2060 Fragola Drive Hilliard , OH 43026",
+    "lotNumber": "326",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2043 Fragola Drive Hilliard , OH 43026",
+    "lotNumber": "328",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2037 Fragola Drive Hilliard , OH 43026",
+    "lotNumber": "329",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2031 Fragola Drive Hilliard , OH 43026",
+    "lotNumber": "330",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2025 Fragola Drive Hilliard , OH 43026",
+    "lotNumber": "331",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2019 Fragola Drive Hilliard , OH 43026",
+    "lotNumber": "332",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2013 Fragola Drive Hilliard , OH 43026",
+    "lotNumber": "333",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2007 Fragola Drive Hilliard , OH 43026",
+    "lotNumber": "334",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2012 Mirtillo Drive Hilliard , OH 43026",
+    "lotNumber": "335",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2018 Mirtillo Drive Hilliard , OH 43026",
+    "lotNumber": "336",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2024 Mirtillo Drive Hilliard , OH 43026",
+    "lotNumber": "337",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2054 Mirtillo Drive Hilliard , OH 43026",
+    "lotNumber": "342",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "6274 Lampone Drive Hilliard , OH 43026",
+    "lotNumber": "343",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Sugar Farms",
+    "address": "2046 Limone Drive Hilliard , OH 43026",
+    "lotNumber": "349",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "399 Shumard Lane Westerville , OH 43082",
+    "lotNumber": "101",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "395 Shumard Lane Westerville , OH 43082",
+    "lotNumber": "102",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "393 Shumard Lane Westerville , OH 43082",
+    "lotNumber": "103",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "387 Shumard Lane Westerville , OH 43082",
+    "lotNumber": "104",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "385 Shumard Lane Westerville , OH 43082",
+    "lotNumber": "105",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "327 Vannette Lane Westerville , OH 43082",
+    "lotNumber": "601",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "325 Vannette Lane Westerville , OH 43082",
+    "lotNumber": "602",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "319 Vannette Lane Westerville , OH 43082",
+    "lotNumber": "603",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "317 Vannette Lane Westerville , OH 43082",
+    "lotNumber": "604",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "322 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1201",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "324 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1202",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "328 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1203",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "332 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1204",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "338 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1301",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "340 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1302",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "344 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1303",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "346 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1304",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "345 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1401",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "343 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1402",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "339 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1403",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "337 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1404",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "331 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1501",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "327 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1502",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "323 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1503",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "321 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1504",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "319 Pinnate Lane Westerville , OH 43082",
+    "lotNumber": "1505",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "393 Hockberry Avenue Westerville , OH 43082",
+    "lotNumber": "1601",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "391 Hockberry Avenue Westerville , OH 43082",
+    "lotNumber": "1602",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Greenway",
+    "address": "385 Hockberry Avenue Westerville , OH 43082",
+    "lotNumber": "1603",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4181 Tuller Road Dublin , OH 43017",
+    "lotNumber": "1100",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4167 Tuller Road Dublin , OH 43017",
+    "lotNumber": "1101",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4171 Tuller Road Dublin , OH 43017",
+    "lotNumber": "1102",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4175 Tuller Road Dublin , OH 43017",
+    "lotNumber": "1103",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4179 Tuller Road Dublin , OH 43017",
+    "lotNumber": "1104",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4183 Tuller Road Dublin , OH 43017",
+    "lotNumber": "1105",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4187 Tuller Road Dublin , OH 43017",
+    "lotNumber": "1106",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4110 McCune Ave Dublin , OH 43017",
+    "lotNumber": "1400",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4168 McCune Avenue Dublin , OH 43017",
+    "lotNumber": "1401",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4164 McCune Avenue Dublin , OH 43017",
+    "lotNumber": "1402",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4160 McCune Avenue Dublin , OH 43017",
+    "lotNumber": "1403",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4156 McCune Avenue Dublin , OH 43017",
+    "lotNumber": "1404",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4152 McCune Avenue Dublin , OH 43017",
+    "lotNumber": "1405",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4148 McCune Avenue Dublin , OH 43017",
+    "lotNumber": "1406",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4150 McCune Ave Dublin , OH 43017",
+    "lotNumber": "1500",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4190 McCune Avenue Dublin , OH 43017",
+    "lotNumber": "1501",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4186 McCune Avenue Dublin , OH 43017",
+    "lotNumber": "1502",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4182 McCune Avenue Dublin , OH 43017",
+    "lotNumber": "1503",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4178 McCune Avenue Dublin , OH 43017",
+    "lotNumber": "1504",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Towns on the Parkway",
+    "address": "4174 McCune Avenue Dublin , OH 43017",
+    "lotNumber": "1505",
+    "builder": "Pulte"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "31 BUCINE COURT DELAWARE OH 43015",
+    "lotNumber": "4873",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Hyatts",
+    "address": "460 ALICIA KELTON DRIVE DELAWARE OH 43015",
+    "lotNumber": "6523",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "32 BUCINE COURT DELAWARE OH 43015",
+    "lotNumber": "4882",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "705 PATCH REEF DRIVE DELAWARE OH 43015",
+    "lotNumber": "4161",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "332 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0033D",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "71 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5274B",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "69 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5274C",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "308 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0028A",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "310 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0028B",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "312 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0028C",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "314 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0028D",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "316 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0028E",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "25 BUCINE COURT DELAWARE OH 43015",
+    "lotNumber": "4872",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "329 PISA LOOP DELAWARE OH 43015",
+    "lotNumber": "4885",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "681 PATCH REEF DRIVE DELAWARE OH 43015",
+    "lotNumber": "4157",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "326 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0033A",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "56 BUCINE COURT DELAWARE OH 43015",
+    "lotNumber": "4878",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Hyatts",
+    "address": "476 ALICIA KELTON DRIVE DELAWARE OH 43015",
+    "lotNumber": "6521",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "38 BUCINE COURT DELAWARE OH 43015",
+    "lotNumber": "4881",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "759 PATCH REEF DRIVE DELAWARE OH 43015",
+    "lotNumber": "4170",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Hyatts",
+    "address": "376 ALICIA KELTON DRIVE DELAWARE OH 43015",
+    "lotNumber": "6531",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "601 PISA LOOP DELAWARE OH 43015",
+    "lotNumber": "3702",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "73 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5274A",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "360 PISA LOOP DELAWARE OH 43015",
+    "lotNumber": "4850",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "268 VIA CORSO DELAWARE OH 43015",
+    "lotNumber": "0043A",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "266 VIA CORSO DELAWARE OH 43015",
+    "lotNumber": "0043B",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "260 VIA CORSO DELAWARE OH 43015",
+    "lotNumber": "0043E",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Hyatts",
+    "address": "384 ALICIA KELTON DRIVE DELAWARE OH 43015",
+    "lotNumber": "6530",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "44 BUCINE COURT DELAWARE OH 43015",
+    "lotNumber": "4880",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "336 PISA LOOP DELAWARE OH 43015",
+    "lotNumber": "4846",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Hyatts",
+    "address": "452 ALICIA KELTON DRIVE DELAWARE OH 43015",
+    "lotNumber": "6524",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Hyatts",
+    "address": "420 ALICIA KELTON DRIVE DELAWARE OH 43015",
+    "lotNumber": "6527",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "26 BUCINE COURT DELAWARE OH 43015",
+    "lotNumber": "4883",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "190 VIA VENETO DELAWARE OH 43015",
+    "lotNumber": "0016A",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "188 VIA VENETO DELAWARE OH 43015",
+    "lotNumber": "0016B",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "186 VIA VENETO DELAWARE OH 43015",
+    "lotNumber": "0016C",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "184 VIA VENETO DELAWARE OH 43015",
+    "lotNumber": "0016D",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "328 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0033B",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "330 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0033C",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "58 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5208A",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "60 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5208B",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "62 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5208C",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "64 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5208D",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "66 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5208E",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "68 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5208F",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "354 PISA LOOP DELAWARE OH 43015",
+    "lotNumber": "4849",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "378 PISA LOOP DELAWARE OH 43015",
+    "lotNumber": "4852",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "55 BUCINE COURT DELAWARE OH 43015",
+    "lotNumber": "4877",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "264 VIA CORSO DELAWARE OH 43015",
+    "lotNumber": "0043C",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "262 VIA CORSO DELAWARE OH 43015",
+    "lotNumber": "0043D",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "575 PISA LOOP DELAWARE OH 43015",
+    "lotNumber": "3704",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "43 BUCINE COURT DELAWARE OH 43015",
+    "lotNumber": "4875",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "711 PATCH REEF DRIVE DELAWARE OH 43015",
+    "lotNumber": "4162",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "323 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0091A",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "321 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0091B",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "319 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0091C",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "300 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0025A",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "67 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5274D",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "65 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5274E",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "63 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5274F",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "52 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5204B",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "54 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5204C",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "56 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5204D",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "334 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0033E",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "680 PATCH REEF DRIVE DELAWARE OH 43015",
+    "lotNumber": "4188",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Hyatts",
+    "address": "496 ALICIA KELTON DRIVE DELAWARE OH 43015",
+    "lotNumber": "6519",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Hyatts",
+    "address": "508 ALICIA KELTON DRIVE DELAWARE OH 43015",
+    "lotNumber": "6518",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Hyatts",
+    "address": "485 ALICIA KELTON DRIVE DELAWARE OH 43015",
+    "lotNumber": "6543",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "49 BUCINE COURT DELAWARE OH 43015",
+    "lotNumber": "4876",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "317 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0091D",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "315 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0091E",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "401 PISA LOOP DELAWARE OH 43015",
+    "lotNumber": "4870",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "278 VIA CORSO DELAWARE OH 43015",
+    "lotNumber": "0038A",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "276 VIA CORSO DELAWARE OH 43015",
+    "lotNumber": "0038B",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "274 VIA CORSO DELAWARE OH 43015",
+    "lotNumber": "0038C",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "272 VIA CORSO DELAWARE OH 43015",
+    "lotNumber": "0038D",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "270 VIA CORSO DELAWARE OH 43015",
+    "lotNumber": "0038E",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "313 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0096A",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "311 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0096B",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "309 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0096C",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "307 VIA CONDOTerra Alta TownHomesI DELAWARE OH 43015",
+    "lotNumber": "0096D",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "348 PISA LOOP DELAWARE OH 43015",
+    "lotNumber": "4848",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Addison Farms",
+    "address": "50 ALLENHURST WAY DELAWARE OH 43015",
+    "lotNumber": "5204A",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "390 PISA LOOP DELAWARE OH 43015",
+    "lotNumber": "4853",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Rutherford",
+    "address": "584 RUTHERFORD AVE DELAWARE OH 43015",
+    "lotNumber": "5368",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta",
+    "address": "600 PISA LOOP DELAWARE OH 43015",
+    "lotNumber": "3738",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Glenross",
+    "address": "717 PATCH REEF DRIVE DELAWARE OH 43015",
+    "lotNumber": "4163",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "204 VIA VENETO DELAWARE OH 43015",
+    "lotNumber": "0073B",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "202 VIA VENETO DELAWARE OH 43015",
+    "lotNumber": "0073C",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "178 VIA VENETO DELAWARE OH 43015",
+    "lotNumber": "0020B",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "176 VIA VENETO DELAWARE OH 43015",
+    "lotNumber": "0020C",
+    "builder": "Ryan Homes"
+  },
+  {
+    "subdivision": "Terra Alta TownHomes",
+    "address": "174 VIA VENETO DELAWARE OH 43015",
+    "lotNumber": "0020D",
+    "builder": "Ryan Homes"
+  }
+]
