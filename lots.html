@@ -60,7 +60,7 @@
     let lots = [];
 
     // Fetch the datasheet (lots.json should be located in the same directory)
-    fetch('lots.json')
+    fetch('lots(1).json')
       .then(response => response.ok ? response.json() : Promise.reject('Network response was not ok'))
       .then(data => {
         lots = data;
