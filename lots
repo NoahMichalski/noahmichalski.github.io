@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lot Lookup</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #ffffff;
+      color: #000000;
+    }
+    #searchBox {
+      width: 200px;
+      padding: 8px;
+      font-size: 1rem;
+      background-color: #ffffff;
+      color: #000000;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #searchBtn {
+      padding: 8px 12px;
+      font-size: 1rem;
+      margin-left: 8px;
+      background-color: #ffffff;
+      color: #000000;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #searchBtn:hover {
+      background-color: #f0f0f0;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    .lot-info {
+      background-color: #ffffff;
+      border: 1px solid #ccc;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    .lot-info p {
+      margin: 4px 0;
+      color: #000000;
+    }
+  </style>
+</head>
+<body>
+  <h1>Lot Lookup</h1>
+  <input type="text" id="searchBox" placeholder="Enter lot number" />
+  <button id="searchBtn">Search</button>
+  <div id="result"></div>
+
+  <script>
+    let lots = [];
+
+    // Fetch the datasheet (lots.json should be located in the same directory)
+    fetch('lots.json')
+      .then(response => response.ok ? response.json() : Promise.reject('Network response was not ok'))
+      .then(data => {
+        lots = data;
+      })
+      .catch(error => {
+        console.error('Error loading datasheet:', error);
+        document.getElementById('result').innerText = 'Failed to load datasheet.';
+      });
+
+    // Function to perform search
+    function performSearch() {
+      const query = document.getElementById('searchBox').value.trim();
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '';
+
+      if (!query) {
+        resultDiv.innerText = 'Please enter a lot number.';
+        return;
+      }
+
+      const matched = lots.filter(lot => lot.lotNumber === query);
+      if (matched.length > 0) {
+        matched.forEach(lot => {
+          const div = document.createElement('div');
+          div.classList.add('lot-info');
+          div.innerHTML = `
+            <p><strong>Lot Number:</strong> ${lot.lotNumber}</p>
+            <p><strong>Subdivision:</strong> ${lot.subdivision}</p>
+            <p><strong>Builder:</strong> ${lot.builder}</p>
+            <p><strong>Address:</strong> ${lot.address}</p>
+          `;
+          resultDiv.appendChild(div);
+        });
+      } else {
+        resultDiv.innerText = `No data found for lot "${query}".`;
+      }
+    }
+
+    // Event listeners
+    document.getElementById('searchBtn').addEventListener('click', performSearch);
+    document.getElementById('searchBox').addEventListener('keyup', e => {
+      if (e.key === 'Enter') performSearch();
+    });
+  </script>
+</body>
+</html>
