@@ -8,42 +8,37 @@
     :root{
       --bg:#ffffff; --panel:#ffffff; --panel-2:#fafafa; --text:#0f172a; --muted:#64748b;
       --accent:#2563eb; --border:#e5e7eb; --pill:#f1f5f9; --radius:14px;
+      /* dynamic sticky offsets populated by JS */
+      --h-header: 0px; 
+      --h-chips: 0px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{
-      margin:0; background:var(--bg); color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-    }
+    body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"}
     a{color:inherit;text-decoration:none;border-bottom:1px dashed var(--border);transition:color .15s ease,border-color .15s ease}
-    a:hover{color:var(--accent);border-bottom-color:var(--accent);text-decoration:none}
+    a:hover{color:var(--accent);border-bottom-color:var(--accent)}
     .wrap{max-width:1200px;margin:40px auto;padding:0 16px}
-    .card{
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:0 6px 20px rgba(0,0,0,.06);
-      overflow:hidden;
-    }
-    header{
-      padding:22px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
-      border-bottom:1px solid var(--border);background:var(--panel);position:sticky;top:0;z-index:5
-    }
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 6px 20px rgba(0,0,0,.06);/* keep overflow visible so sticky works */overflow:visible}
+    header{padding:22px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--panel);position:sticky;top:0;z-index:30}
     .title{font-size:22px;font-weight:800;letter-spacing:.3px;display:flex;gap:10px;align-items:center}
     .title small{font-size:12px;color:var(--muted);font-weight:600}
-    .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;width:fit-content}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:10px 14px;min-width:260px}
     .search input{all:unset;color:var(--text);width:240px}
     .btn{all:unset;cursor:pointer;background:#fff;border:1px solid var(--border);padding:10px 14px;border-radius:999px;color:var(--text);font-weight:700}
-    .chips{display:flex;flex-wrap:nowrap;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--panel);overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+    /* Builder chips bar */
+    .chips{display:flex;flex-wrap:nowrap;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--panel);overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:var(--h-header);z-index:20;box-shadow:0 2px 0 rgba(0,0,0,.03)}
     .chip{display:inline-flex;gap:8px;align-items:center;padding:10px 14px;border-radius:999px;border:1px solid var(--border);background:var(--pill);color:var(--text);font-weight:700;font-size:13px;cursor:pointer;user-select:none;flex:0 0 auto}
     .chip input{display:none}
-    .chip.active{outline:2px solid var(--accent);outline-offset:1px}
+    .chip.active{outline:2px solid var(--accent);outline-offset:1px;box-shadow:none}
     .legend-dot{width:10px;height:10px;border-radius:999px;display:inline-block}
+
+    /* Table */
     .tbl{width:100%;border-collapse:separate;border-spacing:0}
-    .tbl thead th{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);text-align:left;padding:14px;border-bottom:1px solid var(--border);position:sticky;top:62px;background:var(--panel-2);z-index:4}
-    .row{transition:background .1s}
-    .row:hover{background:#f8fafc}
+    .tbl thead th{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);text-align:left;padding:14px;border-bottom:1px solid var(--border);position:sticky;top:calc(var(--h-header) + var(--h-chips));background:var(--panel-2);z-index:10}
+    .tbl tr{transition:background .1s}
+    .tbl tr:hover{background:#f8fafc}
     .tbl td{border-bottom:1px solid var(--border);padding:14px;vertical-align:middle}
     .pill{font-weight:800;font-size:12px;border-radius:999px;padding:6px 10px;display:inline-flex;align-items:center;gap:8px}
     footer{padding:14px 16px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--panel)}
@@ -58,11 +53,6 @@
       .search{min-width:0;width:100%}
       .search input{width:100%}
       .btn{padding:12px 16px}
-
-      .chips{padding:8px 12px}
-
-      /* remove fixed height so page can scroll naturally */
-      .table-scroll{max-height:none}
 
       .tbl, .tbl thead, .tbl tbody, .tbl tr, .tbl th, .tbl td { display:block; width:100% }
       .tbl thead{display:none}
@@ -90,9 +80,10 @@
         </div>
       </header>
 
+      <!-- Sticky chips directly below the sticky header; no inner scroll containers -->
       <div class="chips" id="builderChips"></div>
 
-      <div class="table-scroll" style="overflow:auto; max-height: 70vh;">
+      <div class="table-scroll">
         <table class="tbl" id="tbl">
           <thead>
             <tr><th>Subdivision</th><th>Builder</th><th>GPS Address</th></tr>
@@ -221,45 +212,44 @@
     const empty = document.getElementById('empty');
     const chipsEl = document.getElementById('builderChips');
 
-    const BUILDER_ORDER = [
-  "Pulte",
-  "DR Horton",
-  "Ryan",
-  "Epcon",
-  "Schottenstein",
-  "Rockford",
-  "America Homes 4 Rent",
-  "3 Pillar",
-  "Bob Webb"
-];
+    const BUILDER_ORDER = ["Pulte","DR Horton","Ryan","Epcon","Schottenstein","Rockford","America Homes 4 Rent","3 Pillar","Bob Webb"];
 
-// Collect all builders from the data
-const allBuilders = [...new Set(SUBDIVISIONS.map(s=>s.builder))];
-// Sort using the custom order first, then any others alphabetically at the end
-const builders = allBuilders.sort((a,b)=>{
-  const ia = BUILDER_ORDER.indexOf(a);
-  const ib = BUILDER_ORDER.indexOf(b);
-  if(ia !== -1 && ib !== -1) return ia - ib;           // both in the preferred list
-  if(ia !== -1) return -1;                              // a is preferred, b is not
-  if(ib !== -1) return 1;                               // b is preferred, a is not
-  return a.localeCompare(b);                            // neither preferred → alpha
-});
+    // Collect all builders from the data
+    const allBuilders = [...new Set(SUBDIVISIONS.map(s=>s.builder))];
+    // Sort using the custom order first, then any others alphabetically at the end
+    const builders = allBuilders.sort((a,b)=>{
+      const ia = BUILDER_ORDER.indexOf(a);
+      const ib = BUILDER_ORDER.indexOf(b);
+      if(ia !== -1 && ib !== -1) return ia - ib;
+      if(ia !== -1) return -1;
+      if(ib !== -1) return 1;
+      return a.localeCompare(b);
+    });
 
-const activeBuilders = new Set(builders);
+    const activeBuilders = new Set(builders);
 
-builders.forEach(b=>{
-  const chip = document.createElement('label');
-  chip.className = "chip active";
-  chip.innerHTML = `<input type="checkbox" checked data-b="${b}"><span class="legend-dot" style="background:${BUILDER_COLORS[b]||'#3a86ff'}"></span>${b}`;
-  chip.addEventListener('click', (e)=>{
-    if(e.target.tagName === 'INPUT'){
-      if(e.target.checked) activeBuilders.add(b); else activeBuilders.delete(b);
-      chip.classList.toggle('active', e.target.checked);
-      render();
+    builders.forEach(b=>{
+      const chip = document.createElement('label');
+      chip.className = "chip active";
+      chip.innerHTML = `<input type="checkbox" checked data-b="${b}"><span class="legend-dot" style="background:${BUILDER_COLORS[b]||'#3a86ff'}"></span>${b}`;
+      chip.addEventListener('click', (e)=>{
+        if(e.target.tagName === 'INPUT'){
+          if(e.target.checked) activeBuilders.add(b); else activeBuilders.delete(b);
+          chip.classList.toggle('active', e.target.checked);
+          render();
+        }
+      });
+      chipsEl.appendChild(chip);
+    });
+
+    function recalcSticky(){
+      const hh = document.querySelector('header').offsetHeight || 0;
+      const hc = document.getElementById('builderChips').offsetHeight || 0;
+      document.documentElement.style.setProperty('--h-header', hh + 'px');
+      document.documentElement.style.setProperty('--h-chips', hc + 'px');
     }
-  });
-  chipsEl.appendChild(chip);
-});
+
+    window.addEventListener('resize', recalcSticky);
 
     function builderPill(b){
       const bg = BUILDER_COLORS[b] || '#3a86ff';
@@ -294,6 +284,7 @@ builders.forEach(b=>{
           rows++;
         });
       empty.style.display = rows? "none":"block";
+      recalcSticky();
     }
 
     qEl.addEventListener('input', render);
@@ -304,6 +295,7 @@ builders.forEach(b=>{
       render();
     });
 
+    // initial render + measure
     render();
   </script>
 </body>
