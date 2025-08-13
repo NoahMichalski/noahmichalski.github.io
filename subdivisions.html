@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Subdivision Directory</title>
+  <style>
+    :root{
+      --bg:#ffffff; --panel:#ffffff; --panel-2:#fafafa; --text:#0f172a; --muted:#64748b;
+      --accent:#2563eb; --border:#e5e7eb; --pill:#f1f5f9; --radius:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    a{color:inherit;text-decoration:none;border-bottom:1px dashed var(--border);transition:color .15s ease,border-color .15s ease}
+    a:hover{color:var(--accent);border-bottom-color:var(--accent);text-decoration:none}
+    .wrap{max-width:1200px;margin:40px auto;padding:0 16px}
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:0 6px 20px rgba(0,0,0,.06);
+      overflow:hidden;
+    }
+    header{
+      padding:22px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+      border-bottom:1px solid var(--border);background:var(--panel)
+    }
+    .title{font-size:22px;font-weight:800;letter-spacing:.3px;display:flex;gap:10px;align-items:center}
+    .title small{font-size:12px;color:var(--muted);font-weight:600}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .search{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:10px 14px;min-width:260px}
+    .search input{all:unset;color:var(--text);width:240px}
+    .btn{all:unset;cursor:pointer;background:#fff;border:1px solid var(--border);padding:10px 14px;border-radius:999px;color:var(--text);font-weight:700}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--panel)}
+    .chip{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:var(--pill);color:var(--text);font-weight:700;font-size:12px;cursor:pointer;user-select:none}
+    .chip input{display:none}
+    .chip.active{outline:2px solid var(--accent);outline-offset:1px}
+    .legend-dot{width:10px;height:10px;border-radius:999px;display:inline-block}
+    .tbl{width:100%;border-collapse:separate;border-spacing:0}
+    .tbl thead th{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);text-align:left;padding:14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--panel-2);z-index:2}
+    .row{transition:background .1s}
+    .row:hover{background:#f8fafc}
+    .tbl td{border-bottom:1px solid var(--border);padding:14px;vertical-align:middle}
+    .pill{font-weight:800;font-size:12px;border-radius:999px;padding:6px 10px;display:inline-flex;align-items:center;gap:8px}
+    footer{padding:14px 16px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--panel)}
+    .hint{font-size:12px;color:var(--muted)}
+    .empty{padding:30px 16px;color:var(--muted)}
+    @media (max-width:720px){
+      .tbl td:nth-child(3){display:none}
+      .tbl th:nth-child(3){display:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div class="title">Subdivision Directory <small>Coordinates stored with each subdivision</small></div>
+        <div class="controls">
+          <div class="search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input id="q" placeholder="Search subdivision / city / builder…"/>
+          </div>
+          <button class="btn" id="clearFilters">Clear</button>
+        </div>
+      </header>
+
+      <div class="chips" id="builderChips"></div>
+
+      <div style="overflow:auto; max-height: 70vh;">
+        <table class="tbl" id="tbl">
+          <thead>
+            <tr><th>Subdivision</th><th>Builder</th><th>GPS Address</th></tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div id="empty" class="empty" style="display:none">Nothing matches your filters.</div>
+      </div>
+
+      <footer>
+        <div class="hint">Address hyperlinks use embedded coordinates.</div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const BUILDER_COLORS = {"DR Horton":"#121212","Pulte":"#19c37d","Ryan Homes":"#7b2cf5","Epcon":"#ff6b6b","Schottenstein":"#b00020","MI Homes":"#ffd34d","Rockford":"#ffd34d"};
+
+    // YIQ contrast for pill text
+    function contrastColor(hex){
+      const c = hex.replace('#','');
+      const r = parseInt(c.substring(0,2),16), g = parseInt(c.substring(2,4),16), b = parseInt(c.substring(4,6),16);
+      const yiq = (r*299 + g*587 + b*114)/1000;
+      return yiq >= 140 ? '#0f172a' : '#ffffff';
+    }
+
+    const SUBDIVISIONS = [
+["Pulte","Abberley Park","3384 Abberley Drive, New Albany, OH 43054",40.052873,-82.816503],
+["Pulte","Bloomfield Hills","5002 Roese Ave, South Bloomfield, OH 43103",39.708129,-82.988884],
+["Pulte","Clarkshaw Pulte","3411 Tender Avenue, Powell, OH 43065",40.223191,-83.104699],
+["Pulte","Glenross Pulte","106 E Wind Rd, Delaware, OH 43015",40.236117,-83.020358],
+["Pulte","Magnolia Park","582 Weatherby Drive, Sunbury, OH 43074",40.245373,-82.883716],
+["Pulte","Price Ponds - Highlands","1026 Ping Lane, Sunbury, OH 43074",40.244527,-82.885731],
+["Pulte","Price Ponds - Summit","953 Mill Stone Dr, Sunbury, OH 43074",40.244204,-82.886893],
+["Pulte","Sugar Farms - Highlands","2040 Limone Drive, Hilliard, OH 43026",39.992456,-83.174284],
+["Pulte","Sugar Farms - Retreat","1820 Melanzana Dr, Hilliard, OH 43026",39.987505,-83.173131],
+["Pulte","Sugar Farms - Summit","2019 Fragola Drive, Hilliard, OH 43026",39.991552,-83.177803],
+["Pulte","Towns On The Parkway","4128 John Shields Pkwy, Dublin, OH 43017",40.106649,-83.100162],
+["Pulte","Amrine","334 Amrine Wy, Marysville, OH 43040",40.270238,-83.371765],
+["Pulte","Buckstone","4918 Ranger Dr, Lockbourne, OH 43137",39.856655,-82.967935],
+["Pulte","Clover","40 Reneau Ave, Galloway, OH 43119",39.949993,-83.161864],
+["Pulte","Jerome Village Pulte","8768 Apricot Wy, Plain City, OH 43064",40.187687,-83.189026],
+["Pulte","Nelson","2538 Nelson Ln, Delaware, OH 43015",40.208450,-83.084053],
+["Pulte","Berlin Bluffs","2651 Cleo St, Delaware, OH 43015",40.244850,-82.997809],
+["Pulte","Carpenters","4448 Ruppert Trl, Powell, OH 43065",40.185143,-83.111785],
+["Pulte","Scotts","9556 Burghley Dr, Plain City, OH 43064",40.154941,-83.214898],
+["Pulte","Limestone","101 Franks Field Dr, Delaware, OH 43015",40.302692,-83.122495],
+["Pulte","Nottingham Trace","7715 Nottingham Blvd, New Albany, OH 43054",40.109482,-82.812530],
+["Pulte","Slate Ridge - Preserve","1258 Ashlar Lane, Lewis Center, OH 43035",40.193030,-83.013688],
+["Pulte","Slate Ridge - Retreat","1121 Oldcastle Road, Lewis Center, OH 43035",40.193908,-83.018517],
+["Pulte","Beulah","3655 Glacial Ln, Grove City, OH 43123",39.889952,-83.104556],
+["Pulte","Eagle","7002 Crown Drive, Galena, OH 43021",40.249897,-82.938333],
+["Pulte","Hyatts Pulte","6176 Bishop Blvd, Powell, OH 43065",40.214810,-83.098683],
+["Pulte","Maeve","2598 McKenna Dr, Delaware, OH 43015",40.236883,-83.005326],
+["Pulte","Pioneer","9569 Coach Line Ave, Plain City, OH 43064",40.150438,-83.237856],
+["Pulte","Towns on the Greenway","337 Hockberry Ave, Westerville, OH 43081",40.134287,-82.942262],
+["Pulte","Jefferson Manor","8488 Ben Hale Ct, Blacklick, OH 43004",40.036095,-82.787034],
+["DR Horton","Brookview","6541 Pfeifer Ash Dr, Canal Winchester, OH 43110",39.877261,-82.821450],
+["DR Horton","Orchard Lakes","7055 Royalton Ridge Avenue, Canal Winchester, OH 43110",39.866083,-82.809752],
+["DR Horton","Lansdowne","4213 Sycamore Oak Avenue, Canal Winchester, OH 43110",39.892490,-82.835370],
+["DR Horton","Longview","102 Cedarhurst Ct, Pickerington, OH 43147",39.897680,-82.789797],
+["DR Horton","Madison Meadows","403 Madison Wy, Plain City, OH 43064",40.103927,-83.287352],
+["DR Horton","Maplewood","1159 Mueller Dr, Reynoldsburg, OH 43068",39.969688,-82.754820],
+["DR Horton","Monarch Greene","1414 Chrisman Drive, Columbus, OH 43223",39.927510,-83.032780],
+["DR Horton","Piatt Preserve","2780 Aldengate Ln, Delaware, OH 43015",40.245506,-83.007530],
+["DR Horton","River Ridge","1797 Jacko Lane, Circleville, OH 43113",39.635850,-82.948650],
+["DR Horton","Overlook","2100 Overlook Wy, Newark, OH 43055",40.043237,-82.473669],
+["DR Horton","Wagnalls","1390 Hansberry Dr, Lithopolis, OH 43136",39.811287,-82.813148],
+["DR Horton","Walnut","5 Walnut Mill Way, Ashville, OH 43103",39.734237,-82.953590],
+["DR Horton","Ludlow Ridge","819 Sherwood Loop, Bellefontaine, OH 43311",40.339108,-83.745493],
+["DR Horton","Parkview","557 Park Vista Dr, Delaware, OH 43015",40.317609,-83.092585],
+["DR Horton","Springer Woods","693 Penwell Dr, Delaware, OH 43015",40.310277,-83.120107],
+["DR Horton","Chase Landing","6351 Ballast Rd, Galloway, OH 43119",39.918362,-83.163537],
+["Ryan","Terra Alta","581 Pisa Lp, Delaware, OH 43015",40.268005,-83.051701],
+["Ryan","Addison Farms","50 Allenhurst Way, Delaware, OH 43015",40.322743,-83.085124],
+["Ryan","Rolling Hills","1503 Cypress Pt Dr, Sunbury, OH 43074",40.240643,-82.891371],
+["Ryan","Glenross Ryan","191 Sycamore Ln, Delaware, OH 43015",40.236517,-83.019782],
+["Ryan","Hyatts Ryan","250 Alicia Kelton Dr, Delaware, OH 43015",40.215079,-83.041020],
+["Ryan","Rutherford","572 Rutherford Ave, Delaware, OH 43015",40.320409,-83.088637],
+["Epcon","Hyland Meadows","8027 Grassland Dr, Plain City, OH 43064",40.189891,-83.191183],
+["Epcon","Carr Farms","5755 Arcadian Ave, Hilliard, OH 43026",40.051380,-83.170284],
+["Epcon","Mulberry","4416 Marilyn Ct, Grove City, OH 43123",39.871459,-83.056351],
+["Epcon","White Oaks","8400 Ryan Pkwy, Plain City, OH 43064",40.166178,-83.192868],
+["Epcon","Hyatts Village","3372 Hyatts Rd, Powell, OH 43065",40.217600,-83.108500],
+["Epcon","Courtyards on Hyatts","3200 Korg St, Powell, OH 43065",40.217012,-83.099814],
+["Rockford","Foxfire","440 Bethpage Blvd, Commercial Point, OH 43116",39.777874,-83.029083],
+["Rockford","HofBauer","2223 Ashby Wy, Plain City, OH 43064",40.114270,-83.269355],
+["Rockford","Jerome Aster","6981 Aster Wy, Plain City, OH 43064",40.194037,-83.172143],
+["Rockford","Meadow Grove","1813 Silverlawn Dr, Grove City, OH 43123",39.849346,-83.052656],
+["Rockford","Willowbend","228 Willow Bnd Dr, Newark, OH 43055",40.047837,-82.485522],
+["Rockford","Hazelton Crossing","208 Scotsgrove Drive, Pataskala, OH 43062",39.972371,-82.678359],
+["Rockford","Mitchell Highlands","9511 Camberly Avenue, Plain City, OH 43064",40.148096,-83.226260],
+["Rockford","Jerome Village Meadowlark","8868 Meadowlark Drive, Plain City, OH 43064",40.187822,-83.208990],
+["Rockford","Ayrshire Farms","6195 Lockroy Dr, Dublin, OH 43016",40.092646,-83.185798],
+["3 Pillar","Jerome Village","11451 Winterberry Dr, Plain City, OH 43064",40.178976,-83.192238],
+["3 Pillar","Eversole Woods","11451 Winterberry Drive, Plain City, OH 43064",40.179464,-83.187045],
+["MI Homes","Pinnacle","899 Heimat Haus Dr, Grove City, OH 43123",39.866539,-83.028943],
+["MI Homes","Browns Farm","3215 Farmhouse Ln, Grove City, OH 43123",39.857121,-83.089867],
+["MI Homes","Hill Farm","6960 Gelderland Dr, Hilliard, OH 43026",40.037428,-83.203022],
+["MI Homes","Foxfire","444 Bethpage Blvd, Commercial Point, OH 43116",39.777897,-83.028864],
+["MI Homes","Heron","12146 Prairie View Dr NW, Pickerington, OH 43147",39.909728,-82.716874],
+["MI Homes","Darby","537 Conductor Dr, Plain City, OH 43064",40.107605,-83.250687],
+["MI Homes","Forest Ridge","106 Ruby Rd SW, Pataskala, OH 43062",40.015704,-82.668855],
+["MI Homes","Liberty","3777 Shoal Way, Powell, OH 43065",40.201641,-83.103957],
+["MI Homes","Jerome Village Applewood","10715 Pearl Creek Dr, Plain City, OH 43064",40.169613,-83.199764],
+["MI Homes","Winterbrooke","43 Sienna Glenn Dr, Lewis Center, OH 43035",40.229418,-83.021288],
+["MI Homes","Miller Farm","2799 Sunbury Rd, Galena, OH 43021",40.212932,-82.871836],
+["MI Homes","WoodCrest","6443 Bluejay Rdg Dr, Powell, OH 43065",40.222632,-83.114473],
+["MI Homes","Berlin Farm MI Homes","2651 Cleo St, Delaware, OH 43015",40.240546,-83.004182],
+["MI Homes","Hyland Glen","6986 Stillhouse Ln, Dublin, OH 43016",40.114383,-83.175554],
+["MI Homes","Spring Hill Farm","7820 Oldham Dr, Reynoldsburg, OH 43068",39.972910,-82.792604],
+["Schottenstein","Renner","6186 Renner Park Drive, Columbus, OH 43228",39.982893,-83.173465],
+["Schottenstein","Jerome Aster","6971 Aster Way, Plain City, OH 43064",40.194037,-83.172143],
+["Schottenstein","Holton","3600 Whirla Way, Grove City, OH 43123",39.858200,-83.098300],
+["Schottenstein","Cottages At Verbena","11738 Verbena Place, Plain City, OH 43064",40.184323,-83.200862],
+["Schottenstein","Glacier Pointe","8798 Eliot Drive, Plain City, OH 43064",40.147034,-83.205445],
+["Schottenstein","Wellington Park","598 Courtright Dr, Pickerington, OH 43147",39.895545,-82.751744],
+["America Homes 4 Rent","Eastwood","9045 Lucy Drive, Reynoldsburg, OH 43068",39.961474,-82.758526],
+["Bob Webb","Nook At Highland Lakes","6089 Victory Gate, Westerville, OH 43082",40.181095,-82.928911],
+["Bob Webb","Harpers Pointe","188 Chedworth Row, Powell, OH 43065",40.160454,-83.071413],
+["Bob Webb","Liberty Bluff","1608 Liberty Bluff Dr, Delaware, OH 43015",40.209338,-83.064067]
+    ].map(s=>({builder:s[0], name:s[1], address:s[2], coords:[s[3],s[4]]}));
+
+    const qEl = document.getElementById('q');
+    const tbody = document.getElementById('tbody');
+    const empty = document.getElementById('empty');
+    const chipsEl = document.getElementById('builderChips');
+
+    const builders = [...new Set(SUBDIVISIONS.map(s=>s.builder))].sort();
+    const activeBuilders = new Set(builders);
+    builders.forEach(b=>{
+      const chip = document.createElement('label');
+      chip.className = "chip active";
+      chip.innerHTML = `<input type="checkbox" checked data-b="${b}"><span class="legend-dot" style="background:${BUILDER_COLORS[b]||'#3a86ff'}"></span>${b}`;
+      chip.addEventListener('click', (e)=>{
+        if(e.target.tagName === 'INPUT'){
+          if(e.target.checked) activeBuilders.add(b); else activeBuilders.delete(b);
+          chip.classList.toggle('active', e.target.checked);
+          render();
+        }
+      });
+      chipsEl.appendChild(chip);
+    });
+
+    function builderPill(b){
+      const bg = BUILDER_COLORS[b] || '#3a86ff';
+      const color = contrastColor(bg);
+      return `<span class="pill" style="background:${bg}; color:${color}">${b}</span>`;
+    }
+
+    function render(){
+      const q = qEl.value.trim().toLowerCase();
+      tbody.innerHTML = "";
+      let rows = 0;
+      SUBDIVISIONS
+        .filter(s => activeBuilders.has(s.builder))
+        .filter(s => !q || [s.name, s.builder, s.address].some(v => (v||"").toLowerCase().includes(q)))
+        .sort((a,b)=> a.builder.localeCompare(b.builder) || a.name.localeCompare(b.name))
+        .forEach(s => {
+          const tr = document.createElement('tr');
+          const mapLink = (s.coords && s.coords.length===2) ? `https://www.google.com/maps?q=${s.coords[0]},${s.coords[1]}` : null;
+          tr.innerHTML = `
+            <td>${s.name}</td>
+            <td>${builderPill(s.builder)}</td>
+            <td>${mapLink ? `<a href="${mapLink}" target="_blank">${s.address}</a>` : s.address}</td>`;
+          tbody.appendChild(tr);
+          rows++;
+        });
+      empty.style.display = rows? "none":"block";
+    }
+
+    qEl.addEventListener('input', render);
+    document.getElementById('clearFilters').addEventListener('click', ()=>{
+      qEl.value = "";
+      [...chipsEl.querySelectorAll('input')].forEach(cb=>{ cb.checked = true; cb.closest('.chip').classList.add('active'); });
+      activeBuilders.clear(); builders.forEach(b=>activeBuilders.add(b));
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
