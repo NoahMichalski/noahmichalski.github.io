@@ -221,21 +221,45 @@
     const empty = document.getElementById('empty');
     const chipsEl = document.getElementById('builderChips');
 
-    const builders = [...new Set(SUBDIVISIONS.map(s=>s.builder))].sort();
-    const activeBuilders = new Set(builders);
-    builders.forEach(b=>{
-      const chip = document.createElement('label');
-      chip.className = "chip active";
-      chip.innerHTML = `<input type="checkbox" checked data-b="${b}"><span class="legend-dot" style="background:${BUILDER_COLORS[b]||'#3a86ff'}"></span>${b}`;
-      chip.addEventListener('click', (e)=>{
-        if(e.target.tagName === 'INPUT'){
-          if(e.target.checked) activeBuilders.add(b); else activeBuilders.delete(b);
-          chip.classList.toggle('active', e.target.checked);
-          render();
-        }
-      });
-      chipsEl.appendChild(chip);
-    });
+    const BUILDER_ORDER = [
+  "Pulte",
+  "DR Horton",
+  "Ryan",
+  "Epcon",
+  "Schottenstein",
+  "Rockford",
+  "America Homes 4 Rent",
+  "3 Pillar",
+  "Bob Webb"
+];
+
+// Collect all builders from the data
+const allBuilders = [...new Set(SUBDIVISIONS.map(s=>s.builder))];
+// Sort using the custom order first, then any others alphabetically at the end
+const builders = allBuilders.sort((a,b)=>{
+  const ia = BUILDER_ORDER.indexOf(a);
+  const ib = BUILDER_ORDER.indexOf(b);
+  if(ia !== -1 && ib !== -1) return ia - ib;           // both in the preferred list
+  if(ia !== -1) return -1;                              // a is preferred, b is not
+  if(ib !== -1) return 1;                               // b is preferred, a is not
+  return a.localeCompare(b);                            // neither preferred → alpha
+});
+
+const activeBuilders = new Set(builders);
+
+builders.forEach(b=>{
+  const chip = document.createElement('label');
+  chip.className = "chip active";
+  chip.innerHTML = `<input type="checkbox" checked data-b="${b}"><span class="legend-dot" style="background:${BUILDER_COLORS[b]||'#3a86ff'}"></span>${b}`;
+  chip.addEventListener('click', (e)=>{
+    if(e.target.tagName === 'INPUT'){
+      if(e.target.checked) activeBuilders.add(b); else activeBuilders.delete(b);
+      chip.classList.toggle('active', e.target.checked);
+      render();
+    }
+  });
+  chipsEl.appendChild(chip);
+});
 
     function builderPill(b){
       const bg = BUILDER_COLORS[b] || '#3a86ff';
