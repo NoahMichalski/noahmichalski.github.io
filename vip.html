@@ -420,9 +420,20 @@
         const lotHtml = lotLink && lotLink !== 'No Map'
           ? `<a href="${lotLink}" target="_blank" style="display:block;margin-bottom:6px;">View Lot Map</a>`
           : `<div style="margin-bottom:6px;font-style:italic;">No lot map available</div>`;
-        let popup = L.popup().setLatLng([lat, lon]).setContent(
-          `<b>${name}</b><br>${lotHtml}<a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="text-decoration:underline;">${addr}</a><br><strong>Closest:</strong><div id="nearest-list">Loading...</div>`
-        ).openOn(map);
+        let popup = L.popup()
+  .setLatLng([lat, lon])
+  .setContent(
+    `<div style="text-align:center;">
+       <span class="builder-pill">${builder}</span><br>
+       <b>${name}</b><br>
+     </div>
+     ${lotHtml}
+     <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}"
+        target="_blank" style="text-decoration:underline;">${addr}</a>
+     <br><strong>Closest:</strong>
+     <div id="nearest-list">Loading...</div>`
+  )
+  .openOn(map);
         (async () => {
           const withRoute = await Promise.all(nearest.map(async d => {
             const base = `https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${d.lon},${d.lat}`;
@@ -440,7 +451,16 @@
             listHtml += `<li data-index="${i}" style="cursor:pointer;color:${col};margin-bottom:4px;">${d.name} - ${mins} min (${miles} mi)</li>`;
           });
           listHtml += '</ul>';
-          popup.setContent(`<b>${name}</b><br>${lotHtml}<a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="text-decoration:underline;">${addr}</a><br><strong>Closest:</strong>${listHtml}`);
+          popup.setContent(
+  `<div style="text-align:center;">
+     <span class="builder-pill">${builder}</span><br>
+     <b>${name}</b><br>
+   </div>
+   ${lotHtml}
+   <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}"
+      target="_blank" style="text-decoration:underline;">${addr}</a>
+   <br><strong>Closest:</strong>${listHtml}`
+);
           document.querySelectorAll('#nearest-list li').forEach(li => li.addEventListener('click', () => {
             routeLayer.clearLayers();
             const d = withRoute[li.dataset.index];
