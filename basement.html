@@ -7,12 +7,12 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
   <style>
-    body { background:#0e1525; color:#fff; font-family:Arial,sans-serif; margin:20px; }
+    body { background:#0e1525; color:#fff; font-family:system-ui, sans-serif; margin:20px; }
     h1 { margin-bottom:20px; }
     .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:20px; }
     .card {
       background:#1c2333; border-radius:10px; padding:15px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative; cursor:pointer;
+      box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative;
     }
     .status {
       position:absolute; top:10px; right:10px;
@@ -27,16 +27,42 @@
     .metric span { display:block; font-size:20px; font-weight:bold; }
     .notes { font-size:12px; color:#aaa; margin-top:5px; }
     .updated, .installed { font-size:11px; color:#888; margin-top:8px; }
-    .details { display:none; margin-top:10px; background:#0f172a; padding:10px; border-radius:8px; }
-    table { width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px; }
-    th, td { border:1px solid #444; padding:4px; text-align:center; }
-    th { background:#222; }
-    .filters { margin:10px 0; }
+    .details { margin-top:10px; background:#0f172a; padding:10px; border-radius:8px; }
+    .filters { margin:10px 0; display:flex; flex-wrap:wrap; gap:6px; }
     .filters button {
-      margin-right:5px; padding:5px 10px; border:none; border-radius:4px;
-      background:#1c3c5a; color:#fff; cursor:pointer;
+      padding:6px 10px; border:none; border-radius:4px;
+      background:#1c3c5a; color:#fff; cursor:pointer; font-size:13px;
     }
     .filters button:hover { background:#2d5b85; }
+    .filters .retire { background:#a83232; }
+    .filters .retire:hover { background:#d64545; }
+    .scroll-table {
+      max-height:200px;
+      overflow-y:auto;
+      display:block;
+    }
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    th, td { border:1px solid #444; padding:4px; text-align:center; }
+    th { background:#222; position:sticky; top:0; }
+    .chart-container {
+      display:block; /* always visible */
+      margin-top:10px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      body { margin:10px; font-size:14px; }
+      .card { padding:10px; }
+      h2 { font-size:14px; }
+      .metric span { font-size:16px; }
+      .scroll-table { max-height:150px; }
+      table { font-size:11px; }
+    }
+    @media (max-width: 400px) {
+      h1 { font-size:18px; }
+      .metric span { font-size:14px; }
+      .filters button { font-size:11px; padding:5px; }
+    }
   </style>
 </head>
 <body>
@@ -46,8 +72,10 @@
   <script>
     const { createClient } = supabase;
     const supabaseUrl = "https://imsqijcraukqqopntsmc.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc3FpamNyYXVrcXFvcG50c21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNjQ2NzIsImV4cCI6MjA3MTg0MDY3Mn0.kT7uJbbyEYo-nvrg973B8BLfXmPU5rmcB1bh_ZIXIdM";  // <-- replace with your anon key
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc3FpamNyYXVrcXFvcG50c21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNjQ2NzIsImV4cCI6MjA3MTg0MDY3Mn0.kT7uJbbyEYo-nvrg973B8BLfXmPU5rmcB1bh_ZIXIdM"; // replace with anon key
     const db = createClient(supabaseUrl, supabaseKey);
+
+    const currentRanges = {};
 
     function getStatus(humidity) {
       if (humidity < 65) return {text:"OK", class:"ok"};
@@ -77,9 +105,7 @@
       if (error) { console.error(error); return; }
 
       const latest = {};
-      data.forEach(row => {
-        if (!latest[row.device_id]) latest[row.device_id] = row;
-      });
+      data.forEach(row => { if (!latest[row.device_id]) latest[row.device_id] = row; });
 
       const container = document.getElementById("cards");
       container.innerHTML = "";
@@ -109,40 +135,52 @@
           <div class="notes">Notes: ${notes}</div>
           <div class="installed">Installed: ${installDate}</div>
           <div class="updated">Updated: ${updated}</div>
-          <div id="details-${row.device_id}" class="details">
+          <div id="details-${row.device_id}" class="details" style="display:block;">
             <h3>History</h3>
             <div class="filters">
-              <button onclick="loadHistory('${row.device_id}', '1h')">1h</button>
-              <button onclick="loadHistory('${row.device_id}', '1d')">1d</button>
-              <button onclick="loadHistory('${row.device_id}', '1w')">1w</button>
-              <button onclick="loadHistory('${row.device_id}', '1m')">1m</button>
+              <button onclick="event.stopPropagation(); loadHistory('${row.device_id}', '1d')">1d</button>
+              <button onclick="event.stopPropagation(); loadHistory('${row.device_id}', '1w')">1w</button>
+              <button onclick="event.stopPropagation(); loadHistory('${row.device_id}', '1m')">1m</button>
+              <button onclick="event.stopPropagation(); loadHistory('${row.device_id}', '3m')">3m</button>
+              <button onclick="event.stopPropagation(); loadHistory('${row.device_id}', 'all')">All</button>
+              <button onclick="event.stopPropagation(); downloadLogs('${row.device_id}')">⬇ CSV</button>
+              <button class="retire" onclick="event.stopPropagation(); retireDevice('${row.device_id}')">🗑 Retire</button>
             </div>
-            <table>
-              <thead><tr><th>Time</th><th>Temp</th><th>Humidity</th><th>Dew Pt</th></tr></thead>
-              <tbody id="log-${row.device_id}"></tbody>
-            </table>
-            <canvas id="chart-${row.device_id}" height="200"></canvas>
+            <div class="scroll-table">
+              <table>
+                <thead><tr><th>Time</th><th>Temp</th><th>Humidity</th><th>Dew Pt</th></tr></thead>
+                <tbody id="log-${row.device_id}"></tbody>
+              </table>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-${row.device_id}" height="200"></canvas>
+            </div>
           </div>
         `;
-        card.onclick = () => toggleDetails(row.device_id);
         container.appendChild(card);
+
+        // Load history right away (default 1d)
+        loadHistory(row.device_id, "1d");
       }
     }
 
     async function loadHistory(deviceId, range="1d") {
+      currentRanges[deviceId] = range;
+
       let since = new Date();
-      if (range === "1h") since.setHours(since.getHours() - 1);
       if (range === "1d") since.setDate(since.getDate() - 1);
       if (range === "1w") since.setDate(since.getDate() - 7);
       if (range === "1m") since.setMonth(since.getMonth() - 1);
+      if (range === "3m") since.setMonth(since.getMonth() - 3);
 
-      const { data, error } = await db
-        .from("sensor_logs")
+      let query = db.from("sensor_logs")
         .select("*")
         .eq("device_id", deviceId)
-        .gte("datetime", since.toISOString())
         .order("datetime", { ascending: true });
 
+      if (range !== "all") query = query.gte("datetime", since.toISOString());
+
+      const { data, error } = await query;
       if (error) { console.error(error); return; }
 
       const tbody = document.getElementById("log-" + deviceId);
@@ -159,54 +197,97 @@
       });
 
       const ctx = document.getElementById("chart-" + deviceId).getContext("2d");
-      if (window["chart_" + deviceId]) {
-        window["chart_" + deviceId].destroy();
-      }
+      if (window["chart_" + deviceId]) window["chart_" + deviceId].destroy();
 
       window["chart_" + deviceId] = new Chart(ctx, {
         type: "line",
         data: {
           datasets: [
-            {
-              label: "Temp (°F)",
-              data: data.map(r => ({ x: r.datetime, y: r.temp_f })),
-              borderColor: "red",
-              tension: 0.3
-            },
-            {
-              label: "Humidity (%)",
-              data: data.map(r => ({ x: r.datetime, y: r.humidity })),
-              borderColor: "blue",
-              tension: 0.3
-            },
-            {
-              label: "Dew Pt (°F)",
-              data: data.map(r => ({ x: r.datetime, y: r.dewpoint_f })),
-              borderColor: "green",
-              tension: 0.3
-            }
+            { label: "Temp (°F)", data: data.map(r => ({ x: r.datetime, y: r.temp_f })), borderColor: "red", tension: 0.3 },
+            { label: "Humidity (%)", data: data.map(r => ({ x: r.datetime, y: r.humidity })), borderColor: "blue", tension: 0.3 },
+            { label: "Dew Pt (°F)", data: data.map(r => ({ x: r.datetime, y: r.dewpoint_f })), borderColor: "green", tension: 0.3 }
           ]
         },
         options: {
           responsive: true,
-          interaction: { mode: "nearest", intersect: false },
           plugins: { legend: { labels: { color: "#fff" } } },
+          interaction: { mode: "nearest", intersect: false },
           scales: {
-            x: {
-              type: "time",
-              time: { unit: range === "1h" ? "minute" : range === "1d" ? "hour" : "day" },
-              ticks: { color: "#ccc" }
-            },
+            x: { type: "time", time: { unit: range === "1d" ? "hour" : "day" }, ticks: { color: "#ccc" } },
             y: { ticks: { color: "#ccc" } }
           }
         }
       });
     }
 
-    function toggleDetails(deviceId) {
-      const details = document.getElementById("details-" + deviceId);
-      details.style.display = (details.style.display === "block") ? "none" : "block";
-      if (details.style.display === "block") loadHistory(deviceId, "1d");
+    async function downloadLogs(deviceId) {
+      const range = currentRanges[deviceId] || "all";
+      let since = new Date();
+      if (range === "1d") since.setDate(since.getDate() - 1);
+      if (range === "1w") since.setDate(since.getDate() - 7);
+      if (range === "1m") since.setMonth(since.getMonth() - 1);
+      if (range === "3m") since.setMonth(since.getMonth() - 3);
+
+      let query = db.from("sensor_logs")
+        .select("*")
+        .eq("device_id", deviceId)
+        .order("datetime", { ascending: true });
+
+      if (range !== "all") query = query.gte("datetime", since.toISOString());
+
+      const { data, error } = await query;
+      if (error) { console.error(error); alert("Error exporting logs"); return; }
+
+      exportCSV(`${deviceId}_${range}`, data);
+    }
+
+    async function retireDevice(deviceId) {
+      if (!confirm(`⚠️ Are you sure you want to RETIRE ${deviceId}? This will EXPORT ALL logs and then DELETE them permanently.`)) {
+        return;
+      }
+
+      const { data: logs, error: logsError } = await db
+        .from("sensor_logs")
+        .select("*")
+        .eq("device_id", deviceId)
+        .order("datetime", { ascending: true });
+
+      if (logsError) { console.error(logsError); alert("Error fetching logs"); return; }
+
+      exportCSV(`${deviceId}_FULL_HISTORY`, logs);
+
+      const { error: delLogsError } = await db.from("sensor_logs").delete().eq("device_id", deviceId);
+      if (delLogsError) { console.error(delLogsError); alert("Error deleting logs"); return; }
+
+      const { error: delDeviceError } = await db.from("devices").delete().eq("id", deviceId);
+      if (delDeviceError) { console.error(delDeviceError); alert("Error deleting device"); return; }
+
+      alert(`${deviceId} retired successfully ✅`);
+      loadData();
+    }
+
+    function exportCSV(filename, data) {
+      if (!data || data.length === 0) {
+        alert("No data available for export");
+        return;
+      }
+      const headers = ["datetime","temp_f","humidity","dewpoint_f"];
+      const rows = data.map(r => [
+        new Date(r.datetime).toLocaleString(),
+        r.temp_f,
+        r.humidity,
+        r.dewpoint_f
+      ]);
+
+      let csvContent = "data:text/csv;charset=utf-8," 
+        + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csvContent));
+      link.setAttribute("download", `${filename}_logs.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     loadData();
