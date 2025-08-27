@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Moisture Fleet Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     body { background:#0e1525; color:#fff; font-family:Arial,sans-serif; margin:20px; }
     h1 { margin-bottom:20px; }
@@ -49,17 +49,35 @@
     }
 
     async function loadData() {
-      const { data, error } = await db
+      // try full join first
+      let { data, error } = await db
         .from("sensor_logs")
         .select(`
-          device_id, datetime, temp_f, humidity, dewpoint_f,
-          devices(lot_number, subdivision, builder, notes)
+          device_id,
+          datetime,
+          temp_f,
+          humidity,
+          dewpoint_f,
+          devices!sensor_logs_device_id_fkey (
+            lot_number,
+            subdivision,
+            builder,
+            notes
+          )
         `)
         .order("datetime", { ascending: false });
 
-      if (error) { console.error(error); return; }
+      // fallback if join fails
+      if (error) {
+        console.warn("Join failed, falling back to sensor_logs only:", error.message);
+        const fallback = await db
+          .from("sensor_logs")
+          .select("device_id, datetime, temp_f, humidity, dewpoint_f")
+          .order("datetime", { ascending: false });
+        data = fallback.data;
+      }
 
-      // latest per device
+      // pick latest per device
       const latest = {};
       data.forEach(row => {
         if (!latest[row.device_id]) latest[row.device_id] = row;
@@ -72,9 +90,9 @@
         const status = getStatus(row.humidity);
         const updated = new Date(row.datetime).toLocaleString();
 
-        const lot = row.devices?.lot_number || "N/A";
-        const subdivision = row.devices?.subdivision || "Unknown";
-        const builder = row.devices?.builder || "Unknown";
+        const lot = row.devices?.lot_number || row.device_id;
+        const subdivision = row.devices?.subdivision || "Unknown Subdivision";
+        const builder = row.devices?.builder || "Unknown Builder";
         const notes = row.devices?.notes || "";
 
         const card = document.createElement("div");
@@ -157,4 +175,5 @@
     loadData();
     setInterval(loadData, 60000);
   </script>
-
+</body>
+</html>
