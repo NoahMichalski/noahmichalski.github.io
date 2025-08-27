@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <title>Moisture Fleet Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { background:#0e1525; color:#fff; font-family:Arial,sans-serif; margin:20px; }
     h1 { margin-bottom:20px; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:20px; }
     .card {
       background:#1c2333; border-radius:10px; padding:15px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative;
+      box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative; cursor:pointer;
     }
     .status {
       position:absolute; top:10px; right:10px;
@@ -25,6 +26,10 @@
     .metric span { display:block; font-size:20px; font-weight:bold; }
     .notes { font-size:12px; color:#aaa; margin-top:5px; }
     .updated { font-size:11px; color:#888; margin-top:8px; }
+    .details { display:none; margin-top:10px; background:#0f172a; padding:10px; border-radius:8px; }
+    table { width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px; }
+    th, td { border:1px solid #444; padding:4px; text-align:center; }
+    th { background:#222; }
   </style>
 </head>
 <body>
@@ -34,7 +39,7 @@
   <script>
     const { createClient } = supabase;
     const supabaseUrl = "https://imsqijcraukqqopntsmc.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc3FpamNyYXVrcXFvcG50c21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNjQ2NzIsImV4cCI6MjA3MTg0MDY3Mn0.kT7uJbbyEYo-nvrg973B8BLfXmPU5rmcB1bh_ZIXIdM"; // put your anon key here
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc3FpamNyYXVrcXFvcG50c21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNjQ2NzIsImV4cCI6MjA3MTg0MDY3Mn0.kT7uJbbyEYo-nvrg973B8BLfXmPU5rmcB1bh_ZIXIdM";  // paste anon key here
     const db = createClient(supabaseUrl, supabaseKey);
 
     function getStatus(humidity) {
@@ -51,7 +56,7 @@
 
       if (error) { console.error(error); return; }
 
-      // group latest per device
+      // latest per device
       const latest = {};
       data.forEach(row => {
         if (!latest[row.device_id]) latest[row.device_id] = row;
@@ -60,7 +65,7 @@
       const container = document.getElementById("cards");
       container.innerHTML = "";
 
-      Object.values(latest).forEach(row => {
+      for (const [id, row] of Object.entries(latest)) {
         const status = getStatus(row.humidity);
         const updated = new Date(row.datetime).toLocaleString();
 
@@ -68,16 +73,72 @@
         card.className = "card";
         card.innerHTML = `
           <div class="status ${status.class}">${status.text}</div>
-          <h2>Lot ${row.device_id} • Builder • Subdivision</h2>
+          <h2>Device ${row.device_id}</h2>
           <div class="metrics">
             <div class="metric"><span>${row.humidity}%</span>Humidity</div>
             <div class="metric"><span>${row.temp_f}°F</span>Temp</div>
             <div class="metric"><span>${row.dewpoint_f}°F</span>Dew Pt</div>
           </div>
-          <div class="notes">Notes: TBD</div>
+          <div class="notes">Notes: (add from devices table)</div>
           <div class="updated">Updated: ${updated}</div>
+          <div id="details-${row.device_id}" class="details">
+            <h3>Recent Logs</h3>
+            <table>
+              <thead><tr><th>Time</th><th>Temp</th><th>Humidity</th><th>Dew Pt</th></tr></thead>
+              <tbody id="log-${row.device_id}"></tbody>
+            </table>
+            <canvas id="chart-${row.device_id}" height="150"></canvas>
+          </div>
         `;
+        card.onclick = () => toggleDetails(row.device_id);
         container.appendChild(card);
+      }
+    }
+
+    async function toggleDetails(deviceId) {
+      const details = document.getElementById("details-" + deviceId);
+      if (details.style.display === "block") {
+        details.style.display = "none";
+        return;
+      }
+      details.style.display = "block";
+
+      const { data, error } = await db
+        .from("sensor_logs")
+        .select("*")
+        .eq("device_id", deviceId)
+        .order("datetime", { ascending: false })
+        .limit(20);
+
+      if (error) { console.error(error); return; }
+
+      // Fill table
+      const tbody = document.getElementById("log-" + deviceId);
+      tbody.innerHTML = "";
+      data.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${new Date(r.datetime).toLocaleTimeString()}</td>
+          <td>${r.temp_f}°F</td>
+          <td>${r.humidity}%</td>
+          <td>${r.dewpoint_f}°F</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Chart
+      const ctx = document.getElementById("chart-" + deviceId).getContext("2d");
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: data.map(r => new Date(r.datetime).toLocaleTimeString()).reverse(),
+          datasets: [
+            { label: "Temp (°F)", data: data.map(r => r.temp_f).reverse(), borderColor: "red" },
+            { label: "Humidity (%)", data: data.map(r => r.humidity).reverse(), borderColor: "blue" },
+            { label: "Dew Pt (°F)", data: data.map(r => r.dewpoint_f).reverse(), borderColor: "green" }
+          ]
+        },
+        options: { responsive: true, plugins:{legend:{labels:{color:"#fff"}}}, scales:{ x:{ticks:{color:"#ccc"}}, y:{ticks:{color:"#ccc"}} } }
       });
     }
 
@@ -86,4 +147,3 @@
   </script>
 </body>
 </html>
-
