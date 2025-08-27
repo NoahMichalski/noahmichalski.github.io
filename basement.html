@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Moisture Fleet Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { background:#0e1525; color:#fff; font-family:Arial,sans-serif; margin:20px; }
+    h1 { margin-bottom:20px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
+    .card {
+      background:#1c2333; border-radius:10px; padding:15px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative;
+    }
+    .status {
+      position:absolute; top:10px; right:10px;
+      padding:4px 10px; border-radius:6px; font-weight:bold;
+    }
+    .ok { background:#1e7d32; }
+    .warn { background:#e69500; }
+    .alert { background:#c62828; }
+    h2 { font-size:16px; margin:0 0 10px; }
+    .metrics { display:flex; justify-content:space-between; margin:10px 0; }
+    .metric { text-align:center; }
+    .metric span { display:block; font-size:20px; font-weight:bold; }
+    .notes { font-size:12px; color:#aaa; margin-top:5px; }
+    .updated { font-size:11px; color:#888; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <h1>Basement Humidity — Fleet Dashboard</h1>
+  <div class="grid" id="cards"></div>
+
+  <script>
+    const { createClient } = supabase;
+    const supabaseUrl = "https://imsqijcraukqqopntsmc.supabase.co";
+    const supabaseKey = "YOUR_ANON_KEY"; // put your anon key here
+    const db = createClient(supabaseUrl, supabaseKey);
+
+    function getStatus(humidity) {
+      if (humidity < 65) return {text:"OK", class:"ok"};
+      if (humidity < 75) return {text:"WARN", class:"warn"};
+      return {text:"ALERT", class:"alert"};
+    }
+
+    async function loadData() {
+      const { data, error } = await db
+        .from("sensor_logs")
+        .select("*")
+        .order("datetime", { ascending: false });
+
+      if (error) { console.error(error); return; }
+
+      // group latest per device
+      const latest = {};
+      data.forEach(row => {
+        if (!latest[row.device_id]) latest[row.device_id] = row;
+      });
+
+      const container = document.getElementById("cards");
+      container.innerHTML = "";
+
+      Object.values(latest).forEach(row => {
+        const status = getStatus(row.humidity);
+        const updated = new Date(row.datetime).toLocaleString();
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="status ${status.class}">${status.text}</div>
+          <h2>Lot ${row.device_id} • Builder • Subdivision</h2>
+          <div class="metrics">
+            <div class="metric"><span>${row.humidity}%</span>Humidity</div>
+            <div class="metric"><span>${row.temp_f}°F</span>Temp</div>
+            <div class="metric"><span>${row.dewpoint_f}°F</span>Dew Pt</div>
+          </div>
+          <div class="notes">Notes: TBD</div>
+          <div class="updated">Updated: ${updated}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    loadData();
+    setInterval(loadData, 60000);
+  </script>
+</body>
+</html>
