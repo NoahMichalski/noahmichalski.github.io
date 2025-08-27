@@ -5,6 +5,7 @@
   <title>Moisture Fleet Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
   <style>
     body { background:#0e1525; color:#fff; font-family:Arial,sans-serif; margin:20px; }
     h1 { margin-bottom:20px; }
@@ -25,11 +26,17 @@
     .metric { text-align:center; }
     .metric span { display:block; font-size:20px; font-weight:bold; }
     .notes { font-size:12px; color:#aaa; margin-top:5px; }
-    .updated { font-size:11px; color:#888; margin-top:8px; }
+    .updated, .installed { font-size:11px; color:#888; margin-top:8px; }
     .details { display:none; margin-top:10px; background:#0f172a; padding:10px; border-radius:8px; }
     table { width:100%; border-collapse:collapse; font-size:12px; margin-bottom:10px; }
     th, td { border:1px solid #444; padding:4px; text-align:center; }
     th { background:#222; }
+    .filters { margin:10px 0; }
+    .filters button {
+      margin-right:5px; padding:5px 10px; border:none; border-radius:4px;
+      background:#1c3c5a; color:#fff; cursor:pointer;
+    }
+    .filters button:hover { background:#2d5b85; }
   </style>
 </head>
 <body>
@@ -49,7 +56,6 @@
     }
 
     async function loadData() {
-      // try full join first
       let { data, error } = await db
         .from("sensor_logs")
         .select(`
@@ -62,22 +68,14 @@
             lot_number,
             subdivision,
             builder,
-            notes
+            notes,
+            installed_on
           )
         `)
         .order("datetime", { ascending: false });
 
-      // fallback if join fails
-      if (error) {
-        console.warn("Join failed, falling back to sensor_logs only:", error.message);
-        const fallback = await db
-          .from("sensor_logs")
-          .select("device_id, datetime, temp_f, humidity, dewpoint_f")
-          .order("datetime", { ascending: false });
-        data = fallback.data;
-      }
+      if (error) { console.error(error); return; }
 
-      // pick latest per device
       const latest = {};
       data.forEach(row => {
         if (!latest[row.device_id]) latest[row.device_id] = row;
@@ -89,6 +87,9 @@
       for (const [id, row] of Object.entries(latest)) {
         const status = getStatus(row.humidity);
         const updated = new Date(row.datetime).toLocaleString();
+        const installDate = row.devices?.installed_on 
+            ? new Date(row.devices.installed_on).toLocaleDateString()
+            : "Unknown";
 
         const lot = row.devices?.lot_number || row.device_id;
         const subdivision = row.devices?.subdivision || "Unknown Subdivision";
@@ -106,14 +107,21 @@
             <div class="metric"><span>${row.dewpoint_f}°F</span>Dew Pt</div>
           </div>
           <div class="notes">Notes: ${notes}</div>
+          <div class="installed">Installed: ${installDate}</div>
           <div class="updated">Updated: ${updated}</div>
           <div id="details-${row.device_id}" class="details">
-            <h3>Recent Logs</h3>
+            <h3>History</h3>
+            <div class="filters">
+              <button onclick="loadHistory('${row.device_id}', '1h')">1h</button>
+              <button onclick="loadHistory('${row.device_id}', '1d')">1d</button>
+              <button onclick="loadHistory('${row.device_id}', '1w')">1w</button>
+              <button onclick="loadHistory('${row.device_id}', '1m')">1m</button>
+            </div>
             <table>
               <thead><tr><th>Time</th><th>Temp</th><th>Humidity</th><th>Dew Pt</th></tr></thead>
               <tbody id="log-${row.device_id}"></tbody>
             </table>
-            <canvas id="chart-${row.device_id}" height="150"></canvas>
+            <canvas id="chart-${row.device_id}" height="200"></canvas>
           </div>
         `;
         card.onclick = () => toggleDetails(row.device_id);
@@ -121,30 +129,28 @@
       }
     }
 
-    async function toggleDetails(deviceId) {
-      const details = document.getElementById("details-" + deviceId);
-      if (details.style.display === "block") {
-        details.style.display = "none";
-        return;
-      }
-      details.style.display = "block";
+    async function loadHistory(deviceId, range="1d") {
+      let since = new Date();
+      if (range === "1h") since.setHours(since.getHours() - 1);
+      if (range === "1d") since.setDate(since.getDate() - 1);
+      if (range === "1w") since.setDate(since.getDate() - 7);
+      if (range === "1m") since.setMonth(since.getMonth() - 1);
 
       const { data, error } = await db
         .from("sensor_logs")
         .select("*")
         .eq("device_id", deviceId)
-        .order("datetime", { ascending: false })
-        .limit(20);
+        .gte("datetime", since.toISOString())
+        .order("datetime", { ascending: true });
 
       if (error) { console.error(error); return; }
 
-      // Fill table
       const tbody = document.getElementById("log-" + deviceId);
       tbody.innerHTML = "";
       data.forEach(r => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${new Date(r.datetime).toLocaleTimeString()}</td>
+          <td>${new Date(r.datetime).toLocaleString()}</td>
           <td>${r.temp_f}°F</td>
           <td>${r.humidity}%</td>
           <td>${r.dewpoint_f}°F</td>
@@ -152,24 +158,55 @@
         tbody.appendChild(tr);
       });
 
-      // Chart
       const ctx = document.getElementById("chart-" + deviceId).getContext("2d");
-      new Chart(ctx, {
+      if (window["chart_" + deviceId]) {
+        window["chart_" + deviceId].destroy();
+      }
+
+      window["chart_" + deviceId] = new Chart(ctx, {
         type: "line",
         data: {
-          labels: data.map(r => new Date(r.datetime).toLocaleTimeString()).reverse(),
           datasets: [
-            { label: "Temp (°F)", data: data.map(r => r.temp_f).reverse(), borderColor: "red" },
-            { label: "Humidity (%)", data: data.map(r => r.humidity).reverse(), borderColor: "blue" },
-            { label: "Dew Pt (°F)", data: data.map(r => r.dewpoint_f).reverse(), borderColor: "green" }
+            {
+              label: "Temp (°F)",
+              data: data.map(r => ({ x: r.datetime, y: r.temp_f })),
+              borderColor: "red",
+              tension: 0.3
+            },
+            {
+              label: "Humidity (%)",
+              data: data.map(r => ({ x: r.datetime, y: r.humidity })),
+              borderColor: "blue",
+              tension: 0.3
+            },
+            {
+              label: "Dew Pt (°F)",
+              data: data.map(r => ({ x: r.datetime, y: r.dewpoint_f })),
+              borderColor: "green",
+              tension: 0.3
+            }
           ]
         },
         options: {
           responsive: true,
-          plugins:{legend:{labels:{color:"#fff"}}},
-          scales:{ x:{ticks:{color:"#ccc"}}, y:{ticks:{color:"#ccc"}} }
+          interaction: { mode: "nearest", intersect: false },
+          plugins: { legend: { labels: { color: "#fff" } } },
+          scales: {
+            x: {
+              type: "time",
+              time: { unit: range === "1h" ? "minute" : range === "1d" ? "hour" : "day" },
+              ticks: { color: "#ccc" }
+            },
+            y: { ticks: { color: "#ccc" } }
+          }
         }
       });
+    }
+
+    function toggleDetails(deviceId) {
+      const details = document.getElementById("details-" + deviceId);
+      details.style.display = (details.style.display === "block") ? "none" : "block";
+      if (details.style.display === "block") loadHistory(deviceId, "1d");
     }
 
     loadData();
