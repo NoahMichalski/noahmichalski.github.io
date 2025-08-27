@@ -39,7 +39,7 @@
   <script>
     const { createClient } = supabase;
     const supabaseUrl = "https://imsqijcraukqqopntsmc.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc3FpamNyYXVrcXFvcG50c21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNjQ2NzIsImV4cCI6MjA3MTg0MDY3Mn0.kT7uJbbyEYo-nvrg973B8BLfXmPU5rmcB1bh_ZIXIdM";  // paste anon key here
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc3FpamNyYXVrcXFvcG50c21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNjQ2NzIsImV4cCI6MjA3MTg0MDY3Mn0.kT7uJbbyEYo-nvrg973B8BLfXmPU5rmcB1bh_ZIXIdM";  // <-- replace with your anon key
     const db = createClient(supabaseUrl, supabaseKey);
 
     function getStatus(humidity) {
@@ -51,7 +51,10 @@
     async function loadData() {
       const { data, error } = await db
         .from("sensor_logs")
-        .select("*")
+        .select(`
+          device_id, datetime, temp_f, humidity, dewpoint_f,
+          devices(lot_number, subdivision, builder, notes)
+        `)
         .order("datetime", { ascending: false });
 
       if (error) { console.error(error); return; }
@@ -69,17 +72,22 @@
         const status = getStatus(row.humidity);
         const updated = new Date(row.datetime).toLocaleString();
 
+        const lot = row.devices?.lot_number || "N/A";
+        const subdivision = row.devices?.subdivision || "Unknown";
+        const builder = row.devices?.builder || "Unknown";
+        const notes = row.devices?.notes || "";
+
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
           <div class="status ${status.class}">${status.text}</div>
-          <h2>Device ${row.device_id}</h2>
+          <h2>Lot ${lot} • ${builder} • ${subdivision}</h2>
           <div class="metrics">
             <div class="metric"><span>${row.humidity}%</span>Humidity</div>
             <div class="metric"><span>${row.temp_f}°F</span>Temp</div>
             <div class="metric"><span>${row.dewpoint_f}°F</span>Dew Pt</div>
           </div>
-          <div class="notes">Notes: (add from devices table)</div>
+          <div class="notes">Notes: ${notes}</div>
           <div class="updated">Updated: ${updated}</div>
           <div id="details-${row.device_id}" class="details">
             <h3>Recent Logs</h3>
@@ -138,12 +146,14 @@
             { label: "Dew Pt (°F)", data: data.map(r => r.dewpoint_f).reverse(), borderColor: "green" }
           ]
         },
-        options: { responsive: true, plugins:{legend:{labels:{color:"#fff"}}}, scales:{ x:{ticks:{color:"#ccc"}}, y:{ticks:{color:"#ccc"}} } }
+        options: {
+          responsive: true,
+          plugins:{legend:{labels:{color:"#fff"}}},
+          scales:{ x:{ticks:{color:"#ccc"}}, y:{ticks:{color:"#ccc"}} }
+        }
       });
     }
 
     loadData();
     setInterval(loadData, 60000);
-  </script>
-</body>
-</html>
+  </script
