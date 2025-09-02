@@ -8,7 +8,13 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
   <style>
     body { background:#0e1525; color:#fff; font-family:system-ui, sans-serif; margin:20px; }
-    h1 { margin-bottom:20px; }
+    h1 { margin-bottom:10px; }
+    #filters { margin-bottom:20px; }
+    #filters button {
+      padding:6px 12px; border:none; border-radius:4px;
+      background:#1c3c5a; color:#fff; cursor:pointer; font-size:13px; margin-right:8px;
+    }
+    #filters button:hover { background:#2d5b85; }
     .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:20px; }
     .card {
       background:#1c2333; border-radius:10px; padding:15px;
@@ -50,6 +56,11 @@
 </head>
 <body>
   <h1>Basement Humidity — Fleet Dashboard</h1>
+  <div id="filters">
+    <button onclick="setFilter('all')">All</button>
+    <button onclick="setFilter('online')">Online Only</button>
+    <button onclick="setFilter('offline')">Offline Only</button>
+  </div>
   <div class="grid" id="cards"></div>
 
   <script>
@@ -59,9 +70,22 @@
     const db = createClient(supabaseUrl, supabaseKey);
 
     const currentRanges = {};
+    let currentFilter = "all";
 
-    function getStatus(humidity) {
-      if (humidity === "--") return { text: "OFFLINE", class: "offline" };
+    function setFilter(mode) {
+      currentFilter = mode;
+      loadData();
+    }
+
+    function getStatus(humidity, lastSeenDate) {
+      if (!lastSeenDate) return { text: "OFFLINE", class: "offline" };
+
+      const now = new Date();
+      const last = new Date(lastSeenDate);
+      const diffHrs = (now - last) / (1000 * 60 * 60);
+
+      if (diffHrs > 2) return { text: "OFFLINE", class: "offline" };
+
       if (humidity < 65) return { text: "OK", class: "ok" };
       if (humidity < 75) return { text: "WARN", class: "warn" };
       return { text: "ALERT", class: "alert" };
@@ -107,7 +131,7 @@
       container.innerHTML = "";
 
       data.forEach(device => {
-        const latestLog = device.sensor_logs?.[0]; // may be undefined
+        const latestLog = device.sensor_logs?.[0];
         const humidity = latestLog?.humidity ?? "--";
         const temp_f = latestLog?.temp_f ?? "--";
         const dewpoint_f = latestLog?.dewpoint_f ?? "--";
@@ -116,7 +140,11 @@
           : "No recent data";
         const lastSeen = timeAgo(latestLog?.datetime);
 
-        const status = getStatus(humidity);
+        const status = getStatus(humidity, latestLog?.datetime);
+
+        // filter logic
+        if (currentFilter === "online" && status.text === "OFFLINE") return;
+        if (currentFilter === "offline" && status.text !== "OFFLINE") return;
 
         const card = document.createElement("div");
         card.className = "card";
