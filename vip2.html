@@ -11,18 +11,6 @@
     #map { width: 100%; height: 100%; }
 
     /* Revision number, top-left */
-#revision-number {
-  position: absolute;
-  bottom: 10px;        /* move down to bottom */
-  left: 50%;           /* center horizontally */
-  transform: translateX(-50%);
-  z-index: 1003;
-  background: rgba(255,255,255,0.8);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.9em;
-  font-family: sans-serif;
-}
 /* Logo, bottom-left */
 #company-logo {
   position: absolute;
@@ -32,17 +20,6 @@
   width: 100px;
   height: auto;
 }
-
-    /* Search Box */
-    .search-box {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1001;
-      width: 90vw;
-      max-width: 360px;
-    }
     #searchInput {
       width: 100%;
       padding: 8px 12px;
@@ -98,29 +75,8 @@
       overflow-y: auto;
       padding: 12px;
     }
-    .legend {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      z-index: 1001;
-      width: 140px;
-      font-size: 0.9em;
-      padding: 12px;
-    }
 
     /* Mobile Adjustments */
-    @media (max-width: 600px) {
-      .builder-toggles {
-        position: fixed;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 95vw;
-        max-height: 35vh;
-        overflow-y: auto;
-        border-radius: 10px 10px 0 0;
-        padding: 16px;
-      }
       .legend { display: none; }
       #toggle-ui-btn { padding: 12px 16px; font-size: 1.1em; }
     }
@@ -148,7 +104,7 @@
   </div>
   <div id="map"></div>
 
-  <div id="revision-number">Revision: 1.10</div>
+  <div id="revision-number">Revision: 1.27</div>
 <img id="company-logo" src="/images/logo-VIP.png" alt="Company Logo" />
 
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -177,8 +133,8 @@
 
     const lotMapLinks = { "Pulte|Abberley Park": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=85575928-6f84-4406-9f8d-d3218f666398&noheader",
   "Pulte|Bloomfield Hills": "https://apps.alpha-vision.com/alphamap/index.html?OLAId=a16b941a-1563-49de-9c54-fdb6ff3c0d00&noheader",
-  "Pulte|Clarkshaw Pulte": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=cec414d9-3a84-47b6-8cf4-ad0e8ac23475&noheader",
-  "Pulte|Glenross Pulte": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=cvaQ4NvhexgNTDjDz5OFxw==&languageId=1&noheader",
+  "Pulte|Clarkshaw": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=cec414d9-3a84-47b6-8cf4-ad0e8ac23475&noheader",
+  "Pulte|Glenross": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=cvaQ4NvhexgNTDjDz5OFxw==&languageId=1&noheader",
   "Pulte|Magnolia Park": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=d441b3d3-7402-4def-a1ad-bd717158e6ca&noheader",
   "Pulte|Price Ponds - Highlands": "https://apps.alpha-vision.com/alphamap/index.html?OLAId=59961067-708e-4a9d-9678-a7b79e180a1b&noheader",
   "Pulte|Price Ponds - Summit": "https://apps.alpha-vision.com/alphamap/index.html?OLAId=59961067-708e-4a9d-9678-a7b79e180a1b&noheader",
@@ -189,9 +145,9 @@
   "Pulte|Amrine": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=e13610c8-5e26-472c-9f02-68c8cb85c52d&noheader",
   "Pulte|Buckstone": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=7688b61a-6e78-4926-b849-d663ae7cdc40&noheader",
   "Pulte|Clover": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=bdfb5c90-b41a-499d-85f7-8f0a3fd7353e&noheader",
-  "Pulte|Jerome Village Pulte": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=zy8++jmMizMjwzpl/0/Uqg==&languageId=1&noheader",
+  "Pulte|Jerome Village": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=zy8++jmMizMjwzpl/0/Uqg==&languageId=1&noheader",
   "Pulte|Nelson": "https://apps.alpha-vision.com/alphamap/index.html?OLAId=c5186305-93b5-4604-adc7-906089e01cbb&noheader",
-  "Pulte|Berlin Bluffs Pulte": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=ff5a49ed-6c51-47b6-a08a-33466e3ef5f5&noheader",
+  "Pulte|Berlin Bluffs": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=ff5a49ed-6c51-47b6-a08a-33466e3ef5f5&noheader",
   "Pulte|Carpenters": "No Map",
   "Pulte|Scotts": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=4bd4b403-ca26-48dd-91cb-a758779b5a58&noheader",
   "Pulte|Limestone": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=0f0ba731-49dc-4c78-a1c5-5e6c955a572f&noheader",
@@ -200,15 +156,21 @@
   "Pulte|Slate Ridge - Retreat": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=789c4754-49c2-4df7-a3e9-d127116f0ec8&noheader",
   "Pulte|Beulah": "https://apps.alpha-vision.com/alphamap/index.html?OLAId=9ba5c959-6408-4eed-9fce-095a799f6e0f&noheader",
   "Pulte|Eagle": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=5165feb2-1dc0-400e-bc67-6ef86ef9237d&noheader",
-  "Pulte|Hyatts Pulte": "No Map",
+  "Pulte|Hyatts": "No Map",
   "Pulte|Maeve": "No Map",
   "Pulte|Pioneer": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=5165feb2-1dc0-400e-bc67-6ef86ef9237d&noheader",
   "Pulte|Towns on the Greenway": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=9c83e5a4-b270-405c-a999-da6055e93748&noheader",
   "Pulte|Jefferson Manor": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=73358755-fd05-4977-876c-fd08e1b84a72&noheader",
+  "Pulte|NorthStar": "No Map",
+  "Pulte|Maygrass": "No Map",
+  "Pulte|Honey Grove": "No Map",                        
   "DR Horton|Brookview": "No Map",
   "DR Horton|Lansdowne": "No Map",
+  "DR Horton|Johnsons Creek": "No Map",
   "DR Horton|Longview": "No Map",
   "DR Horton|Madison Meadows": "No Map",
+  "DR Horton|Villages at Galloway": "No Map",
+  "DR Horton|Villas At Renner Park": "No Map",
   "DR Horton|Maplewood": "https://www.drhorton.com/-/media/drhorton/productcatalog/559-columbus/55968-maplewood-north/maplewood_section_1.png?rev=fca435a8e012414593a0f56dc0d2c66e",
   "DR Horton|Monarch Greene": "No Map",
   "DR Horton|Piatt Preserve": "https://www.drhorton.com/-/media/drhorton/productcatalog/559-columbus/55946-piatt-preserve/piatt_preserve_section_2_web.png?rev=8e59c2009eea4299bd72d6536117b0c6",
@@ -220,13 +182,18 @@
   "DR Horton|Parkview": "No Map",
   "DR Horton|Springer Woods": "https://www.drhorton.com/-/media/drhorton/productcatalog/559-columbus/55929-springer-woods/springer_woods_3_web.png?rev=3689c642190e4e46aeb630fd88d74a2a&hash=E965C9DAD707B9C233D895C0F79DBE26",
   "DR Horton|Chase Landing": "No Map",
+  "DR Horton|Orchard Lakes": "No Map",
+  "DR Horton|Bishop Estates": "No Map",
+  "DR Horton|Sugar Creek": "No Map",
+  "DR Horton|Leasure Farms": "No Map",
+  "DR Horton|Liberty Crossing": "No Map",
   "Ryan|Terra Alta": "No Map",
   "Ryan|Rolling Hills": "No Map",
   "Ryan|Glenross Ryan": "No Map",
+  "Ryan|Addison Farms": "No Map",
   "Ryan|Hyatts Ryan": "No Map",
   "Ryan|Rutherford": "No Map",
   "Epcon|Carr Farms": "https://epconcommunities.lotvue.com/marketing/Carr%20Farms#search",
-  "Epcon|Morse": "No Map",
   "Epcon|Mulberry": "https://epconcommunities.lotvue.com/marketing/Mulberry%20Run/?lot_id=#search",
   "Epcon|White Oaks": "https://epconcommunities.lotvue.com/marketing/White%20Oaks/?lot_id=#search",
   "Epcon|Hyland Meadows": "https://epconcommunities.lotvue.com/marketing/Hyland%20Meadows/?lot_id=#search",
@@ -234,13 +201,14 @@
   "Epcon|Courtyards on Hyatts": "No Map",
   "Rockford|Foxfire": "https://rockfordhomes.lotvue.com/marketing/Foxfire#search",
   "Rockford|HofBauer": "https://rockfordhomes.lotvue.com/marketing/Run%20at%20Hofbauer%20Preserve#search",
-  "Rockford|Jerome Aster Rockford": "https://rockfordhomes.lotvue.com/marketing/Jerome%20Village%20Aster#search",
+  "Rockford|Jerome Aster": "https://rockfordhomes.lotvue.com/marketing/Jerome%20Village%20Aster#search",
   "Rockford|Meadow Grove": "https://rockfordhomes.lotvue.com/marketing/Meadow%20Grove%20Estates%20North#search",
   "Rockford|Willowbend": "https://rockfordhomes.lotvue.com/marketing/Willow%20Bend#search",
   "Rockford|Hazelton Crossing": "https://rockfordhomes.lotvue.com/marketing/Ponds%20at%20Hazelton%20Crossing#search",
   "Rockford|Mitchell Highlands": "https://rockfordhomes.lotvue.com/marketing/Mitchell%20Highlands#collapse_body_salesstatus",
   "Rockford|Jerome Village Meadowlark": "https://rockfordhomes.lotvue.com/marketing/Jerome%20Village%20Meadowlark#places",
-  "3 Pillar|Jerome Village 3 Pillar": "No Map",
+  "Rockford|Ayrshire Farms": "No Map",
+  "3 Pillar|Jerome Village": "No Map",
   "3 Pillar|Eversole Woods": "No Map",
   "MI Homes|Pinnacle": "https://www.mihomes.com/new-homes/ohio/central-ohio/grove-city/pinnacle-quarry/Plat%20Map",
   "MI Homes|Browns Farm": "https://www.mihomes.com/new-homes/ohio/central-ohio/grove-city/browns-farm/Plat%20Map",
@@ -254,11 +222,11 @@
   "MI Homes|Winterbrooke": "https://www.mihomes.com/new-homes/ohio/central-ohio/lewis-center/winterbrooke-place/Plat%20Map",
   "MI Homes|Miller Farm": "https://www.mihomes.com/new-homes/ohio/central-ohio/galena/miller-farm/Plat%20Map",
   "MI Homes|WoodCrest": "https://www.mihomes.com/new-homes/ohio/central-ohio/powell/woodcrest-crossing/Plat%20Map",
-  "MI Homes|Berlin Farm MI Homes": "https://www.mihomes.com/new-homes/ohio/central-ohio/delaware/berlin-farm/Plat%20Map",
+  "MI Homes|Berlin Farm": "https://www.mihomes.com/new-homes/ohio/central-ohio/delaware/berlin-farm/Plat%20Map",
   "MI Homes|Hyland Glen": "https://www.mihomes.com/new-homes/ohio/central-ohio/dublin/hyland-glen/Plat%20Map",
   "MI Homes|Spring Hill Farm": "https://www.mihomes.com/new-homes/ohio/central-ohio/reynoldsburg/spring-hill-farm/Plat%20Map",
   "Shottenstein|Renner": "https://schottensteinhomes.com/wp-content/uploads/2024/04/Map-for-Renner-Park-Proof.png",
-  "Shottenstein|Jerome Aster Schottenstein": "https://schottensteinhomes.com/wp-content/uploads/2024/09/Aster-View-Available-Lots.png",
+  "Shottenstein|Jerome Aster": "https://schottensteinhomes.com/wp-content/uploads/2024/09/Aster-View-Available-Lots.png",
   "Shottenstein|Holton": "https://schottensteinhomes.com/wp-content/uploads/2024/04/SH_Holton-Run_Map-1-pdf.jpg",
   "Shottenstein|Cottages At Verbana": "https://schottensteinhomes.com/wp-content/uploads/2022/12/cottages-at-verbena-siteplan.jpg",
   "Shottenstein|Glacier Pointe": "https://schottensteinhomes.com/wp-content/uploads/2024/09/Glacier-Pointe-View-Available-Lots.png",
@@ -269,12 +237,11 @@
   "Bob Webb|Liberty Bluff": "https://bobwebb.com/wp-content/uploads/2025/01/Liberty-Bluff-Community-Map-1.6.2025.jpg.webp",
                         };
     const markerData = [ 
-  ["VIP","Home Office","6407 Nicholas Dr",40.087852,-83.063193],
-  ["VIP","DO NOT USE","1110 Claycraft Rd, Gahanna, OH 43230",39.992860,-82.843525],
+  ["VIP","Home Office","1110 Claycraft Rd, Gahanna, OH 43230",39.992860,-82.843525],
   ["Pulte","Abberley Park","3384 Abberley Drive, New Albany, OH 43054",40.052873,-82.816503],
   ["Pulte","Bloomfield Hills","5002 Roese Ave, South Bloomfield, OH 43103",39.708129,-82.988884],
-  ["Pulte","Clarkshaw Pulte","3411 Tender Avenue, Powell, OH 43065",40.223191,-83.104699],
-  ["Pulte","Glenross Pulte","106 E Wind Rd, Delaware, OH 43015",40.236117,-83.020358],
+  ["Pulte","Clarkshaw","3411 Tender Avenue, Powell, OH 43065",40.223191,-83.104699],
+  ["Pulte","Glenross","106 E Wind Rd, Delaware, OH 43015",40.236117,-83.020358],
   ["Pulte","Magnolia Park","582 Weatherby Drive Sunbury , OH 43074",40.245373, -82.883716],
   ["Pulte","Price Ponds - Highlands","1026 Ping Lane, Sunbury, OH 43074",40.244527, -82.885731],
   ["Pulte","Price Ponds - Summit ","953 Mill Stone Dr, Sunbury, OH 43074",40.244204, -82.886893],
@@ -285,9 +252,9 @@
   ["Pulte","Amrine","334 Amrine Wy, Marysville, OH 43040",40.270238,-83.371765],
   ["Pulte","Buckstone","4918 Ranger Dr, Lockbourne, OH 43137",39.856655,-82.967935],
   ["Pulte","Clover","40 Reneau Ave, Galloway, OH 43119",39.949993,-83.161864],
-  ["Pulte","Jerome Village Pulte","8768 Apricot Wy, Plain City, OH 43064",40.187687,-83.189026],
+  ["Pulte","Jerome Village","8768 Apricot Wy, Plain City, OH 43064",40.187687,-83.189026],
   ["Pulte","Nelson","2538 Nelson Ln, Delaware, OH 43015",40.208450,-83.084053],
-  ["Pulte","Berlin Bluffs Pulte","2651 Cleo St, Delaware, OH 43015",40.244850,-82.997809],
+  ["Pulte","Berlin Bluffs","2651 Cleo St, Delaware, OH 43015",40.244850,-82.997809],
   ["Pulte","Carpenters","4448 Ruppert Trl, Powell, OH 43065",40.185143,-83.111785],
   ["Pulte","Scotts","9556 Burghley Dr, Plain City, OH 43064",40.154941,-83.214898],
   ["Pulte","Limestone","101 Franks Field Dr, Delaware, OH 43015",40.302692,-83.122495],
@@ -296,12 +263,18 @@
   ["Pulte","Slate Ridge - Retreat","1121 Oldcastle Road, Lewis Center, OH 43035",40.193908,-83.018517],
   ["Pulte","Beulah","3655 Glacial Ln, Grove City, OH 43123",39.889952,-83.104556],
   ["Pulte","Eagle","7002 Crown Drive, Galena, OH 43021",40.249897,-82.938333],
-  ["Pulte","Hyatts Pulte","6176 Bishop Blvd, Powell, OH 43065",40.214810,-83.098683],
+  ["Pulte","Hyatts","6176 Bishop Blvd, Powell, OH 43065",40.214810,-83.098683],
   ["Pulte","Maeve","2598 McKenna Dr, Delaware, OH 43015",40.236883,-83.005326],
   ["Pulte","Pioneer","9569 Coach Line Ave, Plain City, OH 43064",40.150438,-83.237856],
   ["Pulte","Towns on the Greenway","337 Hockberry Ave, Westerville, OH 43081",40.134287,-82.942262],
   ["Pulte","Jefferson Manor","8488 Ben Hale Ct, Blacklick, OH 43004",40.036095,-82.787034],
+  ["Pulte","NorthStar","Wilson Rd, Sunbury, OH 43074",40.281729,-82.896846],
+  ["Pulte","Maygrass","Mitchell-Dewitt Road, Plain City OH, 43064",40.140561, -83.228528],
+  ["Pulte","Honey Grove","",40.283643,-82.894916],
   ["DR Horton","Brookview","6541 Pfeifer Ash Dr, Canal Winchester, OH 43110",39.877261,-82.821450],
+  ["DR Horton","Johnsons Creek","1128 Stratford Way, London, OH 43140",39.913494,-83.437509],
+  ["DR Horton","Villas At Renner Park","1486 Cardinez Way, Columbus, OH 43228",39.980788, -83.176207],
+  ["DR Horton","Orchard Lakes","7055 Royalton Ridge Avenue, Canal Winchester, OH 43110",39.866083,-82.809752],
   ["DR Horton","Lansdowne","4213 Sycamore Oak Avenue, Canal Winchester, OH 43110",39.892490,-82.835370],
   ["DR Horton","Longview","102 Cedarhurst Ct, Pickerington, OH 43147",39.897680,-82.789797],
   ["DR Horton","Madison Meadows","403 Madison Wy, Plain City, OH 43064",40.103927,-83.287352],
@@ -316,27 +289,33 @@
   ["DR Horton","Parkview","557 Park Vista Dr, Delaware, OH 43015 ",40.317609,-83.092585],
   ["DR Horton","Springer Woods","693 Penwell Dr, Delaware, OH 43015 ",40.310277,-83.120107],
   ["DR Horton","Chase Landing","6351 Ballast Rd, Galloway, OH 43119 ",39.918362,-83.163537],
+  ["DR Horton","Villages at Galloway","6365 Bellmouth Rd, Galloway, OH 43119 ",39.917887,-83.165329],
+  ["DR Horton","Bishop Estates","1105 Dayton Ave NW, Washington Court House, OH 43160 ",39.537536,-83.455934],
+  ["DR Horton","Sugar Creek","27 Darbyshire Dr, Jeffersonville, OH 43128 ",39.653289,-83.576828],
+  ["DR Horton","Leasure Farms","3870 Frazeysburg Rd, Zanesville, OH 43701 ",39.997650, -82.035303],
+  ["DR Horton","Liberty Crossing","8040 Newark Rd, Mt Vernon, OH 43050 ",40.350467, -82.473826],
   ["Ryan","Terra Alta","581 Pisa Lp, Delaware, OH 43015",40.268005,-83.051701],
+  ["Ryan","Addison Farms","50 Allenhurst Way, Delaware, OH 43015",40.322743,-83.085124],
   ["Ryan","Rolling Hills","1503 Cypress Pt Dr, Sunbury, OH 43074",40.240643,-82.891371],
   ["Ryan","Glenross Ryan","191 Sycamore Ln, Delaware, OH 43015",40.236517,-83.019782],
-  ["Ryan","Hyatts Ryan","250 Alicia Kelton Dr, Delaware, OH 43015",40.215079,-83.041020],
+  ["Ryan","Hyatts","250 Alicia Kelton Dr, Delaware, OH 43015",40.215079,-83.041020],
   ["Ryan","Rutherford","572 Rutherford Ave, Delaware, OH 43015",40.320409,-83.088637],
   ["Epcon","Hyland Meadows","8027 Grassland Dr, Plain City, OH 43064",40.189891,-83.191183],
   ["Epcon","Carr Farms","5755 Arcadian Ave, Hilliard, OH 43026",40.051380,-83.170284],
-  ["Epcon","Morse","3347 Duette Dr, New Albany, OH 43054",40.052234,-82.816331],
   ["Epcon","Mulberry","4416 Marilyn Ct, Grove City, OH 43123",39.871459,-83.056351],
   ["Epcon","White Oaks","8400 Ryan Pkwy, Plain City, OH 43064",40.166178,-83.192868],
   ["Epcon","Hyatts Village","3372 Hyatts Rd, Powell, OH 43065",40.217600,-83.108500],
   ["Epcon","Courtyards on Hyatts","3200 Korg St, Powell, OH 43065",40.217012,-83.099814],
   ["Rockford","Foxfire","440 Bethpage Blvd, Commercial Point, OH 43116",39.777874, -83.029083],
   ["Rockford","HofBauer","2223 Ashby Wy, Plain City, OH 43064",40.114270,-83.269355],
-  ["Rockford","Jerome Aster Rockford","6981 Aster Wy, Plain City, OH 43064",40.194037, -83.172143],
+  ["Rockford","Jerome Aster","6981 Aster Wy, Plain City, OH 43064",40.194037, -83.172143],
   ["Rockford","Meadow Grove","1813 Silverlawn Dr, Grove City, OH 43123",39.849346,-83.052656],
   ["Rockford","Willowbend","228 Willow Bnd Dr, Newark, OH 43055",40.047837,-82.485522],
   ["Rockford","Hazelton Crossing","208 Scotsgrove Drive, Pataskala, OH 43062",39.972371,-82.678359],
   ["Rockford","Mitchell Highlands","9511 Camberly Avenue Plain City, Ohio 43064",40.148096,-83.226260],
   ["Rockford","Jerome Village Meadowlark","8868 Meadowlark Drive Plain City, Ohio 43064",40.187822,-83.208990],
-  ["3 Pillar","Jerome Village 3 Pillar","11451 Winterberry Dr, Plain City, OH 43064",40.178976,-83.192238],
+  ["Rockford","Ayrshire Farms","6195 Lockroy Dr, Dublin, OH 43016",40.092646, -83.185798],
+  ["3 Pillar","Jerome Village","11451 Winterberry Dr, Plain City, OH 43064",40.178976,-83.192238],
   ["3 Pillar","Eversole Woods","11451 Winterberry Drive, Plain City, OH 43064",40.179464,-83.187045],
   ["MI Homes","Pinnacle","899 Heimat Haus Dr, Grove City, OH 43123",39.866539,-83.028943],
   ["MI Homes","Browns Farm","3215 Farmhouse Ln, Grove City, OH 43123",39.857121,-83.089867],
@@ -350,11 +329,11 @@
   ["MI Homes","Winterbrooke","43 Sienna Glenn Dr, Lewis Center, OH 43035",40.229418,-83.021288],
   ["MI Homes","Miller Farm","2799 Sunbury Rd, Galena, OH 43021",40.212932,-82.871836],
   ["MI Homes","WoodCrest","6443 Bluejay Rdg Dr, Powell, OH 43065",40.222632,-83.114473],
-  ["MI Homes","Berlin Farm MI Homes","2651 Cleo St, Delaware, OH 43015",40.240546,-83.004182],
+  ["MI Homes","Berlin Farm","2651 Cleo St, Delaware, OH 43015",40.240546,-83.004182],
   ["MI Homes","Hyland Glen","6986 Stillhouse Ln, Dublin, OH 43016",40.114383,-83.175554],
   ["MI Homes","Spring Hill Farm","7820 Oldham Dr., Reynoldsburg, OH 43068",39.972910,-82.792604],
   ["Shottenstein","Renner","6186 Renner Park Drive, Columbus, OH 43228",39.982893,-83.173465],
-  ["Shottenstein","Jerome Aster Schottenstein","6971 Aster Way, Plain City, OH 43064",40.194037,-83.172143],
+  ["Shottenstein","Jerome Aster","6971 Aster Way, Plain City, OH 43064",40.194037,-83.172143],
   ["Shottenstein","Holton","3600 Whirla Way, Grove City, OH",39.858200,-83.098300],
   ["Shottenstein","Cottages At Verbana","11738 Verbena Place, Plain City, OH 43064",40.184323,-83.200862],
   ["Shottenstein","Glacier Pointe","8798 Eliot Drive, Plain City, OH 43064",40.147034,-83.205445],
@@ -390,7 +369,11 @@
       const matches = markers.filter(m => m.name.toLowerCase().includes(query));
       matches.forEach(m => {
         const li = document.createElement('li');
-        li.textContent = m.name;
+        li.className = 'search-item';
+li.innerHTML = `
+  <span><b>${m.name}</b></span>
+  <span class="builder">${m.builder}</span>
+`;
         li.addEventListener('mousedown', () => {
           searchInput.value = m.name;
           searchResults.innerHTML = '';
@@ -411,9 +394,20 @@
         const lotHtml = lotLink && lotLink !== 'No Map'
           ? `<a href="${lotLink}" target="_blank" style="display:block;margin-bottom:6px;">View Lot Map</a>`
           : `<div style="margin-bottom:6px;font-style:italic;">No lot map available</div>`;
-        let popup = L.popup().setLatLng([lat, lon]).setContent(
-          `<b>${name}</b><br>${lotHtml}<a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="text-decoration:underline;">${addr}</a><br><strong>Closest:</strong><div id="nearest-list">Loading...</div>`
-        ).openOn(map);
+        let popup = L.popup()
+  .setLatLng([lat, lon])
+  .setContent(
+    `<div style="text-align:center;">
+       <span class="builder-pill">${builder}</span><br>
+       <b>${name}</b><br>
+     </div>
+     ${lotHtml}
+     <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}"
+        target="_blank" style="text-decoration:underline;">${addr}</a>
+     <br><strong>Closest:</strong>
+     <div id="nearest-list">Loading...</div>`
+  )
+  .openOn(map);
         (async () => {
           const withRoute = await Promise.all(nearest.map(async d => {
             const base = `https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${d.lon},${d.lat}`;
@@ -431,7 +425,16 @@
             listHtml += `<li data-index="${i}" style="cursor:pointer;color:${col};margin-bottom:4px;">${d.name} - ${mins} min (${miles} mi)</li>`;
           });
           listHtml += '</ul>';
-          popup.setContent(`<b>${name}</b><br>${lotHtml}<a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}" target="_blank" style="text-decoration:underline;">${addr}</a><br><strong>Closest:</strong>${listHtml}`);
+          popup.setContent(
+  `<div style="text-align:center;">
+     <span class="builder-pill">${builder}</span><br>
+     <b>${name}</b><br>
+   </div>
+   ${lotHtml}
+   <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lon}"
+      target="_blank" style="text-decoration:underline;">${addr}</a>
+   <br><strong>Closest:</strong>${listHtml}`
+);
           document.querySelectorAll('#nearest-list li').forEach(li => li.addEventListener('click', () => {
             routeLayer.clearLayers();
             const d = withRoute[li.dataset.index];
@@ -462,3 +465,11 @@
   </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
