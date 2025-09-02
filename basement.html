@@ -2,13 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Humidity Temp Dashboard</title>
+  <title>Moisture Fleet Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
   <style>
     body { background:#0e1525; color:#fff; font-family:system-ui, sans-serif; margin:20px; }
-    h1 { margin-bottom:20px; }
+    h1 { margin-bottom:10px; }
+    #filters { margin-bottom:20px; }
+    #filters button {
+      padding:6px 12px; border:none; border-radius:4px;
+      background:#1c3c5a; color:#fff; cursor:pointer; font-size:13px; margin-right:8px;
+    }
+    #filters button:hover { background:#2d5b85; }
     .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:20px; }
     .card {
       background:#1c2333; border-radius:10px; padding:15px;
@@ -21,12 +27,13 @@
     .ok { background:#1e7d32; }
     .warn { background:#e69500; }
     .alert { background:#c62828; }
+    .offline { background:#555; }
     h2 { font-size:16px; margin:0 0 10px; }
     .metrics { display:flex; justify-content:space-between; margin:10px 0; }
     .metric { text-align:center; }
     .metric span { display:block; font-size:20px; font-weight:bold; }
     .notes { font-size:12px; color:#aaa; margin-top:5px; }
-    .updated, .installed { font-size:11px; color:#888; margin-top:8px; }
+    .updated, .installed, .lastseen { font-size:11px; color:#888; margin-top:5px; }
     .details { margin-top:10px; background:#0f172a; padding:10px; border-radius:8px; }
     .filters { margin:10px 0; display:flex; flex-wrap:wrap; gap:6px; }
     .filters button {
@@ -44,29 +51,16 @@
     table { width:100%; border-collapse:collapse; font-size:12px; }
     th, td { border:1px solid #444; padding:4px; text-align:center; }
     th { background:#222; position:sticky; top:0; }
-    .chart-container {
-      display:block; /* always visible */
-      margin-top:10px;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 600px) {
-      body { margin:10px; font-size:14px; }
-      .card { padding:10px; }
-      h2 { font-size:14px; }
-      .metric span { font-size:16px; }
-      .scroll-table { max-height:150px; }
-      table { font-size:11px; }
-    }
-    @media (max-width: 400px) {
-      h1 { font-size:18px; }
-      .metric span { font-size:14px; }
-      .filters button { font-size:11px; padding:5px; }
-    }
+    .chart-container { display:block; margin-top:10px; }
   </style>
 </head>
 <body>
-  <h1>Basement Humidity Dashboard</h1>
+  <h1>Basement Humidity — Fleet Dashboard</h1>
+  <div id="filters">
+    <button onclick="setFilter('all')">All</button>
+    <button onclick="setFilter('online')">Online Only</button>
+    <button onclick="setFilter('offline')">Offline Only</button>
+  </div>
   <div class="grid" id="cards"></div>
 
   <script>
@@ -76,92 +70,122 @@
     const db = createClient(supabaseUrl, supabaseKey);
 
     const currentRanges = {};
+    let currentFilter = "all";
 
-    function getStatus(humidity) {
-      if (humidity < 65) return {text:"OK", class:"ok"};
-      if (humidity < 75) return {text:"WARN", class:"warn"};
-      return {text:"ALERT", class:"alert"};
+    function setFilter(mode) {
+      currentFilter = mode;
+      loadData();
+    }
+
+    function getStatus(humidity, lastSeenDate) {
+      if (!lastSeenDate) return { text: "OFFLINE", class: "offline" };
+
+      const now = new Date();
+      const last = new Date(lastSeenDate);
+      const diffHrs = (now - last) / (1000 * 60 * 60);
+
+      if (diffHrs > 2) return { text: "OFFLINE", class: "offline" };
+
+      if (humidity < 65) return { text: "OK", class: "ok" };
+      if (humidity < 75) return { text: "WARN", class: "warn" };
+      return { text: "ALERT", class: "alert" };
+    }
+
+    function timeAgo(dateStr) {
+      if (!dateStr) return "Never";
+      const now = new Date();
+      const date = new Date(dateStr);
+      const diffMs = now - date;
+      const diffMin = Math.floor(diffMs / 60000);
+
+      if (diffMin < 1) return "just now";
+      if (diffMin < 60) return `${diffMin}m ago`;
+      const diffHrs = Math.floor(diffMin / 60);
+      if (diffHrs < 24) return `${diffHrs}h ago`;
+      const diffDays = Math.floor(diffHrs / 24);
+      return `${diffDays}d ago`;
     }
 
     async function loadData() {
       let { data, error } = await db
-        .from("sensor_logs")
+        .from("devices")
         .select(`
-          device_id,
-          datetime,
-          temp_f,
-          humidity,
-          dewpoint_f,
-          devices!sensor_logs_device_id_fkey (
-            lot_number,
-            subdivision,
-            builder,
-            notes,
-            installed_on
+          id,
+          lot_number,
+          subdivision,
+          builder,
+          notes,
+          installed_on,
+          sensor_logs (
+            datetime,
+            temp_f,
+            humidity,
+            dewpoint_f
           )
         `)
-        .order("datetime", { ascending: false });
+        .order("datetime", { foreignTable: "sensor_logs", ascending: false });
 
       if (error) { console.error(error); return; }
-
-      const latest = {};
-      data.forEach(row => { if (!latest[row.device_id]) latest[row.device_id] = row; });
 
       const container = document.getElementById("cards");
       container.innerHTML = "";
 
-      for (const [id, row] of Object.entries(latest)) {
-        const status = getStatus(row.humidity);
-        const updated = new Date(row.datetime).toLocaleString();
-        const installDate = row.devices?.installed_on 
-            ? new Date(row.devices.installed_on).toLocaleDateString()
-            : "Unknown";
+      data.forEach(device => {
+        const latestLog = device.sensor_logs?.[0];
+        const humidity = latestLog?.humidity ?? "--";
+        const temp_f = latestLog?.temp_f ?? "--";
+        const dewpoint_f = latestLog?.dewpoint_f ?? "--";
+        const updated = latestLog?.datetime 
+          ? new Date(latestLog.datetime).toLocaleString()
+          : "No recent data";
+        const lastSeen = timeAgo(latestLog?.datetime);
 
-        const lot = row.devices?.lot_number || row.device_id;
-        const subdivision = row.devices?.subdivision || "Unknown Subdivision";
-        const builder = row.devices?.builder || "Unknown Builder";
-        const notes = row.devices?.notes || "";
+        const status = getStatus(humidity, latestLog?.datetime);
+
+        // filter logic
+        if (currentFilter === "online" && status.text === "OFFLINE") return;
+        if (currentFilter === "offline" && status.text !== "OFFLINE") return;
 
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
           <div class="status ${status.class}">${status.text}</div>
-          <h2>Lot ${lot} • ${builder} • ${subdivision}</h2>
+          <h2>Lot ${device.lot_number || device.id} • ${device.builder || "Unknown"} • ${device.subdivision || "Unknown"}</h2>
           <div class="metrics">
-            <div class="metric"><span>${row.humidity}%</span>Humidity</div>
-            <div class="metric"><span>${row.temp_f}°F</span>Temp</div>
-            <div class="metric"><span>${row.dewpoint_f}°F</span>Dew Pt</div>
+            <div class="metric"><span>${humidity}%</span>Humidity</div>
+            <div class="metric"><span>${temp_f}°F</span>Temp</div>
+            <div class="metric"><span>${dewpoint_f}°F</span>Dew Pt</div>
           </div>
-          <div class="notes">Notes: ${notes}</div>
-          <div class="installed">Installed: ${installDate}</div>
+          <div class="notes">Notes: ${device.notes || ""}</div>
+          <div class="installed">Installed: ${device.installed_on ? new Date(device.installed_on).toLocaleDateString() : "Unknown"}</div>
           <div class="updated">Updated: ${updated}</div>
-          <div id="details-${row.device_id}" class="details" style="display:block;">
+          <div class="lastseen">Last Seen: ${lastSeen}</div>
+          <div class="details">
             <h3>History</h3>
             <div class="filters">
-              <button onclick="event.stopPropagation(); loadHistory('${row.device_id}', '1d')">1d</button>
-              <button onclick="event.stopPropagation(); loadHistory('${row.device_id}', '1w')">1w</button>
-              <button onclick="event.stopPropagation(); loadHistory('${row.device_id}', '1m')">1m</button>
-              <button onclick="event.stopPropagation(); loadHistory('${row.device_id}', '3m')">3m</button>
-              <button onclick="event.stopPropagation(); loadHistory('${row.device_id}', 'all')">All</button>
-              <button onclick="event.stopPropagation(); downloadLogs('${row.device_id}')">⬇ CSV</button>
-              <button class="retire" onclick="event.stopPropagation(); retireDevice('${row.device_id}')">🗑 Retire</button>
+              <button onclick="loadHistory('${device.id}', '1d')">1d</button>
+              <button onclick="loadHistory('${device.id}', '1w')">1w</button>
+              <button onclick="loadHistory('${device.id}', '1m')">1m</button>
+              <button onclick="loadHistory('${device.id}', '3m')">3m</button>
+              <button onclick="loadHistory('${device.id}', 'all')">All</button>
+              <button onclick="downloadLogs('${device.id}')">⬇ CSV</button>
+              <button class="retire" onclick="retireDevice('${device.id}')">🗑 Retire</button>
             </div>
             <div class="scroll-table">
               <table>
                 <thead><tr><th>Time</th><th>Temp</th><th>Humidity</th><th>Dew Pt</th></tr></thead>
-                <tbody id="log-${row.device_id}"></tbody>
+                <tbody id="log-${device.id}"></tbody>
               </table>
             </div>
             <div class="chart-container">
-              <canvas id="chart-${row.device_id}" height="200"></canvas>
+              <canvas id="chart-${device.id}" height="200"></canvas>
             </div>
           </div>
         `;
         container.appendChild(card);
 
-        // Load history right away (default 1d)
-        loadHistory(row.device_id, "1d");
-      }
+        if (latestLog) loadHistory(device.id, "1d");
+      });
     }
 
     async function loadHistory(deviceId, range="1d") {
@@ -295,5 +319,3 @@
   </script>
 </body>
 </html>
-
-
