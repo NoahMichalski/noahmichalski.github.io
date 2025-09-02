@@ -20,6 +20,7 @@
       background:#1c2333; border-radius:10px; padding:15px;
       box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative;
     }
+    .card.offline-card { background:#2a2a2a; opacity:0.7; }
     .status {
       position:absolute; top:10px; right:10px;
       padding:4px 10px; border-radius:6px; font-weight:bold;
@@ -34,6 +35,7 @@
     .metric span { display:block; font-size:20px; font-weight:bold; }
     .notes { font-size:12px; color:#aaa; margin-top:5px; }
     .updated, .installed, .lastseen { font-size:11px; color:#888; margin-top:5px; }
+    .extremes { font-size:11px; color:#ccc; margin-top:8px; }
     .details { margin-top:10px; background:#0f172a; padding:10px; border-radius:8px; }
     .filters { margin:10px 0; display:flex; flex-wrap:wrap; gap:6px; }
     .filters button {
@@ -148,6 +150,8 @@
 
         const card = document.createElement("div");
         card.className = "card";
+        if (status.text === "OFFLINE") card.classList.add("offline-card");
+
         card.innerHTML = `
           <div class="status ${status.class}">${status.text}</div>
           <h2>Lot ${device.lot_number || device.id} • ${device.builder || "Unknown"} • ${device.subdivision || "Unknown"}</h2>
@@ -160,6 +164,7 @@
           <div class="installed">Installed: ${device.installed_on ? new Date(device.installed_on).toLocaleDateString() : "Unknown"}</div>
           <div class="updated">Updated: ${updated}</div>
           <div class="lastseen">Last Seen: ${lastSeen}</div>
+          <div id="extremes-${device.id}" class="extremes">No data yet</div>
           <div class="details">
             <h3>History</h3>
             <div class="filters">
@@ -220,6 +225,24 @@
         tbody.appendChild(tr);
       });
 
+      // update extremes
+      if (data.length > 0) {
+        const highTemp = data.reduce((a,b) => a.temp_f > b.temp_f ? a : b);
+        const lowTemp = data.reduce((a,b) => a.temp_f < b.temp_f ? a : b);
+        const highHum = data.reduce((a,b) => a.humidity > b.humidity ? a : b);
+        const lowHum = data.reduce((a,b) => a.humidity < b.humidity ? a : b);
+
+        document.getElementById("extremes-" + deviceId).innerHTML = `
+          <div>High Temp: ${highTemp.temp_f}°F (${new Date(highTemp.datetime).toLocaleString()})</div>
+          <div>Low Temp: ${lowTemp.temp_f}°F (${new Date(lowTemp.datetime).toLocaleString()})</div>
+          <div>High Humidity: ${highHum.humidity}% (${new Date(highHum.datetime).toLocaleString()})</div>
+          <div>Low Humidity: ${lowHum.humidity}% (${new Date(lowHum.datetime).toLocaleString()})</div>
+        `;
+      } else {
+        document.getElementById("extremes-" + deviceId).innerHTML = "No data yet";
+      }
+
+      // chart
       const ctx = document.getElementById("chart-" + deviceId).getContext("2d");
       if (window["chart_" + deviceId]) window["chart_" + deviceId].destroy();
 
