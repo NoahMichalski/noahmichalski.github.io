@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Moisture Fleet Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
   <style>
     body { background:#0e1525; color:#fff; font-family:system-ui, sans-serif; margin:20px; }
     h1 { margin-bottom:10px; }
@@ -13,7 +15,7 @@
       background:#1c3c5a; color:#fff; cursor:pointer; font-size:13px; margin-right:8px;
     }
     #filters button:hover { background:#2d5b85; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:20px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(380px,1fr)); gap:20px; }
     .card {
       background:#1c2333; border-radius:10px; padding:15px;
       box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative;
@@ -28,8 +30,54 @@
     .alert { background:#c62828; }
     .offline { background:#555; }
     h2 { font-size:16px; margin:0 0 10px; }
-    .editable { margin:4px 0; }
-    .editable button { margin-left:6px; font-size:11px; cursor:pointer; }
+    .metrics { display:flex; justify-content:space-between; margin:10px 0; }
+    .metric { text-align:center; }
+    .metric span { display:block; font-size:20px; font-weight:bold; }
+    .notes, .installed, .updated, .lastseen, .extremes { font-size:12px; margin-top:4px; }
+    .extremes { color:#ccc; }
+    .details { margin-top:10px; background:#0f172a; padding:10px; border-radius:8px; }
+    .filters { margin:10px 0; display:flex; flex-wrap:wrap; gap:6px; }
+    .filters button {
+      padding:6px 10px; border:none; border-radius:4px;
+      background:#1c3c5a; color:#fff; cursor:pointer; font-size:13px;
+    }
+    .filters button:hover { background:#2d5b85; }
+    .filters .retire { background:#a83232; }
+    .filters .retire:hover { background:#d64545; }
+    .scroll-table {
+      max-height:200px;
+      overflow-y:auto;
+      display:block;
+    }
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    th, td { border:1px solid #444; padding:4px; text-align:center; }
+    th { background:#222; position:sticky; top:0; }
+    .chart-container { display:block; margin-top:10px; }
+    .edit-btn {
+      margin-top:6px; padding:6px 10px; border:none; border-radius:4px;
+      background:#444; color:#fff; cursor:pointer; font-size:12px;
+    }
+    .edit-btn:hover { background:#666; }
+
+    /* Modal Styles */
+    .modal {
+      display:none; position:fixed; z-index:1000; left:0; top:0;
+      width:100%; height:100%; background:rgba(0,0,0,0.6);
+      align-items:center; justify-content:center;
+    }
+    .modal-content {
+      background:#1c2333; padding:20px; border-radius:10px;
+      width:300px; color:#fff;
+    }
+    .modal-content h3 { margin-top:0; }
+    .modal-content label { display:block; margin:8px 0 4px; }
+    .modal-content input { width:100%; padding:6px; border-radius:4px; border:1px solid #444; background:#0f172a; color:#fff; }
+    .modal-content button {
+      margin-top:10px; padding:6px 12px; border:none; border-radius:4px;
+      cursor:pointer; font-size:13px;
+    }
+    .modal-save { background:#1e7d32; color:#fff; }
+    .modal-cancel { background:#555; color:#fff; margin-left:8px; }
   </style>
 </head>
 <body>
@@ -41,12 +89,27 @@
   </div>
   <div class="grid" id="cards"></div>
 
+  <!-- Popup Modal -->
+  <div id="edit-modal" class="modal">
+    <div class="modal-content">
+      <h3>Edit Device</h3>
+      <input type="hidden" id="edit-id">
+      <label>Lot: <input id="edit-lot"></label>
+      <label>Builder: <input id="edit-builder"></label>
+      <label>Subdivision: <input id="edit-subdivision"></label>
+      <label>Notes: <input id="edit-notes"></label>
+      <button class="modal-save" onclick="saveEdit()">Save</button>
+      <button class="modal-cancel" onclick="closeEditForm()">Cancel</button>
+    </div>
+  </div>
+
   <script>
     const { createClient } = supabase;
     const supabaseUrl = "https://imsqijcraukqqopntsmc.supabase.co";
     const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc3FpamNyYXVrcXFvcG50c21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNjQ2NzIsImV4cCI6MjA3MTg0MDY3Mn0.kT7uJbbyEYo-nvrg973B8BLfXmPU5rmcB1bh_ZIXIdM"; // replace with anon key
     const db = createClient(supabaseUrl, supabaseKey);
 
+    const currentRanges = {};
     let currentFilter = "all";
 
     function setFilter(mode) {
@@ -56,12 +119,10 @@
 
     function getStatus(humidity, lastSeenDate) {
       if (!lastSeenDate) return { text: "OFFLINE", class: "offline" };
-
       const now = new Date();
       const last = new Date(lastSeenDate);
       const diffHrs = (now - last) / (1000 * 60 * 60);
       if (diffHrs > 2) return { text: "OFFLINE", class: "offline" };
-
       if (humidity < 65) return { text: "OK", class: "ok" };
       if (humidity < 75) return { text: "WARN", class: "warn" };
       return { text: "ALERT", class: "alert" };
@@ -85,18 +146,12 @@
       let { data, error } = await db
         .from("devices")
         .select(`
-          id,
-          lot_number,
-          subdivision,
-          builder,
-          notes,
-          installed_on,
+          id, lot_number, subdivision, builder, notes, installed_on,
           sensor_logs ( datetime, temp_f, humidity, dewpoint_f )
         `)
         .order("datetime", { foreignTable: "sensor_logs", ascending: false });
 
       if (error) { console.error(error); return; }
-
       const container = document.getElementById("cards");
       container.innerHTML = "";
 
@@ -105,12 +160,9 @@
         const humidity = latestLog?.humidity ?? "--";
         const temp_f = latestLog?.temp_f ?? "--";
         const dewpoint_f = latestLog?.dewpoint_f ?? "--";
-        const updated = latestLog?.datetime 
-          ? new Date(latestLog.datetime).toLocaleString()
-          : "No recent data";
+        const updated = latestLog?.datetime ? new Date(latestLog.datetime).toLocaleString() : "No recent data";
         const lastSeen = timeAgo(latestLog?.datetime);
         const status = getStatus(humidity, latestLog?.datetime);
-
         if (currentFilter === "online" && status.text === "OFFLINE") return;
         if (currentFilter === "offline" && status.text !== "OFFLINE") return;
 
@@ -120,54 +172,84 @@
 
         card.innerHTML = `
           <div class="status ${status.class}">${status.text}</div>
-          <h2>
-            Lot: <span id="lot_number-${device.id}">${device.lot_number || "NEW_DEVICE"}</span>
-            <button onclick="editField('${device.id}','lot_number')">✏️</button>
-          </h2>
-          <div class="editable">Builder: <span id="builder-${device.id}">${device.builder || "UNKNOWN_BUILDER"}</span>
-            <button onclick="editField('${device.id}','builder')">✏️</button>
-          </div>
-          <div class="editable">Subdivision: <span id="subdivision-${device.id}">${device.subdivision || "UNKNOWN_SUBDIVISION"}</span>
-            <button onclick="editField('${device.id}','subdivision')">✏️</button>
-          </div>
-          <div class="editable">Notes: <span id="notes-${device.id}">${device.notes || ""}</span>
-            <button onclick="editField('${device.id}','notes')">✏️</button>
-          </div>
-          <div class="editable">Installed: ${device.installed_on ? new Date(device.installed_on).toLocaleDateString() : "Unknown"}</div>
-          <div class="editable">Updated: ${updated}</div>
-          <div class="editable">Last Seen: ${lastSeen}</div>
+          <h2>Lot: ${device.lot_number || "NEW_DEVICE"}</h2>
+          <div>Builder: ${device.builder || "UNKNOWN_BUILDER"}</div>
+          <div>Subdivision: ${device.subdivision || "UNKNOWN_SUBDIVISION"}</div>
+          <div class="notes">Notes: ${device.notes || ""}</div>
+          <div class="installed">Installed: ${device.installed_on ? new Date(device.installed_on).toLocaleDateString() : "Unknown"}</div>
+          <div class="updated">Updated: ${updated}</div>
+          <div class="lastseen">Last Seen: ${lastSeen}</div>
           <div class="metrics">
-            <div><b>${humidity}%</b><br/>Humidity</div>
-            <div><b>${temp_f}°F</b><br/>Temp</div>
-            <div><b>${dewpoint_f}°F</b><br/>Dew Pt</div>
+            <div class="metric"><span>${humidity}%</span>Humidity</div>
+            <div class="metric"><span>${temp_f}°F</span>Temp</div>
+            <div class="metric"><span>${dewpoint_f}°F</span>Dew Pt</div>
+          </div>
+          <div id="extremes-${device.id}" class="extremes">No data yet</div>
+          <button class="edit-btn" onclick="openEditForm('${device.id}','${device.lot_number||""}','${device.builder||""}','${device.subdivision||""}','${device.notes||""}')">Edit Device</button>
+          <div class="details">
+            <h3>History</h3>
+            <div class="filters">
+              <button onclick="loadHistory('${device.id}', '1d')">1d</button>
+              <button onclick="loadHistory('${device.id}', '1w')">1w</button>
+              <button onclick="loadHistory('${device.id}', '1m')">1m</button>
+              <button onclick="loadHistory('${device.id}', '3m')">3m</button>
+              <button onclick="loadHistory('${device.id}', 'all')">All</button>
+              <button onclick="downloadLogs('${device.id}')">⬇ CSV</button>
+              <button class="retire" onclick="retireDevice('${device.id}')">🗑 Retire</button>
+            </div>
+            <div class="scroll-table"><table><thead><tr><th>Time</th><th>Temp</th><th>Humidity</th><th>Dew Pt</th></tr></thead><tbody id="log-${device.id}"></tbody></table></div>
+            <div class="chart-container"><canvas id="chart-${device.id}" height="200"></canvas></div>
           </div>
         `;
         container.appendChild(card);
+        if (latestLog) loadHistory(device.id, "1d");
       });
     }
 
-    async function editField(deviceId, field) {
-      const current = document.getElementById(field + "-" + deviceId).innerText;
-      const newValue = prompt(`Update ${field}:`, current);
-
-      if (newValue === null) return;
-
-      let { error } = await db
-        .from("devices")
-        .update({ [field]: newValue })
-        .eq("id", deviceId);
-
-      if (error) {
-        alert("Error updating " + field);
-        console.error(error);
-        return;
+    async function loadHistory(deviceId, range="1d") {
+      let since = new Date();
+      if (range==="1d") since.setDate(since.getDate()-1);
+      if (range==="1w") since.setDate(since.getDate()-7);
+      if (range==="1m") since.setMonth(since.getMonth()-1);
+      if (range==="3m") since.setMonth(since.getMonth()-3);
+      let query = db.from("sensor_logs").select("*").eq("device_id",deviceId).order("datetime",{ascending:true});
+      if(range!=="all") query=query.gte("datetime",since.toISOString());
+      const { data, error } = await query; if(error){console.error(error);return;}
+      const tbody=document.getElementById("log-"+deviceId); tbody.innerHTML="";
+      data.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${new Date(r.datetime).toLocaleString()}</td><td>${r.temp_f}°F</td><td>${r.humidity}%</td><td>${r.dewpoint_f}°F</td>`;tbody.appendChild(tr);});
+      if(data.length>0){
+        const highTemp=data.reduce((a,b)=>a.temp_f>b.temp_f?a:b);
+        const lowTemp=data.reduce((a,b)=>a.temp_f<b.temp_f?a:b);
+        const highHum=data.reduce((a,b)=>a.humidity>b.humidity?a:b);
+        const lowHum=data.reduce((a,b)=>a.humidity<b.humidity?a:b);
+        document.getElementById("extremes-"+deviceId).innerHTML=`
+          <div>High Temp: ${highTemp.temp_f}°F (${new Date(highTemp.datetime).toLocaleString()})</div>
+          <div>Low Temp: ${lowTemp.temp_f}°F (${new Date(lowTemp.datetime).toLocaleString()})</div>
+          <div>High Humidity: ${highHum.humidity}% (${new Date(highHum.datetime).toLocaleString()})</div>
+          <div>Low Humidity: ${lowHum.humidity}% (${new Date(lowHum.datetime).toLocaleString()})</div>`;
       }
-
-      document.getElementById(field + "-" + deviceId).innerText = newValue;
     }
 
-    loadData();
-    setInterval(loadData, 60000);
+    function openEditForm(id, lot, builder, subdivision, notes) {
+      document.getElementById("edit-id").value = id;
+      document.getElementById("edit-lot").value = lot;
+      document.getElementById("edit-builder").value = builder;
+      document.getElementById("edit-subdivision").value = subdivision;
+      document.getElementById("edit-notes").value = notes;
+      document.getElementById("edit-modal").style.display = "flex";
+    }
+    function closeEditForm() { document.getElementById("edit-modal").style.display = "none"; }
+    async function saveEdit() {
+      const id=document.getElementById("edit-id").value;
+      const lot=document.getElementById("edit-lot").value;
+      const builder=document.getElementById("edit-builder").value;
+      const subdivision=document.getElementById("edit-subdivision").value;
+      const notes=document.getElementById("edit-notes").value;
+      let { error } = await db.from("devices").update({lot_number:lot,builder:builder,subdivision:subdivision,notes:notes}).eq("id",id);
+      if(error){alert("Error updating device");console.error(error);}else{closeEditForm();loadData();}
+    }
+
+    loadData(); setInterval(loadData,60000);
   </script>
 </body>
 </html>
