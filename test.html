@@ -6,7 +6,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0/dist/chartjs-plugin-annotation.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
     body { background:#0e1525; color:#fff; font-family:system-ui, sans-serif; margin:20px; }
     h1 { margin-bottom:10px; }
@@ -17,15 +17,9 @@
     }
     #filters button:hover { background:#2d5b85; }
     .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:15px; }
-    .card {
-      background:#1c2333; border-radius:10px; padding:12px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative; font-size:13px;
-    }
+    .card { background:#1c2333; border-radius:10px; padding:12px; box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative; font-size:13px; }
     .card.offline-card { background:#2a2a2a; opacity:0.7; }
-    .status {
-      position:absolute; top:10px; right:10px;
-      padding:4px 10px; border-radius:6px; font-weight:bold; font-size:12px;
-    }
+    .status { position:absolute; top:10px; right:10px; padding:4px 10px; border-radius:6px; font-weight:bold; font-size:12px; }
     .ok { background:#1e7d32; }
     .warn { background:#e69500; }
     .alert { background:#c62828; }
@@ -37,42 +31,21 @@
     .extremes { color:#ccc; }
     .details { margin-top:8px; background:#0f172a; padding:8px; border-radius:8px; }
     .filters { margin:6px 0; display:flex; flex-wrap:wrap; gap:6px; }
-    .filters button {
-      padding:4px 8px; border:none; border-radius:4px;
-      background:#1c3c5a; color:#fff; cursor:pointer; font-size:12px;
-    }
+    .filters button { padding:4px 8px; border:none; border-radius:4px; background:#1c3c5a; color:#fff; cursor:pointer; font-size:12px; }
     .filters .retire { background:#a83232; }
-    .scroll-table {
-      max-height:150px;
-      overflow-y:auto;
-      display:block;
-      font-size:11px;
-    }
+    .scroll-table { max-height:150px; overflow-y:auto; display:block; font-size:11px; }
     table { width:100%; border-collapse:collapse; }
     th, td { border:1px solid #444; padding:3px; text-align:center; }
     th { background:#222; position:sticky; top:0; }
     .chart-tabs { display:flex; gap:6px; margin-top:8px; }
-    .chart-tabs button {
-      flex:1; padding:4px; font-size:12px;
-      border:none; border-radius:4px; background:#1c3c5a; color:#fff; cursor:pointer;
-    }
+    .chart-tabs button { flex:1; padding:4px; font-size:12px; border:none; border-radius:4px; background:#1c3c5a; color:#fff; cursor:pointer; }
     .chart-tabs button.active { background:#2d5b85; }
     .chart-container { margin-top:6px; display:none; }
     .chart-container.active { display:block; }
-    .edit-btn {
-      margin-top:6px; padding:4px 8px; border:none; border-radius:4px;
-      background:#444; color:#fff; cursor:pointer; font-size:12px;
-    }
+    .edit-btn { margin-top:6px; padding:4px 8px; border:none; border-radius:4px; background:#444; color:#fff; cursor:pointer; font-size:12px; }
     /* Modal */
-    .modal {
-      display:none; position:fixed; z-index:1000; left:0; top:0;
-      width:100%; height:100%; background:rgba(0,0,0,0.6);
-      align-items:center; justify-content:center;
-    }
-    .modal-content {
-      background:#1c2333; padding:15px; border-radius:10px;
-      width:280px; color:#fff; font-size:13px;
-    }
+    .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; }
+    .modal-content { background:#1c2333; padding:15px; border-radius:10px; width:280px; color:#fff; font-size:13px; }
     .modal-content label { display:block; margin:6px 0 2px; }
     .modal-content input { width:100%; padding:5px; border-radius:4px; border:1px solid #444; background:#0f172a; color:#fff; }
     .modal-content button { margin-top:10px; padding:6px 12px; border:none; border-radius:4px; cursor:pointer; font-size:12px; }
@@ -206,6 +179,8 @@
       if(range!=="all") query=query.gte("datetime",since.toISOString());
       const { data, error } = await query; if(error){console.error(error);return;}
 
+      console.log("Building charts for", deviceId, "with", data.length, "points");
+
       // Table
       const tbody=document.getElementById("log-"+deviceId); tbody.innerHTML="";
       data.forEach(r=>{
@@ -230,11 +205,10 @@
       // Build charts
       function buildChart(containerId, label, dataset, color, threshold, thresholdLabel) {
         const ctx=document.querySelector(`#${containerId} canvas`).getContext("2d");
-
         if (window[containerId] && typeof window[containerId].destroy === "function") {
           window[containerId].destroy();
         }
-
+        console.log("Drawing chart", containerId, "with", dataset.length, "points");
         window[containerId]=new Chart(ctx,{
           type:"line",
           data:{ datasets:[{label, data:dataset, borderColor:color, tension:0.3}] },
@@ -266,8 +240,6 @@
         document.getElementById(`chart-${t}-${deviceId}`).classList.remove("active");
       });
       document.getElementById(`chart-${type}-${deviceId}`).classList.add("active");
-      const buttons = document.querySelectorAll(`#chart-${type}-${deviceId}`).parentElement.querySelectorAll(".chart-tabs button");
-      buttons.forEach(btn => btn.classList.remove("active"));
     }
 
     function openEditForm(id, lot, builder, subdivision, notes) {
