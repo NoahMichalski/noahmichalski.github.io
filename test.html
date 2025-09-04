@@ -6,6 +6,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
     body { background:#0e1525; color:#fff; font-family:system-ui, sans-serif; margin:20px; }
     h1 { margin-bottom:10px; }
@@ -15,49 +16,53 @@
       background:#1c3c5a; color:#fff; cursor:pointer; font-size:13px; margin-right:8px;
     }
     #filters button:hover { background:#2d5b85; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(380px,1fr)); gap:20px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:15px; }
     .card {
-      background:#1c2333; border-radius:10px; padding:15px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative;
+      background:#1c2333; border-radius:10px; padding:12px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative; font-size:13px;
     }
     .card.offline-card { background:#2a2a2a; opacity:0.7; }
     .status {
       position:absolute; top:10px; right:10px;
-      padding:4px 10px; border-radius:6px; font-weight:bold;
+      padding:4px 10px; border-radius:6px; font-weight:bold; font-size:12px;
     }
     .ok { background:#1e7d32; }
     .warn { background:#e69500; }
     .alert { background:#c62828; }
     .offline { background:#555; }
-    h2 { font-size:16px; margin:0 0 10px; }
-    .metrics { display:flex; justify-content:space-between; margin:10px 0; }
-    .metric { text-align:center; }
-    .metric span { display:block; font-size:20px; font-weight:bold; }
-    .notes, .installed, .updated, .lastseen, .extremes { font-size:12px; margin-top:4px; }
+    h2 { font-size:15px; margin:0 0 8px; }
+    .metrics { display:flex; justify-content:space-between; margin:8px 0; }
+    .metric span { display:block; font-size:18px; font-weight:bold; }
+    .notes, .installed, .updated, .lastseen, .extremes { font-size:11px; margin-top:3px; }
     .extremes { color:#ccc; }
-    .details { margin-top:10px; background:#0f172a; padding:10px; border-radius:8px; }
-    .filters { margin:10px 0; display:flex; flex-wrap:wrap; gap:6px; }
+    .details { margin-top:8px; background:#0f172a; padding:8px; border-radius:8px; }
+    .filters { margin:6px 0; display:flex; flex-wrap:wrap; gap:6px; }
     .filters button {
-      padding:6px 10px; border:none; border-radius:4px;
-      background:#1c3c5a; color:#fff; cursor:pointer; font-size:13px;
+      padding:4px 8px; border:none; border-radius:4px;
+      background:#1c3c5a; color:#fff; cursor:pointer; font-size:12px;
     }
-    .filters button:hover { background:#2d5b85; }
     .filters .retire { background:#a83232; }
-    .filters .retire:hover { background:#d64545; }
     .scroll-table {
-      max-height:200px;
+      max-height:150px;
       overflow-y:auto;
       display:block;
+      font-size:11px;
     }
-    table { width:100%; border-collapse:collapse; font-size:12px; }
-    th, td { border:1px solid #444; padding:4px; text-align:center; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { border:1px solid #444; padding:3px; text-align:center; }
     th { background:#222; position:sticky; top:0; }
-    .chart-container { display:block; margin-top:10px; }
+    .chart-tabs { display:flex; gap:6px; margin-top:8px; }
+    .chart-tabs button {
+      flex:1; padding:4px; font-size:12px;
+      border:none; border-radius:4px; background:#1c3c5a; color:#fff; cursor:pointer;
+    }
+    .chart-tabs button.active { background:#2d5b85; }
+    .chart-container { margin-top:6px; display:none; }
+    .chart-container.active { display:block; }
     .edit-btn {
-      margin-top:6px; padding:6px 10px; border:none; border-radius:4px;
+      margin-top:6px; padding:4px 8px; border:none; border-radius:4px;
       background:#444; color:#fff; cursor:pointer; font-size:12px;
     }
-    .edit-btn:hover { background:#666; }
     /* Modal */
     .modal {
       display:none; position:fixed; z-index:1000; left:0; top:0;
@@ -65,16 +70,12 @@
       align-items:center; justify-content:center;
     }
     .modal-content {
-      background:#1c2333; padding:20px; border-radius:10px;
-      width:300px; color:#fff;
+      background:#1c2333; padding:15px; border-radius:10px;
+      width:280px; color:#fff; font-size:13px;
     }
-    .modal-content h3 { margin-top:0; }
-    .modal-content label { display:block; margin:8px 0 4px; }
-    .modal-content input { width:100%; padding:6px; border-radius:4px; border:1px solid #444; background:#0f172a; color:#fff; }
-    .modal-content button {
-      margin-top:10px; padding:6px 12px; border:none; border-radius:4px;
-      cursor:pointer; font-size:13px;
-    }
+    .modal-content label { display:block; margin:6px 0 2px; }
+    .modal-content input { width:100%; padding:5px; border-radius:4px; border:1px solid #444; background:#0f172a; color:#fff; }
+    .modal-content button { margin-top:10px; padding:6px 12px; border:none; border-radius:4px; cursor:pointer; font-size:12px; }
     .modal-save { background:#1e7d32; color:#fff; }
     .modal-cancel { background:#555; color:#fff; margin-left:8px; }
   </style>
@@ -108,7 +109,6 @@
     const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc3FpamNyYXVrcXFvcG50c21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNjQ2NzIsImV4cCI6MjA3MTg0MDY3Mn0.kT7uJbbyEYo-nvrg973B8BLfXmPU5rmcB1bh_ZIXIdM"; // replace with anon key
     const db = createClient(supabaseUrl, supabaseKey);
 
-    const currentRanges = {};
     let currentFilter = "all";
 
     function setFilter(mode) {
@@ -125,20 +125,6 @@
       if (humidity < 65) return { text: "OK", class: "ok" };
       if (humidity < 75) return { text: "WARN", class: "warn" };
       return { text: "ALERT", class: "alert" };
-    }
-
-    function timeAgo(dateStr) {
-      if (!dateStr) return "Never";
-      const now = new Date();
-      const date = new Date(dateStr);
-      const diffMs = now - date;
-      const diffMin = Math.floor(diffMs / 60000);
-      if (diffMin < 1) return "just now";
-      if (diffMin < 60) return `${diffMin}m ago`;
-      const diffHrs = Math.floor(diffMin / 60);
-      if (diffHrs < 24) return `${diffHrs}h ago`;
-      const diffDays = Math.floor(diffHrs / 24);
-      return `${diffDays}d ago`;
     }
 
     async function loadData() {
@@ -160,7 +146,6 @@
         const temp_f = latestLog?.temp_f ?? "--";
         const dewpoint_f = latestLog?.dewpoint_f ?? "--";
         const updated = latestLog?.datetime ? new Date(latestLog.datetime).toLocaleString() : "No recent data";
-        const lastSeen = timeAgo(latestLog?.datetime);
         const status = getStatus(humidity, latestLog?.datetime);
         if (currentFilter === "online" && status.text === "OFFLINE") return;
         if (currentFilter === "offline" && status.text !== "OFFLINE") return;
@@ -177,7 +162,6 @@
           <div class="notes">Notes: ${device.notes || ""}</div>
           <div class="installed">Installed: ${device.installed_on ? new Date(device.installed_on).toLocaleDateString() : "Unknown"}</div>
           <div class="updated">Updated: ${updated}</div>
-          <div class="lastseen">Last Seen: ${lastSeen}</div>
           <div class="metrics">
             <div class="metric"><span>${humidity}%</span>Humidity</div>
             <div class="metric"><span>${temp_f}°F</span>Temp</div>
@@ -194,16 +178,21 @@
               <button onclick="loadHistory('${device.id}', '3m')">3m</button>
               <button onclick="loadHistory('${device.id}', 'all')">All</button>
             </div>
+            <div class="chart-tabs">
+              <button onclick="showChart('${device.id}','hum')" class="active">Humidity</button>
+              <button onclick="showChart('${device.id}','temp')">Temp</button>
+              <button onclick="showChart('${device.id}','dew')">Dew Pt</button>
+            </div>
+            <div id="chart-hum-${device.id}" class="chart-container active"><canvas></canvas></div>
+            <div id="chart-temp-${device.id}" class="chart-container"><canvas></canvas></div>
+            <div id="chart-dew-${device.id}" class="chart-container"><canvas></canvas></div>
             <div class="scroll-table"><table><thead><tr><th>Time</th><th>Temp</th><th>Humidity</th><th>Dew Pt</th></tr></thead><tbody id="log-${device.id}"></tbody></table></div>
-            <div class="chart-container"><canvas id="chart-hum-${device.id}" height="150"></canvas></div>
-            <div class="chart-container"><canvas id="chart-temp-${device.id}" height="150"></canvas></div>
-            <div class="chart-container"><canvas id="chart-dew-${device.id}" height="150"></canvas></div>
             <button onclick="downloadLogs('${device.id}')">⬇ CSV</button>
             <button class="retire" onclick="retireDevice('${device.id}')">🗑 Retire</button>
           </div>
         `;
         container.appendChild(card);
-        if (latestLog) loadHistory(device.id, "1d");
+        if (latestLog) loadHistory(device.id,"1d");
       });
     }
 
@@ -238,11 +227,11 @@
           <div>Low Humidity: ${lowHum.humidity}% (${new Date(lowHum.datetime).toLocaleString()})</div>`;
       }
 
-      // Charts
-      function buildChart(canvasId, label, dataset, color, threshold, thresholdLabel) {
-        const ctx=document.getElementById(canvasId).getContext("2d");
-        if(window[canvasId]) window[canvasId].destroy();
-        window[canvasId]=new Chart(ctx,{
+      // Build charts
+      function buildChart(containerId, label, dataset, color, threshold, thresholdLabel) {
+        const ctx=document.querySelector(`#${containerId} canvas`).getContext("2d");
+        if(window[containerId]) window[containerId].destroy();
+        window[containerId]=new Chart(ctx,{
           type:"line",
           data:{ datasets:[{label, data:dataset, borderColor:color, tension:0.3}] },
           options:{
@@ -266,6 +255,14 @@
       buildChart("chart-hum-"+deviceId,"Humidity (%)",data.map(r=>({x:r.datetime,y:r.humidity})),"blue",75,"75% Threshold");
       buildChart("chart-temp-"+deviceId,"Temperature (°F)",data.map(r=>({x:r.datetime,y:r.temp_f})),"red",85,"85°F Threshold");
       buildChart("chart-dew-"+deviceId,"Dew Point (°F)",data.map(r=>({x:r.datetime,y:r.dewpoint_f})),"green",null,null);
+    }
+
+    function showChart(deviceId, type) {
+      ["hum","temp","dew"].forEach(t=>{
+        document.getElementById(`chart-${t}-${deviceId}`).classList.remove("active");
+        document.querySelector(`#chart-${t}-${deviceId}`).previousElementSibling.classList.remove("active");
+      });
+      document.getElementById(`chart-${type}-${deviceId}`).classList.add("active");
     }
 
     function openEditForm(id, lot, builder, subdivision, notes) {
