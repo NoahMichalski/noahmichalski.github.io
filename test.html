@@ -230,7 +230,11 @@
       // Build charts
       function buildChart(containerId, label, dataset, color, threshold, thresholdLabel) {
         const ctx=document.querySelector(`#${containerId} canvas`).getContext("2d");
-        if(window[containerId]) window[containerId].destroy();
+
+        if (window[containerId] && typeof window[containerId].destroy === "function") {
+          window[containerId].destroy();
+        }
+
         window[containerId]=new Chart(ctx,{
           type:"line",
           data:{ datasets:[{label, data:dataset, borderColor:color, tension:0.3}] },
@@ -260,9 +264,10 @@
     function showChart(deviceId, type) {
       ["hum","temp","dew"].forEach(t=>{
         document.getElementById(`chart-${t}-${deviceId}`).classList.remove("active");
-        document.querySelector(`#chart-${t}-${deviceId}`).previousElementSibling.classList.remove("active");
       });
       document.getElementById(`chart-${type}-${deviceId}`).classList.add("active");
+      const buttons = document.querySelectorAll(`#chart-${type}-${deviceId}`).parentElement.querySelectorAll(".chart-tabs button");
+      buttons.forEach(btn => btn.classList.remove("active"));
     }
 
     function openEditForm(id, lot, builder, subdivision, notes) {
