@@ -27,13 +27,14 @@
     h2 { font-size:15px; margin:0 0 8px; }
     .metrics { display:flex; justify-content:space-between; margin:8px 0; }
     .metric span { display:block; font-size:18px; font-weight:bold; }
-    .notes, .installed, .updated, .lastseen, .extremes { font-size:11px; margin-top:3px; }
+    .notes, .installed, .updated, .extremes { font-size:11px; margin-top:3px; }
     .extremes { color:#ccc; }
     .details { margin-top:8px; background:#0f172a; padding:8px; border-radius:8px; }
     .filters { margin:6px 0; display:flex; flex-wrap:wrap; gap:6px; }
     .filters button { padding:4px 8px; border:none; border-radius:4px; background:#1c3c5a; color:#fff; cursor:pointer; font-size:12px; }
-    .filters .retire { background:#a83232; }
-    .scroll-table { max-height:150px; overflow-y:auto; display:block; font-size:11px; }
+    .filters .retire { background:#c62828; color:#fff; }
+    .filters .retire:hover { background:#e53935; }
+    .scroll-table { max-height:150px; overflow-y:auto; display:block; font-size:11px; margin-top:6px; }
     table { width:100%; border-collapse:collapse; }
     th, td { border:1px solid #444; padding:3px; text-align:center; }
     th { background:#222; position:sticky; top:0; }
@@ -107,6 +108,7 @@
           id, lot_number, subdivision, builder, notes, installed_on,
           sensor_logs ( datetime, temp_f, humidity, dewpoint_f )
         `)
+        .eq("retired", false)
         .order("datetime", { foreignTable: "sensor_logs", ascending: false });
 
       if (error) { console.error(error); return; }
@@ -151,6 +153,12 @@
               <button onclick="loadHistory('${device.id}', '3m')">3m</button>
               <button onclick="loadHistory('${device.id}', 'all')">All</button>
             </div>
+            <div class="scroll-table">
+              <table>
+                <thead><tr><th>Time</th><th>Temp</th><th>Humidity</th><th>Dew Pt</th></tr></thead>
+                <tbody id="log-${device.id}"></tbody>
+              </table>
+            </div>
             <div class="chart-tabs">
               <button onclick="showChart('${device.id}','hum')" class="active">Humidity</button>
               <button onclick="showChart('${device.id}','temp')">Temp</button>
@@ -159,7 +167,6 @@
             <div id="chart-hum-${device.id}" class="chart-container active"><canvas></canvas></div>
             <div id="chart-temp-${device.id}" class="chart-container"><canvas></canvas></div>
             <div id="chart-dew-${device.id}" class="chart-container"><canvas></canvas></div>
-            <div class="scroll-table"><table><thead><tr><th>Time</th><th>Temp</th><th>Humidity</th><th>Dew Pt</th></tr></thead><tbody id="log-${device.id}"></tbody></table></div>
             <button onclick="downloadLogs('${device.id}')">⬇ CSV</button>
             <button class="retire" onclick="retireDevice('${device.id}')">🗑 Retire</button>
           </div>
@@ -179,8 +186,6 @@
       if(range!=="all") query=query.gte("datetime",since.toISOString());
       const { data, error } = await query; if(error){console.error(error);return;}
 
-      console.log("Building charts for", deviceId, "with", data.length, "points");
-
       // Table
       const tbody=document.getElementById("log-"+deviceId); tbody.innerHTML="";
       data.forEach(r=>{
@@ -189,26 +194,12 @@
         tbody.appendChild(tr);
       });
 
-      // Extremes
-      if(data.length>0){
-        const highTemp=data.reduce((a,b)=>a.temp_f>b.temp_f?a:b);
-        const lowTemp=data.reduce((a,b)=>a.temp_f<b.temp_f?a:b);
-        const highHum=data.reduce((a,b)=>a.humidity>b.humidity?a:b);
-        const lowHum=data.reduce((a,b)=>a.humidity<b.humidity?a:b);
-        document.getElementById("extremes-"+deviceId).innerHTML=`
-          <div>High Temp: ${highTemp.temp_f}°F (${new Date(highTemp.datetime).toLocaleString()})</div>
-          <div>Low Temp: ${lowTemp.temp_f}°F (${new Date(lowTemp.datetime).toLocaleString()})</div>
-          <div>High Humidity: ${highHum.humidity}% (${new Date(highHum.datetime).toLocaleString()})</div>
-          <div>Low Humidity: ${lowHum.humidity}% (${new Date(lowHum.datetime).toLocaleString()})</div>`;
-      }
-
       // Build charts
       function buildChart(containerId, label, dataset, color, threshold, thresholdLabel) {
         const ctx=document.querySelector(`#${containerId} canvas`).getContext("2d");
         if (window[containerId] && typeof window[containerId].destroy === "function") {
           window[containerId].destroy();
         }
-        console.log("Drawing chart", containerId, "with", dataset.length, "points");
         window[containerId]=new Chart(ctx,{
           type:"line",
           data:{ datasets:[{label, data:dataset, borderColor:color, tension:0.3}] },
@@ -240,6 +231,30 @@
         document.getElementById(`chart-${t}-${deviceId}`).classList.remove("active");
       });
       document.getElementById(`chart-${type}-${deviceId}`).classList.add("active");
+    }
+
+    function downloadLogs(deviceId) {
+      const rows = document.querySelectorAll(`#log-${deviceId} tr`);
+      let csv = "Time,Temp (°F),Humidity (%),Dew Point (°F)\n";
+      rows.forEach(row => {
+        const cols = row.querySelectorAll("td");
+        const rowData = Array.from(cols).map(td => td.innerText).join(",");
+        csv += rowData + "\n";
+      });
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `logs-${deviceId}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function retireDevice(deviceId) {
+      if (!confirm("Are you sure you want to retire this device?")) return;
+      let { error } = await db.from("devices").update({ retired: true }).eq("id", deviceId);
+      if (error) { alert("Error retiring device"); console.error(error); }
+      else { loadData(); }
     }
 
     function openEditForm(id, lot, builder, subdivision, notes) {
