@@ -108,7 +108,6 @@
           id, lot_number, subdivision, builder, notes, installed_on,
           sensor_logs ( datetime, temp_f, humidity, dewpoint_f )
         `)
-        .eq("retired", false)
         .order("datetime", { foreignTable: "sensor_logs", ascending: false });
 
       if (error) { console.error(error); return; }
@@ -186,7 +185,6 @@
       if(range!=="all") query=query.gte("datetime",since.toISOString());
       const { data, error } = await query; if(error){console.error(error);return;}
 
-      // Table
       const tbody=document.getElementById("log-"+deviceId); tbody.innerHTML="";
       data.forEach(r=>{
         const tr=document.createElement("tr");
@@ -194,7 +192,6 @@
         tbody.appendChild(tr);
       });
 
-      // Build charts
       function buildChart(containerId, label, dataset, color, threshold, thresholdLabel) {
         const ctx=document.querySelector(`#${containerId} canvas`).getContext("2d");
         if (window[containerId] && typeof window[containerId].destroy === "function") {
@@ -251,8 +248,8 @@
     }
 
     async function retireDevice(deviceId) {
-      if (!confirm("Are you sure you want to retire this device?")) return;
-      let { error } = await db.from("devices").update({ retired: true }).eq("id", deviceId);
+      if (!confirm("Are you sure you want to retire this device? This will delete it permanently.")) return;
+      let { error } = await db.from("devices").delete().eq("id", deviceId);
       if (error) { alert("Error retiring device"); console.error(error); }
       else { loadData(); }
     }
