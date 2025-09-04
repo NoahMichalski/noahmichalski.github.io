@@ -58,8 +58,7 @@
       background:#444; color:#fff; cursor:pointer; font-size:12px;
     }
     .edit-btn:hover { background:#666; }
-
-    /* Modal Styles */
+    /* Modal */
     .modal {
       display:none; position:fixed; z-index:1000; left:0; top:0;
       width:100%; height:100%; background:rgba(0,0,0,0.6);
@@ -106,7 +105,7 @@
   <script>
     const { createClient } = supabase;
     const supabaseUrl = "https://imsqijcraukqqopntsmc.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc3FpamNyYXVrcXFvcG50c21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNjQ2NzIsImV4cCI6MjA3MTg0MDY3Mn0.kT7uJbbyEYo-nvrg973B8BLfXmPU5rmcB1bh_ZIXIdM"; // replace with anon key
+    const supabaseKey = "YOUR_ANON_KEY_HERE"; // replace with anon key
     const db = createClient(supabaseUrl, supabaseKey);
 
     const currentRanges = {};
@@ -194,11 +193,13 @@
               <button onclick="loadHistory('${device.id}', '1m')">1m</button>
               <button onclick="loadHistory('${device.id}', '3m')">3m</button>
               <button onclick="loadHistory('${device.id}', 'all')">All</button>
-              <button onclick="downloadLogs('${device.id}')">⬇ CSV</button>
-              <button class="retire" onclick="retireDevice('${device.id}')">🗑 Retire</button>
             </div>
             <div class="scroll-table"><table><thead><tr><th>Time</th><th>Temp</th><th>Humidity</th><th>Dew Pt</th></tr></thead><tbody id="log-${device.id}"></tbody></table></div>
-            <div class="chart-container"><canvas id="chart-${device.id}" height="200"></canvas></div>
+            <div class="chart-container"><canvas id="chart-hum-${device.id}" height="150"></canvas></div>
+            <div class="chart-container"><canvas id="chart-temp-${device.id}" height="150"></canvas></div>
+            <div class="chart-container"><canvas id="chart-dew-${device.id}" height="150"></canvas></div>
+            <button onclick="downloadLogs('${device.id}')">⬇ CSV</button>
+            <button class="retire" onclick="retireDevice('${device.id}')">🗑 Retire</button>
           </div>
         `;
         container.appendChild(card);
@@ -215,8 +216,16 @@
       let query = db.from("sensor_logs").select("*").eq("device_id",deviceId).order("datetime",{ascending:true});
       if(range!=="all") query=query.gte("datetime",since.toISOString());
       const { data, error } = await query; if(error){console.error(error);return;}
+
+      // Table
       const tbody=document.getElementById("log-"+deviceId); tbody.innerHTML="";
-      data.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td>${new Date(r.datetime).toLocaleString()}</td><td>${r.temp_f}°F</td><td>${r.humidity}%</td><td>${r.dewpoint_f}°F</td>`;tbody.appendChild(tr);});
+      data.forEach(r=>{
+        const tr=document.createElement("tr");
+        tr.innerHTML=`<td>${new Date(r.datetime).toLocaleString()}</td><td>${r.temp_f}°F</td><td>${r.humidity}%</td><td>${r.dewpoint_f}°F</td>`;
+        tbody.appendChild(tr);
+      });
+
+      // Extremes
       if(data.length>0){
         const highTemp=data.reduce((a,b)=>a.temp_f>b.temp_f?a:b);
         const lowTemp=data.reduce((a,b)=>a.temp_f<b.temp_f?a:b);
@@ -228,6 +237,35 @@
           <div>High Humidity: ${highHum.humidity}% (${new Date(highHum.datetime).toLocaleString()})</div>
           <div>Low Humidity: ${lowHum.humidity}% (${new Date(lowHum.datetime).toLocaleString()})</div>`;
       }
+
+      // Charts
+      function buildChart(canvasId, label, dataset, color, threshold, thresholdLabel) {
+        const ctx=document.getElementById(canvasId).getContext("2d");
+        if(window[canvasId]) window[canvasId].destroy();
+        window[canvasId]=new Chart(ctx,{
+          type:"line",
+          data:{ datasets:[{label, data:dataset, borderColor:color, tension:0.3}] },
+          options:{
+            responsive:true,
+            plugins:{
+              legend:{ labels:{ color:"#fff" } },
+              annotation: threshold ? {
+                annotations:{
+                  line1:{ type:"line", yMin:threshold, yMax:threshold, borderColor:"orange", borderWidth:2,
+                    label:{ content:thresholdLabel, enabled:true, color:"#fff" }}
+                }
+              } : {}
+            },
+            scales:{
+              x:{ type:"time", time:{ unit:(range==="1d"?"hour":"day") }, ticks:{ color:"#ccc" } },
+              y:{ ticks:{ color:"#ccc" } }
+            }
+          }
+        });
+      }
+      buildChart("chart-hum-"+deviceId,"Humidity (%)",data.map(r=>({x:r.datetime,y:r.humidity})),"blue",75,"75% Threshold");
+      buildChart("chart-temp-"+deviceId,"Temperature (°F)",data.map(r=>({x:r.datetime,y:r.temp_f})),"red",85,"85°F Threshold");
+      buildChart("chart-dew-"+deviceId,"Dew Point (°F)",data.map(r=>({x:r.datetime,y:r.dewpoint_f})),"green",null,null);
     }
 
     function openEditForm(id, lot, builder, subdivision, notes) {
