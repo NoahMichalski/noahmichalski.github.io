@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Moisture Fleet Dashboard</title>
+  <title>VIP Basement Humidity Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>
-    body { background:#0e1525; color:#fff; font-family:system-ui, sans-serif; margin:20px; }
+  
+  
+    body { background:#000; color:#fff; font-family:system-ui, sans-serif; margin:20px; }
     h1 { margin-bottom:10px; }
     #filters { margin-bottom:20px; }
     #filters button {
@@ -16,46 +17,66 @@
       background:#1c3c5a; color:#fff; cursor:pointer; font-size:13px; margin-right:8px;
     }
     #filters button:hover { background:#2d5b85; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:15px; }
-    .card { background:#1c2333; border-radius:10px; padding:12px; box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative; font-size:13px; }
-    .card.offline-card { background:#2a2a2a; opacity:0.7; }
-    .status { position:absolute; top:10px; right:10px; padding:4px 10px; border-radius:6px; font-weight:bold; font-size:12px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:20px; }
+    .card {
+      background:#121212; border-radius:10px; padding:15px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative;
+    }
+    .status {
+      position:absolute; top:10px; right:10px;
+      padding:4px 10px; border-radius:6px; font-weight:bold;
+    }
     .ok { background:#1e7d32; }
     .warn { background:#e69500; }
     .alert { background:#c62828; }
     .offline { background:#555; }
-    h2 { font-size:15px; margin:0 0 8px; }
-    .metrics { display:flex; justify-content:space-between; margin:8px 0; }
-    .metric span { display:block; font-size:18px; font-weight:bold; }
-    .notes, .installed, .updated, .extremes { font-size:11px; margin-top:3px; }
-    .extremes { color:#ccc; }
-    .details { margin-top:8px; background:#0f172a; padding:8px; border-radius:8px; }
-    .filters { margin:6px 0; display:flex; flex-wrap:wrap; gap:6px; }
-    .filters button { padding:4px 8px; border:none; border-radius:4px; background:#1c3c5a; color:#fff; cursor:pointer; font-size:12px; }
-    .filters .retire { background:#c62828; color:#fff; }
-    .filters .retire:hover { background:#e53935; }
-    .scroll-table { max-height:150px; overflow-y:auto; display:block; font-size:11px; margin-top:6px; }
-    table { width:100%; border-collapse:collapse; }
-    th, td { border:1px solid #444; padding:3px; text-align:center; }
+    h2 { font-size:16px; margin:0 0 10px; }
+    .metrics { display:flex; justify-content:space-between; margin:10px 0; }
+    .metric { text-align:center; }
+    .metric span { display:block; font-size:20px; font-weight:bold; }
+    .notes { font-size:12px; color:#aaa; margin-top:5px; }
+    .updated, .installed, .lastseen { font-size:11px; color:#888; margin-top:5px; }
+    .details { margin-top:10px; background:#121212; padding:10px; border-radius:8px; }
+    .filters { margin:10px 0; display:flex; flex-wrap:wrap; gap:6px; }
+    .filters button {
+      padding:6px 10px; border:none; border-radius:4px;
+      background:#1c3c5a; color:#fff; cursor:pointer; font-size:13px;
+    }
+    .filters button:hover { background:#2d5b85; }
+    .filters .retire { background:#a83232; }
+    .filters .retire:hover { background:#d64545; }
+    .scroll-table {
+      max-height:200px;
+      overflow-y:auto;
+      display:block;
+    }
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    th, td { border:1px solid #444; padding:4px; text-align:center; }
     th { background:#222; position:sticky; top:0; }
-    .chart-tabs { display:flex; gap:6px; margin-top:8px; }
-    .chart-tabs button { flex:1; padding:4px; font-size:12px; border:none; border-radius:4px; background:#1c3c5a; color:#fff; cursor:pointer; }
-    .chart-tabs button.active { background:#2d5b85; }
-    .chart-container { margin-top:6px; display:none; }
-    .chart-container.active { display:block; }
-    .edit-btn { margin-top:6px; padding:4px 8px; border:none; border-radius:4px; background:#444; color:#fff; cursor:pointer; font-size:12px; }
-    /* Modal */
-    .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; }
-    .modal-content { background:#1c2333; padding:15px; border-radius:10px; width:280px; color:#fff; font-size:13px; }
-    .modal-content label { display:block; margin:6px 0 2px; }
-    .modal-content input { width:100%; padding:5px; border-radius:4px; border:1px solid #444; background:#0f172a; color:#fff; }
-    .modal-content button { margin-top:10px; padding:6px 12px; border:none; border-radius:4px; cursor:pointer; font-size:12px; }
-    .modal-save { background:#1e7d32; color:#fff; }
-    .modal-cancel { background:#555; color:#fff; margin-left:8px; }
+    .chart-container { display:block; margin-top:10px; }
+	
+	.logo-container {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  z-index: 10; /* makes sure it stays on top */
+}
+
+.logo-container img {
+  height: 50px;
+  width: auto;
+}
+	
+	
   </style>
 </head>
 <body>
-  <h1>Basement Humidity — Fleet Dashboard</h1>
+
+<div class="logo-container">
+  <img src="images/VIP-logo-white.png" alt="VIP Logo">
+</div>
+
+  <h1>Basement Humidity Dashboard</h1>
   <div id="filters">
     <button onclick="setFilter('all')">All</button>
     <button onclick="setFilter('online')">Online Only</button>
@@ -63,26 +84,13 @@
   </div>
   <div class="grid" id="cards"></div>
 
-  <!-- Popup Modal -->
-  <div id="edit-modal" class="modal">
-    <div class="modal-content">
-      <h3>Edit Device</h3>
-      <input type="hidden" id="edit-id">
-      <label>Lot: <input id="edit-lot"></label>
-      <label>Builder: <input id="edit-builder"></label>
-      <label>Subdivision: <input id="edit-subdivision"></label>
-      <label>Notes: <input id="edit-notes"></label>
-      <button class="modal-save" onclick="saveEdit()">Save</button>
-      <button class="modal-cancel" onclick="closeEditForm()">Cancel</button>
-    </div>
-  </div>
-
   <script>
     const { createClient } = supabase;
     const supabaseUrl = "https://imsqijcraukqqopntsmc.supabase.co";
     const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc3FpamNyYXVrcXFvcG50c21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNjQ2NzIsImV4cCI6MjA3MTg0MDY3Mn0.kT7uJbbyEYo-nvrg973B8BLfXmPU5rmcB1bh_ZIXIdM"; // replace with anon key
     const db = createClient(supabaseUrl, supabaseKey);
 
+    const currentRanges = {};
     let currentFilter = "all";
 
     function setFilter(mode) {
@@ -92,57 +100,99 @@
 
     function getStatus(humidity, lastSeenDate) {
       if (!lastSeenDate) return { text: "OFFLINE", class: "offline" };
+
       const now = new Date();
       const last = new Date(lastSeenDate);
       const diffHrs = (now - last) / (1000 * 60 * 60);
+
       if (diffHrs > 2) return { text: "OFFLINE", class: "offline" };
-      if (humidity < 65) return { text: "OK", class: "ok" };
+
+      if (humidity < 51) return { text: "OK", class: "ok" };
       if (humidity < 75) return { text: "WARN", class: "warn" };
       return { text: "ALERT", class: "alert" };
+    }
+
+    function timeAgo(dateStr) {
+      if (!dateStr) return "Never";
+      const now = new Date();
+      const date = new Date(dateStr);
+      const diffMs = now - date;
+      const diffMin = Math.floor(diffMs / 60000);
+
+      if (diffMin < 1) return "just now";
+      if (diffMin < 60) return `${diffMin}m ago`;
+      const diffHrs = Math.floor(diffMin / 60);
+      if (diffHrs < 24) return `${diffHrs}h ago`;
+      const diffDays = Math.floor(diffHrs / 24);
+      return `${diffDays}d ago`;
     }
 
     async function loadData() {
       let { data, error } = await db
         .from("devices")
         .select(`
-          id, lot_number, subdivision, builder, notes, installed_on,
-          sensor_logs ( datetime, temp_f, humidity, dewpoint_f )
+          id,
+          lot_number,
+          subdivision,
+          builder,
+          notes,
+          installed_on,
+          sensor_logs (
+            datetime,
+            temp_f,
+            humidity,
+            dewpoint_f
+          )
         `)
         .order("datetime", { foreignTable: "sensor_logs", ascending: false });
 
       if (error) { console.error(error); return; }
+
       const container = document.getElementById("cards");
       container.innerHTML = "";
 
       data.forEach(device => {
+	  const installedDate = device.installed_on ? new Date(device.installed_on) : null;
+		let daysInProduction = installedDate 
+			? Math.floor((new Date() - installedDate) / (1000 * 60 * 60 * 24)) 
+		: null;
         const latestLog = device.sensor_logs?.[0];
         const humidity = latestLog?.humidity ?? "--";
         const temp_f = latestLog?.temp_f ?? "--";
         const dewpoint_f = latestLog?.dewpoint_f ?? "--";
-        const updated = latestLog?.datetime ? new Date(latestLog.datetime).toLocaleString() : "No recent data";
+        const updated = latestLog?.datetime 
+          ? new Date(latestLog.datetime).toLocaleString()
+          : "No recent data";
+        const lastSeen = timeAgo(latestLog?.datetime);
+
         const status = getStatus(humidity, latestLog?.datetime);
+
+        // filter logic
         if (currentFilter === "online" && status.text === "OFFLINE") return;
         if (currentFilter === "offline" && status.text !== "OFFLINE") return;
 
         const card = document.createElement("div");
         card.className = "card";
-        if (status.text === "OFFLINE") card.classList.add("offline-card");
+       card.innerHTML = `
 
-        card.innerHTML = `
-          <div class="status ${status.class}">${status.text}</div>
-          <h2>Lot: ${device.lot_number || "NEW_DEVICE"}</h2>
-          <div>Builder: ${device.builder || "UNKNOWN_BUILDER"}</div>
-          <div>Subdivision: ${device.subdivision || "UNKNOWN_SUBDIVISION"}</div>
-          <div class="notes">Notes: ${device.notes || ""}</div>
-          <div class="installed">Installed: ${device.installed_on ? new Date(device.installed_on).toLocaleDateString() : "Unknown"}</div>
-          <div class="updated">Updated: ${updated}</div>
+			<div class="status ${status.class}">${status.text}</div>
+			
+			<div>Lot: ${device.lot_number || "NEW_DEVICE"}</div>
+			<div>Builder: ${device.builder || "UNKNOWN_BUILDER"}</div>
+			<div>Subdivision: ${device.subdivision || "UNKNOWN_SUBDIVISION"}</div>
+			  </div>${device.id}</div>
           <div class="metrics">
             <div class="metric"><span>${humidity}%</span>Humidity</div>
             <div class="metric"><span>${temp_f}°F</span>Temp</div>
             <div class="metric"><span>${dewpoint_f}°F</span>Dew Pt</div>
           </div>
-          <div id="extremes-${device.id}" class="extremes">No data yet</div>
-          <button class="edit-btn" onclick="openEditForm('${device.id}','${device.lot_number||""}','${device.builder||""}','${device.subdivision||""}','${device.notes||""}')">Edit Device</button>
+          <div class="notes">Notes: ${device.notes || ""}</div>
+       	   <div class="installed">
+  Installed: ${installedDate ? installedDate.toLocaleDateString() : "Unknown"}
+  ${daysInProduction !== null ? ` (${daysInProduction} days in production)` : ""}
+</div>
+          <div class="updated">Updated: ${updated}</div>
+          <div class="lastseen">Last Seen: ${lastSeen}</div>
           <div class="details">
             <h3>History</h3>
             <div class="filters">
@@ -151,6 +201,8 @@
               <button onclick="loadHistory('${device.id}', '1m')">1m</button>
               <button onclick="loadHistory('${device.id}', '3m')">3m</button>
               <button onclick="loadHistory('${device.id}', 'all')">All</button>
+              <button onclick="downloadLogs('${device.id}')">⬇ CSV</button>
+              <button class="retire" onclick="retireDevice('${device.id}')">🗑 Retire</button>
             </div>
             <div class="scroll-table">
               <table>
@@ -158,122 +210,148 @@
                 <tbody id="log-${device.id}"></tbody>
               </table>
             </div>
-            <div class="chart-tabs">
-              <button onclick="showChart('${device.id}','hum')" class="active">Humidity</button>
-              <button onclick="showChart('${device.id}','temp')">Temp</button>
-              <button onclick="showChart('${device.id}','dew')">Dew Pt</button>
+            <div class="chart-container">
+              <canvas id="chart-${device.id}" height="200"></canvas>
             </div>
-            <div id="chart-hum-${device.id}" class="chart-container active"><canvas></canvas></div>
-            <div id="chart-temp-${device.id}" class="chart-container"><canvas></canvas></div>
-            <div id="chart-dew-${device.id}" class="chart-container"><canvas></canvas></div>
-            <button onclick="downloadLogs('${device.id}')">⬇ CSV</button>
-            <button class="retire" onclick="retireDevice('${device.id}')">🗑 Retire</button>
           </div>
         `;
         container.appendChild(card);
-        if (latestLog) loadHistory(device.id,"1d");
+
+        if (latestLog) loadHistory(device.id, "1d");
       });
     }
 
     async function loadHistory(deviceId, range="1d") {
-      let since = new Date();
-      if (range==="1d") since.setDate(since.getDate()-1);
-      if (range==="1w") since.setDate(since.getDate()-7);
-      if (range==="1m") since.setMonth(since.getMonth()-1);
-      if (range==="3m") since.setMonth(since.getMonth()-3);
-      let query = db.from("sensor_logs").select("*").eq("device_id",deviceId).order("datetime",{ascending:true});
-      if(range!=="all") query=query.gte("datetime",since.toISOString());
-      const { data, error } = await query; if(error){console.error(error);return;}
+      currentRanges[deviceId] = range;
 
-      const tbody=document.getElementById("log-"+deviceId); tbody.innerHTML="";
-      data.forEach(r=>{
-        const tr=document.createElement("tr");
-        tr.innerHTML=`<td>${new Date(r.datetime).toLocaleString()}</td><td>${r.temp_f}°F</td><td>${r.humidity}%</td><td>${r.dewpoint_f}°F</td>`;
+      let since = new Date();
+      if (range === "1d") since.setDate(since.getDate() - 1);
+      if (range === "1w") since.setDate(since.getDate() - 7);
+      if (range === "1m") since.setMonth(since.getMonth() - 1);
+      if (range === "3m") since.setMonth(since.getMonth() - 3);
+
+      let query = db.from("sensor_logs")
+        .select("*")
+        .eq("device_id", deviceId)
+        .order("datetime", { ascending: true });
+
+      if (range !== "all") query = query.gte("datetime", since.toISOString());
+
+      const { data, error } = await query;
+      if (error) { console.error(error); return; }
+
+      const tbody = document.getElementById("log-" + deviceId);
+      tbody.innerHTML = "";
+      data.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${new Date(r.datetime).toLocaleString()}</td>
+          <td>${r.temp_f}°F</td>
+          <td>${r.humidity}%</td>
+          <td>${r.dewpoint_f}°F</td>
+        `;
         tbody.appendChild(tr);
       });
 
-      function buildChart(containerId, label, dataset, color, threshold, thresholdLabel) {
-        const ctx=document.querySelector(`#${containerId} canvas`).getContext("2d");
-        if (window[containerId] && typeof window[containerId].destroy === "function") {
-          window[containerId].destroy();
-        }
-        window[containerId]=new Chart(ctx,{
-          type:"line",
-          data:{ datasets:[{label, data:dataset, borderColor:color, tension:0.3}] },
-          options:{
-            responsive:true,
-            plugins:{
-              legend:{ labels:{ color:"#fff" } },
-              annotation: threshold ? {
-                annotations:{
-                  line1:{ type:"line", yMin:threshold, yMax:threshold, borderColor:"orange", borderWidth:2,
-                    label:{ content:thresholdLabel, enabled:true, color:"#fff" }}
-                }
-              } : {}
-            },
-            scales:{
-              x:{ type:"time", time:{ unit:(range==="1d"?"hour":"day") }, ticks:{ color:"#ccc" } },
-              y:{ ticks:{ color:"#ccc" } }
-            }
+      const ctx = document.getElementById("chart-" + deviceId).getContext("2d");
+      if (window["chart_" + deviceId]) window["chart_" + deviceId].destroy();
+
+      window["chart_" + deviceId] = new Chart(ctx, {
+        type: "line",
+        data: {
+          datasets: [
+            { label: "Temp (°F)", data: data.map(r => ({ x: r.datetime, y: r.temp_f })), borderColor: "red", tension: 0.3 },
+            { label: "Humidity (%)", data: data.map(r => ({ x: r.datetime, y: r.humidity })), borderColor: "blue", tension: 0.3 },
+            { label: "Dew Pt (°F)", data: data.map(r => ({ x: r.datetime, y: r.dewpoint_f })), borderColor: "green", tension: 0.3 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: "#fff" } } },
+          interaction: { mode: "nearest", intersect: false },
+          scales: {
+            x: { type: "time", time: { unit: range === "1d" ? "hour" : "day" }, ticks: { color: "#ccc" } },
+            y: { ticks: { color: "#ccc" } }
           }
-        });
-      }
-      buildChart("chart-hum-"+deviceId,"Humidity (%)",data.map(r=>({x:r.datetime,y:r.humidity})),"blue",75,"75% Threshold");
-      buildChart("chart-temp-"+deviceId,"Temperature (°F)",data.map(r=>({x:r.datetime,y:r.temp_f})),"red",85,"85°F Threshold");
-      buildChart("chart-dew-"+deviceId,"Dew Point (°F)",data.map(r=>({x:r.datetime,y:r.dewpoint_f})),"green",null,null);
+        }
+      });
     }
 
-    function showChart(deviceId, type) {
-      ["hum","temp","dew"].forEach(t=>{
-        document.getElementById(`chart-${t}-${deviceId}`).classList.remove("active");
-      });
-      document.getElementById(`chart-${type}-${deviceId}`).classList.add("active");
-    }
+    async function downloadLogs(deviceId) {
+      const range = currentRanges[deviceId] || "all";
+      let since = new Date();
+      if (range === "1d") since.setDate(since.getDate() - 1);
+      if (range === "1w") since.setDate(since.getDate() - 7);
+      if (range === "1m") since.setMonth(since.getMonth() - 1);
+      if (range === "3m") since.setMonth(since.getMonth() - 3);
 
-    function downloadLogs(deviceId) {
-      const rows = document.querySelectorAll(`#log-${deviceId} tr`);
-      let csv = "Time,Temp (°F),Humidity (%),Dew Point (°F)\n";
-      rows.forEach(row => {
-        const cols = row.querySelectorAll("td");
-        const rowData = Array.from(cols).map(td => td.innerText).join(",");
-        csv += rowData + "\n";
-      });
-      const blob = new Blob([csv], { type: "text/csv" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `logs-${deviceId}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+      let query = db.from("sensor_logs")
+        .select("*")
+        .eq("device_id", deviceId)
+        .order("datetime", { ascending: true });
+
+      if (range !== "all") query = query.gte("datetime", since.toISOString());
+
+      const { data, error } = await query;
+      if (error) { console.error(error); alert("Error exporting logs"); return; }
+
+      exportCSV(`${deviceId}_${range}`, data);
     }
 
     async function retireDevice(deviceId) {
-      if (!confirm("Are you sure you want to retire this device? This will delete it permanently.")) return;
-      let { error } = await db.from("devices").delete().eq("id", deviceId);
-      if (error) { alert("Error retiring device"); console.error(error); }
-      else { loadData(); }
+      if (!confirm(`⚠️ Are you sure you want to RETIRE ${deviceId}? This will EXPORT ALL logs and then DELETE them permanently.`)) {
+        return;
+      }
+
+      const { data: logs, error: logsError } = await db
+        .from("sensor_logs")
+        .select("*")
+        .eq("device_id", deviceId)
+        .order("datetime", { ascending: true });
+
+      if (logsError) { console.error(logsError); alert("Error fetching logs"); return; }
+
+      exportCSV(`${deviceId}_FULL_HISTORY`, logs);
+
+      const { error: delLogsError } = await db.from("sensor_logs").delete().eq("device_id", deviceId);
+      if (delLogsError) { console.error(delLogsError); alert("Error deleting logs"); return; }
+
+      const { error: delDeviceError } = await db.from("devices").delete().eq("id", deviceId);
+      if (delDeviceError) { console.error(delDeviceError); alert("Error deleting device"); return; }
+
+      alert(`${deviceId} retired successfully ✅`);
+      loadData();
     }
 
-    function openEditForm(id, lot, builder, subdivision, notes) {
-      document.getElementById("edit-id").value = id;
-      document.getElementById("edit-lot").value = lot;
-      document.getElementById("edit-builder").value = builder;
-      document.getElementById("edit-subdivision").value = subdivision;
-      document.getElementById("edit-notes").value = notes;
-      document.getElementById("edit-modal").style.display = "flex";
-    }
-    function closeEditForm() { document.getElementById("edit-modal").style.display = "none"; }
-    async function saveEdit() {
-      const id=document.getElementById("edit-id").value;
-      const lot=document.getElementById("edit-lot").value;
-      const builder=document.getElementById("edit-builder").value;
-      const subdivision=document.getElementById("edit-subdivision").value;
-      const notes=document.getElementById("edit-notes").value;
-      let { error } = await db.from("devices").update({lot_number:lot,builder:builder,subdivision:subdivision,notes:notes}).eq("id",id);
-      if(error){alert("Error updating device");console.error(error);}else{closeEditForm();loadData();}
-    }
+function exportCSV(filename, data) {
+  if (!data || data.length === 0) {
+    alert("No data available for export");
+    return;
+  }
 
-    loadData(); setInterval(loadData,60000);
+  const headers = ["datetime","temp_f","humidity","dewpoint_f"];
+
+  const rows = data.map(r => [
+    `"${new Date(r.datetime).toLocaleString()}"`, // ✅ wrap datetime in quotes
+    r.temp_f,
+    r.humidity,
+    r.dewpoint_f
+  ]);
+
+  let csvContent = "data:text/csv;charset=utf-8," 
+    + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+
+  const link = document.createElement("a");
+  link.setAttribute("href", encodeURI(csvContent));
+  link.setAttribute("download", `${filename}_logs.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+    loadData();
+    setInterval(loadData, 60000);
   </script>
 </body>
 </html>
+
