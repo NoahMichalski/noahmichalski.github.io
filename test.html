@@ -42,11 +42,21 @@
     .updated, .installed, .lastseen { font-size:11px; color:#888; margin-top:5px; }
     .details { margin-top:10px; background:#121212; padding:10px; border-radius:8px; }
     .filters { margin:10px 0; display:flex; flex-wrap:wrap; gap:6px; }
-    .filters button {
-      padding:6px 10px; border:none; border-radius:4px;
-      background:#1c3c5a; color:#fff; cursor:pointer; font-size:13px;
-    }
-    .filters button:hover { background:#2d5b85; }
+#filters button,
+.filters button {
+  padding:6px 12px;
+  border:none;
+  border-radius:4px;
+  background:#333;   /* dark grey background */
+  color:#fff;
+  cursor:pointer;
+  font-size:13px;
+}
+
+#filters button:hover,
+.filters button:hover {
+  background:#555;   /* lighter grey on hover */
+}
     .filters .retire { background:#a83232; }
     .filters .retire:hover { background:#d64545; }
     .scroll-table {
@@ -71,6 +81,10 @@
   width: auto;
 }
 
+#filters button.active,
+.filters button.active {
+  background:#1e7d32; /* green for active */
+}
 	
 	
   </style>
@@ -82,11 +96,11 @@
 </div>
 
   <h1>Basement Humidity Dashboard</h1>
-  <div id="filters">
-    <button onclick="setFilter('all')">All</button>
-    <button onclick="setFilter('online')">Online Only</button>
-    <button onclick="setFilter('offline')">Offline Only</button>
-  </div>
+<div id="filters">
+  <button onclick="setFilter('all', this)">All</button>
+  <button onclick="setFilter('online', this)">Online Only</button>
+  <button onclick="setFilter('offline', this)">Offline Only</button>
+</div>
   <div class="grid" id="cards"></div>
 
   <script>
@@ -98,10 +112,16 @@
     const currentRanges = {};
     let currentFilter = "all";
 
-    function setFilter(mode) {
-      currentFilter = mode;
-      loadData();
+function setFilter(mode, buttonEl) {
+  currentFilter = mode;
+  loadData();
+  
+    document.querySelectorAll('#filters button').forEach(btn => btn.classList.remove('active'));
+  // add .active to the clicked one
+  buttonEl.classList.add('active');
     }
+	
+
 
     function getStatus(humidity, lastSeenDate) {
       if (!lastSeenDate) return { text: "OFFLINE", class: "offline" };
@@ -201,11 +221,11 @@
           <div class="details">
             <h3>History</h3>
             <div class="filters">
-              <button onclick="loadHistory('${device.id}', '1d')">1d</button>
-              <button onclick="loadHistory('${device.id}', '1w')">1w</button>
-              <button onclick="loadHistory('${device.id}', '1m')">1m</button>
-              <button onclick="loadHistory('${device.id}', '3m')">3m</button>
-              <button onclick="loadHistory('${device.id}', 'all')">All</button>
+              <button onclick="loadHistory('${device.id}', '1d',this)">1d</button>
+              <button onclick="loadHistory('${device.id}', '1w',this)">1w</button>
+              <button onclick="loadHistory('${device.id}', '1m',this)">1m</button>
+              <button onclick="loadHistory('${device.id}', '3m',this)">3m</button>
+              <button onclick="loadHistory('${device.id}', 'all',this)">All</button>
               <button onclick="downloadLogs('${device.id}')">⬇ CSV</button>
               <button class="retire" onclick="retireDevice('${device.id}')">🗑 Retire</button>
             </div>
