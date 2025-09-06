@@ -290,32 +290,35 @@
       loadData();
     }
 
-    function exportCSV(filename, data) {
-      if (!data || data.length === 0) {
-        alert("No data available for export");
-        return;
-      }
-      const headers = ["datetime","temp_f","humidity","dewpoint_f"];
-      const rows = data.map(r => [
-        new Date(r.datetime).toLocaleString(),
-        r.temp_f,
-        r.humidity,
-        r.dewpoint_f
-      ]);
+function exportCSV(filename, data) {
+  if (!data || data.length === 0) {
+    alert("No data available for export");
+    return;
+  }
 
-      let csvContent = "data:text/csv;charset=utf-8," 
-        + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+  const headers = ["datetime","temp_f","humidity","dewpoint_f"];
 
-      const link = document.createElement("a");
-      link.setAttribute("href", encodeURI(csvContent));
-      link.setAttribute("download", `${filename}_logs.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+  const rows = data.map(r => [
+    `"${new Date(r.datetime).toLocaleString()}"`, // ✅ wrap datetime in quotes
+    r.temp_f,
+    r.humidity,
+    r.dewpoint_f
+  ]);
+
+  let csvContent = "data:text/csv;charset=utf-8," 
+    + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+
+  const link = document.createElement("a");
+  link.setAttribute("href", encodeURI(csvContent));
+  link.setAttribute("download", `${filename}_logs.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 
     loadData();
     setInterval(loadData, 60000);
   </script>
 </body>
 </html>
+
