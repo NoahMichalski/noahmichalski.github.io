@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VIP Basement Humidity Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <style>
+  
+  
+    body { background:#000; color:#fff; font-family:system-ui, sans-serif; margin:20px; }
+   h1 {
+  margin-bottom: 50px;
+  padding-left: 125px;  /* ✅ pushes title away from logo */
+}
+
+    #filters { margin-bottom:20px; }
+    #filters button {
+      padding:6px 12px; border:none; border-radius:4px;
+      background:#1c3c5a; color:#fff; cursor:pointer; font-size:13px; margin-right:8px;
+    }
+    #filters button:hover { background:#2d5b85; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:20px; }
+    .card {
+      background:#121212; border-radius:10px; padding:15px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative;
+    }
+    .status {
+      position:absolute; top:10px; right:10px;
+      padding:4px 10px; border-radius:6px; font-weight:bold;
+    }
+    .ok { background:#1e7d32; }
+    .warn { background:#e69500; }
+    .alert { background:#c62828; }
+    .offline { background:#555; }
+    h2 { font-size:16px; margin:0 0 10px; }
+    .metrics { display:flex; justify-content:space-between; margin:10px 0; }
+    .metric { text-align:center; }
+    .metric span { display:block; font-size:20px; font-weight:bold; }
+    .notes { font-size:12px; color:#aaa; margin-top:5px; }
+    .updated, .installed, .lastseen { font-size:11px; color:#888; margin-top:5px; }
+    .details { margin-top:10px; background:#121212; padding:10px; border-radius:8px; }
+    .filters { margin:10px 0; display:flex; flex-wrap:wrap; gap:6px; }
+#filters button,
+.filters button {
+  padding:6px 12px;
+  border:none;
+  border-radius:4px;
+  background:#333;   /* dark grey background */
+  color:#fff;
+  cursor:pointer;
+  font-size:13px;
+}
+
+#filters button:hover,
+.filters button:hover {
+  background:#555;   /* lighter grey on hover */
+}
+    .filters .retire { background:#a83232; }
+    .filters .retire:hover { background:#d64545; }
+    .scroll-table {
+      max-height:200px;
+      overflow-y:auto;
+      display:block;
+    }
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    th, td { border:1px solid #444; padding:4px; text-align:center; }
+    th { background:#222; position:sticky; top:0; }
+    .chart-container { display:block; margin-top:10px; }
+	
+.logo-container {
+  position: absolute;   /* use fixed if you want it visible while scrolling */
+  top: 15px;
+  left: 20px;           /* ✅ changed from right to left */
+  z-index: 10;
+}
+
+.logo-container img {
+  height: 100px;
+  width: auto;
+}
+
+#filters button.active,
+.filters button.active {
+  background:#1e7d32; /* green for active */
+}
+
+.details {
+  display: none;
+  margin-top: 10px;
+  background: #1a1a1a;
+  padding: 10px;
+  border-radius: 8px;
+}
+.card.open .details {
+  display: block;
+}
+.summary {
+  cursor: pointer;
+}
+
+.row .details { display: none; }
+.row.open .details { display: block; }
+
+
+
+	
+  </style>
+</head>
+<body>
+
+<div class="logo-container">
+  <img src="images/VIP-logo-white.png" alt="VIP Logo">
+</div>
+
+  <h1>Basement Humidity Dashboard</h1>
+<div id="filters">
+  <button onclick="setFilter('all', this)">All</button>
+  <button onclick="setFilter('online', this)">Online Only</button>
+  <button onclick="setFilter('offline', this)">Offline Only</button>
+  <button onclick="setFilter('warn', this)">Warn Only</button>
+  <button onclick="setFilter('alert', this)">Alert Only</button>
+</div>
+  <div class="grid" id="cards"></div>
+
+  <script>
+    const { createClient } = supabase;
+    const supabaseUrl = "https://imsqijcraukqqopntsmc.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc3FpamNyYXVrcXFvcG50c21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNjQ2NzIsImV4cCI6MjA3MTg0MDY3Mn0.kT7uJbbyEYo-nvrg973B8BLfXmPU5rmcB1bh_ZIXIdM"; // replace with anon key
+    const db = createClient(supabaseUrl, supabaseKey);
+
+    const currentRanges = {};
+    let currentFilter = "all";
+
+
+
+function setFilter(mode, buttonEl) {
+  currentFilter = mode;
+  loadData();  // re-run loadData with new filter
+
+  // remove active from all
+  document.querySelectorAll('#filters button').forEach(btn => btn.classList.remove('active'));
+  
+  // add active to the one that was clicked
+  if (buttonEl) {
+    buttonEl.classList.add('active');
+  }
+}
+
+
+
+    function getStatus(humidity, lastSeenDate) {
+      if (!lastSeenDate) return { text: "OFFLINE", class: "offline" };
+
+      const now = new Date();
+      const last = new Date(lastSeenDate);
+      const diffHrs = (now - last) / (1000 * 60 * 60);
+
+      if (diffHrs > 2) return { text: "OFFLINE", class: "offline" };
+
+      if (humidity < 50) return { text: "OK", class: "ok" };
+      if (humidity < 75) return { text: "WARNING", class: "warn" };
+      return { text: "ALERT", class: "alert" };
+    }
+
+    function timeAgo(dateStr) {
+      if (!dateStr) return "Never";
+      const now = new Date();
+      const date = new Date(dateStr);
+      const diffMs = now - date;
+      const diffMin = Math.floor(diffMs / 60000);
+
+      if (diffMin < 1) return "just now";
+      if (diffMin < 60) return `${diffMin}m ago`;
+      const diffHrs = Math.floor(diffMin / 60);
+      if (diffHrs < 24) return `${diffHrs}h ago`;
+      const diffDays = Math.floor(diffHrs / 24);
+      return `${diffDays}d ago`;
+    }
+
+    async function loadData() {
+      let { data, error } = await db
+        .from("devices")
+        .select(`
+          id,
+          lot_number,
+          subdivision,
+          builder,
+          notes,
+          installed_on,
+          sensor_logs (
+            datetime,
+            temp_f,
+            humidity,
+            dewpoint_f
+          )
+        `)
+        .order("datetime", { foreignTable: "sensor_logs", ascending: false });
+
+      if (error) { console.error(error); return; }
+
+     const container = document.getElementById("cards");
+container.innerHTML = "";
+
+      data.forEach(device => {
+	  const installedDate = device.installed_on ? new Date(device.installed_on) : null;
+		let daysInProduction = installedDate 
+			? Math.floor((new Date() - installedDate) / (1000 * 60 * 60 * 24)) 
+		: null;
+        const latestLog = device.sensor_logs?.[0];
+        const humidity = latestLog?.humidity ?? "--";
+        const temp_f = latestLog?.temp_f ?? "--";
+        const dewpoint_f = latestLog?.dewpoint_f ?? "--";
+        const updated = latestLog?.datetime 
+          ? new Date(latestLog.datetime).toLocaleString()
+          : "No recent data";
+        const lastSeen = timeAgo(latestLog?.datetime);
+
+        const status = getStatus(humidity, latestLog?.datetime);
+
+        // filter logic
+        if (currentFilter === "online" && status.text === "OFFLINE") return;
+        if (currentFilter === "offline" && status.text !== "OFFLINE") return;
+		if (currentFilter === "warn" && status.class !== "warn") return;
+        if (currentFilter === "alert" && status.class !== "alert") return;
+
+        const card = document.createElement("div");
+        card.className = "card";
+card.innerHTML = `
+  <div class="summary" onclick="toggleDetails('${device.id}')">
+    <div class="status ${status.class}">${status.text}</div>
+    <div>Lot: ${device.lot_number || "NEW_DEVICE"}</div>
+    <div>Builder: ${device.builder || "UNKNOWN_BUILDER"}</div>
+    <div>Subdivision: ${device.subdivision || "UNKNOWN_SUBDIVISION"}</div>
+	 <div>Sensor ID: ${device.id}</div>
+    <div class="metrics">
+      <div class="metric"><span>${humidity}%</span>Humidity</div>
+      <div class="metric"><span>${temp_f}°F</span>Temp</div>
+      <div class="metric"><span>${dewpoint_f}°F</span>Dew Pt</div>
+    </div>
+  </div>
+
+  <div class="details" id="details-${device.id}">
+    <div class="notes">Notes: ${device.notes || ""}</div>
+    <div class="installed">
+      Installed: ${installedDate ? installedDate.toLocaleDateString() : "Unknown"}
+      ${daysInProduction !== null ? ` (${daysInProduction} days in production)` : ""}
+    </div>
+    <div class="updated">Updated: ${updated}</div>
+    <div class="lastseen">Last Seen: ${lastSeen}</div>
+
+    <h3>History</h3>
+    <div class="filters">
+      <button onclick="loadHistory('${device.id}', '1d',this)">1d</button>
+      <button onclick="loadHistory('${device.id}', '1w',this)">1w</button>
+      <button onclick="loadHistory('${device.id}', '1m',this)">1m</button>
+      <button onclick="loadHistory('${device.id}', '3m',this)">3m</button>
+      <button onclick="loadHistory('${device.id}', 'all',this)">All</button>
+      <button onclick="downloadLogs('${device.id}')">⬇ CSV</button>
+      <button class="retire" onclick="retireDevice('${device.id}')">🗑 Retire</button>
+    </div>
+
+    <div class="scroll-table">
+      <table>
+        <thead><tr><th>Time</th><th>Temp</th><th>Humidity</th><th>Dew Pt</th></tr></thead>
+        <tbody id="log-${device.id}"></tbody>
+      </table>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-${device.id}" height="200"></canvas>
+    </div>
+  </div>
+`;
+           
+        container.appendChild(card);
+
+        if (latestLog) loadHistory(device.id, "1d");
+      });
+    }
+
+    async function loadHistory(deviceId, range="1d") {
+      currentRanges[deviceId] = range;
+
+      let since = new Date();
+      if (range === "1d") since.setDate(since.getDate() - 1);
+      if (range === "1w") since.setDate(since.getDate() - 7);
+      if (range === "1m") since.setMonth(since.getMonth() - 1);
+      if (range === "3m") since.setMonth(since.getMonth() - 3);
+
+      let query = db.from("sensor_logs")
+        .select("*")
+        .eq("device_id", deviceId)
+        .order("datetime", { ascending: true });
+
+      if (range !== "all") query = query.gte("datetime", since.toISOString());
+
+      const { data, error } = await query;
+      if (error) { console.error(error); return; }
+
+      const tbody = document.getElementById("log-" + deviceId);
+      tbody.innerHTML = "";
+      data.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${new Date(r.datetime).toLocaleString()}</td>
+          <td>${r.temp_f}°F</td>
+          <td>${r.humidity}%</td>
+          <td>${r.dewpoint_f}°F</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const ctx = document.getElementById("chart-" + deviceId).getContext("2d");
+      if (window["chart_" + deviceId]) window["chart_" + deviceId].destroy();
+
+      window["chart_" + deviceId] = new Chart(ctx, {
+        type: "line",
+        data: {
+          datasets: [
+            { label: "Temp (°F)", data: data.map(r => ({ x: r.datetime, y: r.temp_f })), borderColor: "red", tension: 0.3 },
+            { label: "Humidity (%)", data: data.map(r => ({ x: r.datetime, y: r.humidity })), borderColor: "blue", tension: 0.3 },
+            { label: "Dew Pt (°F)", data: data.map(r => ({ x: r.datetime, y: r.dewpoint_f })), borderColor: "green", tension: 0.3 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: "#fff" } } },
+          interaction: { mode: "nearest", intersect: false },
+          scales: {
+            x: { type: "time", time: { unit: range === "1d" ? "hour" : "day" }, ticks: { color: "#ccc" } },
+            y: { ticks: { color: "#ccc" } }
+          }
+        }
+      });
+    }
+
+    async function downloadLogs(deviceId) {
+      const range = currentRanges[deviceId] || "all";
+      let since = new Date();
+      if (range === "1d") since.setDate(since.getDate() - 1);
+      if (range === "1w") since.setDate(since.getDate() - 7);
+      if (range === "1m") since.setMonth(since.getMonth() - 1);
+      if (range === "3m") since.setMonth(since.getMonth() - 3);
+
+      let query = db.from("sensor_logs")
+        .select("*")
+        .eq("device_id", deviceId)
+        .order("datetime", { ascending: true });
+
+      if (range !== "all") query = query.gte("datetime", since.toISOString());
+
+      const { data, error } = await query;
+      if (error) { console.error(error); alert("Error exporting logs"); return; }
+
+      exportCSV(`${deviceId}_${range}`, data);
+    }
+
+    async function retireDevice(deviceId) {
+      if (!confirm(`⚠️ Are you sure you want to RETIRE ${deviceId}? This will EXPORT ALL logs and then DELETE them permanently.`)) {
+        return;
+      }
+
+      const { data: logs, error: logsError } = await db
+        .from("sensor_logs")
+        .select("*")
+        .eq("device_id", deviceId)
+        .order("datetime", { ascending: true });
+
+      if (logsError) { console.error(logsError); alert("Error fetching logs"); return; }
+
+      exportCSV(`${deviceId}_FULL_HISTORY`, logs);
+
+      const { error: delLogsError } = await db.from("sensor_logs").delete().eq("device_id", deviceId);
+      if (delLogsError) { console.error(delLogsError); alert("Error deleting logs"); return; }
+
+      const { error: delDeviceError } = await db.from("devices").delete().eq("id", deviceId);
+      if (delDeviceError) { console.error(delDeviceError); alert("Error deleting device"); return; }
+
+      alert(`${deviceId} retired successfully ✅`);
+      loadData();
+    }
+
+function exportCSV(filename, data) {
+  if (!data || data.length === 0) {
+    alert("No data available for export");
+    return;
+  }
+
+  const headers = ["datetime","temp_f","humidity","dewpoint_f"];
+
+  const rows = data.map(r => [
+    `"${new Date(r.datetime).toLocaleString()}"`, // ✅ wrap datetime in quotes
+    r.temp_f,
+    r.humidity,
+    r.dewpoint_f
+  ]);
+
+  let csvContent = "data:text/csv;charset=utf-8," 
+    + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+
+  const link = document.createElement("a");
+  link.setAttribute("href", encodeURI(csvContent));
+  link.setAttribute("download", `${filename}_logs.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function toggleDetails(id) {
+  const details = document.getElementById("details-" + id);
+  const card = details.parentElement;
+  card.classList.toggle("open");
+}
+
+
+
+    loadData();
+    setInterval(loadData, 60000);
+  </script>
+</body>
+</html>
+
