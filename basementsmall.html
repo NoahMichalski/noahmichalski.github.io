@@ -234,6 +234,7 @@ card.innerHTML = `
     <div>Builder: ${device.builder || "UNKNOWN_BUILDER"}</div>
     <div>Subdivision: ${device.subdivision || "UNKNOWN_SUBDIVISION"}</div>
 	 <div>Sensor ID: ${device.id}</div>
+   <div class="lastseen">Last Seen: ${lastSeen}</div>
     <div class="metrics">
       <div class="metric"><span>${humidity}%</span>Humidity</div>
       <div class="metric"><span>${temp_f}°F</span>Temp</div>
@@ -248,7 +249,7 @@ card.innerHTML = `
       ${daysInProduction !== null ? ` (${daysInProduction} days in production)` : ""}
     </div>
     <div class="updated">Updated: ${updated}</div>
-    <div class="lastseen">Last Seen: ${lastSeen}</div>
+    
 
     <h3>History</h3>
     <div class="filters">
@@ -420,4 +421,5 @@ function toggleDetails(id) {
   </script>
 </body>
 </html>
+
 
