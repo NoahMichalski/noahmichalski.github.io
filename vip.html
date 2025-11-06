@@ -147,6 +147,8 @@
   <div><span style="color:grey;">●</span> Bob Webb</div>
   <div><span style="color:grey;">●</span> WPLand Company</div>
   <div><span style="color:grey;">●</span> Fischer Homes</div>
+  <div><span style="color:Green;">●</span> Del Webb</div>
+  <div><span style="color:Green;">●</span> Centex</div>
   </div>
   <div id="map"></div>
 
@@ -178,7 +180,6 @@
     }
 
     const lotMapLinks = { "Pulte|Abberley Park": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=85575928-6f84-4406-9f8d-d3218f666398&noheader",
-  "Pulte|Bloomfield Hills": "https://apps.alpha-vision.com/alphamap/index.html?OLAId=a16b941a-1563-49de-9c54-fdb6ff3c0d00&noheader",
   "Pulte|Clarkshaw": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=cec414d9-3a84-47b6-8cf4-ad0e8ac23475&noheader",
   "Pulte|Glenross": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=cvaQ4NvhexgNTDjDz5OFxw==&languageId=1&noheader",
   "Pulte|Magnolia Park": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=d441b3d3-7402-4def-a1ad-bd717158e6ca&noheader",
@@ -190,11 +191,9 @@
   "Pulte|Towns On The Parkway": "https://apps.alpha-vision.com/alphamap/index.html?OLAId=1ce1562f-d016-4c16-aa0b-3acbc551a5bd&noheader",
   "Pulte|Amrine": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=e13610c8-5e26-472c-9f02-68c8cb85c52d&noheader",
   "Pulte|Buckstone": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=7688b61a-6e78-4926-b849-d663ae7cdc40&noheader",
-  "Pulte|Clover": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=bdfb5c90-b41a-499d-85f7-8f0a3fd7353e&noheader",
   "Pulte|Jerome Village": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=zy8++jmMizMjwzpl/0/Uqg==&languageId=1&noheader",
   "Pulte|Nelson": "https://apps.alpha-vision.com/alphamap/index.html?OLAId=c5186305-93b5-4604-adc7-906089e01cbb&noheader",
   "Pulte|Berlin Bluffs": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=ff5a49ed-6c51-47b6-a08a-33466e3ef5f5&noheader",
-  "Pulte|Carpenters": "No Map",
   "Pulte|Scotts": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=4bd4b403-ca26-48dd-91cb-a758779b5a58&noheader",
   "Pulte|Limestone": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=0f0ba731-49dc-4c78-a1c5-5e6c955a572f&noheader",
   "Pulte|Nottingham Trace": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=45003e58-72ca-4d66-aa2a-10af070a84cb&languageId=1&noheader",
@@ -207,9 +206,10 @@
   "Pulte|Pioneer": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=5165feb2-1dc0-400e-bc67-6ef86ef9237d&noheader",
   "Pulte|Towns on the Greenway": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=9c83e5a4-b270-405c-a999-da6055e93748&noheader",
   "Pulte|Jefferson Manor": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=73358755-fd05-4977-876c-fd08e1b84a72&noheader",
-  "Pulte|NorthStar": "No Map",
-  "Pulte|Maygrass": "No Map",
-  "Pulte|Honey Grove": "No Map",                        
+  "Centex|Bloomfield Hills": "https://apps.alpha-vision.com/alphamap/index.html?OLAId=a16b941a-1563-49de-9c54-fdb6ff3c0d00&noheader",
+  "Centex|Clover": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=bdfb5c90-b41a-499d-85f7-8f0a3fd7353e&noheader",
+  "Del Webb|NorthStar": "No Map",
+  "Del Webb|Maygrass": "No Map",                        
   "DR Horton|Brookview": "No Map",
   "DR Horton|Lansdowne": "No Map",
   "DR Horton|Johnsons Creek": "No Map",
@@ -277,6 +277,7 @@
   "Shottenstein|Cottages At Verbana": "https://schottensteinhomes.com/wp-content/uploads/2022/12/cottages-at-verbena-siteplan.jpg",
   "Shottenstein|Glacier Pointe": "https://schottensteinhomes.com/wp-content/uploads/2024/09/Glacier-Pointe-View-Available-Lots.png",
   "Shottenstein|Wellington Park": "https://schottensteinhomes.com/wp-content/uploads/2021/11/Wellington-Park-Site-Plan-Phase-4-v2.jpg",
+  "Shottenstein|The Reserve at New California": "https://schottensteinhomes.com/wp-content/uploads/2024/09/New-California-View-Available-Lots.png",
   "America Homes 4 Rent|Eastwood": "No Map",
   "Bob Webb|Nook At Highland Lakes": "https://bobwebb.com/wp-content/uploads/2025/06/The-Nook-Community-Map-6.9.2025.jpg.webp",
   "Bob Webb|Harpers Pointe": "No Map",
@@ -290,7 +291,6 @@
     const markerData = [ 
   ["VIP","Home Office","1110 Claycraft Rd, Gahanna, OH 43230",39.992860,-82.843525],
   ["Pulte","Abberley Park","3384 Abberley Drive, New Albany, OH 43054",40.052873,-82.816503],
-  ["Pulte","Bloomfield Hills","5002 Roese Ave, South Bloomfield, OH 43103",39.708129,-82.988884],
   ["Pulte","Clarkshaw","3411 Tender Avenue, Powell, OH 43065",40.223191,-83.104699],
   ["Pulte","Glenross","106 E Wind Rd, Delaware, OH 43015",40.236117,-83.020358],
   ["Pulte","Magnolia Park","582 Weatherby Drive Sunbury , OH 43074",40.245373, -82.883716],
@@ -302,11 +302,9 @@
   ["Pulte","Towns On The Parkway","4128 John Shields Pkwy, Dublin, OH 43017",40.106649,-83.100162],
   ["Pulte","Amrine","334 Amrine Wy, Marysville, OH 43040",40.270238,-83.371765],
   ["Pulte","Buckstone","4918 Ranger Dr, Lockbourne, OH 43137",39.856655,-82.967935],
-  ["Pulte","Clover","40 Reneau Ave, Galloway, OH 43119",39.949993,-83.161864],
   ["Pulte","Jerome Village","8768 Apricot Wy, Plain City, OH 43064",40.187687,-83.189026],
   ["Pulte","Nelson","2538 Nelson Ln, Delaware, OH 43015",40.208450,-83.084053],
   ["Pulte","Berlin Bluffs","2651 Cleo St, Delaware, OH 43015",40.244850,-82.997809],
-  ["Pulte","Carpenters","4448 Ruppert Trl, Powell, OH 43065",40.185143,-83.111785],
   ["Pulte","Scotts","9556 Burghley Dr, Plain City, OH 43064",40.154941,-83.214898],
   ["Pulte","Limestone","101 Franks Field Dr, Delaware, OH 43015",40.302692,-83.122495],
   ["Pulte","Nottingham Trace","7715 Nottingham Blvd, New Albany, OH 43054",40.109482,-82.812530],
@@ -319,9 +317,10 @@
   ["Pulte","Pioneer","9569 Coach Line Ave, Plain City, OH 43064",40.150438,-83.237856],
   ["Pulte","Towns on the Greenway","337 Hockberry Ave, Westerville, OH 43081",40.134287,-82.942262],
   ["Pulte","Jefferson Manor","8488 Ben Hale Ct, Blacklick, OH 43004",40.036095,-82.787034],
-  ["Pulte","NorthStar","Wilson Rd, Sunbury, OH 43074",40.281729,-82.896846],
-  ["Pulte","Maygrass","Mitchell-Dewitt Road, Plain City OH, 43064",40.140561, -83.228528],
-  ["Pulte","Honey Grove","",40.283643,-82.894916],
+  ["Centex","Bloomfield Hills","5002 Roese Ave, South Bloomfield, OH 43103",39.708129,-82.988884],
+  ["Centex","Clover","40 Reneau Ave, Galloway, OH 43119",39.949993,-83.161864],
+  ["Del Webb","NorthStar","Wilson Rd, Sunbury, OH 43074",40.281729,-82.896846],
+  ["Del Webb","Maygrass","Mitchell-Dewitt Road, Plain City OH, 43064",40.140561, -83.228528],
   ["DR Horton","Brookview","6541 Pfeifer Ash Dr, Canal Winchester, OH 43110",39.877261,-82.821450],
   ["DR Horton","Johnsons Creek","1128 Stratford Way, London, OH 43140",39.913494,-83.437509],
   ["DR Horton","Villas At Renner Park","1486 Cardinez Way, Columbus, OH 43228",39.980788, -83.176207],
@@ -389,6 +388,7 @@
   ["Shottenstein","Cottages At Verbana","11738 Verbena Place, Plain City, OH 43064",40.184323,-83.200862],
   ["Shottenstein","Glacier Pointe","8798 Eliot Drive, Plain City, OH 43064",40.147034,-83.205445],
   ["Shottenstein","Wellington Park","598 Courtright Dr, Pickerington, OH 43147",39.895545,-82.751744],
+  ["Shottenstein","Reserve at New California","10171 Jeffrey Pine Drive, Plain City, Ohio 43064",40.159868, -83.243261],
   ["America Homes 4 Rent","Eastwood","9045 Lucy Drive, Reynoldsburg, OH",39.961474,-82.758526],
   ["Bob Webb","Nook At Highland Lakes","6089 Victory Gate, Westerville, OH 43082",40.181095,-82.928911],
   ["Bob Webb","Harpers Pointe","188 Chedworth Row, Powell, OH 43065",40.160454,-83.071413],
@@ -520,6 +520,7 @@ li.innerHTML = `
   </script>
 </body>
 </html>
+
 
 
 
