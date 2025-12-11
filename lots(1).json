@@ -995,56 +995,56 @@
   },
   {
     "lotNumber": "4",
-    "subdivision": "DW Maygrass-Preserve 34'",
+    "subdivision": "Maygrass-Preserve 34'",
     "builder": "Del Webb",
     "address": "8969 Bryce Road Plain City , OH 43064",
     "floorplan": "Meadow"
   },
   {
     "lotNumber": "3",
-    "subdivision": "DW Maygrass-Retreat 40'",
+    "subdivision": "Maygrass-Retreat 40'",
     "builder": "Del Webb",
     "address": "8959 Bryce Road Plain City , OH 43064",
     "floorplan": "Prototype"
   },
   {
     "lotNumber": "5",
-    "subdivision": "DW Maygrass-Retreat 40'",
+    "subdivision": "Maygrass-Retreat 40'",
     "builder": "Del Webb",
     "address": "8979 Bryce Road Plain City , OH 43064",
     "floorplan": "Prestige II"
   },
   {
     "lotNumber": "6",
-    "subdivision": "DW Maygrass-Sanctuary 54'",
+    "subdivision": "Maygrass-Sanctuary 54'",
     "builder": "Del Webb",
     "address": "8999 Bryce Road Plain City , OH 43064",
     "floorplan": "Stardom"
   },
   {
     "lotNumber": "445",
-    "subdivision": "DWE Northstar-Preserve 34'",
+    "subdivision": "Northstar-Preserve 34'",
     "builder": "Del Webb",
     "address": "2492 Firethorn Drive Sunbury , OH 43074",
     "floorplan": "Mirage"
   },
   {
     "lotNumber": "444",
-    "subdivision": "DWE Northstar-Retreat 40'",
+    "subdivision": "Northstar-Retreat 40'",
     "builder": "Del Webb",
     "address": "2510 Firethorn Drive Sunbury , OH 43074",
     "floorplan": "Mystique II"
   },
   {
     "lotNumber": "446",
-    "subdivision": "DWE Northstar-Retreat 40'",
+    "subdivision": "Northstar-Retreat 40'",
     "builder": "Del Webb",
     "address": "2480 Firethorn Drive Sunbury , OH 43074",
     "floorplan": "Prototype"
   },
   {
     "lotNumber": "443",
-    "subdivision": "DWE Northstar-Sanctuary 54'",
+    "subdivision": "Northstar-Sanctuary 54'",
     "builder": "Del Webb",
     "address": "2524 Firethorn Drive Sunbury , OH 43074",
     "floorplan": "Renown"
@@ -1964,7 +1964,7 @@
     "subdivision": "Pioneer Crossing",
     "builder": "Pulte",
     "address": "9208 Horseshoe Street Plain City , OH 43064",
-    "floorplan": "CountryBasement"
+    "floorplan": "Countryview - Basement"
   },
   {
     "lotNumber": "119",
@@ -1992,7 +1992,7 @@
     "subdivision": "Pioneer Crossing",
     "builder": "Pulte",
     "address": "9480 Wagon Trail Lane Plain City , OH 43064",
-    "floorplan": "CountryBasement"
+    "floorplan": "Countryview - Basement"
   },
   {
     "lotNumber": "131",
@@ -2034,7 +2034,7 @@
     "subdivision": "Pioneer Crossing",
     "builder": "Pulte",
     "address": "9503 Wagon Trail Lane Plain City , OH 43064",
-    "floorplan": "AlBasement"
+    "floorplan": "Alcott - Basement"
   },
   {
     "lotNumber": "138",
@@ -2055,7 +2055,7 @@
     "subdivision": "Pioneer Crossing",
     "builder": "Pulte",
     "address": "9520 Wagon Trail Lane Plain City , OH 43064",
-    "floorplan": "CountryBasement"
+    "floorplan": "Countryview - Basement"
   },
   {
     "lotNumber": "156",
@@ -2094,784 +2094,784 @@
   },
   {
     "lotNumber": "2146",
-    "subdivision": "Price PHighlands 5L",
+    "subdivision": "Price Ponds - Highlands",
     "builder": "Pulte",
     "address": "1083 Portrush Drive Sunbury , OH 43074",
     "floorplan": "Hilltop II"
   },
   {
     "lotNumber": "2415",
-    "subdivision": "Price PHighlands 5L",
+    "subdivision": "Price Ponds - Highlands",
     "builder": "Pulte",
     "address": "728 Callaway Lane Sunbury , OH 43074",
     "floorplan": "Hilltop II"
   },
   {
     "lotNumber": "2429",
-    "subdivision": "Price PHighlands 5L",
+    "subdivision": "Price Ponds - Highlands",
     "builder": "Pulte",
     "address": "880 Callaway Lane Sunbury , OH 43074",
     "floorplan": "Hilltop II"
   },
   {
     "lotNumber": "2436",
-    "subdivision": "Price PHighlands 5L",
+    "subdivision": "Price Ponds - Highlands",
     "builder": "Pulte",
     "address": "851 Callaway Lane Sunbury , OH 43074",
     "floorplan": "Hilltop II"
   },
   {
     "lotNumber": "2440",
-    "subdivision": "Price PHighlands 5L",
+    "subdivision": "Price Ponds - Highlands",
     "builder": "Pulte",
     "address": "827 Callaway Lane Sunbury , OH 43074",
     "floorplan": "Riverton II"
   },
   {
     "lotNumber": "2442",
-    "subdivision": "Price PHighlands 5L",
+    "subdivision": "Price Ponds - Highlands",
     "builder": "Pulte",
     "address": "815 Callaway Lane Sunbury , OH 43074",
     "floorplan": "Riverton II"
   },
   {
     "lotNumber": "2445",
-    "subdivision": "Price PHighlands 5L",
+    "subdivision": "Price Ponds - Highlands",
     "builder": "Pulte",
     "address": "854 Ping Lane Sunbury , OH 43074",
     "floorplan": "Greenfield II"
   },
   {
     "lotNumber": "2446",
-    "subdivision": "Price PHighlands 5L",
+    "subdivision": "Price Ponds - Highlands",
     "builder": "Pulte",
     "address": "860 Ping Lane Sunbury , OH 43074",
     "floorplan": "Westchester II"
   },
   {
     "lotNumber": "2450",
-    "subdivision": "Price PHighlands 5L",
+    "subdivision": "Price Ponds - Highlands",
     "builder": "Pulte",
     "address": "886 Ping Lane Sunbury , OH 43074",
     "floorplan": "Westchester II"
   },
   {
     "lotNumber": "2460",
-    "subdivision": "Price PHighlands 5L",
+    "subdivision": "Price Ponds - Highlands",
     "builder": "Pulte",
     "address": "847 Ping Lane Sunbury , OH 43074",
     "floorplan": "Riverton II"
   },
   {
     "lotNumber": "2465",
-    "subdivision": "Price PHighlands 5L",
+    "subdivision": "Price Ponds - Highlands",
     "builder": "Pulte",
     "address": "819 Ping Lane Sunbury , OH 43074",
     "floorplan": "Riverton II"
   },
   {
     "lotNumber": "2628",
-    "subdivision": "Price PHighlands 5L",
+    "subdivision": "Price Ponds - Highlands",
     "builder": "Pulte",
     "address": "811 Fairway Loop Sunbury , OH 43074",
     "floorplan": "Westchester II"
   },
   {
     "lotNumber": "2211",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "413 Weatherby Drive Sunbury , OH 43074",
     "floorplan": "Linwood II"
   },
   {
     "lotNumber": "2262",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "643 Mill Stone Drive Sunbury , OH 43074",
     "floorplan": "Linwood II"
   },
   {
     "lotNumber": "2263",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "653 Mill Stone Drive Sunbury , OH 43074",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "2475",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "443 Weatherby Drive Sunbury , OH 43074",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "2479",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "419 Weatherby Drive Sunbury , OH 43074",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "2480",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "426 Weatherby Drive Sunbury , OH 43074",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "2483",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "400 Nike Way Sunbury , OH 43074",
     "floorplan": "Mercer II"
   },
   {
     "lotNumber": "2484",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "394 Nike Way Sunbury , OH 43074",
     "floorplan": "Linwood II"
   },
   {
     "lotNumber": "2486",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "382 Nike Way Sunbury , OH 43074",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "2488",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "370 Nike Way Sunbury , OH 43074",
     "floorplan": "Linwood II"
   },
   {
     "lotNumber": "2490",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "665 Eagle Court Sunbury , OH 43074",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "2496",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "460 Weatherby Drive Sunbury , OH 43074",
     "floorplan": "Mercer II"
   },
   {
     "lotNumber": "2497",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "468 Weatherby Drive Sunbury , OH 43074",
     "floorplan": "Mercer II"
   },
   {
     "lotNumber": "2500",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "708 Eagle Court Sunbury , OH 43074",
     "floorplan": "Newberry II"
   },
   {
     "lotNumber": "2504",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "682 Eagle Court Sunbury , OH 43074",
     "floorplan": "Linwood II"
   },
   {
     "lotNumber": "2505",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "676 Eagle Court Sunbury , OH 43074",
     "floorplan": "Linwood II"
   },
   {
     "lotNumber": "2508",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "658 Eagle Court Sunbury , OH 43074",
     "floorplan": "Linwood II"
   },
   {
     "lotNumber": "2509",
-    "subdivision": "Price PSummit 5-40",
+    "subdivision": "Price Ponds - Summit",
     "builder": "Pulte",
     "address": "652 Eagle Court Sunbury , OH 43074",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "30006",
-    "subdivision": "Slate RPreserve",
+    "subdivision": "Slate Ridge Preserve",
     "builder": "Pulte",
     "address": "6737 Preserve Drive Lewis Center , OH 43035",
     "floorplan": "Meadow"
   },
   {
     "lotNumber": "30007",
-    "subdivision": "Slate RPreserve",
+    "subdivision": "Slate Ridge Preserve",
     "builder": "Pulte",
     "address": "1258 Ashlar Lane Lewis Center , OH 43035",
     "floorplan": "Meadow"
   },
   {
     "lotNumber": "30010",
-    "subdivision": "Slate RPreserve",
+    "subdivision": "Slate Ridge Preserve",
     "builder": "Pulte",
     "address": "1280 Ashlar Lane Lewis Center , OH 43035",
     "floorplan": "Meadow"
   },
   {
     "lotNumber": "30016",
-    "subdivision": "Slate RPreserve",
+    "subdivision": "Slate Ridge Preserve",
     "builder": "Pulte",
     "address": "6730 Strata Avenue Lewis Center , OH 43035",
     "floorplan": "Vista"
   },
   {
     "lotNumber": "30022",
-    "subdivision": "Slate RPreserve",
+    "subdivision": "Slate Ridge Preserve",
     "builder": "Pulte",
     "address": "1327 Fairstone Drive Lewis Center , OH 43035",
     "floorplan": "Vista"
   },
   {
     "lotNumber": "30038",
-    "subdivision": "Slate RPreserve",
+    "subdivision": "Slate Ridge Preserve",
     "builder": "Pulte",
     "address": "1245 Ashlar Lane Lewis Center , OH 43035",
     "floorplan": "Meadow"
   },
   {
     "lotNumber": "36725",
-    "subdivision": "Slate RPreserve",
+    "subdivision": "Slate Ridge Preserve",
     "builder": "Pulte",
     "address": "6725 Preserve Drive Lewis Center , OH 43035",
     "floorplan": "Clubhouse"
   },
   {
     "lotNumber": "12",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "921 Oldcastle Road Lewis Center , OH 43035",
     "floorplan": "PrestigBsmt"
   },
   {
     "lotNumber": "14",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "885 Oldcastle Road Lewis Center , OH 43035",
     "floorplan": "MystiquBsmt"
   },
   {
     "lotNumber": "15",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "867 Oldcastle Road Lewis Center , OH 43035",
     "floorplan": "PrestigBsmt"
   },
   {
     "lotNumber": "16",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "849 Oldcastle Road Lewis Center , OH 43035",
     "floorplan": "PalmarBsmt"
   },
   {
     "lotNumber": "18",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "819 Oldcastle Road Lewis Center , OH 43035",
     "floorplan": "MystiquBsmt"
   },
   {
     "lotNumber": "24",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "721 Oldcastle Road Lewis Center , OH 43035",
     "floorplan": "ProsperitBsmt"
   },
   {
     "lotNumber": "28",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "6193 Montauk Road Lewis Center , OH 43035",
     "floorplan": "Prestige II"
   },
   {
     "lotNumber": "37",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "6250 Montauk Road Lewis Center , OH 43035",
     "floorplan": "Prestige II"
   },
   {
     "lotNumber": "38",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "6258 Montauk Road Lewis Center , OH 43035",
     "floorplan": "Prestige II"
   },
   {
     "lotNumber": "39",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "6266 Montauk Road Lewis Center , OH 43035",
     "floorplan": "Mystique II"
   },
   {
     "lotNumber": "40",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "6274 Montauk Road Lewis Center , OH 43035",
     "floorplan": "Prestige II"
   },
   {
     "lotNumber": "41",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "6280 Montauk Road Lewis Center , OH 43035",
     "floorplan": "Mystique II"
   },
   {
     "lotNumber": "43",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "6298 Montauk Road Lewis Center , OH 43035",
     "floorplan": "Prestige II"
   },
   {
     "lotNumber": "44",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "680 Satori Lane Lewis Center , OH 43035",
     "floorplan": "Prestige II"
   },
   {
     "lotNumber": "45",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "696 Satori Lane Lewis Center , OH 43035",
     "floorplan": "Mystique II"
   },
   {
     "lotNumber": "47",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "724 Satori Lane Lewis Center , OH 43035",
     "floorplan": "Prestige II"
   },
   {
     "lotNumber": "52",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "1046 Oldcastle Road Lewis Center , OH 43035",
     "floorplan": "Prosperity II"
   },
   {
     "lotNumber": "63",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "661 Satori Lane Lewis Center , OH 43035",
     "floorplan": "Palmary II"
   },
   {
     "lotNumber": "64",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "677 Satori Lane Lewis Center , OH 43035",
     "floorplan": "Prestige II"
   },
   {
     "lotNumber": "65",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "695 Satori Lane Lewis Center , OH 43035",
     "floorplan": "Prestige II"
   },
   {
     "lotNumber": "66",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "6341 Montauk Road Lewis Center , OH 43035",
     "floorplan": "Prestige II"
   },
   {
     "lotNumber": "69",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "6313 Montauk Road Lewis Center , OH 43035",
     "floorplan": "Prosperity II"
   },
   {
     "lotNumber": "76",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "674 Oldcastle Road Lewis Center , OH 43035",
     "floorplan": "Prosperity II"
   },
   {
     "lotNumber": "77",
-    "subdivision": "Slate RRetreat",
+    "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "706 Oldcastle Road Lewis Center , OH 43035",
     "floorplan": "Prosperity II"
   },
   {
     "lotNumber": "369",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "2131 Melone Drive Hilliard , OH 43026",
     "floorplan": "Hilltop II"
   },
   {
     "lotNumber": "370",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "2139 Melone Drive Hilliard , OH 43026",
     "floorplan": "Westchester II"
   },
   {
     "lotNumber": "378",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6126 Dever Lane Hilliard , OH 43026",
     "floorplan": "Allison II"
   },
   {
     "lotNumber": "383",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6086 Dever Lane Hilliard , OH 43026",
     "floorplan": "Riverton II"
   },
   {
     "lotNumber": "396",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6051 Pisello Drive Hilliard , OH 43026",
     "floorplan": "Riverton II"
   },
   {
     "lotNumber": "400",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6083 Pisello Drive Hilliard , OH 43026",
     "floorplan": "Hilltop II"
   },
   {
     "lotNumber": "411",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "2110 Melone Drive Hilliard , OH 43026",
     "floorplan": "Amberwood II"
   },
   {
     "lotNumber": "413",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "2094 Melone Drive Hilliard , OH 43026",
     "floorplan": "Hilltop II"
   },
   {
     "lotNumber": "414",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "2086 Melone Drive Hilliard , OH 43026",
     "floorplan": "Allison II"
   },
   {
     "lotNumber": "427",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6137 Dever Lane Hilliard , OH 43026",
     "floorplan": "Riverton II"
   },
   {
     "lotNumber": "429",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6121 Dever Lane Hilliard , OH 43026",
     "floorplan": "Allison II"
   },
   {
     "lotNumber": "430",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6113 Dever Lane Hilliard , OH 43026",
     "floorplan": "Riverton II"
   },
   {
     "lotNumber": "435",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6065 Dever Lane Hilliard , OH 43026",
     "floorplan": "Greenfield II"
   },
   {
     "lotNumber": "440",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6096 Pisello Drive Hilliard , OH 43026",
     "floorplan": "Allison II"
   },
   {
     "lotNumber": "443",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6120 Pisello Drive Hilliard , OH 43026",
     "floorplan": "Greenfield II"
   },
   {
     "lotNumber": "444",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6128 Pisello Drive Hilliard , OH 43026",
     "floorplan": "Riverton II"
   },
   {
     "lotNumber": "445",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6136 Pisello Drive Hilliard , OH 43026",
     "floorplan": "Allison II"
   },
   {
     "lotNumber": "446",
-    "subdivision": "Sugar FHighlands 5L",
+    "subdivision": "Sugar Farms - Highlands",
     "builder": "Pulte",
     "address": "6144 Pisello Drive Hilliard , OH 43026",
     "floorplan": "Riverton II"
   },
   {
     "lotNumber": "168",
-    "subdivision": "Sugar FRetreat 10-40",
+    "subdivision": "Sugar Farms - Retreat",
     "builder": "Pulte",
     "address": "1853 Zucchina Drive Hilliard , OH 43026",
     "floorplan": "Prosperity"
   },
   {
     "lotNumber": "170",
-    "subdivision": "Sugar FRetreat 10-40",
+    "subdivision": "Sugar Farms - Retreat",
     "builder": "Pulte",
     "address": "1865 Zucchina Drive Hilliard , OH 43026",
     "floorplan": "Prosperity"
   },
   {
     "lotNumber": "171",
-    "subdivision": "Sugar FRetreat 10-40",
+    "subdivision": "Sugar Farms - Retreat",
     "builder": "Pulte",
     "address": "1871 Zucchina Drive Hilliard , OH 43026",
     "floorplan": "Prestige"
   },
   {
     "lotNumber": "182",
-    "subdivision": "Sugar FRetreat 10-40",
+    "subdivision": "Sugar Farms - Retreat",
     "builder": "Pulte",
     "address": "1947 Zucchina Drive Hilliard , OH 43026",
     "floorplan": "Mystique"
   },
   {
     "lotNumber": "184",
-    "subdivision": "Sugar FRetreat 10-40",
+    "subdivision": "Sugar Farms - Retreat",
     "builder": "Pulte",
     "address": "1944 Melanzana Drive Hilliard , OH 43026",
     "floorplan": "Mystique"
   },
   {
     "lotNumber": "190",
-    "subdivision": "Sugar FRetreat 10-40",
+    "subdivision": "Sugar Farms - Retreat",
     "builder": "Pulte",
     "address": "1898 Melanzana Drive Hilliard , OH 43026",
     "floorplan": "Mystique"
   },
   {
     "lotNumber": "191",
-    "subdivision": "Sugar FRetreat 10-40",
+    "subdivision": "Sugar Farms - Retreat",
     "builder": "Pulte",
     "address": "1892 Melanzana Drive Hilliard , OH 43026",
     "floorplan": "Mystique"
   },
   {
     "lotNumber": "207",
-    "subdivision": "Sugar FRetreat 10-40",
+    "subdivision": "Sugar Farms - Retreat",
     "builder": "Pulte",
     "address": "1848 Zucchina Drive Hilliard , OH 43026",
     "floorplan": "Mystique"
   },
   {
     "lotNumber": "208",
-    "subdivision": "Sugar FRetreat 10-40",
+    "subdivision": "Sugar Farms - Retreat",
     "builder": "Pulte",
     "address": "1854 Zucchina Drive Hilliard , OH 43026",
     "floorplan": "Mystique"
   },
   {
     "lotNumber": "224",
-    "subdivision": "Sugar FRetreat 10-40",
+    "subdivision": "Sugar Farms - Retreat",
     "builder": "Pulte",
     "address": "1849 Melanzana Drive Hilliard , OH 43026",
     "floorplan": "Prosperity"
   },
   {
     "lotNumber": "225",
-    "subdivision": "Sugar FRetreat 10-40",
+    "subdivision": "Sugar Farms - Retreat",
     "builder": "Pulte",
     "address": "1843 Melanzana Drive Hilliard , OH 43026",
     "floorplan": "Mystique"
   },
   {
     "lotNumber": "135",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "6338 Zuccaro Drive Hilliard , OH 43026",
     "floorplan": "Newberry II"
   },
   {
     "lotNumber": "139",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "1840 Pomodoro Drive Hilliard , OH 43026",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "140",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "1854 Pomodoro Drive Hilliard , OH 43026",
     "floorplan": "Mercer II"
   },
   {
     "lotNumber": "143",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "6347 Patata Drive Hilliard , OH 43026",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "245",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "6320 Anguria Drive Hilliard , OH 43026",
     "floorplan": "Newberry II"
   },
   {
     "lotNumber": "304",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "6295 Lampone Drive Hilliard , OH 43026",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "306",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "6307 Lampone Drive Hilliard , OH 43026",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "310",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "6331 Lampone Drive Hilliard , OH 43026",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "311",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "2030 Ceduna Drive Hilliard , OH 43026",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "312",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "2020 Ceduna Drive Hilliard , OH 43026",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "314",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "2096 Arancia Drive Hilliard , OH 43026",
     "floorplan": "Newberry II"
   },
   {
     "lotNumber": "322",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "2073 Fragola Drive Hilliard , OH 43026",
     "floorplan": "Newberry II"
   },
   {
     "lotNumber": "323",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "2078 Fragola Drive Hilliard , OH 43026",
     "floorplan": "Linwood II"
   },
   {
     "lotNumber": "324",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "2072 Fragola Drive Hilliard , OH 43026",
     "floorplan": "Newberry II"
   },
   {
     "lotNumber": "328",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "2043 Fragola Drive Hilliard , OH 43026",
     "floorplan": "Newberry II"
   },
   {
     "lotNumber": "329",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "2037 Fragola Drive Hilliard , OH 43026",
     "floorplan": "Newberry II"
   },
   {
     "lotNumber": "330",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "2031 Fragola Drive Hilliard , OH 43026",
     "floorplan": "Mercer II"
   },
   {
     "lotNumber": "331",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "2025 Fragola Drive Hilliard , OH 43026",
     "floorplan": "Mercer II"
   },
   {
     "lotNumber": "341",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "2048 Mirtillo Drive Hilliard , OH 43026",
     "floorplan": "Continental II"
   },
   {
     "lotNumber": "343",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "6274 Lampone Drive Hilliard , OH 43026",
     "floorplan": "Linwood II"
   },
   {
     "lotNumber": "344",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "6280 Lampone Drive Hilliard , OH 43026",
     "floorplan": "Newberry II"
   },
   {
     "lotNumber": "353",
-    "subdivision": "Sugar FSummit 5-40",
+    "subdivision": "Sugar Farms - Summit",
     "builder": "Pulte",
     "address": "6293 Amarena Drive Hilliard , OH 43026",
     "floorplan": "Linwood II"
@@ -5083,70 +5083,70 @@
   },
   {
     "lotNumber": "39",
-    "subdivision": "Forest Riidge",
+    "subdivision": "Forest Ridge",
     "builder": "MI Homes",
     "address": "313 Reign Way",
     "floorplan": "Bella"
   },
   {
     "lotNumber": "75",
-    "subdivision": "Forest Riidge",
+    "subdivision": "Forest Ridge",
     "builder": "MI Homes",
     "address": "418 Fannin Drive",
     "floorplan": "Caymus"
   },
   {
     "lotNumber": "56",
-    "subdivision": "Forest Riidge",
+    "subdivision": "Forest Ridge",
     "builder": "MI Homes",
     "address": "304 Reign Way",
     "floorplan": "Duckhorn"
   },
   {
     "lotNumber": "55",
-    "subdivision": "Forest Riidge",
+    "subdivision": "Forest Ridge",
     "builder": "MI Homes",
     "address": "306 Reign Way",
     "floorplan": "Caymus"
   },
   {
     "lotNumber": "53",
-    "subdivision": "Forest Riidge",
+    "subdivision": "Forest Ridge",
     "builder": "MI Homes",
     "address": "310 Reign Way",
     "floorplan": "Farm"
   },
   {
     "lotNumber": "57",
-    "subdivision": "Forest Riidge",
+    "subdivision": "Forest Ridge",
     "builder": "MI Homes",
     "address": "302 Reign Way",
     "floorplan": "Farm"
   },
   {
     "lotNumber": "86",
-    "subdivision": "Forest Riidge",
+    "subdivision": "Forest Ridge",
     "builder": "MI Homes",
     "address": "301 Reign Way",
     "floorplan": "Bella"
   },
   {
     "lotNumber": "52",
-    "subdivision": "Forest Riidge",
+    "subdivision": "Forest Ridge",
     "builder": "MI Homes",
     "address": "312 Reign Way",
     "floorplan": "Ellman"
   },
   {
     "lotNumber": "60",
-    "subdivision": "Forest Riidge",
+    "subdivision": "Forest Ridge",
     "builder": "MI Homes",
     "address": "118 Ruby Road",
     "floorplan": "Ellman"
   },
   {
     "lotNumber": "33",
-    "subdivision": "Forest Riidge",
+    "subdivision": "Forest Ridge",
     "builder": "MI Homes",
     "address": "116 Ruby Road",
     "floorplan": "Grandview"
@@ -5995,203 +5995,203 @@
     "lotNumber": "244",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18846_244/_9040 Henley Avenue_0244 9040 Henley Avenue",
-    "floorplan": "O"
+    "address": "9040 Henley Avenue",
+    "floorplan": "O340"
   },
   {
     "lotNumber": "242",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18844_242/_9052 Henley Avenue_0242 9052 Henley Avenue",
-    "floorplan": "O"
+    "address": "9052 Henley Avenue",
+    "floorplan": "O340"
   },
   {
     "lotNumber": "136",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18738_136/_9085 Henley Avenue_0136 9085 Henley Avenue",
-    "floorplan": "O"
+    "address": "9085 Henley Avenue",
+    "floorplan": "O340"
   },
   {
     "lotNumber": "128",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18730_128/_9037 Henley Avenue_0128 9037 Henley Avenue",
-    "floorplan": "O"
+    "address": "9037 Henley Avenue",
+    "floorplan": "O520"
   },
   {
     "lotNumber": "126",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18728_126/_9025 Henley Avenue_0126 9025 Henley Avenue",
-    "floorplan": "O"
+    "address": "9025 Henley Avenue",
+    "floorplan": "O520"
   },
   {
     "lotNumber": "233",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18835_233/_9106 Henley Avenue_0233 9106 Henley Avenue",
-    "floorplan": "O"
+    "address": "9106 Henley Avenue",
+    "floorplan": "O340"
   },
   {
     "lotNumber": "247",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18849_247/_9022 Henley Avenue_0247 9022 Henley Avenue",
-    "floorplan": "O"
+    "address": "9022 Henley Avenue",
+    "floorplan": "O520"
   },
   {
     "lotNumber": "132",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18734_132/_9061 Henley Avenue_0132 9061 Henley Avenue",
-    "floorplan": "O"
+    "address": "9061 Henley Avenue",
+    "floorplan": "O520"
   },
   {
     "lotNumber": "129",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18731_129/_9043 Henley Avenue_0129 9043 Henley Avenue",
-    "floorplan": "O"
+    "address": "9043 Henley Avenue",
+    "floorplan": "O510"
   },
   {
     "lotNumber": "246",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18848_246/_9028 Henley Avenue_0246 9028 Henley Avenue",
-    "floorplan": "O"
+    "address": "9028 Henley Avenue",
+    "floorplan": "O510"
   },
   {
     "lotNumber": "235",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18837_235/_9094 Henley Avenue_0235 9094 Henley Avenue",
-    "floorplan": "O"
+    "address": "9094 Henley Avenue",
+    "floorplan": "O510"
   },
   {
     "lotNumber": "135",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18737_135/_9079 Henley Avenue_0135 9079 Henley Avenue",
-    "floorplan": "O"
+    "address": "9079 Henley Avenue",
+    "floorplan": "O510"
   },
   {
     "lotNumber": "239",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18841_239/_9070 Henley Avenue_0239 9070 Henley Avenue",
-    "floorplan": "O"
+    "address": "9070 Henley Avenue",
+    "floorplan": "O500"
   },
   {
     "lotNumber": "134",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18736_134/_9073 Henley Avenue_0134 9073 Henley Avenue",
-    "floorplan": "O"
+    "address": "9073 Henley Avenue",
+    "floorplan": "O510"
   },
   {
     "lotNumber": "240",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18842_240/_9064 Henley Avenue_0240 9064 Henley Avenue",
-    "floorplan": "O"
+    "address": "9064 Henley Avenue",
+    "floorplan": "O340"
   },
   {
     "lotNumber": "234",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18836_234/_9100 Henley Avenue_0234 9100 Henley Avenue",
-    "floorplan": "O"
+    "address": "9100 Henley Avenue",
+    "floorplan": "O510"
   },
   {
     "lotNumber": "138",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18740_138/_9097 Henley Avenue_0138 9097 Henley Avenue",
-    "floorplan": "O"
+    "address": "9097 Henley Avenue",
+    "floorplan": "O510"
   },
   {
     "lotNumber": "237",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18839_237/_9082 Henley Avenue_0237 9082 Henley Avenue",
-    "floorplan": "O"
+    "address": "9082 Henley Avenue",
+    "floorplan": "O510"
   },
   {
     "lotNumber": "127",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18729_127/_9031  Henley Avenue_0127 9031  Henley Avenue",
-    "floorplan": "O"
+    "address": "9031 Henley Avenue",
+    "floorplan": "O340"
   },
   {
     "lotNumber": "236",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18838_236/_9088 Henley Avenue_0236 9088 Henley Avenue",
-    "floorplan": "O"
+    "address": "9088 Henley Avenue",
+    "floorplan": "O520"
   },
   {
     "lotNumber": "243",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18845_243/_9046 Henley Avenue_0243 9046 Henley Avenue",
-    "floorplan": "O"
+    "address": "9046 Henley Avenue",
+    "floorplan": "O520"
   },
   {
     "lotNumber": "245",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18847_245/_9034 Henley Avenue_0245 9034 Henley Avenue",
-    "floorplan": "O"
+    "address": "9034 Henley Avenue",
+    "floorplan": "O510"
   },
   {
     "lotNumber": "248",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18850_248/_9016 Henley Avenue_0248 9016 Henley Avenue",
-    "floorplan": "O"
+    "address": "9016 Henley Avenue",
+    "floorplan": "O500"
   },
   {
     "lotNumber": "241",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18843_241/_9058 Henley Avenue_0241 9058 Henley Avenue",
-    "floorplan": "O"
+    "address": "9058 Henley Avenue",
+    "floorplan": "O520"
   },
   {
     "lotNumber": "131",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18733_131/_9055 Henley Avenue_0131 9055 Henley Avenue",
-    "floorplan": "O"
+    "address": "9055 Henley Avenue",
+    "floorplan": "O510"
   },
   {
     "lotNumber": "133",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18735_133/_9067 Henley Avenue_0133 9067 Henley Avenue",
-    "floorplan": "O"
+    "address": "9067 Henley Avenue",
+    "floorplan": "O340"
   },
   {
     "lotNumber": "130",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18732_130/_9049 Henley Avenue_0130 9049 Henley Avenue",
-    "floorplan": "O"
+    "address": "9049 Henley Avenue",
+    "floorplan": "O340"
   },
   {
     "lotNumber": "238",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18840_238/_9076 Henley Avenue_0238 9076 Henley Avenue",
-    "floorplan": "O"
+    "address": "9076 Henley Avenue",
+    "floorplan": "O520"
   },
   {
     "lotNumber": "137",
     "subdivision": "Eastwood",
     "builder": "American Homes 4 Rent ",
-    "address": "OH18739_137/_9091 Henley Avenue_0137 9091 Henley Avenue",
-    "floorplan": "O"
+    "address": "9091 Henley Avenue",
+    "floorplan": "O520"
   }
 ]
