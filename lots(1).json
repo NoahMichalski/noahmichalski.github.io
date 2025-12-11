@@ -1,4 +1,3364 @@
 [
+   {
+    "lotNumber": "100",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "Wheatly Road New Albany , OH 43054",
+    "floorplan": "Building Shell"
+  },
+  {
+    "lotNumber": "101",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "6535 Wheatly Road New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "102",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "6531 Wheatly Road New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "103",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "6527 Wheatly Road New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "104",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "6525 Wheatly Road New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "105",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "6521 Wheatly Road New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "701",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "6540 Wheatly Road New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "702",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "6544 Wheatly Road New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "800",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "Wheatly Road New Albany , OH 43054",
+    "floorplan": "Building Shell"
+  },
+  {
+    "lotNumber": "801",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "6522 Wheatly Road New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "802",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "6526 Wheatly Road New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "803",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "6528 Wheatly Road New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "804",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "6532 Wheatly Road New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "902",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "3377 Abberley Drive New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "904",
+    "subdivision": "Abberley Park",
+    "builder": "Pulte",
+    "address": "3385 Abberley Drive New Albany , OH 43054",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "35",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "241 Figleaf Lane Marysville , OH 43040",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "41",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "181 Figleaf Lane Marysville , OH 43040",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "43",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "161 Figleaf Lane Marysville , OH 43040",
+    "floorplan": "Ivy"
+  },
+  {
+    "lotNumber": "44",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "151 Figleaf Lane Marysville , OH 43040",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "46",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "131 Figleaf Lane Marysville , OH 43040",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "47",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "2233 Hubbard Road Marysville , OH 43040",
+    "floorplan": "PalmarBsmt"
+  },
+  {
+    "lotNumber": "48",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "154 Figleaf Lane Marysville , OH 43040",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "51",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "184 Figleaf Lane Marysville , OH 43040",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "52",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "194 Figleaf Lane Marysville , OH 43040",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "61",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "2353 Hubbard Road Marysville , OH 43040",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "62",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "2343 Hubbard Road Marysville , OH 43040",
+    "floorplan": "Ivy"
+  },
+  {
+    "lotNumber": "63",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "2333 Hubbard Road Marysville , OH 43040",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "64",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "2323 Hubbard Road Marysville , OH 43040",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "69",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "2253 Hubbard Road Marysville , OH 43040",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "80",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "2260 Hubbard Road Marysville , OH 43040",
+    "floorplan": "Ivy"
+  },
+  {
+    "lotNumber": "83",
+    "subdivision": "Amrine Meadows",
+    "builder": "Pulte",
+    "address": "2290 Hubbard Road Marysville , OH 43040",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "3516",
+    "subdivision": "Berlin Bluffs",
+    "builder": "Pulte",
+    "address": "2723 Cleo Street Delaware , OH 43015",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "3517",
+    "subdivision": "Berlin Bluffs",
+    "builder": "Pulte",
+    "address": "2759 Cleo Street Delaware , OH 43015",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "3523",
+    "subdivision": "Berlin Bluffs",
+    "builder": "Pulte",
+    "address": "2893 Cleo Street Delaware , OH 43015",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "3536",
+    "subdivision": "Berlin Bluffs",
+    "builder": "Pulte",
+    "address": "2914 Cleo Street Delaware , OH 43015",
+    "floorplan": "Melrose"
+  },
+  {
+    "lotNumber": "3538",
+    "subdivision": "Berlin Bluffs",
+    "builder": "Pulte",
+    "address": "2882 Cleo Street Delaware , OH 43015",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "3539",
+    "subdivision": "Berlin Bluffs",
+    "builder": "Pulte",
+    "address": "2866 Cleo Street Delaware , OH 43015",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "3546",
+    "subdivision": "Berlin Bluffs",
+    "builder": "Pulte",
+    "address": "2728 Cleo Street Delaware , OH 43015",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "3572",
+    "subdivision": "Berlin Bluffs",
+    "builder": "Pulte",
+    "address": "3110 Cleo Street Delaware , OH 43015",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "3573",
+    "subdivision": "Berlin Bluffs",
+    "builder": "Pulte",
+    "address": "3128 Cleo Street Delaware , OH 43015",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "3574",
+    "subdivision": "Berlin Bluffs",
+    "builder": "Pulte",
+    "address": "3146 Cleo Street Delaware , OH 43015",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "3576",
+    "subdivision": "Berlin Bluffs",
+    "builder": "Pulte",
+    "address": "3198 Cleo Street Delaware , OH 43015",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "97",
+    "subdivision": "Beulah Park",
+    "builder": "Pulte",
+    "address": "3655 Glacial Lane Grove City , OH 43123",
+    "floorplan": "Boardwalk"
+  },
+  {
+    "lotNumber": "187",
+    "subdivision": "Beulah Park",
+    "builder": "Pulte",
+    "address": "3780 Brody Drive Grove City , OH 43123",
+    "floorplan": "Fifth Avenue"
+  },
+  {
+    "lotNumber": "303",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "272 Dowler Drive South Bloomfield , OH 43103",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "304",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "270 Dowler Drive South Bloomfield , OH 43103",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "325",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "336 Honeysuckle Street South Bloomfield , OH 43103",
+    "floorplan": "Serenada"
+  },
+  {
+    "lotNumber": "326",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "334 Honeysuckle Street South Bloomfield , OH 43103",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "327",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "332 Honeysuckle Street South Bloomfield , OH 43103",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "328",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "330 Honeysuckle Street South Bloomfield , OH 43103",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "329",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "328 Honeysuckle Street South Bloomfield , OH 43103",
+    "floorplan": "Oakdale"
+  },
+  {
+    "lotNumber": "330",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "326 Honeysuckle Street South Bloomfield , OH 43103",
+    "floorplan": "Serenada"
+  },
+  {
+    "lotNumber": "335",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "5435 Morning Glory Street South Bloomfield , OH 43103",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "337",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "5439 Morning Glory Street South Bloomfield , OH 43103",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "338",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "5441 Morning Glory Street South Bloomfield , OH 43103",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "339",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "5443 Morning Glory Street South Bloomfield , OH 43103",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "340",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "5445 Morning Glory Street South Bloomfield , OH 43103",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "341",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "276 Dowler Drive South Bloomfield , OH 43103",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "342",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "274 Dowler Drive South Bloomfield , OH 43103",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "344",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "287 Dowler Drive South Bloomfield , OH 43103",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "345",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "289 Dowler Drive South Bloomfield , OH 43103",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "346",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "291 Dowler Drive South Bloomfield , OH 43103",
+    "floorplan": "Mitchell"
+  },
+  {
+    "lotNumber": "350",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "278 Dowler Drive South Bloomfield , OH 43103",
+    "floorplan": "Mitchell"
+  },
+  {
+    "lotNumber": "352",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "5444 Morning Glory Street South Bloomfield , OH 43103",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "353",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "5442 Morning Glory Street South Bloomfield , OH 43103",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "354",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "5440 Morning Glory Street South Bloomfield , OH 43103",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "355",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "5438 Morning Glory Street South Bloomfield , OH 43103",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "356",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "5436 Morning Glory Street South Bloomfield , OH 43103",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "359",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "5430 Morning Glory Street South Bloomfield , OH 43103",
+    "floorplan": "Serenada"
+  },
+  {
+    "lotNumber": "372",
+    "subdivision": "Bloomfield Hills",
+    "builder": "Centex",
+    "address": "5547 Violet Street South Bloomfield , OH 43103",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "77",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1346 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "83",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1292 Webb Drive Lockbourne , OH 43137",
+    "floorplan": "Aspire II"
+  },
+  {
+    "lotNumber": "84",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1284 Webb Drive Lockbourne , OH 43137",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "87",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "5060 Ranger Drive Lockbourne , OH 43137",
+    "floorplan": "Aspire II"
+  },
+  {
+    "lotNumber": "88",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "5068 Ranger Drive Lockbourne , OH 43137",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "90",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1291 Webb Drive Lockbourne , OH 43137",
+    "floorplan": "Hampton II"
+  },
+  {
+    "lotNumber": "91",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1299 Webb Drive Lockbourne , OH 43137",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "92",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1307 Webb Drive Lockbourne , OH 43137",
+    "floorplan": "Fairview"
+  },
+  {
+    "lotNumber": "93",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1315 Webb Drive Lockbourne , OH 43137",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "95",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1314 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Hampton II"
+  },
+  {
+    "lotNumber": "96",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1306 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "97",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1298 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Aspire II"
+  },
+  {
+    "lotNumber": "98",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1290 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Hampton II"
+  },
+  {
+    "lotNumber": "99",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1282 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Aspire II"
+  },
+  {
+    "lotNumber": "100",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "5076 Ranger Drive Lockbourne , OH 43137",
+    "floorplan": "Oakdale"
+  },
+  {
+    "lotNumber": "105",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1279 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "108",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1303 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "110",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1319 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "112",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1335 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Aspire II"
+  },
+  {
+    "lotNumber": "113",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1343 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Fairview"
+  },
+  {
+    "lotNumber": "115",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1359 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "116",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1367 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Hampton II"
+  },
+  {
+    "lotNumber": "117",
+    "subdivision": "Buckstone Bend",
+    "builder": "Pulte",
+    "address": "1375 Acuff Avenue Lockbourne , OH 43137",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "7131",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "5662 Peavey Street Powell , OH 43065",
+    "floorplan": "Linwood III"
+  },
+  {
+    "lotNumber": "7132",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "5672 Peavey Street Powell , OH 43065",
+    "floorplan": "Waverly III"
+  },
+  {
+    "lotNumber": "7133",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "5684 Peavey Street Powell , OH 43065",
+    "floorplan": "Waverly III"
+  },
+  {
+    "lotNumber": "7146",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "3460 Tender Avenue Powell , OH 43065",
+    "floorplan": "Waverly III"
+  },
+  {
+    "lotNumber": "7147",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "3468 Tender Avenue Powell , OH 43065",
+    "floorplan": "Continental III"
+  },
+  {
+    "lotNumber": "7150",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "3494 Tender Avenue Powell , OH 43065",
+    "floorplan": "Continental III"
+  },
+  {
+    "lotNumber": "7151",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "3495 Tender Avenue Powell , OH 43065",
+    "floorplan": "Waverly III"
+  },
+  {
+    "lotNumber": "7153",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "3481 Tender Avenue Powell , OH 43065",
+    "floorplan": "Ivy III"
+  },
+  {
+    "lotNumber": "7162",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "3375 Tender Avenue Powell , OH 43065",
+    "floorplan": "Mercer III"
+  },
+  {
+    "lotNumber": "7163",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "3355 Tender Avenue Powell , OH 43065",
+    "floorplan": "Waverly III"
+  },
+  {
+    "lotNumber": "7164",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "3337 Tender Avenue Powell , OH 43065",
+    "floorplan": "Waverly III"
+  },
+  {
+    "lotNumber": "7165",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "3323 Tender Avenue Powell , OH 43065",
+    "floorplan": "Continental III"
+  },
+  {
+    "lotNumber": "7184",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "5695 Peavey Street Powell , OH 43065",
+    "floorplan": "Waverly III"
+  },
+  {
+    "lotNumber": "7185",
+    "subdivision": "Clark Shaw Reserve",
+    "builder": "Pulte",
+    "address": "5683 Peavey Street Powell , OH 43065",
+    "floorplan": "Newberry III"
+  },
+  {
+    "lotNumber": "48",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "296 Rye Street Galloway , OH 43119",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "49",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "308 Rye Street Galloway , OH 43119",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "50",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "314 Rye Street Galloway , OH 43119",
+    "floorplan": "Fairview"
+  },
+  {
+    "lotNumber": "51",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "320 Rye Street Galloway , OH 43119",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "52",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "326 Rye Street Galloway , OH 43119",
+    "floorplan": "Mitchell"
+  },
+  {
+    "lotNumber": "53",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "332 Rye Street Galloway , OH 43119",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "107",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "6212 Trefoil Street Galloway , OH 43119",
+    "floorplan": "Oakdale"
+  },
+  {
+    "lotNumber": "108",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "6206 Trefoil Street Galloway , OH 43119",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "109",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "6200 Trefoil Street Galloway , OH 43119",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "112",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "297 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Mitchell"
+  },
+  {
+    "lotNumber": "113",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "289 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "114",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "281 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Fairview"
+  },
+  {
+    "lotNumber": "115",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "273 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "116",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "265 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "117",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "260 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "118",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "295 Rye Street Galloway , OH 43119",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "119",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "301 Rye Street Galloway , OH 43119",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "120",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "307 Rye Street Galloway , OH 43119",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "121",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "315 Rye Street Galloway , OH 43119",
+    "floorplan": "Oakdale"
+  },
+  {
+    "lotNumber": "122",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "319 Rye Street Galloway , OH 43119",
+    "floorplan": "Mitchell"
+  },
+  {
+    "lotNumber": "123",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "325 Rye Street Galloway , OH 43119",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "124",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "331 Rye Street Galloway , OH 43119",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "125",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "337 Rye Street Galloway , OH 43119",
+    "floorplan": "Mitchell"
+  },
+  {
+    "lotNumber": "138",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "342 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Oakdale"
+  },
+  {
+    "lotNumber": "139",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "334 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Mitchell"
+  },
+  {
+    "lotNumber": "140",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "326 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "141",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "318 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Hampton"
+  },
+  {
+    "lotNumber": "142",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "310 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Fairview"
+  },
+  {
+    "lotNumber": "143",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "302 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "144",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "294 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "145",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "286 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "146",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "278 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Oakdale"
+  },
+  {
+    "lotNumber": "147",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "270 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "148",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "335 Fortune Drive Galloway , OH 43119",
+    "floorplan": "Aspire"
+  },
+  {
+    "lotNumber": "163",
+    "subdivision": "Clover Run",
+    "builder": "Centex",
+    "address": "336 Clonfert Road Galloway , OH 43119",
+    "floorplan": "Mitchell"
+  },
+  {
+    "lotNumber": "4",
+    "subdivision": "DW Maygrass-Preserve 34'",
+    "builder": "Del Webb",
+    "address": "8969 Bryce Road Plain City , OH 43064",
+    "floorplan": "Meadow"
+  },
+  {
+    "lotNumber": "3",
+    "subdivision": "DW Maygrass-Retreat 40'",
+    "builder": "Del Webb",
+    "address": "8959 Bryce Road Plain City , OH 43064",
+    "floorplan": "Prototype"
+  },
+  {
+    "lotNumber": "5",
+    "subdivision": "DW Maygrass-Retreat 40'",
+    "builder": "Del Webb",
+    "address": "8979 Bryce Road Plain City , OH 43064",
+    "floorplan": "Prestige II"
+  },
+  {
+    "lotNumber": "6",
+    "subdivision": "DW Maygrass-Sanctuary 54'",
+    "builder": "Del Webb",
+    "address": "8999 Bryce Road Plain City , OH 43064",
+    "floorplan": "Stardom"
+  },
+  {
+    "lotNumber": "445",
+    "subdivision": "DWE Northstar-Preserve 34'",
+    "builder": "Del Webb",
+    "address": "2492 Firethorn Drive Sunbury , OH 43074",
+    "floorplan": "Mirage"
+  },
+  {
+    "lotNumber": "444",
+    "subdivision": "DWE Northstar-Retreat 40'",
+    "builder": "Del Webb",
+    "address": "2510 Firethorn Drive Sunbury , OH 43074",
+    "floorplan": "Mystique II"
+  },
+  {
+    "lotNumber": "446",
+    "subdivision": "DWE Northstar-Retreat 40'",
+    "builder": "Del Webb",
+    "address": "2480 Firethorn Drive Sunbury , OH 43074",
+    "floorplan": "Prototype"
+  },
+  {
+    "lotNumber": "443",
+    "subdivision": "DWE Northstar-Sanctuary 54'",
+    "builder": "Del Webb",
+    "address": "2524 Firethorn Drive Sunbury , OH 43074",
+    "floorplan": "Renown"
+  },
+  {
+    "lotNumber": "2563",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1315 Red Tail Place Galena , OH 43021",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "2573",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1470 Crest Drive Galena , OH 43021",
+    "floorplan": "Aspire II"
+  },
+  {
+    "lotNumber": "2575",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1454 Crest Drive Galena , OH 43021",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "2576",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1245 Steller Drive Galena , OH 43021",
+    "floorplan": "OakBsmt"
+  },
+  {
+    "lotNumber": "2577",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1237 Steller Drive Galena , OH 43021",
+    "floorplan": "MitchelBsmt"
+  },
+  {
+    "lotNumber": "2582",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "7420 Steppe Court Galena , OH 43021",
+    "floorplan": "Hampton II"
+  },
+  {
+    "lotNumber": "2583",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "7428 Steppe Court Galena , OH 43021",
+    "floorplan": "Aspire II"
+  },
+  {
+    "lotNumber": "2585",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "7444 Steppe Court Galena , OH 43021",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "2586",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1074 Solitary Street Galena , OH 43021",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "2588",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1086 Solitary Street Galena , OH 43021",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "2589",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1094 Solitary Street Galena , OH 43021",
+    "floorplan": "Oakdale"
+  },
+  {
+    "lotNumber": "2590",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1102 Solitary Street Galena , OH 43021",
+    "floorplan": "Aspire II"
+  },
+  {
+    "lotNumber": "2591",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1110 Solitary Street Galena , OH 43021",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "2592",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1118 Solitary Street Galena , OH 43021",
+    "floorplan": "Aspire II"
+  },
+  {
+    "lotNumber": "2593",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1126 Solitary Street Galena , OH 43021",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "2594",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1134 Solitary Street Galena , OH 43021",
+    "floorplan": "Fairview"
+  },
+  {
+    "lotNumber": "2595",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1142 Solitary Street Galena , OH 43021",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "2596",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1399 Crest Drive Galena , OH 43021",
+    "floorplan": "CrisfBsmt"
+  },
+  {
+    "lotNumber": "2597",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1407 Crest Drive Galena , OH 43021",
+    "floorplan": "HamptoBsmt"
+  },
+  {
+    "lotNumber": "2598",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1415 Crest Drive Galena , OH 43021",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "2599",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1423 Crest Drive Galena , OH 43021",
+    "floorplan": "Aspire II"
+  },
+  {
+    "lotNumber": "2600",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1240 Steller Drive Galena , OH 43021",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "2602",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1256 Steller Drive Galena , OH 43021",
+    "floorplan": "Oakdale"
+  },
+  {
+    "lotNumber": "2604",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1455 Crest Drive Galena , OH 43021",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "2606",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1477 Crest Drive Galena , OH 43021",
+    "floorplan": "Hampton II"
+  },
+  {
+    "lotNumber": "2921",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1150 Solitary Street Galena , OH 43021",
+    "floorplan": "Hampton II"
+  },
+  {
+    "lotNumber": "2933",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1296 Steller Drive Galena , OH 43021",
+    "floorplan": "Crisfield"
+  },
+  {
+    "lotNumber": "2934",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1280 Steller Drive Galena , OH 43021",
+    "floorplan": "Aspire II"
+  },
+  {
+    "lotNumber": "2936",
+    "subdivision": "Eagle Creek",
+    "builder": "Pulte",
+    "address": "1265 Steller Drive Galena , OH 43021",
+    "floorplan": "MitchelBsmt"
+  },
+  {
+    "lotNumber": "13978",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "416 Cardinal Point Drive Delaware , OH 43015",
+    "floorplan": "Ivy"
+  },
+  {
+    "lotNumber": "13980",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "409 Cardinal Point Drive Delaware , OH 43015",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "13982",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "397 Cardinal Point Drive Delaware , OH 43015",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "14008",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "428 Cardinal Point Drive Delaware , OH 43015",
+    "floorplan": "Waverly III"
+  },
+  {
+    "lotNumber": "14009",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "422 Cardinal Point Drive Delaware , OH 43015",
+    "floorplan": "Greenfield II"
+  },
+  {
+    "lotNumber": "14018",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "71 Harvest Moon Road Delaware , OH 43015",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "14025",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "138 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Ivy"
+  },
+  {
+    "lotNumber": "14026",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "132 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "14029",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "114 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "14030",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "108 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "14031",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "102 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "14032",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "96 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Waverly III"
+  },
+  {
+    "lotNumber": "14034",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "84 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "14037",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "66 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "14038",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "60 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Waverly III"
+  },
+  {
+    "lotNumber": "14039",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "54 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Ivy"
+  },
+  {
+    "lotNumber": "14042",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "36 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "14043",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "30 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "14044",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "31 Shadow Oak Loop Delaware , OH 43015",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "14056",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "70 Harvest Moon Road Delaware , OH 43015",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "14059",
+    "subdivision": "Glenross",
+    "builder": "Pulte",
+    "address": "52 Harvest Moon Road Delaware , OH 43015",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "13",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9390 Red Cherry Lane Plain City , OH 43064",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "54",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9884 Glenfield Court Plain City , OH 43064",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "55",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9872 Glenfield Avenue Plain City , OH 43064",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "154",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9690 Glenfield Avenue Plain City , OH 43064",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "158",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9650 Glenfield Avenue Plain City , OH 43064",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "160",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9630 Glenfield Avenue Plain City , OH 43064",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "162",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9610 Glenfield Avenue Plain City , OH 43064",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "211",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9303 Vista Lane Plain City , OH 43064",
+    "floorplan": "Greenfield II"
+  },
+  {
+    "lotNumber": "214",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9333 Vista Lane Plain City , OH 43064",
+    "floorplan": "Greenfield II"
+  },
+  {
+    "lotNumber": "215",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9609 Glenfield Avenue Plain City , OH 43064",
+    "floorplan": "Greenfield II"
+  },
+  {
+    "lotNumber": "217",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9629 Glenfield Avenue Plain City , OH 43064",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "218",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9639 Glenfield Avenue Plain City , OH 43064",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "219",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9649 Glenfield Avenue Plain City , OH 43064",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "220",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9659 Glenfield Avenue Plain City , OH 43064",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "228",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9588 Rosemont Road Plain City , OH 43064",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "232",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9557 Rosemont Road Plain City , OH 43064",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "238",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9617 Rosemont Road Plain City , OH 43064",
+    "floorplan": "Greenfield II"
+  },
+  {
+    "lotNumber": "239",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9627 Rosemont Road Plain City , OH 43064",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "242",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9657 Rosemont Road Plain City , OH 43064",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "243",
+    "subdivision": "Homestead at Scotts Farm",
+    "builder": "Pulte",
+    "address": "9709 Glenfield Avenue Plain City , OH 43064",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "2",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "8516 Ben Hale Court Blacklick , OH 43004",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "9",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "8622 Ben Hale Court Blacklick , OH 43004",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "11",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "8648 Ben Hale Court Blacklick , OH 43004",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "17",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "8679 Ben Hale Court Blacklick , OH 43004",
+    "floorplan": "Woodside"
+  },
+  {
+    "lotNumber": "19",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "8603 Ben Hale Court Blacklick , OH 43004",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "23",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "2488 Elisabeth Lane Blacklick , OH 43004",
+    "floorplan": "Maple Valley"
+  },
+  {
+    "lotNumber": "25",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "2462 Elisabeth Lane Blacklick , OH 43004",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "26",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "2446 Elisabeth Lane Blacklick , OH 43004",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "27",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "2432 Elisabeth Lane Blacklick , OH 43004",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "28",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "2420 Elisabeth Lane Blacklick , OH 43004",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "30",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "2400 Elisabeth Lane Blacklick , OH 43004",
+    "floorplan": "Woodside"
+  },
+  {
+    "lotNumber": "34",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "2435 Elisabeth Lane Blacklick , OH 43004",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "35",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "2447 Elisabeth Lane Blacklick , OH 43004",
+    "floorplan": "Woodside"
+  },
+  {
+    "lotNumber": "36",
+    "subdivision": "Jefferson Manor",
+    "builder": "Pulte",
+    "address": "2463 Elisabeth Lane Blacklick , OH 43004",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "1892",
+    "subdivision": "Jerome Village 5-35",
+    "builder": "Pulte",
+    "address": "8562 Gardenia Drive Plain City , OH 43064",
+    "floorplan": "Prototype"
+  },
+  {
+    "lotNumber": "13846",
+    "subdivision": "Limestone Ridge",
+    "builder": "Pulte",
+    "address": "107 Franks Field Drive Delaware , OH 43015",
+    "floorplan": "Aspire II"
+  },
+  {
+    "lotNumber": "13847",
+    "subdivision": "Limestone Ridge",
+    "builder": "Pulte",
+    "address": "113 Franks Field Drive Delaware , OH 43015",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "13859",
+    "subdivision": "Limestone Ridge",
+    "builder": "Pulte",
+    "address": "430 Penwell Drive Delaware , OH 43015",
+    "floorplan": "Oakdale"
+  },
+  {
+    "lotNumber": "13862",
+    "subdivision": "Limestone Ridge",
+    "builder": "Pulte",
+    "address": "412 Penwell Drive Delaware , OH 43015",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "13879",
+    "subdivision": "Limestone Ridge",
+    "builder": "Pulte",
+    "address": "227 Franks Field Drive Delaware , OH 43015",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "13880",
+    "subdivision": "Limestone Ridge",
+    "builder": "Pulte",
+    "address": "233 Franks Field Drive Delaware , OH 43015",
+    "floorplan": "Oakdale"
+  },
+  {
+    "lotNumber": "13896",
+    "subdivision": "Limestone Ridge",
+    "builder": "Pulte",
+    "address": "526 Penwell Drive Delaware , OH 43015",
+    "floorplan": "Hampton II"
+  },
+  {
+    "lotNumber": "13901",
+    "subdivision": "Limestone Ridge",
+    "builder": "Pulte",
+    "address": "490 Penwell Drive Delaware , OH 43015",
+    "floorplan": "Hampton II"
+  },
+  {
+    "lotNumber": "13903",
+    "subdivision": "Limestone Ridge",
+    "builder": "Pulte",
+    "address": "478 Penwell Drive Delaware , OH 43015",
+    "floorplan": "Mitchell II"
+  },
+  {
+    "lotNumber": "2374",
+    "subdivision": "Magnolia Park",
+    "builder": "Pulte",
+    "address": "582 Weatherby Drive Sunbury , OH 43074",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "2392",
+    "subdivision": "Magnolia Park",
+    "builder": "Pulte",
+    "address": "761 Buckeye Circle Sunbury , OH 43074",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "2401",
+    "subdivision": "Magnolia Park",
+    "builder": "Pulte",
+    "address": "645 Fairland Drive Sunbury , OH 43074",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "2402",
+    "subdivision": "Magnolia Park",
+    "builder": "Pulte",
+    "address": "655 Fairland Drive Sunbury , OH 43074",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "2403",
+    "subdivision": "Magnolia Park",
+    "builder": "Pulte",
+    "address": "665 Fairland Drive Sunbury , OH 43074",
+    "floorplan": "Melrose"
+  },
+  {
+    "lotNumber": "2405",
+    "subdivision": "Magnolia Park",
+    "builder": "Pulte",
+    "address": "685 Fairland Drive Sunbury , OH 43074",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "2406",
+    "subdivision": "Magnolia Park",
+    "builder": "Pulte",
+    "address": "503 Weatherby Drive Sunbury , OH 43074",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "2407",
+    "subdivision": "Magnolia Park",
+    "builder": "Pulte",
+    "address": "509 Weatherby Drive Sunbury , OH 43074",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "6887",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "2488 Nelson Lane Delaware , OH 43015",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "6901",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "2513 Nelson Lane Delaware , OH 43015",
+    "floorplan": "Melrose"
+  },
+  {
+    "lotNumber": "7070",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "6329 Muellen Trace Delaware , OH 43015",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "7071",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "6345 Muellen Trace Delaware , OH 43015",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "7075",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "6417 Muellen Trace Delaware , OH 43015",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "7081",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "2530 Rangeland Drive Delaware , OH 43015",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "7090",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "2521 Rangeland Drive Delaware , OH 43015",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "7096",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "2603 Hammersley Loop Delaware , OH 43015",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "7097",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "2587 Hammersley Loop Delaware , OH 43015",
+    "floorplan": "Melrose"
+  },
+  {
+    "lotNumber": "7098",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "2539 Hammersley Loop Delaware , OH 43015",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "7101",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "2546 Hammersley Loop Delaware , OH 43015",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "7103",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "2578 Hammersley Loop Delaware , OH 43015",
+    "floorplan": "Deer Valley II"
+  },
+  {
+    "lotNumber": "7105",
+    "subdivision": "Nelson Farms",
+    "builder": "Pulte",
+    "address": "6326 Muellen Trace Delaware , OH 43015",
+    "floorplan": "Willwood"
+  },
+  {
+    "lotNumber": "130",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "6399 Callaway Square East New Albany , OH 43054",
+    "floorplan": "Ascend"
+  },
+  {
+    "lotNumber": "134",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "6423 Callaway Square East New Albany , OH 43054",
+    "floorplan": "Abbeyville"
+  },
+  {
+    "lotNumber": "159",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7618 Brinsley Lane New Albany , OH 43054",
+    "floorplan": "Ascend"
+  },
+  {
+    "lotNumber": "163",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7642 Brinsley Lane New Albany , OH 43054",
+    "floorplan": "Martin Ray"
+  },
+  {
+    "lotNumber": "173",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7551 Bullock Lane New Albany , OH 43054",
+    "floorplan": "Ascend"
+  },
+  {
+    "lotNumber": "176",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7533 Bullock Lane New Albany , OH 43054",
+    "floorplan": "Martin Ray"
+  },
+  {
+    "lotNumber": "181",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7503 Bullock Lane New Albany , OH 43054",
+    "floorplan": "Abbeyville"
+  },
+  {
+    "lotNumber": "187",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7536 Bullock Lane New Albany , OH 43054",
+    "floorplan": "Martin Ray"
+  },
+  {
+    "lotNumber": "188",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7542 Bullock Lane New Albany , OH 43054",
+    "floorplan": "Martin Ray"
+  },
+  {
+    "lotNumber": "189",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7548 Bullock Lane New Albany , OH 43054",
+    "floorplan": "Martin Ray"
+  },
+  {
+    "lotNumber": "190",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7641 Brinsley Lane New Albany , OH 43054",
+    "floorplan": "Senoia"
+  },
+  {
+    "lotNumber": "191",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7639 Brinsley Lane New Albany , OH 43054",
+    "floorplan": "Ascend"
+  },
+  {
+    "lotNumber": "198",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7416 Linden Lane New Albany , OH 43054",
+    "floorplan": "Ascend"
+  },
+  {
+    "lotNumber": "206",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7464 Linden Lane New Albany , OH 43054",
+    "floorplan": "Martin Ray"
+  },
+  {
+    "lotNumber": "207",
+    "subdivision": "Nottingham Trace",
+    "builder": "Pulte",
+    "address": "7470 Linden Lane New Albany , OH 43054",
+    "floorplan": "Martin Ray"
+  },
+  {
+    "lotNumber": "96",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9208 Horseshoe Street Plain City , OH 43064",
+    "floorplan": "CountryBasement"
+  },
+  {
+    "lotNumber": "119",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9602 Bur Oak Drive Plain City , OH 43064",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "126",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9168 Horseshoe Street Plain City , OH 43064",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "127",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9160 Horseshoe Street Plain City , OH 43064",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "130",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9480 Wagon Trail Lane Plain City , OH 43064",
+    "floorplan": "CountryBasement"
+  },
+  {
+    "lotNumber": "131",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9470 Wagon Trail Lane Plain City , OH 43064",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "132",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9460 Wagon Trail Lane Plain City , OH 43064",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "133",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9450 Wagon Trail Lane Plain City , OH 43064",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "135",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9443 Wagon Trail Lane Plain City , OH 43064",
+    "floorplan": "BedBasement"
+  },
+  {
+    "lotNumber": "136",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9493 Wagon Trail Lane Plain City , OH 43064",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "137",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9503 Wagon Trail Lane Plain City , OH 43064",
+    "floorplan": "AlBasement"
+  },
+  {
+    "lotNumber": "138",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9513 Wagon Trail Lane Plain City , OH 43064",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "148",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9601 Bur Oak Drive Plain City , OH 43064",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "153",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9520 Wagon Trail Lane Plain City , OH 43064",
+    "floorplan": "CountryBasement"
+  },
+  {
+    "lotNumber": "156",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9560 Wagon Trail Lane Plain City , OH 43064",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "158",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9496 Goldenrod Road Plain City , OH 43064",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "159",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9486 Goldenrod Road Plain City , OH 43064",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "176",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "9505 Goldenrod Road Plain City , OH 43064",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "186",
+    "subdivision": "Pioneer Crossing",
+    "builder": "Pulte",
+    "address": "10758 Trail Dust Street Plain City , OH 43064",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "2146",
+    "subdivision": "Price PHighlands 5L",
+    "builder": "Pulte",
+    "address": "1083 Portrush Drive Sunbury , OH 43074",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "2415",
+    "subdivision": "Price PHighlands 5L",
+    "builder": "Pulte",
+    "address": "728 Callaway Lane Sunbury , OH 43074",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "2429",
+    "subdivision": "Price PHighlands 5L",
+    "builder": "Pulte",
+    "address": "880 Callaway Lane Sunbury , OH 43074",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "2436",
+    "subdivision": "Price PHighlands 5L",
+    "builder": "Pulte",
+    "address": "851 Callaway Lane Sunbury , OH 43074",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "2440",
+    "subdivision": "Price PHighlands 5L",
+    "builder": "Pulte",
+    "address": "827 Callaway Lane Sunbury , OH 43074",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "2442",
+    "subdivision": "Price PHighlands 5L",
+    "builder": "Pulte",
+    "address": "815 Callaway Lane Sunbury , OH 43074",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "2445",
+    "subdivision": "Price PHighlands 5L",
+    "builder": "Pulte",
+    "address": "854 Ping Lane Sunbury , OH 43074",
+    "floorplan": "Greenfield II"
+  },
+  {
+    "lotNumber": "2446",
+    "subdivision": "Price PHighlands 5L",
+    "builder": "Pulte",
+    "address": "860 Ping Lane Sunbury , OH 43074",
+    "floorplan": "Westchester II"
+  },
+  {
+    "lotNumber": "2450",
+    "subdivision": "Price PHighlands 5L",
+    "builder": "Pulte",
+    "address": "886 Ping Lane Sunbury , OH 43074",
+    "floorplan": "Westchester II"
+  },
+  {
+    "lotNumber": "2460",
+    "subdivision": "Price PHighlands 5L",
+    "builder": "Pulte",
+    "address": "847 Ping Lane Sunbury , OH 43074",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "2465",
+    "subdivision": "Price PHighlands 5L",
+    "builder": "Pulte",
+    "address": "819 Ping Lane Sunbury , OH 43074",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "2628",
+    "subdivision": "Price PHighlands 5L",
+    "builder": "Pulte",
+    "address": "811 Fairway Loop Sunbury , OH 43074",
+    "floorplan": "Westchester II"
+  },
+  {
+    "lotNumber": "2211",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "413 Weatherby Drive Sunbury , OH 43074",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "2262",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "643 Mill Stone Drive Sunbury , OH 43074",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "2263",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "653 Mill Stone Drive Sunbury , OH 43074",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "2475",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "443 Weatherby Drive Sunbury , OH 43074",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "2479",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "419 Weatherby Drive Sunbury , OH 43074",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "2480",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "426 Weatherby Drive Sunbury , OH 43074",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "2483",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "400 Nike Way Sunbury , OH 43074",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "2484",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "394 Nike Way Sunbury , OH 43074",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "2486",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "382 Nike Way Sunbury , OH 43074",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "2488",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "370 Nike Way Sunbury , OH 43074",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "2490",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "665 Eagle Court Sunbury , OH 43074",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "2496",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "460 Weatherby Drive Sunbury , OH 43074",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "2497",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "468 Weatherby Drive Sunbury , OH 43074",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "2500",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "708 Eagle Court Sunbury , OH 43074",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "2504",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "682 Eagle Court Sunbury , OH 43074",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "2505",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "676 Eagle Court Sunbury , OH 43074",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "2508",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "658 Eagle Court Sunbury , OH 43074",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "2509",
+    "subdivision": "Price PSummit 5-40",
+    "builder": "Pulte",
+    "address": "652 Eagle Court Sunbury , OH 43074",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "30006",
+    "subdivision": "Slate RPreserve",
+    "builder": "Pulte",
+    "address": "6737 Preserve Drive Lewis Center , OH 43035",
+    "floorplan": "Meadow"
+  },
+  {
+    "lotNumber": "30007",
+    "subdivision": "Slate RPreserve",
+    "builder": "Pulte",
+    "address": "1258 Ashlar Lane Lewis Center , OH 43035",
+    "floorplan": "Meadow"
+  },
+  {
+    "lotNumber": "30010",
+    "subdivision": "Slate RPreserve",
+    "builder": "Pulte",
+    "address": "1280 Ashlar Lane Lewis Center , OH 43035",
+    "floorplan": "Meadow"
+  },
+  {
+    "lotNumber": "30016",
+    "subdivision": "Slate RPreserve",
+    "builder": "Pulte",
+    "address": "6730 Strata Avenue Lewis Center , OH 43035",
+    "floorplan": "Vista"
+  },
+  {
+    "lotNumber": "30022",
+    "subdivision": "Slate RPreserve",
+    "builder": "Pulte",
+    "address": "1327 Fairstone Drive Lewis Center , OH 43035",
+    "floorplan": "Vista"
+  },
+  {
+    "lotNumber": "30038",
+    "subdivision": "Slate RPreserve",
+    "builder": "Pulte",
+    "address": "1245 Ashlar Lane Lewis Center , OH 43035",
+    "floorplan": "Meadow"
+  },
+  {
+    "lotNumber": "36725",
+    "subdivision": "Slate RPreserve",
+    "builder": "Pulte",
+    "address": "6725 Preserve Drive Lewis Center , OH 43035",
+    "floorplan": "Clubhouse"
+  },
+  {
+    "lotNumber": "12",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "921 Oldcastle Road Lewis Center , OH 43035",
+    "floorplan": "PrestigBsmt"
+  },
+  {
+    "lotNumber": "14",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "885 Oldcastle Road Lewis Center , OH 43035",
+    "floorplan": "MystiquBsmt"
+  },
+  {
+    "lotNumber": "15",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "867 Oldcastle Road Lewis Center , OH 43035",
+    "floorplan": "PrestigBsmt"
+  },
+  {
+    "lotNumber": "16",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "849 Oldcastle Road Lewis Center , OH 43035",
+    "floorplan": "PalmarBsmt"
+  },
+  {
+    "lotNumber": "18",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "819 Oldcastle Road Lewis Center , OH 43035",
+    "floorplan": "MystiquBsmt"
+  },
+  {
+    "lotNumber": "24",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "721 Oldcastle Road Lewis Center , OH 43035",
+    "floorplan": "ProsperitBsmt"
+  },
+  {
+    "lotNumber": "28",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "6193 Montauk Road Lewis Center , OH 43035",
+    "floorplan": "Prestige II"
+  },
+  {
+    "lotNumber": "37",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "6250 Montauk Road Lewis Center , OH 43035",
+    "floorplan": "Prestige II"
+  },
+  {
+    "lotNumber": "38",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "6258 Montauk Road Lewis Center , OH 43035",
+    "floorplan": "Prestige II"
+  },
+  {
+    "lotNumber": "39",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "6266 Montauk Road Lewis Center , OH 43035",
+    "floorplan": "Mystique II"
+  },
+  {
+    "lotNumber": "40",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "6274 Montauk Road Lewis Center , OH 43035",
+    "floorplan": "Prestige II"
+  },
+  {
+    "lotNumber": "41",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "6280 Montauk Road Lewis Center , OH 43035",
+    "floorplan": "Mystique II"
+  },
+  {
+    "lotNumber": "43",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "6298 Montauk Road Lewis Center , OH 43035",
+    "floorplan": "Prestige II"
+  },
+  {
+    "lotNumber": "44",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "680 Satori Lane Lewis Center , OH 43035",
+    "floorplan": "Prestige II"
+  },
+  {
+    "lotNumber": "45",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "696 Satori Lane Lewis Center , OH 43035",
+    "floorplan": "Mystique II"
+  },
+  {
+    "lotNumber": "47",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "724 Satori Lane Lewis Center , OH 43035",
+    "floorplan": "Prestige II"
+  },
+  {
+    "lotNumber": "52",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "1046 Oldcastle Road Lewis Center , OH 43035",
+    "floorplan": "Prosperity II"
+  },
+  {
+    "lotNumber": "63",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "661 Satori Lane Lewis Center , OH 43035",
+    "floorplan": "Palmary II"
+  },
+  {
+    "lotNumber": "64",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "677 Satori Lane Lewis Center , OH 43035",
+    "floorplan": "Prestige II"
+  },
+  {
+    "lotNumber": "65",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "695 Satori Lane Lewis Center , OH 43035",
+    "floorplan": "Prestige II"
+  },
+  {
+    "lotNumber": "66",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "6341 Montauk Road Lewis Center , OH 43035",
+    "floorplan": "Prestige II"
+  },
+  {
+    "lotNumber": "69",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "6313 Montauk Road Lewis Center , OH 43035",
+    "floorplan": "Prosperity II"
+  },
+  {
+    "lotNumber": "76",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "674 Oldcastle Road Lewis Center , OH 43035",
+    "floorplan": "Prosperity II"
+  },
+  {
+    "lotNumber": "77",
+    "subdivision": "Slate RRetreat",
+    "builder": "Pulte",
+    "address": "706 Oldcastle Road Lewis Center , OH 43035",
+    "floorplan": "Prosperity II"
+  },
+  {
+    "lotNumber": "369",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "2131 Melone Drive Hilliard , OH 43026",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "370",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "2139 Melone Drive Hilliard , OH 43026",
+    "floorplan": "Westchester II"
+  },
+  {
+    "lotNumber": "378",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6126 Dever Lane Hilliard , OH 43026",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "383",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6086 Dever Lane Hilliard , OH 43026",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "396",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6051 Pisello Drive Hilliard , OH 43026",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "400",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6083 Pisello Drive Hilliard , OH 43026",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "411",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "2110 Melone Drive Hilliard , OH 43026",
+    "floorplan": "Amberwood II"
+  },
+  {
+    "lotNumber": "413",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "2094 Melone Drive Hilliard , OH 43026",
+    "floorplan": "Hilltop II"
+  },
+  {
+    "lotNumber": "414",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "2086 Melone Drive Hilliard , OH 43026",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "427",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6137 Dever Lane Hilliard , OH 43026",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "429",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6121 Dever Lane Hilliard , OH 43026",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "430",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6113 Dever Lane Hilliard , OH 43026",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "435",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6065 Dever Lane Hilliard , OH 43026",
+    "floorplan": "Greenfield II"
+  },
+  {
+    "lotNumber": "440",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6096 Pisello Drive Hilliard , OH 43026",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "443",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6120 Pisello Drive Hilliard , OH 43026",
+    "floorplan": "Greenfield II"
+  },
+  {
+    "lotNumber": "444",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6128 Pisello Drive Hilliard , OH 43026",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "445",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6136 Pisello Drive Hilliard , OH 43026",
+    "floorplan": "Allison II"
+  },
+  {
+    "lotNumber": "446",
+    "subdivision": "Sugar FHighlands 5L",
+    "builder": "Pulte",
+    "address": "6144 Pisello Drive Hilliard , OH 43026",
+    "floorplan": "Riverton II"
+  },
+  {
+    "lotNumber": "168",
+    "subdivision": "Sugar FRetreat 10-40",
+    "builder": "Pulte",
+    "address": "1853 Zucchina Drive Hilliard , OH 43026",
+    "floorplan": "Prosperity"
+  },
+  {
+    "lotNumber": "170",
+    "subdivision": "Sugar FRetreat 10-40",
+    "builder": "Pulte",
+    "address": "1865 Zucchina Drive Hilliard , OH 43026",
+    "floorplan": "Prosperity"
+  },
+  {
+    "lotNumber": "171",
+    "subdivision": "Sugar FRetreat 10-40",
+    "builder": "Pulte",
+    "address": "1871 Zucchina Drive Hilliard , OH 43026",
+    "floorplan": "Prestige"
+  },
+  {
+    "lotNumber": "182",
+    "subdivision": "Sugar FRetreat 10-40",
+    "builder": "Pulte",
+    "address": "1947 Zucchina Drive Hilliard , OH 43026",
+    "floorplan": "Mystique"
+  },
+  {
+    "lotNumber": "184",
+    "subdivision": "Sugar FRetreat 10-40",
+    "builder": "Pulte",
+    "address": "1944 Melanzana Drive Hilliard , OH 43026",
+    "floorplan": "Mystique"
+  },
+  {
+    "lotNumber": "190",
+    "subdivision": "Sugar FRetreat 10-40",
+    "builder": "Pulte",
+    "address": "1898 Melanzana Drive Hilliard , OH 43026",
+    "floorplan": "Mystique"
+  },
+  {
+    "lotNumber": "191",
+    "subdivision": "Sugar FRetreat 10-40",
+    "builder": "Pulte",
+    "address": "1892 Melanzana Drive Hilliard , OH 43026",
+    "floorplan": "Mystique"
+  },
+  {
+    "lotNumber": "207",
+    "subdivision": "Sugar FRetreat 10-40",
+    "builder": "Pulte",
+    "address": "1848 Zucchina Drive Hilliard , OH 43026",
+    "floorplan": "Mystique"
+  },
+  {
+    "lotNumber": "208",
+    "subdivision": "Sugar FRetreat 10-40",
+    "builder": "Pulte",
+    "address": "1854 Zucchina Drive Hilliard , OH 43026",
+    "floorplan": "Mystique"
+  },
+  {
+    "lotNumber": "224",
+    "subdivision": "Sugar FRetreat 10-40",
+    "builder": "Pulte",
+    "address": "1849 Melanzana Drive Hilliard , OH 43026",
+    "floorplan": "Prosperity"
+  },
+  {
+    "lotNumber": "225",
+    "subdivision": "Sugar FRetreat 10-40",
+    "builder": "Pulte",
+    "address": "1843 Melanzana Drive Hilliard , OH 43026",
+    "floorplan": "Mystique"
+  },
+  {
+    "lotNumber": "135",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "6338 Zuccaro Drive Hilliard , OH 43026",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "139",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "1840 Pomodoro Drive Hilliard , OH 43026",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "140",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "1854 Pomodoro Drive Hilliard , OH 43026",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "143",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "6347 Patata Drive Hilliard , OH 43026",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "245",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "6320 Anguria Drive Hilliard , OH 43026",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "304",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "6295 Lampone Drive Hilliard , OH 43026",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "306",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "6307 Lampone Drive Hilliard , OH 43026",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "310",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "6331 Lampone Drive Hilliard , OH 43026",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "311",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "2030 Ceduna Drive Hilliard , OH 43026",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "312",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "2020 Ceduna Drive Hilliard , OH 43026",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "314",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "2096 Arancia Drive Hilliard , OH 43026",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "322",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "2073 Fragola Drive Hilliard , OH 43026",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "323",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "2078 Fragola Drive Hilliard , OH 43026",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "324",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "2072 Fragola Drive Hilliard , OH 43026",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "328",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "2043 Fragola Drive Hilliard , OH 43026",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "329",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "2037 Fragola Drive Hilliard , OH 43026",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "330",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "2031 Fragola Drive Hilliard , OH 43026",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "331",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "2025 Fragola Drive Hilliard , OH 43026",
+    "floorplan": "Mercer II"
+  },
+  {
+    "lotNumber": "341",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "2048 Mirtillo Drive Hilliard , OH 43026",
+    "floorplan": "Continental II"
+  },
+  {
+    "lotNumber": "343",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "6274 Lampone Drive Hilliard , OH 43026",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "344",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "6280 Lampone Drive Hilliard , OH 43026",
+    "floorplan": "Newberry II"
+  },
+  {
+    "lotNumber": "353",
+    "subdivision": "Sugar FSummit 5-40",
+    "builder": "Pulte",
+    "address": "6293 Amarena Drive Hilliard , OH 43026",
+    "floorplan": "Linwood II"
+  },
+  {
+    "lotNumber": "21",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "313 North West Street Westerville , OH 43082",
+    "floorplan": "Prototype"
+  },
+  {
+    "lotNumber": "22",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "323 North West Street Westerville , OH 43082",
+    "floorplan": "Prototype"
+  },
+  {
+    "lotNumber": "100",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "Shell 1 Westerville , OH 43082",
+    "floorplan": "Building Shell"
+  },
+  {
+    "lotNumber": "101",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "399 Shumard Lane Westerville , OH 43082",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "102",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "395 Shumard Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "103",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "393 Shumard Lane Westerville , OH 43082",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "104",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "387 Shumard Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "105",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "385 Shumard Lane Westerville , OH 43082",
+    "floorplan": "HighLoft"
+  },
+  {
+    "lotNumber": "200",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "Shell 2 Westerville , OH 43082",
+    "floorplan": "Building Shell"
+  },
+  {
+    "lotNumber": "201",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "381 Shumard Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "202",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "379 Shumard Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "203",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "377 Shumard Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "601",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "327 Vannette Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1201",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "322 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "Highwood"
+  },
+  {
+    "lotNumber": "1202",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "324 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1203",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "328 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1204",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "332 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1300",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "Shell 13 Westerville , OH 43082",
+    "floorplan": "Building Shell"
+  },
+  {
+    "lotNumber": "1301",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "338 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "1302",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "340 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1303",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "344 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1304",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "346 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "1400",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "Shell 14 Westerville , OH 43082",
+    "floorplan": "Building Shell"
+  },
+  {
+    "lotNumber": "1401",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "345 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "1402",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "343 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1403",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "339 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1404",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "337 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "1500",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "Shell 15 Westerville , OH 43082",
+    "floorplan": "Building Shell"
+  },
+  {
+    "lotNumber": "1501",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "331 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "HighLoft"
+  },
+  {
+    "lotNumber": "1502",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "327 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "Highwood"
+  },
+  {
+    "lotNumber": "1503",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "323 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "1504",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "321 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1505",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "319 Pinnate Lane Westerville , OH 43082",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "1601",
+    "subdivision": "Towns on the Greenway",
+    "builder": "Pulte",
+    "address": "393 Hockberry Avenue Westerville , OH 43082",
+    "floorplan": "HighLoft"
+  },
+  {
+    "lotNumber": "1100",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4181 Tuller Road Dublin , OH 43017",
+    "floorplan": "Building Shell"
+  },
+  {
+    "lotNumber": "1101",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4171 Tuller Road Dublin , OH 43017",
+    "floorplan": "Highwood"
+  },
+  {
+    "lotNumber": "1102",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4175 Tuller Road Dublin , OH 43017",
+    "floorplan": "Highwood"
+  },
+  {
+    "lotNumber": "1103",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4179 Tuller Road Dublin , OH 43017",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "1104",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4183 Tuller Road Dublin , OH 43017",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1105",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4187 Tuller Road Dublin , OH 43017",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "1106",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4191 Tuller Road Dublin , OH 43017",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1200",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4151 Tuller Road Dublin , OH 43017",
+    "floorplan": "Building Shell"
+  },
+  {
+    "lotNumber": "1201",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4145 Tuller Road Dublin , OH 43017",
+    "floorplan": "Highwood"
+  },
+  {
+    "lotNumber": "1202",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4149 Tuller Road Dublin , OH 43017",
+    "floorplan": "Highwood"
+  },
+  {
+    "lotNumber": "1203",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4153 Tuller Road Dublin , OH 43017",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "1204",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4157 Tuller Road Dublin , OH 43017",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1205",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4161 Tuller Road Dublin , OH 43017",
+    "floorplan": "HighLoft"
+  },
+  {
+    "lotNumber": "1206",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4165 Tuller Road Dublin , OH 43017",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1300",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "6825 Seville Street Dublin , OH 43017",
+    "floorplan": "Building Shell"
+  },
+  {
+    "lotNumber": "1301",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "6877 Seville Street Dublin , OH 43017",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1302",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "6881 Seville Street Dublin , OH 43017",
+    "floorplan": "Highwood"
+  },
+  {
+    "lotNumber": "1303",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "6885 Seville Street Dublin , OH 43017",
+    "floorplan": "Highwood"
+  },
+  {
+    "lotNumber": "1304",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "6889 Seville Street Dublin , OH 43017",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1305",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "6893 Seville Street Dublin , OH 43017",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "1306",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "6897 Seville Street Dublin , OH 43017",
+    "floorplan": "Highwood"
+  },
+  {
+    "lotNumber": "1400",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4110 McCune Ave Dublin , OH 43017",
+    "floorplan": "Building Shell"
+  },
+  {
+    "lotNumber": "1401",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4168 McCune Avenue Dublin , OH 43017",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "1402",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4164 McCune Avenue Dublin , OH 43017",
+    "floorplan": "Highwood"
+  },
+  {
+    "lotNumber": "1403",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4160 McCune Avenue Dublin , OH 43017",
+    "floorplan": "HighLoft"
+  },
+  {
+    "lotNumber": "1404",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4156 McCune Avenue Dublin , OH 43017",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "1405",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4152 McCune Avenue Dublin , OH 43017",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "1406",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4148 McCune Avenue Dublin , OH 43017",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "2900",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4127 Tuller Road Dublin , OH 43016",
+    "floorplan": "Building Shell"
+  },
+  {
+    "lotNumber": "2901",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4117 Tuller Road Dublin , OH 43017",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "2902",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4121 Tuller Road Dublin , OH 43017",
+    "floorplan": "Highwood"
+  },
+  {
+    "lotNumber": "2903",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4125 Tuller Road Dublin , OH 43017",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "2904",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4129 Tuller Road Dublin , OH 43017",
+    "floorplan": "Halston"
+  },
+  {
+    "lotNumber": "2905",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4133 Tuller Road Dublin , OH 43017",
+    "floorplan": "HalLoft"
+  },
+  {
+    "lotNumber": "2906",
+    "subdivision": "Towns on the Parkway",
+    "builder": "Pulte",
+    "address": "4137 Tuller Road Dublin , OH 43017",
+    "floorplan": "Highwood"
+  }
   {
     "lotNumber": "50",
     "subdivision": "Heron",
