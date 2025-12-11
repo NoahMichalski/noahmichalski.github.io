@@ -1,5 +1,999 @@
 [
    {
+    "lotNumber": "4865",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "431 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4845",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "330 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4158",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "687 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "53E",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "240 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "53D",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "242 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "53A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "248 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "53B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "246 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "53C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "244 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "4188",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "680 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4886",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "323 PISA LOOP DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4864",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "437 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4169",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "753 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4853",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "390 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4171",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "765 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4881",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "38 BUCINE COURT DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4854",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "396 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4160",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "699 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "SENECA"
+  },
+  {
+    "lotNumber": "4861",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "438 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "48A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "258 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "48B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "256 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "48C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "254 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "48D",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "252 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "48E",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "250 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "4166",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "735 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "SENECA"
+  },
+  {
+    "lotNumber": "4167",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "741 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4863",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "449 PISA LOOP DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4847",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "342 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4850",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "360 PISA LOOP DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4168",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "747 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "SENECA"
+  },
+  {
+    "lotNumber": "4877",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "55 BUCINE COURT DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4193",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "109 CAMEO WOODS DRIVE DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4855",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "402 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4849",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "354 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "87A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "331 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "87B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "329 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "87C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "327 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "87D",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "325 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "4869",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "407 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4848",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "348 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4884",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "20 BUCINE COURT DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4880",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "44 BUCINE COURT DELAWARE 43015",
+    "floorplan": "HUDSON"
+  },
+  {
+    "lotNumber": "4876",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "49 BUCINE COURT DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5204A",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "50 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "4882",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "32 BUCINE COURT DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4163",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "717 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "SENECA"
+  },
+  {
+    "lotNumber": "4164",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "723 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4871",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "19 BUCINE COURT DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "3738",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "600 PISA LOOP DELAWARE 43015",
+    "floorplan": "HUDSON"
+  },
+  {
+    "lotNumber": "4852",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "378 PISA LOOP DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4851",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "366 PISA LOOP DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4870",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "401 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "33B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "328 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "33C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "330 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "33D",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "332 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "33E",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "334 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "4883",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "26 BUCINE COURT DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "5204B",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "52 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5204C",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "54 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5204D",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "56 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5368",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "584 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4872",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "25 BUCINE COURT DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4161",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "705 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "HUDSON"
+  },
+  {
+    "lotNumber": "4170",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "759 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "33A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "326 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "4157",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "681 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "SENECA"
+  },
+  {
+    "lotNumber": "4885",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "329 PISA LOOP DELAWARE 43015",
+    "floorplan": "HUDSON"
+  },
+  {
+    "lotNumber": "4846",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "336 PISA LOOP DELAWARE 43015",
+    "floorplan": "HUDSON"
+  },
+  {
+    "lotNumber": "3702",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "601 PISA LOOP DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "43A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "268 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "43B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "266 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "43C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "264 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "43D",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "262 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "43E",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "260 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5274A",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "73 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5274B",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "71 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5274C",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "69 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "3704",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "575 PISA LOOP DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4875",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "43 BUCINE COURT DELAWARE 43015",
+    "floorplan": "BALLENGER"
+  },
+  {
+    "lotNumber": "5274D",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "67 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5274E",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "65 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5274F",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "63 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "4878",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "56 BUCINE COURT DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4844",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "324 PISA LOOP DELAWARE 43015",
+    "floorplan": "HUDSON"
+  },
+  {
+    "lotNumber": "91A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "323 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "91B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "321 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "91C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "319 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "91D",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "317 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "91E",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "315 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "4873",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "31 BUCINE COURT DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "4162",
+    "subdivision": "Glenross",
+    "builder": "Ryan",
+    "address": "711 PATCH REEF DRIVE DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "4879",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "50 BUCINE COURT DELAWARE 43015",
+    "floorplan": "HUDSON"
+  },
+  {
+    "lotNumber": "96A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "313 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "96B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "311 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "96C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "309 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "96D",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "307 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5208A",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "58 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5208B",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "60 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5208C",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "62 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5208D",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "64 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5208E",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "66 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5365",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "602 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5208F",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "68 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5373",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "595 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "ALLEGHENY"
+  },
+  {
+    "lotNumber": "5389",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "83 MACVEIGH PLACE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "38A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "278 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "38B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "276 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "38C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "274 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "38D",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "272 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "38E",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "270 VIA CORSO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "4874",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "37 BUCINE COURT DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5363",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "614 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5425",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "699 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "ALLEGHENY"
+  },
+  {
+    "lotNumber": "5426",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "705 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "ALLEGHENY"
+  },
+  {
+    "lotNumber": "5372",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "591 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5366",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "596 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5428",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "717 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "BALLENGER"
+  },
+  {
+    "lotNumber": "28A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "308 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "28B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "310 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "28C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "312 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "28D",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "314 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "28E",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "316 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "16C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "186 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "16B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "188 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "16D",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "184 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "25A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "300 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "25B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "302 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "25C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "304 VIA CONDOTerra Alta TownhomesI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5375",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "607 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5362",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "620 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "5358",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "644 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5377",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "621 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "ALLEGHENY"
+  },
+  {
+    "lotNumber": "20A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "180 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "20B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "178 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "20C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "176 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "20D",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "174 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "20E",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "172 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "73A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "206 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "73B",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "204 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "73C",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "202 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "73D",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "200 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5364",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "608 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "ALLEGHENY"
+  },
+  {
+    "lotNumber": "16A",
+    "subdivision": "Terra Alta Townhomes",
+    "builder": "Ryan",
+    "address": "190 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+   {
     "lotNumber": "33",
     "subdivision": "Brookview ",
     "builder": "DR Horton",
