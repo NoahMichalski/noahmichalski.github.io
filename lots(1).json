@@ -1,5 +1,131 @@
 [
    {
+    "lotNumber": "180A",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "705 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "180B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "701 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "F401"
+  },
+  {
+    "lotNumber": "181A",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "718 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "181B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "722 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "182A",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "726 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "XA05"
+  },
+  {
+    "lotNumber": "182B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "730 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "XA05"
+  },
+  {
+    "lotNumber": "183A",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "734 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "F401"
+  },
+  {
+    "lotNumber": "183B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "738 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "185A",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "750 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "190B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "398 Emily Drive PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "191A",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "753 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "191B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "749 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "192A",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "745 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "F401"
+  },
+  {
+    "lotNumber": "192B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "741 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "194A",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "729 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "XA05"
+  },
+  {
+    "lotNumber": "194B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "725 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "XA05"
+  },
+  {
+    "lotNumber": "195A",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "721 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "XA05"
+  },
+  {
+    "lotNumber": "195B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "717 Maria Drive PLAIN CITY OH 43064",
+    "floorplan": "XA05"
+  },
+   {
     "lotNumber": "4865",
     "subdivision": "Terra Alta",
     "builder": "Ryan",
