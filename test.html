@@ -1,382 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>VIP Basement Humidity Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <meta charset="UTF-8" />
+  <title>VPGO U – Employee Setup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
-  
-  
-    body { background:#000; color:#fff; font-family:system-ui, sans-serif; margin:20px; }
-   h1 {
-  margin-bottom: 50px;
-  padding-left: 125px;  /* ✅ pushes title away from logo */
-}
-
-    #filters { margin-bottom:20px; }
-    #filters button {
-      padding:6px 12px; border:none; border-radius:4px;
-      background:#1c3c5a; color:#fff; cursor:pointer; font-size:13px; margin-right:8px;
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      color: #222;
     }
-    #filters button:hover { background:#2d5b85; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(350px,1fr)); gap:20px; }
-    .card {
-      background:#121212; border-radius:10px; padding:15px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.5); position:relative;
-    }
-    .status {
-      position:absolute; top:10px; right:10px;
-      padding:4px 10px; border-radius:6px; font-weight:bold;
-    }
-    .ok { background:#1e7d32; }
-    .warn { background:#e69500; }
-    .alert { background:#c62828; }
-    .offline { background:#555; }
-    h2 { font-size:16px; margin:0 0 10px; }
-    .metrics { display:flex; justify-content:space-between; margin:10px 0; }
-    .metric { text-align:center; }
-    .metric span { display:block; font-size:20px; font-weight:bold; }
-    .notes { font-size:12px; color:#aaa; margin-top:5px; }
-    .updated, .installed, .lastseen { font-size:11px; color:#888; margin-top:5px; }
-    .details { margin-top:10px; background:#121212; padding:10px; border-radius:8px; }
-    .filters { margin:10px 0; display:flex; flex-wrap:wrap; gap:6px; }
-#filters button,
-.filters button {
-  padding:6px 12px;
-  border:none;
-  border-radius:4px;
-  background:#333;   /* dark grey background */
-  color:#fff;
-  cursor:pointer;
-  font-size:13px;
-}
 
-#filters button:hover,
-.filters button:hover {
-  background:#555;   /* lighter grey on hover */
-}
-    .filters .retire { background:#a83232; }
-    .filters .retire:hover { background:#d64545; }
-    .scroll-table {
-      max-height:200px;
-      overflow-y:auto;
-      display:block;
+    header {
+      background: #000000;
+      color: white;
+      padding: 24px;
+      text-align: center;
+      position: relative;
     }
-    table { width:100%; border-collapse:collapse; font-size:12px; }
-    th, td { border:1px solid #444; padding:4px; text-align:center; }
-    th { background:#222; position:sticky; top:0; }
-    .chart-container { display:block; margin-top:10px; }
-	
-.logo-container {
-  position: absolute;   /* use fixed if you want it visible while scrolling */
-  top: 15px;
-  left: 20px;           /* ✅ changed from right to left */
-  z-index: 10;
-}
 
-.logo-container img {
-  height: 100px;
-  width: auto;
-}
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
 
-#filters button.active,
-.filters button.active {
-  background:#1e7d32; /* green for active */
-}
-	
-	
+    header p {
+      margin-top: 8px;
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 16px;
+    }
+
+    .download-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .download-buttons a {
+      text-decoration: none;
+      padding: 14px 22px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .playstore {
+      background: #34a853;
+      color: white;
+    }
+
+    .appstore {
+      background: #000;
+      color: white;
+    }
+
+    .download-buttons a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    }
+
+    details {
+      background: white;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    summary {
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details p,
+    details li {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    details ul {
+      padding-left: 20px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: #666;
+    }
   </style>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement(
+    { pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE },
+    'google_translate_element'
+  );
+}
+</script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+
 </head>
 <body>
 
-<div class="logo-container">
-  <img src="images/VIP-logo-white.png" alt="VIP Logo">
-</div>
+<header>
+  <div id="google_translate_element" style="position:absolute; top:16px; right:16px;"></div>
+  <h1>VPGO U – Employee Setup</h1>
+  <p>Download the app and follow the steps below to get started</p>
+</header>
 
-  <h1>Basement Humidity Dashboard</h1>
-<div id="filters">
-  <button onclick="setFilter('all', this)">All</button>
-  <button onclick="setFilter('online', this)">Online Only</button>
-  <button onclick="setFilter('offline', this)">Offline Only</button>
-</div>
-  <div class="grid" id="cards"></div>
+<main data-lang="en">
 
-  <script>
-    const { createClient } = supabase;
-    const supabaseUrl = "https://imsqijcraukqqopntsmc.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc3FpamNyYXVrcXFvcG50c21jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNjQ2NzIsImV4cCI6MjA3MTg0MDY3Mn0.kT7uJbbyEYo-nvrg973B8BLfXmPU5rmcB1bh_ZIXIdM"; // replace with anon key
-    const db = createClient(supabaseUrl, supabaseKey);
+  <section class="download-buttons">
+    <a class="playstore" href="https://play.google.com/store/apps/details?id=com.stilog.VPGOU&hl=en_US" target="_blank">📱 Download on Google Play</a>
+    <a class="appstore" href="https://apps.apple.com/us/app/vpgo-u/id1598862750" target="_blank">🍎 Download on App Store</a>
+  </section>
 
-    const currentRanges = {};
-    let currentFilter = "all";
+  <details open>
+    <summary>📌 Step 1 – Download the App</summary>
+    <p>Download <strong>VPGO U</strong> from the App Store or Google Play using the buttons above.</p>
+  </details>
 
-function setFilter(mode, buttonEl) {
-  currentFilter = mode;
-  loadData();
-  
-    document.querySelectorAll('#filters button').forEach(btn => btn.classList.remove('active'));
-  // add .active to the clicked one
-  buttonEl.classList.add('active');
-    }
-	
+  <details>
+    <summary>🔐 Step 2 – Login Information & Add Planner</summary>
+    <p>Use the login information provided by your supervisor.</p>
+    <ul>
+      <li><strong>Username:</strong> (provided by management)</li>
+      <li><strong>Password:</strong> (temporary password on first login)</li>
+    </ul>
+    <p><strong>Add the Planner to the app:</strong></p>
+    <ol>
+      <li>After downloading and logging into the app, open this Planner website:</li>
+    </ol>
+    <p>
+      <a href="https://us2.visual-planning.com/vip/web/m/index.jsp#secondPage" target="_blank">https://us2.visual-planning.com/vip/web/m/index.jsp#secondPage</a>
+    </p>
+    <ol start="2">
+      <li>On the Planner page, click <strong>Add</strong>.</li>
+      <li>Return to the VPGO U app once the Planner is added.</li>
+    </ol>
+  </details>
 
+  <details>
+    <summary>🗓 Step 3 – Planner & Daily Jobs</summary>
+    <p>Once logged in, follow these steps exactly to start a job:</p>
+    <ol>
+      <li>Tap <strong>View Jobs</strong>.</li>
+      <li>Select the <strong>Job</strong> you are working on.</li>
+      <li>You will see the <strong>Lot Address</strong> and job details.</li>
+      <li>Tap <strong>Check In</strong> and open the <strong>Location Map</strong>.</li>
+      <li>Tap the <strong>bottom-left button</strong> on the map.</li>
+      <li>Tap <strong>Validate</strong>.</li>
+      <li>Tap the <strong>bottom-right checkmark</strong> to confirm check-in.</li>
+    </ol>
 
-    function getStatus(humidity, lastSeenDate) {
-      if (!lastSeenDate) return { text: "OFFLINE", class: "offline" };
+    <p><strong>Before starting work:</strong></p>q
+    <ol>
+      <li>Go back into the <strong>Job</strong>.</li>
+      <li>Tap the <strong>Attachments</strong> button (bottom right).</li>
+      <li>Tap the <strong>arrow</strong> next to <strong>Before Photos</strong>.</li>
+      <li>Upload all required <strong>before photos</strong> before starting the job.</li>
+    </ol>
 
-      const now = new Date();
-      const last = new Date(lastSeenDate);
-      const diffHrs = (now - last) / (1000 * 60 * 60);
+    
+    <p>
+      
+    </p>
+  </details>
 
-      if (diffHrs > 2) return { text: "OFFLINE", class: "offline" };
+  <details>
+    <summary>📷 Step 4 – Check Out & After Photos</summary>
+    <p><strong>After finishing all work:</strong></p>
+    <ol>
+      <li>Tap <strong>Check Out</strong> and open the <strong>Location Map</strong>.</li>
+      <li>Follow the <strong>same process as check-in</strong>:</li>
+      <ul>
+        <li>Tap the <strong>bottom-left button</strong> on the map.</li>
+        <li>Tap <strong>Validate</strong>.</li>
+        <li>Tap the <strong>bottom-right checkmark</strong> to confirm check-out.</li>
+      </ul>
+    </ol>
 
-      if (humidity < 51) return { text: "OK", class: "ok" };
-      if (humidity < 75) return { text: "WARN", class: "warn" };
-      return { text: "ALERT", class: "alert" };
-    }
+    <p><strong>After checking out:</strong></p>
+    <ol>
+      <li>Go back into the <strong>Job</strong>.</li>
+      <li>Tap the <strong>Attachments</strong> button (bottom right).</li>
+      <li>Tap the <strong>arrow</strong> next to <strong>After Photos</strong>.</li>
+      <li>Upload all required <strong>after photos</strong>.</li>
+      <li>Once photos are uploaded, tap the <strong>checkmark</strong> to finalize the job.</li>
+    </ol>
 
-    function timeAgo(dateStr) {
-      if (!dateStr) return "Never";
-      const now = new Date();
-      const date = new Date(dateStr);
-      const diffMs = now - date;
-      const diffMin = Math.floor(diffMs / 60000);
+    
+  </details>
 
-      if (diffMin < 1) return "just now";
-      if (diffMin < 60) return `${diffMin}m ago`;
-      const diffHrs = Math.floor(diffMin / 60);
-      if (diffHrs < 24) return `${diffHrs}h ago`;
-      const diffDays = Math.floor(diffHrs / 24);
-      return `${diffDays}d ago`;
-    }
+  <details>
+    <summary>❓ Need Help?</summary>
+    <p>Contact your supervisor if you have login issues or questions.</p>
+  </details>
 
-    async function loadData() {
-      let { data, error } = await db
-        .from("devices")
-        .select(`
-          id,
-          lot_number,
-          subdivision,
-          builder,
-          notes,
-          installed_on,
-          sensor_logs (
-            datetime,
-            temp_f,
-            humidity,
-            dewpoint_f
-          )
-        `)
-        .order("datetime", { foreignTable: "sensor_logs", ascending: false });
+</main>
 
-      if (error) { console.error(error); return; }
+<footer>
+  © 2026 – Internal Employee Use Only
+</footer>
 
-      const container = document.getElementById("cards");
-      container.innerHTML = "";
-
-      data.forEach(device => {
-	  const installedDate = device.installed_on ? new Date(device.installed_on) : null;
-		let daysInProduction = installedDate 
-			? Math.floor((new Date() - installedDate) / (1000 * 60 * 60 * 24)) 
-		: null;
-        const latestLog = device.sensor_logs?.[0];
-        const humidity = latestLog?.humidity ?? "--";
-        const temp_f = latestLog?.temp_f ?? "--";
-        const dewpoint_f = latestLog?.dewpoint_f ?? "--";
-        const updated = latestLog?.datetime 
-          ? new Date(latestLog.datetime).toLocaleString()
-          : "No recent data";
-        const lastSeen = timeAgo(latestLog?.datetime);
-
-        const status = getStatus(humidity, latestLog?.datetime);
-
-        // filter logic
-        if (currentFilter === "online" && status.text === "OFFLINE") return;
-        if (currentFilter === "offline" && status.text !== "OFFLINE") return;
-
-        const card = document.createElement("div");
-        card.className = "card";
-       card.innerHTML = `
-
-			<div class="status ${status.class}">${status.text}</div>
-			
-			<div>Lot: ${device.lot_number || "NEW_DEVICE"}</div>
-			<div>Builder: ${device.builder || "UNKNOWN_BUILDER"}</div>
-			<div>Subdivision: ${device.subdivision || "UNKNOWN_SUBDIVISION"}</div>
-			  </div>${device.id}</div>
-          <div class="metrics">
-            <div class="metric"><span>${humidity}%</span>Humidity</div>
-            <div class="metric"><span>${temp_f}°F</span>Temp</div>
-            <div class="metric"><span>${dewpoint_f}°F</span>Dew Pt</div>
-          </div>
-          <div class="notes">Notes: ${device.notes || ""}</div>
-       	   <div class="installed">
-  Installed: ${installedDate ? installedDate.toLocaleDateString() : "Unknown"}
-  ${daysInProduction !== null ? ` (${daysInProduction} days in production)` : ""}
-</div>
-          <div class="updated">Updated: ${updated}</div>
-          <div class="lastseen">Last Seen: ${lastSeen}</div>
-          <div class="details">
-            <h3>History</h3>
-            <div class="filters">
-              <button onclick="loadHistory('${device.id}', '1d',this)">1d</button>
-              <button onclick="loadHistory('${device.id}', '1w',this)">1w</button>
-              <button onclick="loadHistory('${device.id}', '1m',this)">1m</button>
-              <button onclick="loadHistory('${device.id}', '3m',this)">3m</button>
-              <button onclick="loadHistory('${device.id}', 'all',this)">All</button>
-              <button onclick="downloadLogs('${device.id}')">⬇ CSV</button>
-              <button class="retire" onclick="retireDevice('${device.id}')">🗑 Retire</button>
-            </div>
-            <div class="scroll-table">
-              <table>
-                <thead><tr><th>Time</th><th>Temp</th><th>Humidity</th><th>Dew Pt</th></tr></thead>
-                <tbody id="log-${device.id}"></tbody>
-              </table>
-            </div>
-            <div class="chart-container">
-              <canvas id="chart-${device.id}" height="200"></canvas>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-
-        if (latestLog) loadHistory(device.id, "1d");
-      });
-    }
-
-    async function loadHistory(deviceId, range="1d") {
-      currentRanges[deviceId] = range;
-
-      let since = new Date();
-      if (range === "1d") since.setDate(since.getDate() - 1);
-      if (range === "1w") since.setDate(since.getDate() - 7);
-      if (range === "1m") since.setMonth(since.getMonth() - 1);
-      if (range === "3m") since.setMonth(since.getMonth() - 3);
-
-      let query = db.from("sensor_logs")
-        .select("*")
-        .eq("device_id", deviceId)
-        .order("datetime", { ascending: true });
-
-      if (range !== "all") query = query.gte("datetime", since.toISOString());
-
-      const { data, error } = await query;
-      if (error) { console.error(error); return; }
-
-      const tbody = document.getElementById("log-" + deviceId);
-      tbody.innerHTML = "";
-      data.forEach(r => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${new Date(r.datetime).toLocaleString()}</td>
-          <td>${r.temp_f}°F</td>
-          <td>${r.humidity}%</td>
-          <td>${r.dewpoint_f}°F</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      const ctx = document.getElementById("chart-" + deviceId).getContext("2d");
-      if (window["chart_" + deviceId]) window["chart_" + deviceId].destroy();
-
-      window["chart_" + deviceId] = new Chart(ctx, {
-        type: "line",
-        data: {
-          datasets: [
-            { label: "Temp (°F)", data: data.map(r => ({ x: r.datetime, y: r.temp_f })), borderColor: "red", tension: 0.3 },
-            { label: "Humidity (%)", data: data.map(r => ({ x: r.datetime, y: r.humidity })), borderColor: "blue", tension: 0.3 },
-            { label: "Dew Pt (°F)", data: data.map(r => ({ x: r.datetime, y: r.dewpoint_f })), borderColor: "green", tension: 0.3 }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { labels: { color: "#fff" } } },
-          interaction: { mode: "nearest", intersect: false },
-          scales: {
-            x: { type: "time", time: { unit: range === "1d" ? "hour" : "day" }, ticks: { color: "#ccc" } },
-            y: { ticks: { color: "#ccc" } }
-          }
-        }
-      });
-    }
-
-    async function downloadLogs(deviceId) {
-      const range = currentRanges[deviceId] || "all";
-      let since = new Date();
-      if (range === "1d") since.setDate(since.getDate() - 1);
-      if (range === "1w") since.setDate(since.getDate() - 7);
-      if (range === "1m") since.setMonth(since.getMonth() - 1);
-      if (range === "3m") since.setMonth(since.getMonth() - 3);
-
-      let query = db.from("sensor_logs")
-        .select("*")
-        .eq("device_id", deviceId)
-        .order("datetime", { ascending: true });
-
-      if (range !== "all") query = query.gte("datetime", since.toISOString());
-
-      const { data, error } = await query;
-      if (error) { console.error(error); alert("Error exporting logs"); return; }
-
-      exportCSV(`${deviceId}_${range}`, data);
-    }
-
-    async function retireDevice(deviceId) {
-      if (!confirm(`⚠️ Are you sure you want to RETIRE ${deviceId}? This will EXPORT ALL logs and then DELETE them permanently.`)) {
-        return;
-      }
-
-      const { data: logs, error: logsError } = await db
-        .from("sensor_logs")
-        .select("*")
-        .eq("device_id", deviceId)
-        .order("datetime", { ascending: true });
-
-      if (logsError) { console.error(logsError); alert("Error fetching logs"); return; }
-
-      exportCSV(`${deviceId}_FULL_HISTORY`, logs);
-
-      const { error: delLogsError } = await db.from("sensor_logs").delete().eq("device_id", deviceId);
-      if (delLogsError) { console.error(delLogsError); alert("Error deleting logs"); return; }
-
-      const { error: delDeviceError } = await db.from("devices").delete().eq("id", deviceId);
-      if (delDeviceError) { console.error(delDeviceError); alert("Error deleting device"); return; }
-
-      alert(`${deviceId} retired successfully ✅`);
-      loadData();
-    }
-
-function exportCSV(filename, data) {
-  if (!data || data.length === 0) {
-    alert("No data available for export");
-    return;
-  }
-
-  const headers = ["datetime","temp_f","humidity","dewpoint_f"];
-
-  const rows = data.map(r => [
-    `"${new Date(r.datetime).toLocaleString()}"`, // ✅ wrap datetime in quotes
-    r.temp_f,
-    r.humidity,
-    r.dewpoint_f
-  ]);
-
-  let csvContent = "data:text/csv;charset=utf-8," 
-    + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-
-  const link = document.createElement("a");
-  link.setAttribute("href", encodeURI(csvContent));
-  link.setAttribute("download", `${filename}_logs.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-    loadData();
-    setInterval(loadData, 60000);
-  </script>
 </body>
 </html>
-
