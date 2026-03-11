@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Central Ohio Storm Center</title>
 <style>
-body{font-family:Arial,Helvetica,sans-serif;background:#0b1220;color:white;margin:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#000;color:white;margin:0}
 header{background:#111a33;padding:15px;text-align:center;font-size:26px;font-weight:bold}
 
 .container{
@@ -99,6 +99,17 @@ const counties=[
 
 async function loadWeather(){
 
+function getEmoji(text){
+text=text.toLowerCase()
+if(text.includes("sun")||text.includes("clear")) return "☀️"
+if(text.includes("cloud")) return "☁️"
+if(text.includes("rain")||text.includes("shower")) return "🌧️"
+if(text.includes("storm")||text.includes("thunder")) return "⛈️"
+if(text.includes("snow")) return "❄️"
+if(text.includes("fog")) return "🌫️"
+return "🌤️"
+}
+
 let html=""
 
 for(const c of counties){
@@ -111,28 +122,36 @@ let forecastData=await forecast.json()
 
 let current=forecastData.properties.periods[0]
 
-html+=`<div class="county green"><b>${c.name}</b><br>${current.temperature}°F<br><small>${current.shortForecast}</small></div>`
+let emoji=getEmoji(current.shortForecast)
+
+html+=`<div class="county green"><b>${c.name}</b><br>${emoji} ${current.temperature}°F<br><small>${current.shortForecast}</small></div>`
 
 }
 
 document.getElementById("countyWeather").innerHTML=html
 
-// also load weekly forecast using Columbus point
+// weekly forecast (daytime only if available)
 let point=await fetch("https://api.weather.gov/points/39.96,-82.99")
 let pointData=await point.json()
 
 let forecast=await fetch(pointData.properties.forecast)
 let forecastData=await forecast.json()
 
-let days=forecastData.properties.periods.slice(0,7)
+let periods=forecastData.properties.periods
+let days=periods.filter(p=>p.isDaytime===true)
+if(days.length===0) days=periods
+
+days=days.slice(0,7)
 
 let forecastHTML=""
 
 days.forEach(d=>{
 
-forecastHTML+=`<div class="county" style="background:#1b2a4a;text-align:center">
+let emoji=getEmoji(d.shortForecast)
+
+forecastHTML+=`<div class="county" style="background:#111;text-align:center">
 <b>${d.name}</b><br>
-${d.temperature}°${d.temperatureUnit}<br>
+${emoji} ${d.temperature}°${d.temperatureUnit}<br>
 <small>${d.shortForecast}</small>
 </div>`
 
