@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central Ohio Storm Center</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;background:#0b1220;color:white;margin:0}
+header{background:#111a33;padding:15px;text-align:center;font-size:26px;font-weight:bold}
+
+.container{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:15px;
+ padding:15px
+}
+
+.card{
+ background:#16213a;
+ border-radius:12px;
+ padding:12px;
+ box-shadow:0 0 10px rgba(0,0,0,.5)
+}
+
+iframe{width:100%;border:none;border-radius:10px}
+
+.countyGrid{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:8px;
+ margin-top:10px
+}
+
+.county{
+ padding:8px;
+ border-radius:6px;
+ font-size:14px
+}
+
+.green{background:#1c6b3a}
+.red{background:#8b1e1e}
+.yellow{background:#8a6d1b}
+
+</style>
+</head>
+<body>
+
+<header>Central Ohio Storm Center</header>
+
+<div class="container">
+
+<div class="card">
+<h2>County Conditions</h2>
+<div class="countyGrid" id="countyWeather"></div>
+</div>
+
+<div class="card">
+<h2>Central Ohio County Alerts</h2>
+<div class="countyGrid" id="countyList"></div>
+</div>
+
+<div class="card">
+<h2>Live Radar</h2>
+<iframe height="450" src="https://embed.windy.com/embed2.html?lat=39.96&lon=-82.99&zoom=6&level=surface&overlay=radar"></iframe>
+</div>
+
+<div class="card">
+<h2>NWS Radar (KILN)</h2>
+<div style="display:flex;justify-content:center">
+<img style="width:60%;max-width:420px;border-radius:10px" src="https://radar.weather.gov/ridge/standard/KILN_loop.gif">
+</div>
+</div>
+
+<div class="card">
+<h2>7 Day Forecast</h2>
+<div id="weeklyForecast" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px"></div>
+</div>
+
+</div>
+
+<script>
+
+const counties=[
+{name:"Franklin",lat:39.96,lon:-82.99},
+{name:"Delaware",lat:40.30,lon:-83.07},
+{name:"Union",lat:40.25,lon:-83.36},
+{name:"Madison",lat:39.90,lon:-83.40},
+{name:"Pickaway",lat:39.64,lon:-82.95},
+{name:"Fairfield",lat:39.78,lon:-82.60},
+{name:"Licking",lat:40.06,lon:-82.40},
+{name:"Morrow",lat:40.52,lon:-82.80},
+{name:"Marion",lat:40.59,lon:-83.12},
+{name:"Knox",lat:40.40,lon:-82.42},
+{name:"Ross",lat:39.33,lon:-82.98},
+{name:"Fayette",lat:39.55,lon:-83.43},
+{name:"Perry",lat:39.88,lon:-82.22},
+{name:"Hocking",lat:39.49,lon:-82.48}
+]
+
+async function loadWeather(){
+
+let html=""
+
+for(const c of counties){
+
+let point=await fetch(`https://api.weather.gov/points/${c.lat},${c.lon}`)
+let pointData=await point.json()
+
+let forecast=await fetch(pointData.properties.forecastHourly)
+let forecastData=await forecast.json()
+
+let current=forecastData.properties.periods[0]
+
+html+=`<div class="county green"><b>${c.name}</b><br>${current.temperature}°F<br><small>${current.shortForecast}</small></div>`
+
+}
+
+document.getElementById("countyWeather").innerHTML=html
+
+// also load weekly forecast using Columbus point
+let point=await fetch("https://api.weather.gov/points/39.96,-82.99")
+let pointData=await point.json()
+
+let forecast=await fetch(pointData.properties.forecast)
+let forecastData=await forecast.json()
+
+let days=forecastData.properties.periods.slice(0,7)
+
+let forecastHTML=""
+
+days.forEach(d=>{
+
+forecastHTML+=`<div class="county" style="background:#1b2a4a;text-align:center">
+<b>${d.name}</b><br>
+${d.temperature}°${d.temperatureUnit}<br>
+<small>${d.shortForecast}</small>
+</div>`
+
+})
+
+document.getElementById("weeklyForecast").innerHTML=forecastHTML
+
+}
+
+async function loadCountyAlerts(){
+
+let res=await fetch("https://api.weather.gov/alerts/active?area=OH")
+let data=await res.json()
+
+let countyStatus={}
+
+counties.forEach(c=>countyStatus[c.name]=[])
+
+// collect ALL alerts affecting each county
+ data.features.forEach(alert=>{
+
+ let event=alert.properties.event
+ let areas=alert.properties.areaDesc
+
+ counties.forEach(c=>{
+
+ if(areas.includes(c.name)){
+ countyStatus[c.name].push(event)
+ }
+
+ })
+
+ })
+
+// priority ranking
+const priority=[
+"Tornado Warning",
+"Severe Thunderstorm Warning",
+"Flash Flood Warning",
+"Tornado Watch",
+"Severe Thunderstorm Watch"
+]
+
+let html=""
+
+counties.forEach(c=>{
+
+let alerts=countyStatus[c.name]
+
+let cls="green"
+let label="No Alerts"
+let extra=""
+
+if(alerts.length>0){
+
+// determine highest priority alert
+let highest=null
+
+priority.forEach(p=>{
+ if(!highest && alerts.some(a=>a.includes(p))){
+ highest=p
+ }
+})
+
+if(!highest) highest=alerts[0]
+
+if(highest.includes("Tornado Warning")) cls="red"
+else if(highest.includes("Warning")) cls="yellow"
+else if(highest.includes("Watch")) cls="yellow"
+
+label=highest
+
+// show additional alerts if more exist
+if(alerts.length>1){
+
+let others=alerts.filter(a=>a!==highest)
+
+extra="<br><small>+ "+others.join(", ")+"</small>"
+
+}
+
+}
+
+html+=`<div class="county ${cls}"><b>${c.name}</b><br>${label}${extra}</div>`
+
+})
+
+document.getElementById("countyList").innerHTML=html
+
+}
+
+loadWeather()
+loadCountyAlerts()
+
+setInterval(loadCountyAlerts,60000)
+
+</script>
+
+</body>
+</html>
