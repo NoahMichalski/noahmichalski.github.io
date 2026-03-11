@@ -6,7 +6,7 @@
 <title>Central Ohio Storm Center</title>
 <style>
 body{font-family:Arial,Helvetica,sans-serif;background:#000;color:white;margin:0}
-header{background:#111a33;padding:15px;text-align:center;font-size:26px;font-weight:bold}
+header{background:#000;padding:15px;text-align:center;font-size:26px;font-weight:bold;border-bottom:1px solid #222}
 
 .container{
  display:grid;
@@ -16,10 +16,10 @@ header{background:#111a33;padding:15px;text-align:center;font-size:26px;font-wei
 }
 
 .card{
- background:#16213a;
+ background:#000;
  border-radius:12px;
  padding:12px;
- box-shadow:0 0 10px rgba(0,0,0,.5)
+ border:1px solid #222
 }
 
 iframe{width:100%;border:none;border-radius:10px}
@@ -34,12 +34,35 @@ iframe{width:100%;border:none;border-radius:10px}
 .county{
  padding:8px;
  border-radius:6px;
- font-size:14px
+ font-size:14px;
+ border:1px solid #333
 }
 
-.green{background:#1c6b3a}
-.red{background:#8b1e1e}
-.yellow{background:#8a6d1b}
+.green{background:#0e3a1c}
+.red{background:#5a0f0f}
+.yellow{background:#5a4a0f}
+
+.modal{
+ position:fixed;
+ top:0;
+ left:0;
+ width:100%;
+ height:100%;
+ background:rgba(0,0,0,0.85);
+ display:none;
+ align-items:center;
+ justify-content:center;
+ z-index:1000
+}
+
+.modalBox{
+ background:#000;
+ border:1px solid #333;
+ padding:20px;
+ border-radius:10px;
+ max-width:700px;
+ width:90%
+}
 
 </style>
 </head>
@@ -78,6 +101,28 @@ iframe{width:100%;border:none;border-radius:10px}
 
 </div>
 
+<!-- hourly modal -->
+<div id="hourlyModal" class="modal">
+ <div class="modalBox">
+ <div style="display:flex;justify-content:space-between">
+ <h3 id="hourlyTitle"></h3>
+ <button onclick="closeHourly()">Close</button>
+ </div>
+ <div id="hourlyContent" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px"></div>
+ </div>
+</div>
+
+<!-- alert modal -->
+<div id="alertModal" class="modal">
+ <div class="modalBox">
+ <div style="display:flex;justify-content:space-between">
+ <h3 id="alertTitle"></h3>
+ <button onclick="closeAlert()">Close</button>
+ </div>
+ <div id="alertContent"></div>
+ </div>
+</div>
+
 <script>
 
 const counties=[
@@ -97,8 +142,6 @@ const counties=[
 {name:"Hocking",lat:39.49,lon:-82.48}
 ]
 
-async function loadWeather(){
-
 function getEmoji(text){
 text=text.toLowerCase()
 if(text.includes("sun")||text.includes("clear")) return "☀️"
@@ -109,6 +152,8 @@ if(text.includes("snow")) return "❄️"
 if(text.includes("fog")) return "🌫️"
 return "🌤️"
 }
+
+async function loadWeather(){
 
 let html=""
 
@@ -124,37 +169,25 @@ let current=forecastData.properties.periods[0]
 
 let emoji=getEmoji(current.shortForecast)
 
-html+=`<div class="county green"><b>${c.name}</b><br>${emoji} ${current.temperature}°F<br><small>${current.shortForecast}</small></div>`
+html+=`<div class="county green" style="cursor:pointer" onclick="showHourly('${c.name}',${c.lat},${c.lon})"><b>${c.name}</b><br>${emoji} ${current.temperature}°F<br><small>${current.shortForecast}</small></div>`
 
 }
 
 document.getElementById("countyWeather").innerHTML=html
 
-// weekly forecast (daytime only if available)
+// weekly
 let point=await fetch("https://api.weather.gov/points/39.96,-82.99")
 let pointData=await point.json()
-
 let forecast=await fetch(pointData.properties.forecast)
 let forecastData=await forecast.json()
 
-let periods=forecastData.properties.periods
-let days=periods.filter(p=>p.isDaytime===true)
-if(days.length===0) days=periods
-
-days=days.slice(0,7)
+let days=forecastData.properties.periods.filter(p=>p.isDaytime).slice(0,7)
 
 let forecastHTML=""
 
 days.forEach(d=>{
-
 let emoji=getEmoji(d.shortForecast)
-
-forecastHTML+=`<div class="county" style="background:#111;text-align:center">
-<b>${d.name}</b><br>
-${emoji} ${d.temperature}°${d.temperatureUnit}<br>
-<small>${d.shortForecast}</small>
-</div>`
-
+forecastHTML+=`<div class="county" style="background:#000;text-align:center;cursor:pointer" onclick="showDay('${d.name}',${d.temperature},'${d.temperatureUnit}','${d.shortForecast.replace(/'/g,"\'")}')"><b>${d.name}</b><br>${emoji} ${d.temperature}°${d.temperatureUnit}<br><small>${d.shortForecast}</small></div>`
 })
 
 document.getElementById("weeklyForecast").innerHTML=forecastHTML
@@ -167,85 +200,139 @@ let res=await fetch("https://api.weather.gov/alerts/active?area=OH")
 let data=await res.json()
 
 let countyStatus={}
-
 counties.forEach(c=>countyStatus[c.name]=[])
 
-// collect ALL alerts affecting each county
- data.features.forEach(alert=>{
-
- let event=alert.properties.event
- let areas=alert.properties.areaDesc
-
- counties.forEach(c=>{
-
+data.features.forEach(alert=>{
+let event=alert.properties.event
+let areas=alert.properties.areaDesc
+counties.forEach(c=>{
  if(areas.includes(c.name)){
- countyStatus[c.name].push(event)
+ countyStatus[c.name].push(alert)
  }
-
- })
-
- })
-
-// priority ranking
-const priority=[
-"Tornado Warning",
-"Severe Thunderstorm Warning",
-"Flash Flood Warning",
-"Tornado Watch",
-"Severe Thunderstorm Watch"
-]
+})
+})
 
 let html=""
 
 counties.forEach(c=>{
-
 let alerts=countyStatus[c.name]
-
 let cls="green"
 let label="No Alerts"
-let extra=""
 
 if(alerts.length>0){
-
-// determine highest priority alert
-let highest=null
-
-priority.forEach(p=>{
- if(!highest && alerts.some(a=>a.includes(p))){
- highest=p
- }
-})
-
-if(!highest) highest=alerts[0]
-
-if(highest.includes("Tornado Warning")) cls="red"
-else if(highest.includes("Warning")) cls="yellow"
-else if(highest.includes("Watch")) cls="yellow"
-
-label=highest
-
-// show additional alerts if more exist
-if(alerts.length>1){
-
-let others=alerts.filter(a=>a!==highest)
-
-extra="<br><small>+ "+others.join(", ")+"</small>"
-
+label=alerts[0].properties.event
+if(label.includes("Tornado Warning")) cls="red"
+else cls="yellow"
 }
 
-}
-
-html+=`<div class="county ${cls}"><b>${c.name}</b><br>${label}${extra}</div>`
+html+=`<div class="county ${cls}" style="cursor:pointer" onclick="showAlert('${c.name}')"><b>${c.name}</b><br>${label}</div>`
 
 })
 
 document.getElementById("countyList").innerHTML=html
 
+window._alerts=data.features
+
+}
+
+async function showHourly(name,lat,lon){
+
+let point=await fetch(`https://api.weather.gov/points/${lat},${lon}`)
+let pointData=await point.json()
+
+let forecast=await fetch(pointData.properties.forecastHourly)
+let forecastData=await forecast.json()
+
+let hours=forecastData.properties.periods.slice(0,12)
+
+let html=""
+
+hours.forEach(h=>{
+html+=`<div style="background:#111;padding:6px;border-radius:6px;text-align:center"><b>${new Date(h.startTime).getHours()}:00</b><br>${h.temperature}°F<br><small>${h.shortForecast}</small></div>`
+})
+
+hourlyTitle.innerText=name+" County Hourly"
+hourlyContent.innerHTML=html
+hourlyModal.style.display="flex"
+
+}
+
+function closeHourly(){ hourlyModal.style.display="none" }
+
+function showAlert(county){
+
+let html=""
+
+window._alerts.forEach(a=>{
+ if(a.properties.areaDesc.includes(county)){
+ html+=`<div style="margin-bottom:12px"><b>${a.properties.event}</b><br>
+ Expires: ${new Date(a.properties.ends).toLocaleString()}<br><br>
+ ${a.properties.description}</div>`
+ }
+})
+
+alertTitle.innerText=county+" Alerts"
+alertContent.innerHTML=html||"No active alerts"
+alertModal.style.display="flex"
+
+}
+
+function closeAlert(){ alertModal.style.display="none" }
+
+async function showDay(name,temp,unit,desc){
+
+// get hourly forecast for Columbus (represents region)
+let point=await fetch("https://api.weather.gov/points/39.96,-82.99")
+let pointData=await point.json()
+
+let forecast=await fetch(pointData.properties.forecastHourly)
+let forecastData=await forecast.json()
+
+let hours=forecastData.properties.periods
+
+// match the clicked day
+let target=name.toLowerCase()
+
+let dayHours=hours.filter(h=>{
+ let d=new Date(h.startTime).toLocaleDateString('en-US',{weekday:'long'}).toLowerCase()
+ return d===target
+}).slice(0,24)
+
+let html="<div style='display:grid;grid-template-columns:repeat(6,1fr);gap:6px'>"
+
+function getEmoji(text){
+text=text.toLowerCase()
+if(text.includes("sun")||text.includes("clear")) return "☀️"
+if(text.includes("cloud")) return "☁️"
+if(text.includes("rain")||text.includes("shower")) return "🌧️"
+if(text.includes("storm")||text.includes("thunder")) return "⛈️"
+if(text.includes("snow")) return "❄️"
+return "🌤️"
+}
+
+dayHours.forEach(h=>{
+
+let hour=new Date(h.startTime).getHours()
+let emoji=getEmoji(h.shortForecast)
+
+html+=`<div style="background:#111;padding:6px;border-radius:6px;text-align:center">
+<b>${hour}:00</b><br>
+${emoji} ${h.temperature}°F<br>
+<small>${h.shortForecast}</small>
+</div>`
+
+})
+
+html+="</div>"
+
+alertTitle.innerText=name+" Hourly Forecast"
+alertContent.innerHTML=html
+alertModal.style.display="flex"
+
 }
 
 loadWeather()
 loadCountyAlerts()
-
 setInterval(loadCountyAlerts,60000)
 
 </script>
