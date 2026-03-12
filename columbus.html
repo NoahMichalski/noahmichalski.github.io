@@ -108,7 +108,7 @@ iframe{width:100%;border:none;border-radius:10px}
  <h3 id="hourlyTitle"></h3>
  <button onclick="closeHourly()">Close</button>
  </div>
- <div id="hourlyContent" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px"></div>
+ <div id="hourlyContent" style="display:flex;flex-direction:column;gap:4px"></div>
  </div>
 </div>
 
@@ -155,33 +155,43 @@ return "🌤️"
 
 async function loadWeather(){
 
-let html=""
+// show loading indicators
+countyWeather.innerHTML = "Loading county conditions..."
+weeklyForecast.innerHTML = "Loading 7 day forecast..."
 
-for(const c of counties){
+// load counties in parallel (much faster)
+const countyPromises = counties.map(async (c)=>{
 
-let point=await fetch(`https://api.weather.gov/points/${c.lat},${c.lon}`)
-let pointData=await point.json()
+let point = await fetch(`https://api.weather.gov/points/${c.lat},${c.lon}`)
+let pointData = await point.json()
 
-let forecast=await fetch(pointData.properties.forecastHourly)
-let forecastData=await forecast.json()
+let forecast = await fetch(pointData.properties.forecastHourly)
+let forecastData = await forecast.json()
 
-let current=forecastData.properties.periods[0]
+let current = forecastData.properties.periods[0]
 
-let emoji=getEmoji(current.shortForecast)
+let emoji = getEmoji(current.shortForecast)
 
-html+=`<div class="county green" style="cursor:pointer" onclick="showHourly('${c.name}',${c.lat},${c.lon})"><b>${c.name}</b><br>${emoji} ${current.temperature}°F<br><small>${current.shortForecast}</small></div>`
+return `<div class="county green" style="cursor:pointer" onclick="showHourly('${c.name}',${c.lat},${c.lon})">
+<b>${c.name}</b><br>
+${emoji} ${current.temperature}°F<br>
+<small>${current.shortForecast}</small>
+</div>`
 
-}
+})
 
-document.getElementById("countyWeather").innerHTML=html
+let results = await Promise.all(countyPromises)
 
-// weekly
-let point=await fetch("https://api.weather.gov/points/39.96,-82.99")
-let pointData=await point.json()
-let forecast=await fetch(pointData.properties.forecast)
-let forecastData=await forecast.json()
+countyWeather.innerHTML = results.join("")
 
-let days=forecastData.properties.periods.filter(p=>p.isDaytime).slice(0,7)
+// weekly forecast
+let point = await fetch("https://api.weather.gov/points/39.96,-82.99")
+let pointData = await point.json()
+
+let forecast = await fetch(pointData.properties.forecast)
+let forecastData = await forecast.json()
+
+let days = forecastData.properties.periods.filter(p=>p.isDaytime).slice(0,7)
 
 let forecastHTML=""
 
@@ -190,7 +200,7 @@ let emoji=getEmoji(d.shortForecast)
 forecastHTML+=`<div class="county" style="background:#000;text-align:center;cursor:pointer" onclick="showDay('${d.name}',${d.temperature},'${d.temperatureUnit}','${d.shortForecast.replace(/'/g,"\'")}')"><b>${d.name}</b><br>${emoji} ${d.temperature}°${d.temperatureUnit}<br><small>${d.shortForecast}</small></div>`
 })
 
-document.getElementById("weeklyForecast").innerHTML=forecastHTML
+weeklyForecast.innerHTML = forecastHTML
 
 }
 
@@ -248,7 +258,14 @@ let hours=forecastData.properties.periods.slice(0,12)
 let html=""
 
 hours.forEach(h=>{
-html+=`<div style="background:#111;padding:6px;border-radius:6px;text-align:center"><b>${new Date(h.startTime).getHours()}:00</b><br>${h.temperature}°F<br><small>${h.shortForecast}</small></div>`
+let hour=new Date(h.startTime).getHours().toString().padStart(2,'0')
+let emoji=getEmoji(h.shortForecast)
+html+=`<div style="background:#111;padding:4px 8px;border-radius:4px;font-size:13px;display:flex;gap:14px;align-items:center">
+<span style="min-width:55px"><b>${hour}:00</b></span>
+<span style="min-width:90px">${emoji} ${h.temperature}°F</span>
+<span style="flex:1">${h.shortForecast}</span>
+<span style="white-space:nowrap">💨 ${h.windSpeed}</span>
+</div>`
 })
 
 hourlyTitle.innerText=name+" County Hourly"
@@ -298,7 +315,7 @@ let dayHours=hours.filter(h=>{
  return d===target
 }).slice(0,24)
 
-let html="<div style='display:grid;grid-template-columns:repeat(6,1fr);gap:6px'>"
+let html="<div style='display:flex;flex-direction:column;gap:6px'>"
 
 function getEmoji(text){
 text=text.toLowerCase()
@@ -312,13 +329,14 @@ return "🌤️"
 
 dayHours.forEach(h=>{
 
-let hour=new Date(h.startTime).getHours()
+let hour=new Date(h.startTime).getHours().toString().padStart(2,'0')
 let emoji=getEmoji(h.shortForecast)
 
-html+=`<div style="background:#111;padding:6px;border-radius:6px;text-align:center">
-<b>${hour}:00</b><br>
-${emoji} ${h.temperature}°F<br>
-<small>${h.shortForecast}</small>
+html+=`<div style="background:#111;padding:4px 8px;border-radius:4px;font-size:13px;display:flex;gap:14px;align-items:center">
+<span style="min-width:55px"><b>${hour}:00</b></span>
+<span style="min-width:90px">${emoji} ${h.temperature}°F</span>
+<span style="flex:1">${h.shortForecast}</span>
+<span style="white-space:nowrap">💨 ${h.windSpeed}</span>
 </div>`
 
 })
