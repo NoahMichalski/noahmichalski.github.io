@@ -1,5 +1,33 @@
 [
   {
+    "lotNumber": "63",
+    "subdivision": "Alton Place",
+    "builder": "Drees Homes",
+    "address": "6752 WOODEDGE LANE, HILLIARD, OH",
+    "floorplan": "ASH LAWN"
+  },
+  {
+    "lotNumber": "61",
+    "subdivision": "Alton Place",
+    "builder": "Drees Homes",
+    "address": "6776 WOODEDGE LANE, HILLIARD, OH",
+    "floorplan": "BEDFORD"
+  },
+  {
+    "lotNumber": "11",
+    "subdivision": "Alton Place",
+    "builder": "Drees Homes",
+    "address": "6773 WOODEDGE LANE, HILLIARD, OH",
+    "floorplan": "CRESTWOOD"
+  },
+  {
+    "lotNumber": "12",
+    "subdivision": "Alton Place",
+    "builder": "Drees Homes",
+    "address": "6785 WOODEDGE LANE, HILLIARD, OH",
+    "floorplan": "ASH LAWN"
+  },
+  {
     "lotNumber": "228",
     "subdivision": "London Landing at Brooksedge",
     "builder": "Arbor Homes",
