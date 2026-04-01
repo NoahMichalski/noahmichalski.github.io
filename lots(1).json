@@ -1,4 +1,151 @@
 [
+  {
+    "lotNumber": "228",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "420 LUKES CIRCLE",
+    "floorplan": "Norway"
+  },
+  {
+    "lotNumber": "260",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "215 MADDOX DRIVE",
+    "floorplan": "Palmetto"
+  },
+  {
+    "lotNumber": "240",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "502 REAGAN'S RIDGE",
+    "floorplan": "Palmetto"
+  },
+  {
+    "lotNumber": "234",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "432 LUKES CIRCLE",
+    "floorplan": "Empress"
+  },
+  {
+    "lotNumber": "271",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "407 LUKES CIRCLE",
+    "floorplan": "Aspen II"
+  },
+  {
+    "lotNumber": "265",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "205 MADDOX DRIVE",
+    "floorplan": "Cooper"
+  },
+  {
+    "lotNumber": "224",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "412 LUKES CIRCLE",
+    "floorplan": "Cooper"
+  },
+  {
+    "lotNumber": "253",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "313 NIXON WAY",
+    "floorplan": "Spruce"
+  },
+  {
+    "lotNumber": "233",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "430 LUKES CIRCLE",
+    "floorplan": "Cooper"
+  },
+  {
+    "lotNumber": "270",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "405 LUKES CIRCLE",
+    "floorplan": "Spruce"
+  },
+  {
+    "lotNumber": "238",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "440 LUKES CIRCLE",
+    "floorplan": "Spruce"
+  },
+  {
+    "lotNumber": "213",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "225 MADDOX DRIVE",
+    "floorplan": "Walnut"
+  },
+  {
+    "lotNumber": "252",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "315 NIXON WAY",
+    "floorplan": "Cooper"
+  },
+  {
+    "lotNumber": "251",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "317 NIXON WAY",
+    "floorplan": "Ironwood"
+  },
+  {
+    "lotNumber": "220",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "404 LUKES CIRCLE",
+    "floorplan": "Bradford"
+  },
+  {
+    "lotNumber": "222",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "408 LUKES CIRCLE",
+    "floorplan": "Ashton"
+  },
+  {
+    "lotNumber": "244",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "331 NIXON WAY",
+    "floorplan": "Bradford"
+  },
+  {
+    "lotNumber": "243",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "499 REAGAN'S RIDGE",
+    "floorplan": "Bradford"
+  },
+  {
+    "lotNumber": "239",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor Homes",
+    "address": "500 REAGAN'S RIDGE",
+    "floorplan": "Bradford"
+  },
+  {
+    "lotNumber": "1",
+    "subdivision": "Edgewood Farms",
+    "builder": "Arbor Homes",
+    "address": "965 TY DRIVE",
+    "floorplan": "Palmetto"
+  },
+  {
+    "lotNumber": "2",
+    "subdivision": "Edgewood Farms",
+    "builder": "Arbor Homes",
+    "address": "955 TY DRIVE",
+    "floorplan": "Bradford"
+  },
    {
     "lotNumber": "180A",
     "subdivision": "Madison Meadows",
