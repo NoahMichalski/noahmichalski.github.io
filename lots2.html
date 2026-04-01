@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lot Lookup</title>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      padding: 25px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    #searchBox {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    #searchBox::placeholder {
+      color: #aaa;
+    }
+
+    #searchBtn {
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: none;
+      background: #ffffff;
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    #searchBtn:hover {
+      background: #ddd;
+      transform: translateY(-1px);
+    }
+
+    #result {
+      margin-top: 20px;
+    }
+
+    .lot-info {
+      background: rgba(255,255,255,0.08);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: 0.2s ease;
+    }
+
+    .lot-info:hover {
+      transform: scale(1.02);
+      background: rgba(255,255,255,0.12);
+    }
+
+    .lot-info p {
+      margin: 6px 0;
+      font-size: 0.95rem;
+    }
+
+    .label {
+      color: #aaa;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .value {
+      font-weight: 500;
+    }
+
+    .error {
+      color: #ff6b6b;
+      text-align: center;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Lot Lookup</h1>
+
+  <div class="search-row">
+    <input type="text" id="searchBox" placeholder="Enter lot number..." />
+    <button id="searchBtn">Search</button>
+  </div>
+
+  <div id="result"></div>
+</div>
+
+<script>
+  let lots = [];
+
+  fetch('lots(1).json')
+    .then(res => res.ok ? res.json() : Promise.reject())
+    .then(data => lots = data)
+    .catch(() => {
+      document.getElementById('result').innerHTML = '<p class="error">Failed to load data.</p>';
+    });
+
+  function performSearch() {
+    const query = document.getElementById('searchBox').value.trim();
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '';
+
+    if (!query) {
+      resultDiv.innerHTML = '<p class="error">Enter a lot number.</p>';
+      return;
+    }
+
+    const matched = lots.filter(lot => lot.lotNumber === query);
+
+    if (matched.length > 0) {
+      matched.forEach(lot => {
+        const div = document.createElement('div');
+        div.classList.add('lot-info');
+
+        div.innerHTML = `
+          <p><span class="label">Lot</span><br><span class="value">${lot.lotNumber}</span></p>
+          <p><span class="label">Subdivision</span><br><span class="value">${lot.subdivision}</span></p>
+          <p><span class="label">Builder</span><br><span class="value">${lot.builder}</span></p>
+          <p><span class="label">Address</span><br><span class="value">${lot.address}</span></p>
+          <p><span class="label">Floorplan</span><br><span class="value">${lot.floorplan || 'N/A'}</span></p>
+        `;
+
+        resultDiv.appendChild(div);
+      });
+    } else {
+      resultDiv.innerHTML = `<p class="error">No results for "${query}".</p>`;
+    }
+  }
+
+  document.getElementById('searchBtn').addEventListener('click', performSearch);
+
+  document.getElementById('searchBox').addEventListener('keyup', e => {
+    if (e.key === 'Enter') performSearch();
+  });
+</script>
+
+</body>
+</html>
