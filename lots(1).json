@@ -3266,7 +3266,7 @@
     "subdivision": "Amrine Meadows",
     "builder": "Pulte",
     "address": "2233 Hubbard Road Marysville , OH 43040",
-    "floorplan": "PalmarBsmt"
+    "floorplan": "Palmary"
   },
   {
     "lotNumber": "48",
@@ -4295,14 +4295,14 @@
     "subdivision": "Eagle Creek",
     "builder": "Pulte",
     "address": "1399 Crest Drive Galena , OH 43021",
-    "floorplan": "CrisfBsmt"
+    "floorplan": "Crisfield"
   },
   {
     "lotNumber": "2597",
     "subdivision": "Eagle Creek",
     "builder": "Pulte",
     "address": "1407 Crest Drive Galena , OH 43021",
-    "floorplan": "HamptoBsmt"
+    "floorplan": "Hampton"
   },
   {
     "lotNumber": "2598",
@@ -4372,7 +4372,7 @@
     "subdivision": "Eagle Creek",
     "builder": "Pulte",
     "address": "1265 Steller Drive Galena , OH 43021",
-    "floorplan": "MitchelBsmt"
+    "floorplan": "Mitchell"
   },
   {
     "lotNumber": "13978",
@@ -5142,7 +5142,7 @@
     "subdivision": "Pioneer Crossing",
     "builder": "Pulte",
     "address": "9443 Wagon Trail Lane Plain City , OH 43064",
-    "floorplan": "BedBasement"
+    "floorplan": "Bedford"
   },
   {
     "lotNumber": "136",
@@ -5478,42 +5478,42 @@
     "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "921 Oldcastle Road Lewis Center , OH 43035",
-    "floorplan": "PrestigBsmt"
+    "floorplan": "Prestige"
   },
   {
     "lotNumber": "14",
     "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "885 Oldcastle Road Lewis Center , OH 43035",
-    "floorplan": "MystiquBsmt"
+    "floorplan": "Mystique"
   },
   {
     "lotNumber": "15",
     "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "867 Oldcastle Road Lewis Center , OH 43035",
-    "floorplan": "PrestigBsmt"
+    "floorplan": "Prestige"
   },
   {
     "lotNumber": "16",
     "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "849 Oldcastle Road Lewis Center , OH 43035",
-    "floorplan": "PalmarBsmt"
+    "floorplan": "Palmary"
   },
   {
     "lotNumber": "18",
     "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "819 Oldcastle Road Lewis Center , OH 43035",
-    "floorplan": "MystiquBsmt"
+    "floorplan": "Mystique"
   },
   {
     "lotNumber": "24",
     "subdivision": "Slate Ridge - Retreat",
     "builder": "Pulte",
     "address": "721 Oldcastle Road Lewis Center , OH 43035",
-    "floorplan": "ProsperitBsmt"
+    "floorplan": "Prosperity"
   },
   {
     "lotNumber": "28",
@@ -6024,7 +6024,7 @@
     "subdivision": "Towns on the Greenway",
     "builder": "Pulte",
     "address": "399 Shumard Lane Westerville , OH 43082",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "102",
@@ -6038,7 +6038,7 @@
     "subdivision": "Towns on the Greenway",
     "builder": "Pulte",
     "address": "393 Shumard Lane Westerville , OH 43082",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "104",
@@ -6052,7 +6052,7 @@
     "subdivision": "Towns on the Greenway",
     "builder": "Pulte",
     "address": "385 Shumard Lane Westerville , OH 43082",
-    "floorplan": "HighLoft"
+    "floorplan": "Highwood"
   },
   {
     "lotNumber": "200",
@@ -6129,7 +6129,7 @@
     "subdivision": "Towns on the Greenway",
     "builder": "Pulte",
     "address": "338 Pinnate Lane Westerville , OH 43082",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "1302",
@@ -6164,7 +6164,7 @@
     "subdivision": "Towns on the Greenway",
     "builder": "Pulte",
     "address": "345 Pinnate Lane Westerville , OH 43082",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "1402",
@@ -6185,7 +6185,7 @@
     "subdivision": "Towns on the Greenway",
     "builder": "Pulte",
     "address": "337 Pinnate Lane Westerville , OH 43082",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "1500",
@@ -6199,7 +6199,7 @@
     "subdivision": "Towns on the Greenway",
     "builder": "Pulte",
     "address": "331 Pinnate Lane Westerville , OH 43082",
-    "floorplan": "HighLoft"
+    "floorplan": "Highwood"
   },
   {
     "lotNumber": "1502",
@@ -6227,14 +6227,14 @@
     "subdivision": "Towns on the Greenway",
     "builder": "Pulte",
     "address": "319 Pinnate Lane Westerville , OH 43082",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "1601",
     "subdivision": "Towns on the Greenway",
     "builder": "Pulte",
     "address": "393 Hockberry Avenue Westerville , OH 43082",
-    "floorplan": "HighLoft"
+    "floorplan": "Highwood"
   },
   {
     "lotNumber": "1100",
@@ -6262,7 +6262,7 @@
     "subdivision": "Towns on the Parkway",
     "builder": "Pulte",
     "address": "4179 Tuller Road Dublin , OH 43017",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "1104",
@@ -6276,7 +6276,7 @@
     "subdivision": "Towns on the Parkway",
     "builder": "Pulte",
     "address": "4187 Tuller Road Dublin , OH 43017",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "1106",
@@ -6311,7 +6311,7 @@
     "subdivision": "Towns on the Parkway",
     "builder": "Pulte",
     "address": "4153 Tuller Road Dublin , OH 43017",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "1204",
@@ -6325,7 +6325,7 @@
     "subdivision": "Towns on the Parkway",
     "builder": "Pulte",
     "address": "4161 Tuller Road Dublin , OH 43017",
-    "floorplan": "HighLoft"
+    "floorplan": "Highwood"
   },
   {
     "lotNumber": "1206",
@@ -6395,7 +6395,7 @@
     "subdivision": "Towns on the Parkway",
     "builder": "Pulte",
     "address": "4168 McCune Avenue Dublin , OH 43017",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "1402",
@@ -6409,7 +6409,7 @@
     "subdivision": "Towns on the Parkway",
     "builder": "Pulte",
     "address": "4160 McCune Avenue Dublin , OH 43017",
-    "floorplan": "HighLoft"
+    "floorplan": "Highwood"
   },
   {
     "lotNumber": "1404",
@@ -6423,14 +6423,14 @@
     "subdivision": "Towns on the Parkway",
     "builder": "Pulte",
     "address": "4152 McCune Avenue Dublin , OH 43017",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "1406",
     "subdivision": "Towns on the Parkway",
     "builder": "Pulte",
     "address": "4148 McCune Avenue Dublin , OH 43017",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "2900",
@@ -6472,7 +6472,7 @@
     "subdivision": "Towns on the Parkway",
     "builder": "Pulte",
     "address": "4133 Tuller Road Dublin , OH 43017",
-    "floorplan": "HalLoft"
+    "floorplan": "Halston"
   },
   {
     "lotNumber": "2906",
