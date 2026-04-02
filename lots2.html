@@ -28,19 +28,33 @@ h1 {
   font-size: 1.4rem;
 }
 
-/* FILTER BAR */
+/* FILTER GRID */
 .filters {
-  display: flex;
+  display: grid;
+  grid-template-columns: 120px 1fr 180px 180px auto;
   gap: 10px;
 }
 
 .filters input {
-  flex: 1;
   padding: 10px;
   border-radius: 8px;
   border: none;
   background: #1e1e1e;
   color: #fff;
+}
+
+/* CLEAR BUTTON */
+.clear-btn {
+  background: #222;
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.clear-btn:hover {
+  background: #333;
 }
 
 /* TABLE */
@@ -57,17 +71,16 @@ table {
 
 thead th {
   position: sticky;
-  top: 70px;
+  top: 80px;
   background: #1a1a1a;
   z-index: 5;
   cursor: pointer;
-  user-select: none;
 }
 
 th, td {
   padding: 12px;
-  text-align: left;
   border-bottom: 1px solid #222;
+  text-align: left;
 }
 
 th {
@@ -87,6 +100,11 @@ tr:hover {
 
 .address-link:hover {
   text-decoration: underline;
+}
+
+.highlight {
+  color: #4da3ff;
+  font-weight: 600;
 }
 
 .no-results {
@@ -112,6 +130,7 @@ tr:hover {
     <input id="filterSubdivision" placeholder="Subdivision">
     <input id="filterBuilder" placeholder="Builder">
     <input id="filterFloorplan" placeholder="Floorplan">
+    <button class="clear-btn" onclick="clearFilters()">Clear</button>
   </div>
 </div>
 
@@ -119,11 +138,11 @@ tr:hover {
   <table>
     <thead>
       <tr>
-        <th onclick="sortTable('lotNumber')">Lot<span class="sort-indicator" id="sort-lotNumber"></span></th>
-        <th onclick="sortTable('subdivision')">Subdivision<span class="sort-indicator" id="sort-subdivision"></span></th>
-        <th onclick="sortTable('builder')">Builder<span class="sort-indicator" id="sort-builder"></span></th>
-        <th onclick="sortTable('address')">Address<span class="sort-indicator" id="sort-address"></span></th>
-        <th onclick="sortTable('floorplan')">Floorplan<span class="sort-indicator" id="sort-floorplan"></span></th>
+        <th onclick="sortTable('lotNumber')">Lot<span id="sort-lotNumber" class="sort-indicator"></span></th>
+        <th onclick="sortTable('subdivision')">Subdivision<span id="sort-subdivision" class="sort-indicator"></span></th>
+        <th onclick="sortTable('builder')">Builder<span id="sort-builder" class="sort-indicator"></span></th>
+        <th onclick="sortTable('address')">Address<span id="sort-address" class="sort-indicator"></span></th>
+        <th onclick="sortTable('floorplan')">Floorplan<span id="sort-floorplan" class="sort-indicator"></span></th>
       </tr>
     </thead>
     <tbody id="resultsTable"></tbody>
@@ -141,6 +160,14 @@ fetch('lots(1).json')
     renderTable(lots);
   });
 
+/* HIGHLIGHT FUNCTION */
+function highlight(text, query) {
+  if (!query) return text || '';
+  const regex = new RegExp(`(${query})`, 'gi');
+  return (text || '').replace(regex, '<span class="highlight">$1</span>');
+}
+
+/* RENDER */
 function renderTable(data) {
   const table = document.getElementById('resultsTable');
   table.innerHTML = '';
@@ -150,23 +177,28 @@ function renderTable(data) {
     return;
   }
 
+  const lotQ = document.getElementById('filterLot').value;
+  const subQ = document.getElementById('filterSubdivision').value;
+  const builderQ = document.getElementById('filterBuilder').value;
+  const floorQ = document.getElementById('filterFloorplan').value;
+
   data.forEach(lot => {
     const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lot.address)}`;
 
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${lot.lotNumber}</td>
-      <td>${lot.subdivision}</td>
-      <td>${lot.builder}</td>
+      <td>${highlight(lot.lotNumber, lotQ)}</td>
+      <td>${highlight(lot.subdivision, subQ)}</td>
+      <td>${highlight(lot.builder, builderQ)}</td>
       <td><a class="address-link" href="${mapsLink}" target="_blank">${lot.address}</a></td>
-      <td>${lot.floorplan || 'N/A'}</td>
+      <td>${highlight(lot.floorplan || 'N/A', floorQ)}</td>
     `;
 
     table.appendChild(row);
   });
 }
 
-/* FILTERING */
+/* FILTER */
 function filterLots() {
   const lotVal = document.getElementById('filterLot').value.toLowerCase();
   const subVal = document.getElementById('filterSubdivision').value.toLowerCase();
@@ -191,7 +223,7 @@ document.querySelectorAll('.filters input').forEach(input => {
   input.addEventListener('input', filterLots);
 });
 
-/* SORTING */
+/* SORT */
 function sortTable(key) {
   if (currentSort.key === key) {
     currentSort.asc = !currentSort.asc;
@@ -205,8 +237,15 @@ function sortTable(key) {
 
 function sortData(data, key, asc) {
   return [...data].sort((a, b) => {
-    const valA = (a[key] || '').toLowerCase();
-    const valB = (b[key] || '').toLowerCase();
+    let valA = a[key] || '';
+    let valB = b[key] || '';
+
+    if (!isNaN(valA) && !isNaN(valB)) {
+      return asc ? valA - valB : valB - valA;
+    }
+
+    valA = valA.toString().toLowerCase();
+    valB = valB.toString().toLowerCase();
 
     if (valA < valB) return asc ? -1 : 1;
     if (valA > valB) return asc ? 1 : -1;
@@ -218,9 +257,17 @@ function updateSortIndicators() {
   document.querySelectorAll('.sort-indicator').forEach(el => el.textContent = '');
 
   if (currentSort.key) {
-    const el = document.getElementById(`sort-${currentSort.key}`);
-    el.textContent = currentSort.asc ? '▲' : '▼';
+    document.getElementById(`sort-${currentSort.key}`).textContent =
+      currentSort.asc ? '▲' : '▼';
   }
+}
+
+/* CLEAR */
+function clearFilters() {
+  document.querySelectorAll('.filters input').forEach(i => i.value = '');
+  currentSort = { key: null, asc: true };
+  updateSortIndicators();
+  renderTable(lots);
 }
 </script>
 
