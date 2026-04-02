@@ -10918,5 +10918,194 @@
     "builder": "DR Horton",
     "address": "24 MEAD MILL DRIVE ASHVILLE OH 43103",
     "floorplan": "X437"
+  },
+  {
+    "lotNumber": "0025A",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "300 VIA CONDOTTI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "0025B",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "302 VIA CONDOTTI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "0025C",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "304 VIA CONDOTTI DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "0073C",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "202 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "0073D",
+    "subdivision": "Terra Alta",
+    "builder": "Ryan",
+    "address": "200 VIA VENETO DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5214A",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "70 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5214B",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "72 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5214C",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "74 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5214E",
+    "subdivision": "Addison Farms",
+    "builder": "Ryan",
+    "address": "78 ALLENHURST WAY DELAWARE 43015",
+    "floorplan": "WEXFORD F"
+  },
+  {
+    "lotNumber": "5359",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "638 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5360",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "632 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "5361",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "626 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5374",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "601 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "ALLEGHENY"
+  },
+  {
+    "lotNumber": "5376",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "615 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "BALLENGER"
+  },
+  {
+    "lotNumber": "5378",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "627 RUTHERFORD AVE DELAWARE 43015",
+    "floorplan": "LEHIGH"
+  },
+  {
+    "lotNumber": "5379",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "698 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "HUDSON"
+  },
+  {
+    "lotNumber": "5380",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "688 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5381",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "682 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "ALLEGHENY"
+  },
+  {
+    "lotNumber": "5382",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "41 MACVEIGH PLACE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5383",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "47 MACVEIGH PLACE DELAWARE 43015",
+    "floorplan": "HUDSON"
+  },
+  {
+    "lotNumber": "5417",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "651 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "ALLEGHENY"
+  },
+  {
+    "lotNumber": "5418",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "657 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "BALLENGER"
+  },
+  {
+    "lotNumber": "5419",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "663 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "ALLEGHENY"
+  },
+  {
+    "lotNumber": "5420",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "669 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5423",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "687 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "BALLENGER"
+  },
+  {
+    "lotNumber": "5424",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "693 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
+  },
+  {
+    "lotNumber": "5427",
+    "subdivision": "Rutherford",
+    "builder": "Ryan",
+    "address": "711 BIRCHARD AVE DELAWARE 43015",
+    "floorplan": "COLUMBIA"
   }
 ]
