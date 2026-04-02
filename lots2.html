@@ -13,6 +13,7 @@ body {
   color: #fff;
 }
 
+/* HEADER */
 .header {
   padding: 15px;
   background: #111;
@@ -27,22 +28,25 @@ h1 {
   font-size: 1.4rem;
 }
 
-#searchBox {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
+/* FILTER BAR */
+.filters {
+  display: flex;
+  gap: 10px;
+}
+
+.filters input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
   border: none;
   background: #1e1e1e;
   color: #fff;
-  font-size: 1rem;
 }
 
-#searchBox::placeholder {
-  color: #888;
-}
-
+/* TABLE */
 .table-container {
-  overflow-x: auto;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
 }
 
 table {
@@ -51,23 +55,25 @@ table {
   min-width: 700px;
 }
 
-thead {
+thead th {
+  position: sticky;
+  top: 70px;
   background: #1a1a1a;
+  z-index: 5;
+  cursor: pointer;
+  user-select: none;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #222;
 }
 
 th {
-  text-align: left;
-  padding: 12px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #aaa;
   text-transform: uppercase;
-  border-bottom: 1px solid #333;
-}
-
-td {
-  padding: 12px;
-  border-bottom: 1px solid #222;
-  font-size: 0.95rem;
 }
 
 tr:hover {
@@ -84,11 +90,15 @@ tr:hover {
 }
 
 .no-results {
-  padding: 20px;
   text-align: center;
+  padding: 20px;
   color: #888;
 }
 
+.sort-indicator {
+  margin-left: 5px;
+  font-size: 0.7rem;
+}
 </style>
 </head>
 
@@ -96,18 +106,24 @@ tr:hover {
 
 <div class="header">
   <h1>Lot Lookup</h1>
-  <input id="searchBox" placeholder="Search lot, subdivision, builder, address..." />
+
+  <div class="filters">
+    <input id="filterLot" placeholder="Lot">
+    <input id="filterSubdivision" placeholder="Subdivision">
+    <input id="filterBuilder" placeholder="Builder">
+    <input id="filterFloorplan" placeholder="Floorplan">
+  </div>
 </div>
 
 <div class="table-container">
   <table>
     <thead>
       <tr>
-        <th>Lot</th>
-        <th>Subdivision</th>
-        <th>Builder</th>
-        <th>Address</th>
-        <th>Floorplan</th>
+        <th onclick="sortTable('lotNumber')">Lot<span class="sort-indicator" id="sort-lotNumber"></span></th>
+        <th onclick="sortTable('subdivision')">Subdivision<span class="sort-indicator" id="sort-subdivision"></span></th>
+        <th onclick="sortTable('builder')">Builder<span class="sort-indicator" id="sort-builder"></span></th>
+        <th onclick="sortTable('address')">Address<span class="sort-indicator" id="sort-address"></span></th>
+        <th onclick="sortTable('floorplan')">Floorplan<span class="sort-indicator" id="sort-floorplan"></span></th>
       </tr>
     </thead>
     <tbody id="resultsTable"></tbody>
@@ -116,6 +132,7 @@ tr:hover {
 
 <script>
 let lots = [];
+let currentSort = { key: null, asc: true };
 
 fetch('lots(1).json')
   .then(res => res.json())
@@ -134,10 +151,9 @@ function renderTable(data) {
   }
 
   data.forEach(lot => {
-    const row = document.createElement('tr');
-
     const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lot.address)}`;
 
+    const row = document.createElement('tr');
     row.innerHTML = `
       <td>${lot.lotNumber}</td>
       <td>${lot.subdivision}</td>
@@ -150,22 +166,62 @@ function renderTable(data) {
   });
 }
 
-function filterLots(query) {
-  query = query.toLowerCase();
+/* FILTERING */
+function filterLots() {
+  const lotVal = document.getElementById('filterLot').value.toLowerCase();
+  const subVal = document.getElementById('filterSubdivision').value.toLowerCase();
+  const builderVal = document.getElementById('filterBuilder').value.toLowerCase();
+  const floorVal = document.getElementById('filterFloorplan').value.toLowerCase();
 
-  return lots.filter(lot =>
-    lot.lotNumber?.toLowerCase().includes(query) ||
-    lot.subdivision?.toLowerCase().includes(query) ||
-    lot.builder?.toLowerCase().includes(query) ||
-    lot.address?.toLowerCase().includes(query)
+  let filtered = lots.filter(lot =>
+    (!lotVal || lot.lotNumber?.toLowerCase().includes(lotVal)) &&
+    (!subVal || lot.subdivision?.toLowerCase().includes(subVal)) &&
+    (!builderVal || lot.builder?.toLowerCase().includes(builderVal)) &&
+    (!floorVal || lot.floorplan?.toLowerCase().includes(floorVal))
   );
+
+  if (currentSort.key) {
+    filtered = sortData(filtered, currentSort.key, currentSort.asc);
+  }
+
+  renderTable(filtered);
 }
 
-document.getElementById('searchBox').addEventListener('input', e => {
-  const query = e.target.value.trim();
-  const filtered = query ? filterLots(query) : lots;
-  renderTable(filtered);
+document.querySelectorAll('.filters input').forEach(input => {
+  input.addEventListener('input', filterLots);
 });
+
+/* SORTING */
+function sortTable(key) {
+  if (currentSort.key === key) {
+    currentSort.asc = !currentSort.asc;
+  } else {
+    currentSort = { key, asc: true };
+  }
+
+  updateSortIndicators();
+  filterLots();
+}
+
+function sortData(data, key, asc) {
+  return [...data].sort((a, b) => {
+    const valA = (a[key] || '').toLowerCase();
+    const valB = (b[key] || '').toLowerCase();
+
+    if (valA < valB) return asc ? -1 : 1;
+    if (valA > valB) return asc ? 1 : -1;
+    return 0;
+  });
+}
+
+function updateSortIndicators() {
+  document.querySelectorAll('.sort-indicator').forEach(el => el.textContent = '');
+
+  if (currentSort.key) {
+    const el = document.getElementById(`sort-${currentSort.key}`);
+    el.textContent = currentSort.asc ? '▲' : '▼';
+  }
+}
 </script>
 
 </body>
