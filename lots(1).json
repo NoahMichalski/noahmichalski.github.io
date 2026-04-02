@@ -1,131 +1,5 @@
 [
   {
-    "lotNumber": "180A",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "705 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "180B",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "701 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F401"
-  },
-  {
-    "lotNumber": "181A",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "718 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "181B",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "722 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "182A",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "726 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "XA05"
-  },
-  {
-    "lotNumber": "182B",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "730 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "XA05"
-  },
-  {
-    "lotNumber": "183A",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "734 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F401"
-  },
-  {
-    "lotNumber": "183B",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "738 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "185A",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "750 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "190B",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "398 Emily Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "191A",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "753 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "191B",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "749 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "192A",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "745 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F401"
-  },
-  {
-    "lotNumber": "192B",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "741 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "194A",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "729 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "XA05"
-  },
-  {
-    "lotNumber": "194B",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "725 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "XA05"
-  },
-  {
-    "lotNumber": "195A",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "721 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "XA05"
-  },
-  {
-    "lotNumber": "195B",
-    "subdivision": "Madison Meadows",
-    "builder": "DR Horton",
-    "address": "717 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "XA05"
-  },
-  {
     "lotNumber": "4865",
     "subdivision": "Terra Alta",
     "builder": "Ryan",
@@ -1118,1833 +992,6 @@
     "builder": "Ryan",
     "address": "190 VIA VENETO DELAWARE 43015",
     "floorplan": "WEXFORD F"
-  },
-  {
-    "lotNumber": "33",
-    "subdivision": "Brookview ",
-    "builder": "DR Horton",
-    "address": "6535 Pfeifer Ash Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "104",
-    "subdivision": "Chase Landings ",
-    "builder": "DR Horton",
-    "address": "6407 Bellmouth Road GALLOWAY OH 43119",
-    "floorplan": "XT05"
-  },
-  {
-    "lotNumber": "105",
-    "subdivision": "Chase Landings ",
-    "builder": "DR Horton",
-    "address": "6411 Bellmouth Road GALLOWAY OH 43119",
-    "floorplan": "XT05"
-  },
-  {
-    "lotNumber": "106",
-    "subdivision": "Chase Landings ",
-    "builder": "DR Horton",
-    "address": "6413 Bellmouth Road GALLOWAY OH 43119",
-    "floorplan": "XT05"
-  },
-  {
-    "lotNumber": "107",
-    "subdivision": "Chase Landings ",
-    "builder": "DR Horton",
-    "address": "6415 Bellmouth Road GALLOWAY OH 43119",
-    "floorplan": "XT05"
-  },
-  {
-    "lotNumber": "108",
-    "subdivision": "Chase Landings ",
-    "builder": "DR Horton",
-    "address": "6417 Bellmouth Road GALLOWAY OH 43119",
-    "floorplan": "XT05"
-  },
-  {
-    "lotNumber": "109",
-    "subdivision": "Chase Landings ",
-    "builder": "DR Horton",
-    "address": "6421 Bellmouth Road GALLOWAY OH 43119",
-    "floorplan": "XT05"
-  },
-  {
-    "lotNumber": "2",
-    "subdivision": "Johnson's Creek ",
-    "builder": "DR Horton",
-    "address": "1252 Eagleton Blvd LONDON OH 43140",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "3",
-    "subdivision": "Johnson's Creek ",
-    "builder": "DR Horton",
-    "address": "1253 Eagleton Blvd LONDON OH 43140",
-    "floorplan": "X437"
-  },
-  {
-    "lotNumber": "66",
-    "subdivision": "Johnson's Creek ",
-    "builder": "DR Horton",
-    "address": "1095 Hartford Lane LONDON OH 43140",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "67",
-    "subdivision": "Johnson's Creek ",
-    "builder": "DR Horton",
-    "address": "1099 Hartford Lane LONDON OH 43140",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "68",
-    "subdivision": "Johnson's Creek ",
-    "builder": "DR Horton",
-    "address": "1103 Hartford Lane LONDON OH 43140",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "69",
-    "subdivision": "Johnson's Creek ",
-    "builder": "DR Horton",
-    "address": "1107 Hartford Lane LONDON OH 43140",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "70",
-    "subdivision": "Johnson's Creek ",
-    "builder": "DR Horton",
-    "address": "1111 Hartford Lane LONDON OH 43140",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "71",
-    "subdivision": "Johnson's Creek ",
-    "builder": "DR Horton",
-    "address": "1115 Hartford Lane LONDON OH 43140",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "72",
-    "subdivision": "Johnson's Creek ",
-    "builder": "DR Horton",
-    "address": "1110 Hartford Lane LONDON OH 43140",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "73",
-    "subdivision": "Johnson's Creek ",
-    "builder": "DR Horton",
-    "address": "1106 Hartford Lane LONDON OH 43140",
-    "floorplan": "X437"
-  },
-  {
-    "lotNumber": "75",
-    "subdivision": "Johnson's Creek ",
-    "builder": "DR Horton",
-    "address": "1098 Hartford Lane LONDON OH 43140",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "76",
-    "subdivision": "Johnson's Creek ",
-    "builder": "DR Horton",
-    "address": "1094 Hartford Lane LONDON OH 43140",
-    "floorplan": "X437"
-  },
-  {
-    "lotNumber": "12",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4219 Saddle Leaf Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "15",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5890 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X304"
-  },
-  {
-    "lotNumber": "16",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5896 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "17",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5912 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "18",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5918 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X311"
-  },
-  {
-    "lotNumber": "19",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5924 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X306"
-  },
-  {
-    "lotNumber": "20",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5930 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X301"
-  },
-  {
-    "lotNumber": "21",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5936 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X303"
-  },
-  {
-    "lotNumber": "22",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5942 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X304"
-  },
-  {
-    "lotNumber": "38",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5945 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "39",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5939 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "40",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5933 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X311"
-  },
-  {
-    "lotNumber": "41",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5927 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X311"
-  },
-  {
-    "lotNumber": "42",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5921 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X304"
-  },
-  {
-    "lotNumber": "43",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5915 Ebony Oak Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "44",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5910 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X303"
-  },
-  {
-    "lotNumber": "45",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5916 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "46",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5922 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X304"
-  },
-  {
-    "lotNumber": "47",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5928 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X311"
-  },
-  {
-    "lotNumber": "48",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5934 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "49",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5940 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X301"
-  },
-  {
-    "lotNumber": "50",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5946 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "51",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5952 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X303"
-  },
-  {
-    "lotNumber": "54",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5970 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X303"
-  },
-  {
-    "lotNumber": "56",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5982 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X311"
-  },
-  {
-    "lotNumber": "57",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5989 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "58",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5983 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X304"
-  },
-  {
-    "lotNumber": "62",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5959 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "63",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5953 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X311"
-  },
-  {
-    "lotNumber": "64",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5947 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X304"
-  },
-  {
-    "lotNumber": "65",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5935 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "66",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5929 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X303"
-  },
-  {
-    "lotNumber": "67",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5923 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X301"
-  },
-  {
-    "lotNumber": "68",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5917 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "69",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5911 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "70",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5905 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X303"
-  },
-  {
-    "lotNumber": "71",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5899 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "72",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5893 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "73",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5887 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X303"
-  },
-  {
-    "lotNumber": "74",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5881 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X301"
-  },
-  {
-    "lotNumber": "75",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5875 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "76",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "5869 Pitch Pine Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X305"
-  },
-  {
-    "lotNumber": "77",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4264 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "78",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4272 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "79",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4280 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "80",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4288 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "81",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4304 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "82",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4312 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X475"
-  },
-  {
-    "lotNumber": "83",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4320 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "84",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4328 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "85",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4344 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X421"
-  },
-  {
-    "lotNumber": "86",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4284 Water Aven Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "87",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4292 Water Aven Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "88",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4300 Water Aven Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "89",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4308 Water Aven Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "90",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4316 Water Aven Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "101",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4325 Water Aven Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "102",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4326 Gray Birch Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "103",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4334 Gray Birch Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X432"
-  },
-  {
-    "lotNumber": "109",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4311 Water Aven Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "110",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4303 Water Aven Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "111",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4295 Water Aven Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "112",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4287 Water Aven Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "113",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4279 Water Aven Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X423"
-  },
-  {
-    "lotNumber": "114",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4317 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "115",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4309 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "116",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4301 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "117",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4293 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "118",
-    "subdivision": "Lansdowne Farms ",
-    "builder": "DR Horton",
-    "address": "4285 Sycamore Oak Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "293",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "291 Sterndale Drive PICKERINGTON OH 43147",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "294",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "138 Robinette Street PICKERINGTON OH 43147",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "295",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "140 Robinette Street PICKERINGTON OH 43147",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "297",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "144 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "299",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "148 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "302",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "154 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "303",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "156 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "306",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "162 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "311",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "172 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "312",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "174 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "313",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "176 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "331",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "192 Kidbrooke Drive PICKERINGTON OH 43147",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "335",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "184 Kidbrooke Drive PICKERINGTON OH 43147",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "345",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "149 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "347",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "153 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "348",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "155 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "349",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "157 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "352",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "163 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "354",
-    "subdivision": "Longview Highlands ",
-    "builder": "DR Horton",
-    "address": "167 Lorrimore Drive PICKERINGTON OH 43147",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "5256",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "1041 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X421"
-  },
-  {
-    "lotNumber": "5257",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "1049 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "5258",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "1057 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "5264",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "1105 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "5270",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "1128 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "5277",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "1018 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "5278",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "1010 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "5282",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "978 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X421"
-  },
-  {
-    "lotNumber": "5283",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "970 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "5284",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "962 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X475"
-  },
-  {
-    "lotNumber": "5285",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "954 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X432"
-  },
-  {
-    "lotNumber": "5287",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "938 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "5288",
-    "subdivision": "Ludlow Ridge ",
-    "builder": "DR Horton",
-    "address": "930 Sherwood Loop BELLEFONTAINE OH 43311",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "165",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "577 Madison Way PLAIN CITY OH 43064",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "178",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "594 Madison Way PLAIN CITY OH 43064",
-    "floorplan": "X437"
-  },
-  {
-    "lotNumber": "179",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "590 Madison Way PLAIN CITY OH 43064",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "180",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "586 Madison Way PLAIN CITY OH 43064",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "184",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "329 Angely Drive PLAIN CITY OH 43064",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "185",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "333 Angely Drive PLAIN CITY OH 43064",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "186",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "337 Angely Drive PLAIN CITY OH 43064",
-    "floorplan": "X437"
-  },
-  {
-    "lotNumber": "187",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "341 Angely Drive PLAIN CITY OH 43064",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "198",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "316 Angely Drive PLAIN CITY OH 43064",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "202",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "300 Angely Drive PLAIN CITY OH 43064",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "206",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "413 Samantha Drive PLAIN CITY OH 43064",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "208",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "421 Samantha Drive PLAIN CITY OH 43064",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "210",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "429 Samantha Drive PLAIN CITY OH 43064",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "211",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "431 Samantha Drive PLAIN CITY OH 43064",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "212",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "435 Samantha Drive PLAIN CITY OH 43064",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "213",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "439 Samantha Drive PLAIN CITY OH 43064",
-    "floorplan": "X437"
-  },
-  {
-    "lotNumber": "225",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "442 Samantha Drive PLAIN CITY OH 43064",
-    "floorplan": "X423"
-  },
-  {
-    "lotNumber": "226",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "434 Samantha Drive PLAIN CITY OH 43064",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "227",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "430 Samantha Drive PLAIN CITY OH 43064",
-    "floorplan": "X437"
-  },
-  {
-    "lotNumber": "331",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "495 Darliene Drive PLAIN CITY OH 43064",
-    "floorplan": "F401"
-  },
-  {
-    "lotNumber": "332",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "499 Darliene Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "333",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "503 Darliene Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "335",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "511 Darliene Drive PLAIN CITY OH 43064",
-    "floorplan": "X421"
-  },
-  {
-    "lotNumber": "337",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "519 Darliene Drive PLAIN CITY OH 43064",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "338",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "523 Darliene Drive PLAIN CITY OH 43064",
-    "floorplan": "X421"
-  },
-  {
-    "lotNumber": "339",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "527 Darliene Drive PLAIN CITY OH 43064",
-    "floorplan": "F401"
-  },
-  {
-    "lotNumber": "340",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "531 Darliene Drive PLAIN CITY OH 43064",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "341",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "535 Darliene Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "342",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "521 Claire Drive PLAIN CITY OH 43064",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "346",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "490 Darliene Drive PLAIN CITY OH 43064",
-    "floorplan": "F401"
-  },
-  {
-    "lotNumber": "347",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "486 Darliene Drive PLAIN CITY OH 43064",
-    "floorplan": "F400"
-  },
-  {
-    "lotNumber": "1801",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "705 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "1802",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "701 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F401"
-  },
-  {
-    "lotNumber": "1811",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "718 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "1812",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "722 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "1821",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "726 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "XA05"
-  },
-  {
-    "lotNumber": "1822",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "730 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "XA05"
-  },
-  {
-    "lotNumber": "1831",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "734 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F401"
-  },
-  {
-    "lotNumber": "1832",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "738 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "1851",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "750 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "1902",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "398 Emily Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "1911",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "753 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "1912",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "749 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "1921",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "745 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F401"
-  },
-  {
-    "lotNumber": "1922",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "741 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "F402"
-  },
-  {
-    "lotNumber": "1941",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "729 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "XA05"
-  },
-  {
-    "lotNumber": "1942",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "725 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "XA05"
-  },
-  {
-    "lotNumber": "1951",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "721 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "XA05"
-  },
-  {
-    "lotNumber": "1952",
-    "subdivision": "Madison Meadows ",
-    "builder": "DR Horton",
-    "address": "717 Maria Drive PLAIN CITY OH 43064",
-    "floorplan": "XA05"
-  },
-  {
-    "lotNumber": "35",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "5670 Orchard Lakes Trail Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "43",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "5718 Orchard Lakes Trail Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "44",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "5724 Orchard Lakes Trail Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "45",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "5730 Orchard Lakes Trail Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "46",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "5736 Orchard Lakes Trail Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "47",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "5742 Orchard Lakes Trail Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "49",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "5754 Orchard Lakes Trail Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "50",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "5760 Orchard Lakes Trail Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "51",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "5766 Orchard Lakes Trail Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "54",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "5784 Orchard Lakes Trail Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "59",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "5814 Orchard Lakes Trail Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "60",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "7109 Balaton Creek Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "61",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "7108 Balaton Creek Avenue CANAL WINCHESTER OH 43110",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "62",
-    "subdivision": "Orchard Lakes ",
-    "builder": "DR Horton",
-    "address": "7103 Rome Beauty Drive CANAL WINCHESTER OH 43110",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "3631",
-    "subdivision": "Park View ",
-    "builder": "DR Horton",
-    "address": "353 Park Vista Drive DELAWARE OH 43015",
-    "floorplan": "X450"
-  },
-  {
-    "lotNumber": "3649",
-    "subdivision": "Park View ",
-    "builder": "DR Horton",
-    "address": "401 Garnet Ranch Drive DELAWARE OH 43015",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "3650",
-    "subdivision": "Park View ",
-    "builder": "DR Horton",
-    "address": "407 Garnet Ranch Drive DELAWARE OH 43015",
-    "floorplan": "X421"
-  },
-  {
-    "lotNumber": "3651",
-    "subdivision": "Park View ",
-    "builder": "DR Horton",
-    "address": "413 Garnet Ranch Drive DELAWARE OH 43015",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "3652",
-    "subdivision": "Park View ",
-    "builder": "DR Horton",
-    "address": "419 Garnet Ranch Drive DELAWARE OH 43015",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "3653",
-    "subdivision": "Park View ",
-    "builder": "DR Horton",
-    "address": "425 Garnet Ranch Drive DELAWARE OH 43015",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "3666",
-    "subdivision": "Park View ",
-    "builder": "DR Horton",
-    "address": "412 Garnet Ranch Drive DELAWARE OH 43015",
-    "floorplan": "X432"
-  },
-  {
-    "lotNumber": "3676",
-    "subdivision": "Park View ",
-    "builder": "DR Horton",
-    "address": "389 Greenland Pass DELAWARE OH 43015",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "2953",
-    "subdivision": "Piatt Preserve ",
-    "builder": "DR Horton",
-    "address": "2889 Piatt Crest Drive DELAWARE OH 43015",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "2954",
-    "subdivision": "Piatt Preserve ",
-    "builder": "DR Horton",
-    "address": "2873 Piatt Crest Drive DELAWARE OH 43015",
-    "floorplan": "X437"
-  },
-  {
-    "lotNumber": "2955",
-    "subdivision": "Piatt Preserve ",
-    "builder": "DR Horton",
-    "address": "2857 Piatt Crest Drive DELAWARE OH 43015",
-    "floorplan": "X437"
-  },
-  {
-    "lotNumber": "2956",
-    "subdivision": "Piatt Preserve ",
-    "builder": "DR Horton",
-    "address": "2841 Piatt Crest Drive DELAWARE OH 43015",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "2961",
-    "subdivision": "Piatt Preserve ",
-    "builder": "DR Horton",
-    "address": "2770 Piatt Crest Drive DELAWARE OH 43015",
-    "floorplan": "D544"
-  },
-  {
-    "lotNumber": "2963",
-    "subdivision": "Piatt Preserve ",
-    "builder": "DR Horton",
-    "address": "2804 Piatt Crest Drive DELAWARE OH 43015",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "2973",
-    "subdivision": "Piatt Preserve ",
-    "builder": "DR Horton",
-    "address": "2964 Piatt Crest Drive DELAWARE OH 43015",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "3327",
-    "subdivision": "Piatt Preserve ",
-    "builder": "DR Horton",
-    "address": "2741 Carrowmore Court DELAWARE OH 43015",
-    "floorplan": "D544"
-  },
-  {
-    "lotNumber": "3354",
-    "subdivision": "Piatt Preserve ",
-    "builder": "DR Horton",
-    "address": "2579 Carrowmore Drive DELAWARE OH 43015",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "88",
-    "subdivision": "River Ridge ",
-    "builder": "DR Horton",
-    "address": "113 Vine Grove Drive CIRCLEVILLE OH 43113",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "89",
-    "subdivision": "River Ridge ",
-    "builder": "DR Horton",
-    "address": "107 Vine Grove Drive CIRCLEVILLE OH 43113",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "93",
-    "subdivision": "River Ridge ",
-    "builder": "DR Horton",
-    "address": "1748 Jacko Lane CIRCLEVILLE OH 43113",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "94",
-    "subdivision": "River Ridge ",
-    "builder": "DR Horton",
-    "address": "1752 Jacko Lane CIRCLEVILLE OH 43113",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "3248",
-    "subdivision": "Springer Woods ",
-    "builder": "DR Horton",
-    "address": "687 Penwell Drive DELAWARE OH 43015",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "19",
-    "subdivision": "Sugar Creek ",
-    "builder": "DR Horton",
-    "address": "137 Brookside Drive JEFFERSONVILLE OH 43128",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "20",
-    "subdivision": "Sugar Creek ",
-    "builder": "DR Horton",
-    "address": "139 Brookside Drive JEFFERSONVILLE OH 43128",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "21",
-    "subdivision": "Sugar Creek ",
-    "builder": "DR Horton",
-    "address": "141 Brookside Drive JEFFERSONVILLE OH 43128",
-    "floorplan": "X437"
-  },
-  {
-    "lotNumber": "22",
-    "subdivision": "Sugar Creek ",
-    "builder": "DR Horton",
-    "address": "143 Brookside Drive JEFFERSONVILLE OH 43128",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "24",
-    "subdivision": "Sugar Creek ",
-    "builder": "DR Horton",
-    "address": "147 Brookside Drive JEFFERSONVILLE OH 43128",
-    "floorplan": "X421"
-  },
-  {
-    "lotNumber": "26",
-    "subdivision": "Sugar Creek ",
-    "builder": "DR Horton",
-    "address": "151 Brookside Drive JEFFERSONVILLE OH 43128",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "54",
-    "subdivision": "Sugar Creek ",
-    "builder": "DR Horton",
-    "address": "146 Brookside Drive JEFFERSONVILLE OH 43128",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "3733",
-    "subdivision": "The Overlook ",
-    "builder": "DR Horton",
-    "address": "175 Oak Valley Court NEWARK OH 43055",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "3734",
-    "subdivision": "The Overlook ",
-    "builder": "DR Horton",
-    "address": "165 Oak Valley Court NEWARK OH 43055",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "3756",
-    "subdivision": "The Overlook ",
-    "builder": "DR Horton",
-    "address": "172 Badger Pass NEWARK OH 43055",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "3757",
-    "subdivision": "The Overlook ",
-    "builder": "DR Horton",
-    "address": "180 Badger Pass NEWARK OH 43055",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "3765",
-    "subdivision": "The Overlook ",
-    "builder": "DR Horton",
-    "address": "2235 Overlook Way NEWARK OH 43055",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "3766",
-    "subdivision": "The Overlook ",
-    "builder": "DR Horton",
-    "address": "2245 Overlook Way NEWARK OH 43055",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "3767",
-    "subdivision": "The Overlook ",
-    "builder": "DR Horton",
-    "address": "2255 Overlook Way NEWARK OH 43055",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "3768",
-    "subdivision": "The Overlook ",
-    "builder": "DR Horton",
-    "address": "2275 Overlook Way NEWARK OH 43055",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "3769",
-    "subdivision": "The Overlook ",
-    "builder": "DR Horton",
-    "address": "2285 Overlook Way NEWARK OH 43055",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "3795",
-    "subdivision": "The Overlook ",
-    "builder": "DR Horton",
-    "address": "2100 Overlook Way NEWARK OH 43055",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "262",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "1350 Hansberry Drive LITHOPOLIS OH 43136",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "317",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "638 Faulkner Drive LITHOPOLIS OH 43136",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "319",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "607 Eastman Avenue LITHOPOLIS OH 43136",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "324",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "557 Eastman Avenue LITHOPOLIS OH 43136",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "329",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "507 Eastman Avenue LITHOPOLIS OH 43136",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "341",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "560 Eastman Avenue LITHOPOLIS OH 43136",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "353",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "607 Faulkner Drive LITHOPOLIS OH 43136",
-    "floorplan": "X475"
-  },
-  {
-    "lotNumber": "356",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "720 Faulkner Drive LITHOPOLIS OH 43136",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "358",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "740 Faulkner Drive LITHOPOLIS OH 43136",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "359",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "750 Faulkner Drive LITHOPOLIS OH 43136",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "360",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "760 Faulkner Drive LITHOPOLIS OH 43136",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "361",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "159 Wheatley Street LITHOPOLIS OH 43136",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "362",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "169 Wheatley Street LITHOPOLIS OH 43136",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "363",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "179 Wheatley Street LITHOPOLIS OH 43136",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "365",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "199 Wheatley Street LITHOPOLIS OH 43136",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "366",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "787 Faulkner Drive LITHOPOLIS OH 43136",
-    "floorplan": "X432"
-  },
-  {
-    "lotNumber": "367",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "777 Faulkner Drive LITHOPOLIS OH 43136",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "368",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "767 Faulkner Drive LITHOPOLIS OH 43136",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "369",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "757 Faulkner Drive LITHOPOLIS OH 43136",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "370",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "747 Faulkner Drive LITHOPOLIS OH 43136",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "375",
-    "subdivision": "Wagnalls Run ",
-    "builder": "DR Horton",
-    "address": "697 Faulkner Drive LITHOPOLIS OH 43136",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "2",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "5 Walnut Mill Way ASHVILLE OH 43103",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "54",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "48 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "55",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "50 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "56",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "52 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X424"
-  },
-  {
-    "lotNumber": "57",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "54 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "58",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "56 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "59",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "58 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "60",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "60 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "61",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "62 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "62",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "64 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X426"
-  },
-  {
-    "lotNumber": "63",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "1 Grismill Drive ASHVILLE OH 43103",
-    "floorplan": "X437"
-  },
-  {
-    "lotNumber": "64",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "3 Grismill Drive ASHVILLE OH 43103",
-    "floorplan": "X421"
-  },
-  {
-    "lotNumber": "65",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "61 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X423"
-  },
-  {
-    "lotNumber": "67",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "57 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X421"
-  },
-  {
-    "lotNumber": "69",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "53 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X422"
-  },
-  {
-    "lotNumber": "70",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "51 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X429"
-  },
-  {
-    "lotNumber": "71",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "49 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X431"
-  },
-  {
-    "lotNumber": "75",
-    "subdivision": "Walnut Mill ",
-    "builder": "DR Horton",
-    "address": "41 Cider Mill Drive ASHVILLE OH 43103",
-    "floorplan": "X422"
   },
   {
     "lotNumber": "303",
@@ -6651,77 +4698,77 @@
   },
   {
     "lotNumber": "519",
-    "subdivision": "Villages Classicway",
+    "subdivision": "VCL MSH",
     "builder": "Fischer Homes Cincinnati",
     "address": "2476 GIACOMO DRIVE",
     "floorplan": "Fairfax"
   },
   {
     "lotNumber": "465",
-    "subdivision": "Villages Classicway",
+    "subdivision": "VCL MSH",
     "builder": "Fischer Homes Cincinnati",
     "address": "2544 BUCHANAN DRIVE",
     "floorplan": "Yosemite"
   },
   {
     "lotNumber": "503",
-    "subdivision": "Villages Classicway",
+    "subdivision": "VCL MSH",
     "builder": "Fischer Homes Cincinnati",
     "address": "2545 BUCHANAN DRIVE",
     "floorplan": "Jensen"
   },
   {
     "lotNumber": "522",
-    "subdivision": "Villages Classicway",
+    "subdivision": "VCL MSH",
     "builder": "Fischer Homes Cincinnati",
     "address": "2494 GIACOMO DRIVE",
     "floorplan": "Yosemite"
   },
   {
     "lotNumber": "474",
-    "subdivision": "Villages Classicway",
+    "subdivision": "VCL MSH",
     "builder": "Fischer Homes Cincinnati",
     "address": "5580 CHARISMATIC COURT",
     "floorplan": "Jensen"
   },
   {
     "lotNumber": "469",
-    "subdivision": "Villages Classicway",
+    "subdivision": "VCL MSH",
     "builder": "Fischer Homes Cincinnati",
     "address": "2520 BUCHANAN DRIVE",
     "floorplan": "Beacon"
   },
   {
     "lotNumber": "494",
-    "subdivision": "Villages Classicway",
+    "subdivision": "VCL MSH",
     "builder": "Fischer Homes Cincinnati",
     "address": "2453 GIACOMO DRIVE",
     "floorplan": "Beacon"
   },
   {
     "lotNumber": "470",
-    "subdivision": "Villages Classicway",
+    "subdivision": "VCL MSH",
     "builder": "Fischer Homes Cincinnati",
     "address": "2514 BUCHANAN DRIVE",
     "floorplan": "Breckenridge"
   },
   {
     "lotNumber": "497",
-    "subdivision": "Villages Classicway",
+    "subdivision": "VCL MSH",
     "builder": "Fischer Homes Cincinnati",
     "address": "2471 GIACOMO DRIVE",
     "floorplan": "Wesley"
   },
   {
     "lotNumber": "502",
-    "subdivision": "Villages Classicway",
+    "subdivision": "VCL MSH",
     "builder": "Fischer Homes Cincinnati",
     "address": "2501 GIACOMO DRIVE",
     "floorplan": "Breckenridge"
   },
   {
     "lotNumber": "490",
-    "subdivision": "Villages Classicway",
+    "subdivision": "VCL MSH",
     "builder": "Fischer Homes Cincinnati",
     "address": "5513 CHARISMATIC COURT",
     "floorplan": "Jensen"
@@ -11429,5 +9476,1447 @@
     "builder": "Pulte",
     "address": "4137 TULLER ROAD DUBLIN , OH 43017",
     "floorplan": "Highwood"
+  },
+  {
+    "lotNumber": "3",
+    "subdivision": "Bishop Estates",
+    "builder": "DR Horton",
+    "address": "427 JARET WAY WASHINGTON COURT HOUSE OH 43160",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "5",
+    "subdivision": "Bishop Estates",
+    "builder": "DR Horton",
+    "address": "424 JARET WAY WASHINGTON COURT HOUSE OH 43160",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "7",
+    "subdivision": "Bishop Estates",
+    "builder": "DR Horton",
+    "address": "435 JARET WAY WASHINGTON COURT HOUSE OH 43160",
+    "floorplan": "X423"
+  },
+  {
+    "lotNumber": "8",
+    "subdivision": "Bishop Estates",
+    "builder": "DR Horton",
+    "address": "441 JARET WAY WASHINGTON COURT HOUSE OH 43160",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "10",
+    "subdivision": "Bishop Estates",
+    "builder": "DR Horton",
+    "address": "461 JARET WAY WASHINGTON COURT HOUSE OH 43160",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "40",
+    "subdivision": "Bishop Estates",
+    "builder": "DR Horton",
+    "address": "474 JARET WAY WASHINGTON COURT HOUSE OH 43160",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "41",
+    "subdivision": "Bishop Estates",
+    "builder": "DR Horton",
+    "address": "462 JARET WAY WASHINGTON COURT HOUSE OH 43160",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "43",
+    "subdivision": "Bishop Estates",
+    "builder": "DR Horton",
+    "address": "442 JARET WAY WASHINGTON COURT HOUSE OH 43160",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "120",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6420 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "121",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6416 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "122",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6414 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "123",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6410 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "124",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6404 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "125",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6400 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "126",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6398 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "127",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6396 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "128",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6394 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "129",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6390 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "130",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6386 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "131",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6382 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "132",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6380 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "133",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6378 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "134",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6376 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "135",
+    "subdivision": "Chase Landings",
+    "builder": "DR Horton",
+    "address": "6372 SILVER CANOE WAY GALLOWAY OH 43119",
+    "floorplan": "XT05"
+  },
+  {
+    "lotNumber": "262",
+    "subdivision": "Galloway East",
+    "builder": "DR Horton",
+    "address": "6264 FARELLA WAY GALLOWAY OH 43119",
+    "floorplan": "X490"
+  },
+  {
+    "lotNumber": "3",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1253 EAGLETON BLVD LONDON OH 43140",
+    "floorplan": "X437"
+  },
+  {
+    "lotNumber": "20",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1243 STRATFORD WAY LONDON OH 43140",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "21",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1239 STRATFORD WAY LONDON OH 43140",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "22",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1235 STRATFORD WAY LONDON OH 43140",
+    "floorplan": "X421"
+  },
+  {
+    "lotNumber": "23",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1231 STRATFORD WAY LONDON OH 43140",
+    "floorplan": "X423"
+  },
+  {
+    "lotNumber": "24",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1227 STRATFORD WAY LONDON OH 43140",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "25",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1223 STRATFORD WAY LONDON OH 43140",
+    "floorplan": "X423"
+  },
+  {
+    "lotNumber": "29",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1207 STRATFORD WAY LONDON OH 43140",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "36",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1179 STRATFORD WAY LONDON OH 43140",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "51",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1222 STRATFORD WAY LONDON OH 43140",
+    "floorplan": "X421"
+  },
+  {
+    "lotNumber": "74",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1102 HARTFORD LANE LONDON OH 43140",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "2750",
+    "subdivision": "Kintner Crossing",
+    "builder": "DR Horton",
+    "address": "809 SOUTH KINTNER PARKWAY SUNBURY OH 43074",
+    "floorplan": "F403"
+  },
+  {
+    "lotNumber": "23",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5948 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X305"
+  },
+  {
+    "lotNumber": "24",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5954 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X303"
+  },
+  {
+    "lotNumber": "25",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5960 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X305"
+  },
+  {
+    "lotNumber": "26",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5966 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X304"
+  },
+  {
+    "lotNumber": "27",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5972 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X305"
+  },
+  {
+    "lotNumber": "28",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5978 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X301"
+  },
+  {
+    "lotNumber": "29",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5984 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X305"
+  },
+  {
+    "lotNumber": "30",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5990 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X304"
+  },
+  {
+    "lotNumber": "31",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5987 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X305"
+  },
+  {
+    "lotNumber": "32",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5981 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X305"
+  },
+  {
+    "lotNumber": "33",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5975 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X303"
+  },
+  {
+    "lotNumber": "34",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5969 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X304"
+  },
+  {
+    "lotNumber": "35",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5963 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X305"
+  },
+  {
+    "lotNumber": "36",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5957 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X305"
+  },
+  {
+    "lotNumber": "37",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5951 EBONY OAK DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X303"
+  },
+  {
+    "lotNumber": "52",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5958 PITCH PINE DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X305"
+  },
+  {
+    "lotNumber": "53",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5964 PITCH PINE DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X304"
+  },
+  {
+    "lotNumber": "60",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "5971 PITCH PINE DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X305"
+  },
+  {
+    "lotNumber": "89",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4308 WATER AVEN DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "90",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4316 WATER AVEN DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "91",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4324 WATER AVEN DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "92",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4332 WATER AVEN DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "93",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4340 WATER AVEN DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "94",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4348 WATER AVEN DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "95",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4356 WATER AVEN DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "96",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4365 WATER AVEN DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "97",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4357 WATER AVEN DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "98",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4349 WATER AVEN DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "99",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4341 WATER AVEN DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "104",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4342 GRAY BIRCH DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "105",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4350 GRAY BIRCH DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "106",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4358 GRAY BIRCH DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "107",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4366 GRAY BIRCH DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "108",
+    "subdivision": "Lansdowne Farms",
+    "builder": "DR Horton",
+    "address": "4374 GRAY BIRCH DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "2",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3866 LEASURE FARMS DRIVE ZANESVILLE OH 43701",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "3",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3862 LEASURE FARMS DRIVE ZANESVILLE OH 43701",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "4",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3858 LEASURE FARMS DRIVE ZANESVILLE OH 43701",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "5",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3854 LEASURE FARMS DRIVE ZANESVILLE OH 43701",
+    "floorplan": "X423"
+  },
+  {
+    "lotNumber": "6",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3850 LEASURE FARMS DRIVE ZANESVILLE OH 43701",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "8",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3842 LEASURE FARMS DRIVE ZANESVILLE OH 43701",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "18",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3831 LEASURE FARMS DRIVE ZANESVILLE OH 43701",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "21",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3851 LEASURE FARMS DRIVE ZANESVILLE OH 43701",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "22",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3857 LEASURE FARMS DRIVE ZANESVILLE OH 43701",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "23",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3861 LEASURE FARMS DRIVE ZANESVILLE OH 43701",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "25",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3871 LEASURE FARMS DRIVE ZANESVILLE OH 43701",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "44",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3746 FOUNDATION CIRCLE ZANESVILLE OH 43701",
+    "floorplan": "X423"
+  },
+  {
+    "lotNumber": "45",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3742 FOUNDATION CIRCLE ZANESVILLE OH 43701",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "46",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3738 FOUNDATION CIRCLE ZANESVILLE OH 43701",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "50",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3743 FOUNDATION CIRCLE ZANESVILLE OH 43701",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "2",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "104 FIPPENNY PLACE MOUNT VERNON OH 43050",
+    "floorplan": "F401"
+  },
+  {
+    "lotNumber": "3",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "108 FIPPENNY PLACE MOUNT VERNON OH 43050",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "4",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "112 FIPPENNY PLACE MOUNT VERNON OH 43050",
+    "floorplan": "F400"
+  },
+  {
+    "lotNumber": "38",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "117 FIPPENNY PLACE MOUNT VERNON OH 43050",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "39",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "113 FIPPENNY PLACE MOUNT VERNON OH 43050",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "40",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "109 FIPPENNY PLACE MOUNT VERNON OH 43050",
+    "floorplan": "X421"
+  },
+  {
+    "lotNumber": "42",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "101 FIPPENNY PLACE MOUNT VERNON OH 43050",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "43",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "105 APPLESEED WAY MOUNT VERNON OH 43050",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "47",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "121 APPLESEED WAY MOUNT VERNON OH 43050",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "48",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "125 APPLESEED WAY MOUNT VERNON OH 43050",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "51",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "137 APPLESEED WAY MOUNT VERNON OH 43050",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "52",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "108 APPLESEED WAY MOUNT VERNON OH 43050",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "53",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "112 APPLESEED WAY MOUNT VERNON OH 43050",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "43",
+    "subdivision": "Longview Highlands",
+    "builder": "DR Horton",
+    "address": "100 CEDARHURST COURT PICKERINGTON OH 43147",
+    "floorplan": "X437"
+  },
+  {
+    "lotNumber": "295",
+    "subdivision": "Longview Highlands",
+    "builder": "DR Horton",
+    "address": "140 ROBINETTE STREET PICKERINGTON OH 43147",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "298",
+    "subdivision": "Longview Highlands",
+    "builder": "DR Horton",
+    "address": "146 LORRIMORE DRIVE PICKERINGTON OH 43147",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "300",
+    "subdivision": "Longview Highlands",
+    "builder": "DR Horton",
+    "address": "150 LORRIMORE DRIVE PICKERINGTON OH 43147",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "301",
+    "subdivision": "Longview Highlands",
+    "builder": "DR Horton",
+    "address": "152 LORRIMORE DRIVE PICKERINGTON OH 43147",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "303",
+    "subdivision": "Longview Highlands",
+    "builder": "DR Horton",
+    "address": "156 LORRIMORE DRIVE PICKERINGTON OH 43147",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "304",
+    "subdivision": "Longview Highlands",
+    "builder": "DR Horton",
+    "address": "158 LORRIMORE DRIVE PICKERINGTON OH 43147",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "305",
+    "subdivision": "Longview Highlands",
+    "builder": "DR Horton",
+    "address": "160 LORRIMORE DRIVE PICKERINGTON OH 43147",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "306",
+    "subdivision": "Longview Highlands",
+    "builder": "DR Horton",
+    "address": "162 LORRIMORE DRIVE PICKERINGTON OH 43147",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "307",
+    "subdivision": "Longview Highlands",
+    "builder": "DR Horton",
+    "address": "164 LORRIMORE DRIVE PICKERINGTON OH 43147",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "308",
+    "subdivision": "Longview Highlands",
+    "builder": "DR Horton",
+    "address": "166 LORRIMORE DRIVE PICKERINGTON OH 43147",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "310",
+    "subdivision": "Longview Highlands",
+    "builder": "DR Horton",
+    "address": "170 LORRIMORE DRIVE PICKERINGTON OH 43147",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "170",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "597 MADISON WAY PLAIN CITY OH 43064",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "176",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "602 MADISON WAY PLAIN CITY OH 43064",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "177",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "598 MADISON WAY PLAIN CITY OH 43064",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "184",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "329 ANGELY DRIVE PLAIN CITY OH 43064",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "187",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "341 ANGELY DRIVE PLAIN CITY OH 43064",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "188",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "345 ANGELY DRIVE PLAIN CITY OH 43064",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "189",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "349 ANGELY DRIVE PLAIN CITY OH 43064",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "193",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "336 ANGELY DRIVE PLAIN CITY OH 43064",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "194",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "332 ANGELY DRIVE PLAIN CITY OH 43064",
+    "floorplan": "X423"
+  },
+  {
+    "lotNumber": "212",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "435 SAMANTHA DRIVE PLAIN CITY OH 43064",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "213",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "439 SAMANTHA DRIVE PLAIN CITY OH 43064",
+    "floorplan": "X437"
+  },
+  {
+    "lotNumber": "331",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "495 DARLIENE DRIVE PLAIN CITY OH 43064",
+    "floorplan": "F401"
+  },
+  {
+    "lotNumber": "344",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "498 DARLIENE DRIVE PLAIN CITY OH 43064",
+    "floorplan": "F400"
+  },
+  {
+    "lotNumber": "345",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "494 DARLIENE DRIVE PLAIN CITY OH 43064",
+    "floorplan": "X421"
+  },
+  {
+    "lotNumber": "366",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "539 DARLIENE DRIVE PLAIN CITY OH 43064",
+    "floorplan": "F401"
+  },
+  {
+    "lotNumber": "367",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "543 DARLIENE DRIVE PLAIN CITY OH 43064",
+    "floorplan": "X421"
+  },
+  {
+    "lotNumber": "371",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "559 DARLIENE DRIVE PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "181A",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "718 MARIA DRIVE PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "181B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "722 MARIA DRIVE PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "183B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "738 MARIA DRIVE PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "193A",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "737 MARIA DRIVE PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "193B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "733 MARIA DRIVE PLAIN CITY OH 43064",
+    "floorplan": "F402"
+  },
+  {
+    "lotNumber": "41",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5706 ORCHARD LAKES TRAIL DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "48",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5748 ORCHARD LAKES TRAIL DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "51",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5766 ORCHARD LAKES TRAIL DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "52",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5772 ORCHARD LAKES TRAIL DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "53",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5778 ORCHARD LAKES TRAIL DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "54",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5784 ORCHARD LAKES TRAIL DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "55",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5790 ORCHARD LAKES TRAIL DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "56",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5796 ORCHARD LAKES TRAIL DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X421"
+  },
+  {
+    "lotNumber": "57",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5802 ORCHARD LAKES TRAIL DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "58",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5808 ORCHARD LAKES TRAIL DRIVE CANAL WINCHESTER OH 43110",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "13625",
+    "subdivision": "Park View",
+    "builder": "DR Horton",
+    "address": "762 SUNNY VALE DRIVE DELAWARE OH 43015",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "13654",
+    "subdivision": "Park View",
+    "builder": "DR Horton",
+    "address": "431 GARNET RANCH DRIVE DELAWARE OH 43015",
+    "floorplan": "X421"
+  },
+  {
+    "lotNumber": "13655",
+    "subdivision": "Park View",
+    "builder": "DR Horton",
+    "address": "437 GARNET RANCH DRIVE DELAWARE OH 43015",
+    "floorplan": "X450"
+  },
+  {
+    "lotNumber": "13656",
+    "subdivision": "Park View",
+    "builder": "DR Horton",
+    "address": "443 GARNET RANCH DRIVE DELAWARE OH 43015",
+    "floorplan": "X437"
+  },
+  {
+    "lotNumber": "13662",
+    "subdivision": "Park View",
+    "builder": "DR Horton",
+    "address": "436 GARNET RANCH DRIVE DELAWARE OH 43015",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "2952",
+    "subdivision": "Piatt Preserve",
+    "builder": "DR Horton",
+    "address": "2905 PIATT CREST DRIVE DELAWARE OH 43015",
+    "floorplan": "X437"
+  },
+  {
+    "lotNumber": "2960",
+    "subdivision": "Piatt Preserve",
+    "builder": "DR Horton",
+    "address": "2754 PIATT CREST DRIVE DELAWARE OH 43015",
+    "floorplan": "X437"
+  },
+  {
+    "lotNumber": "2964",
+    "subdivision": "Piatt Preserve",
+    "builder": "DR Horton",
+    "address": "2820 PIATT CREST DRIVE DELAWARE OH 43015",
+    "floorplan": "X437"
+  },
+  {
+    "lotNumber": "2965",
+    "subdivision": "Piatt Preserve",
+    "builder": "DR Horton",
+    "address": "2836 PIATT CREST DRIVE DELAWARE OH 43015",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "2966",
+    "subdivision": "Piatt Preserve",
+    "builder": "DR Horton",
+    "address": "2852 PIATT CREST DRIVE DELAWARE OH 43015",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "2967",
+    "subdivision": "Piatt Preserve",
+    "builder": "DR Horton",
+    "address": "2868 PIATT CREST DRIVE DELAWARE OH 43015",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "2968",
+    "subdivision": "Piatt Preserve",
+    "builder": "DR Horton",
+    "address": "2884 PIATT CREST DRIVE DELAWARE OH 43015",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "2971",
+    "subdivision": "Piatt Preserve",
+    "builder": "DR Horton",
+    "address": "2928 PIATT CREST DRIVE DELAWARE OH 43015",
+    "floorplan": "X437"
+  },
+  {
+    "lotNumber": "17",
+    "subdivision": "Sugar Creek",
+    "builder": "DR Horton",
+    "address": "133 BROOKSIDE DRIVE JEFFERSONVILLE OH 43128",
+    "floorplan": "X450"
+  },
+  {
+    "lotNumber": "18",
+    "subdivision": "Sugar Creek",
+    "builder": "DR Horton",
+    "address": "135 BROOKSIDE DRIVE JEFFERSONVILLE OH 43128",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "20",
+    "subdivision": "Sugar Creek",
+    "builder": "DR Horton",
+    "address": "139 BROOKSIDE DRIVE JEFFERSONVILLE OH 43128",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "22",
+    "subdivision": "Sugar Creek",
+    "builder": "DR Horton",
+    "address": "143 BROOKSIDE DRIVE JEFFERSONVILLE OH 43128",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "23",
+    "subdivision": "Sugar Creek",
+    "builder": "DR Horton",
+    "address": "145 BROOKSIDE DRIVE JEFFERSONVILLE OH 43128",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "24",
+    "subdivision": "Sugar Creek",
+    "builder": "DR Horton",
+    "address": "147 BROOKSIDE DRIVE JEFFERSONVILLE OH 43128",
+    "floorplan": "X421"
+  },
+  {
+    "lotNumber": "26",
+    "subdivision": "Sugar Creek",
+    "builder": "DR Horton",
+    "address": "151 BROOKSIDE DRIVE JEFFERSONVILLE OH 43128",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "50",
+    "subdivision": "Sugar Creek",
+    "builder": "DR Horton",
+    "address": "132 BROOKSIDE DRIVE JEFFERSONVILLE OH 43128",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "54",
+    "subdivision": "Sugar Creek",
+    "builder": "DR Horton",
+    "address": "146 BROOKSIDE DRIVE JEFFERSONVILLE OH 43128",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "13750",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "137 BADGER PASS NEWARK OH 43055",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "13754",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "152 BADGER PASS NEWARK OH 43055",
+    "floorplan": "X450"
+  },
+  {
+    "lotNumber": "13765",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "2235 OVERLOOK WAY NEWARK OH 43055",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "13773",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "2290 OVERLOOK WAY NEWARK OH 43055",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "13774",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "2280 OVERLOOK WAY NEWARK OH 43055",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "13775",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "2270 OVERLOOK WAY NEWARK OH 43055",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "13776",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "2260 OVERLOOK WAY NEWARK OH 43055",
+    "floorplan": "X421"
+  },
+  {
+    "lotNumber": "13777",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "2250 OVERLOOK WAY NEWARK OH 43055",
+    "floorplan": "X450"
+  },
+  {
+    "lotNumber": "13778",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "2240 OVERLOOK WAY NEWARK OH 43055",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "13794",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "2110 OVERLOOK WAY NEWARK OH 43055",
+    "floorplan": "X450"
+  },
+  {
+    "lotNumber": "13795",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "2100 OVERLOOK WAY NEWARK OH 43055",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "259",
+    "subdivision": "Wagnalls Run",
+    "builder": "DR Horton",
+    "address": "1375 HANSBERRY DRIVE LITHOPOLIS OH 43136",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "263",
+    "subdivision": "Wagnalls Run",
+    "builder": "DR Horton",
+    "address": "89 WHEATLEY STREET LITHOPOLIS OH 43136",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "264",
+    "subdivision": "Wagnalls Run",
+    "builder": "DR Horton",
+    "address": "99 WHEATLEY STREET LITHOPOLIS OH 43136",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "344",
+    "subdivision": "Wagnalls Run",
+    "builder": "DR Horton",
+    "address": "590 EASTMAN AVENUE LITHOPOLIS OH 43136",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "345",
+    "subdivision": "Wagnalls Run",
+    "builder": "DR Horton",
+    "address": "687 FAULKNER DRIVE LITHOPOLIS OH 43136",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "364",
+    "subdivision": "Wagnalls Run",
+    "builder": "DR Horton",
+    "address": "189 WHEATLEY STREET LITHOPOLIS OH 43136",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "371",
+    "subdivision": "Wagnalls Run",
+    "builder": "DR Horton",
+    "address": "737 FAULKNER DRIVE LITHOPOLIS OH 43136",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "372",
+    "subdivision": "Wagnalls Run",
+    "builder": "DR Horton",
+    "address": "727 FAULKNER DRIVE LITHOPOLIS OH 43136",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "373",
+    "subdivision": "Wagnalls Run",
+    "builder": "DR Horton",
+    "address": "717 FAULKNER DRIVE LITHOPOLIS OH 43136",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "374",
+    "subdivision": "Wagnalls Run",
+    "builder": "DR Horton",
+    "address": "707 FAULKNER DRIVE LITHOPOLIS OH 43136",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "2",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "5 WALNUT MILL WAY ASHVILLE OH 43103",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "55",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "50 CIDER MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "57",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "54 CIDER MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "60",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "60 CIDER MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "61",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "62 CIDER MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "62",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "64 CIDER MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "63",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "1 GRISTMILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X437"
+  },
+  {
+    "lotNumber": "64",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "3 GRISTMILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X421"
+  },
+  {
+    "lotNumber": "65",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "61 CIDER MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X423"
+  },
+  {
+    "lotNumber": "66",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "59 CIDER MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "67",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "57 CIDER MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X421"
+  },
+  {
+    "lotNumber": "68",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "55 CIDER MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X426"
+  },
+  {
+    "lotNumber": "69",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "53 CIDER MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X422"
+  },
+  {
+    "lotNumber": "80",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "12 MEAD MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "81",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "14 MEAD MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X437"
+  },
+  {
+    "lotNumber": "82",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "16 MEAD MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X424"
+  },
+  {
+    "lotNumber": "83",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "18 MEAD MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "84",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "20 MEAD MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X431"
+  },
+  {
+    "lotNumber": "85",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "22 MEAD MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X429"
+  },
+  {
+    "lotNumber": "86",
+    "subdivision": "Walnut Mill",
+    "builder": "DR Horton",
+    "address": "24 MEAD MILL DRIVE ASHVILLE OH 43103",
+    "floorplan": "X437"
   }
 ]
