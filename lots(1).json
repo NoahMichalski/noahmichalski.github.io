@@ -1625,7 +1625,7 @@
   },
   {
     "lotNumber": "4",
-    "subdivision": "Maygrass-Preserve 34'",
+    "subdivision": "Maygrass",
     "builder": "Del Webb",
     "address": "8969 Bryce Road Plain City, Oh 43064",
     "floorplan": "Meadow",
@@ -1633,7 +1633,7 @@
   },
   {
     "lotNumber": "3",
-    "subdivision": "Maygrass-Retreat 40'",
+    "subdivision": "Maygrass",
     "builder": "Del Webb",
     "address": "8959 Bryce Road Plain City, Oh 43064",
     "floorplan": "Prototype",
@@ -1641,7 +1641,7 @@
   },
   {
     "lotNumber": "5",
-    "subdivision": "Maygrass-Retreat 40'",
+    "subdivision": "Maygrass",
     "builder": "Del Webb",
     "address": "8979 Bryce Road Plain City, Oh 43064",
     "floorplan": "Prestige II",
@@ -1649,7 +1649,7 @@
   },
   {
     "lotNumber": "6",
-    "subdivision": "Maygrass-Sanctuary 54'",
+    "subdivision": "Maygrass",
     "builder": "Del Webb",
     "address": "8999 Bryce Road Plain City, Oh 43064",
     "floorplan": "Stardom",
@@ -1657,7 +1657,7 @@
   },
   {
     "lotNumber": "445",
-    "subdivision": "Northstar-Preserve 34'",
+    "subdivision": "Northstar",
     "builder": "Del Webb",
     "address": "2492 Firethorn Drive Sunbury, Oh 43074",
     "floorplan": "Mirage",
@@ -1665,7 +1665,7 @@
   },
   {
     "lotNumber": "444",
-    "subdivision": "Northstar-Retreat 40'",
+    "subdivision": "Northstar",
     "builder": "Del Webb",
     "address": "2510 Firethorn Drive Sunbury, Oh 43074",
     "floorplan": "Mystique II",
@@ -1673,7 +1673,7 @@
   },
   {
     "lotNumber": "446",
-    "subdivision": "Northstar-Retreat 40'",
+    "subdivision": "Northstar",
     "builder": "Del Webb",
     "address": "2480 Firethorn Drive Sunbury, Oh 43074",
     "floorplan": "Prototype",
@@ -1681,7 +1681,7 @@
   },
   {
     "lotNumber": "443",
-    "subdivision": "Northstar-Sanctuary 54'",
+    "subdivision": "Northstar",
     "builder": "Del Webb",
     "address": "2524 Firethorn Drive Sunbury, Oh 43074",
     "floorplan": "Renown",
