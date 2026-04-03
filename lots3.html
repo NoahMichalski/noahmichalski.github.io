@@ -23,8 +23,6 @@ body {
   border-bottom: 1px solid #222;
 }
 
-h1 { margin: 0 0 10px 0; }
-
 /* BUILDER UPDATE BAR */
 #builderUpdates {
   padding: 8px 15px;
@@ -67,7 +65,7 @@ h1 { margin: 0 0 10px 0; }
 
 /* TABLE */
 .table-container {
-  height: calc(100vh - 180px);
+  height: calc(100vh - 160px);
   overflow-y: auto;
 }
 
@@ -90,20 +88,6 @@ th, td {
 }
 
 tr:hover { background: #1c1c1c; }
-
-.highlight {
-  color: #4da3ff;
-  font-weight: 600;
-}
-
-/* 🔥 NEW ROW HIGHLIGHT */
-.new-row {
-  background: rgba(77,163,255,0.15);
-}
-
-.new-row:hover {
-  background: rgba(77,163,255,0.25);
-}
 
 .sort-indicator { margin-left: 5px; }
 
@@ -145,7 +129,7 @@ tr:hover { background: #1c1c1c; }
   <span id="builderUpdateList"></span>
 </div>
 
-<!-- NEW LOTS MODAL -->
+<!-- MODAL -->
 <div id="newLotsModal">
   <div style="background:#111;padding:20px;border-radius:10px;width:90%;max-width:500px;">
     <h3>New Lots This Week</h3>
@@ -158,11 +142,12 @@ tr:hover { background: #1c1c1c; }
 <table>
 <thead>
 <tr>
-<th onclick="sortTable('lotNumber')">Lot<span id="sort-lotNumber"></span></th>
+<th onclick="sortTable('lotNumber')">Lot</th>
 <th onclick="sortTable('subdivision')">Subdivision</th>
 <th onclick="sortTable('builder')">Builder</th>
 <th>Address</th>
 <th onclick="sortTable('floorplan')">Floorplan</th>
+<th>Updated</th>
 </tr>
 </thead>
 <tbody id="resultsTable"></tbody>
@@ -186,34 +171,50 @@ loadData();
 
 function refreshData() { loadData(); }
 
-/* BUILDER UPDATE */
+/* DAYS AGO FUNCTION */
+function daysAgo(dateStr) {
+  if (!dateStr) return '';
+
+  const [y,m,d] = dateStr.split('-');
+  const date = new Date(y, m-1, d);
+  const diff = Math.floor((Date.now() - date.getTime()) / 86400000);
+
+  if (diff === 0) return 'Today';
+  if (diff === 1) return '1 day ago';
+  return diff + ' days ago';
+}
+
+/* BUILDER UPDATES */
 function buildBuilderUpdates() {
   const latest = {};
-  lots.forEach(lot => {
-    if (!lot.lastUpdated) return;
-    const d = new Date(lot.lastUpdated);
-    if (!latest[lot.builder] || d > latest[lot.builder]) {
-      latest[lot.builder] = d;
+
+  lots.forEach(l => {
+    if (!l.lastUpdated) return;
+
+    const [y,m,d] = l.lastUpdated.split('-');
+    const date = new Date(y, m-1, d);
+
+    if (!latest[l.builder] || date > latest[l.builder]) {
+      latest[l.builder] = date;
     }
   });
 
-  const el = document.getElementById('builderUpdateList');
-  el.innerHTML = '';
+  builderUpdateList.innerHTML = '';
 
   Object.entries(latest).forEach(([builder, date]) => {
+    const diff = Math.floor((Date.now() - date.getTime()) / 86400000);
+
     const span = document.createElement('span');
     span.className = 'builder-pill';
-    span.textContent = `${builder} – ${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`;
+    span.textContent = `${builder} – ${diff === 0 ? 'Today' : diff + 'd ago'}`;
 
-    if (Date.now() - date.getTime() > 30*86400000) {
-      span.style.color = '#ff6b6b';
-    }
+    if (diff > 30) span.style.color = '#ff6b6b';
 
-    el.appendChild(span);
+    builderUpdateList.appendChild(span);
   });
 }
 
-/* SMART LOT SORT */
+/* SMART SORT */
 function smartLotSort(a,b){
   const parse=x=>{
     const m=x.toString().match(/^(\d+)([A-Za-z]*)$/);
@@ -250,24 +251,23 @@ function exactLotSearch(){
   renderTable(lots.filter(l=>l.lotNumber.toLowerCase()===v));
 }
 
-/* NEW LOTS */
+/* NEW LOTS MODAL */
 function showNewLots(){
   const week=new Date(Date.now()-7*86400000);
   const newLots=lots.filter(l=>l.lastUpdated && new Date(l.lastUpdated)>=week);
 
-  const el=document.getElementById('newLotsList');
-  el.innerHTML='';
+  newLotsList.innerHTML='';
 
   newLots.forEach(l=>{
     const d=document.createElement('div');
     d.style.padding='8px';
-    d.innerHTML=`<strong>${l.lotNumber}</strong> – ${l.subdivision}<br><span style="color:#888">${l.builder}</span>`;
+    d.innerHTML=`<strong>${l.lotNumber}</strong> – ${l.subdivision}`;
     d.onclick=()=>{
       filterLot.value=l.lotNumber;
       filterLots();
       closeNewLots();
     };
-    el.appendChild(d);
+    newLotsList.appendChild(d);
   });
 
   newLotsModal.style.display='flex';
@@ -278,22 +278,15 @@ function closeNewLots(){ newLotsModal.style.display='none'; }
 function renderTable(data){
   resultsTable.innerHTML='';
 
-  const week=new Date(Date.now()-7*86400000);
-
   data.forEach(l=>{
     const row=document.createElement('tr');
-
-    // 🔥 AUTO HIGHLIGHT NEW
-    if(l.lastUpdated && new Date(l.lastUpdated)>=week){
-      row.classList.add('new-row');
-    }
-
     row.innerHTML=`
       <td>${l.lotNumber}</td>
       <td>${l.subdivision}</td>
       <td>${l.builder}</td>
       <td>${l.address}</td>
       <td>${l.floorplan||'N/A'}</td>
+      <td>${daysAgo(l.lastUpdated)}</td>
     `;
     resultsTable.appendChild(row);
   });
