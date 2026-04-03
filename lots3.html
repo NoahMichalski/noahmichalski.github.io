@@ -23,15 +23,25 @@ body {
   border-bottom: 1px solid #222;
 }
 
-h1 {
-  margin: 0 0 10px 0;
-  font-size: 1.4rem;
+h1 { margin: 0 0 10px 0; }
+
+/* BUILDER UPDATE BAR */
+#builderUpdates {
+  padding: 8px 15px;
+  background: #0d0d0d;
+  border-bottom: 1px solid #222;
+  font-size: 0.85rem;
 }
 
-/* FILTER GRID */
+.builder-pill {
+  margin-right: 12px;
+  color: #aaa;
+}
+
+/* FILTERS */
 .filters {
   display: grid;
-  grid-template-columns: 120px auto 1fr 180px 180px auto auto;
+  grid-template-columns: 120px auto 1fr 180px 180px auto auto auto;
   gap: 10px;
 }
 
@@ -53,20 +63,17 @@ h1 {
   cursor: pointer;
 }
 
-.btn:hover {
-  background: #333;
-}
+.btn:hover { background: #333; }
 
 /* TABLE */
 .table-container {
-  height: calc(100vh - 120px);
+  height: calc(100vh - 180px);
   overflow-y: auto;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
 }
 
 thead th {
@@ -75,44 +82,41 @@ thead th {
   background: #1a1a1a;
   z-index: 5;
   cursor: pointer;
-  border-bottom: 2px solid #333;
 }
 
 th, td {
   padding: 12px;
   border-bottom: 1px solid #222;
-  text-align: left;
 }
 
-th {
-  font-size: 0.8rem;
-  color: #aaa;
-  text-transform: uppercase;
-}
-
-tr:hover {
-  background: #1c1c1c;
-}
-
-.address-link {
-  color: #4da3ff;
-  text-decoration: none;
-}
+tr:hover { background: #1c1c1c; }
 
 .highlight {
   color: #4da3ff;
   font-weight: 600;
 }
 
-.no-results {
-  text-align: center;
-  padding: 20px;
-  color: #888;
+/* 🔥 NEW ROW HIGHLIGHT */
+.new-row {
+  background: rgba(77,163,255,0.15);
 }
 
-.sort-indicator {
-  margin-left: 5px;
-  font-size: 0.7rem;
+.new-row:hover {
+  background: rgba(77,163,255,0.25);
+}
+
+.sort-indicator { margin-left: 5px; }
+
+/* MODAL */
+#newLotsModal {
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.7);
+  z-index:100;
+  justify-content:center;
+  align-items:center;
 }
 </style>
 </head>
@@ -130,24 +134,39 @@ tr:hover {
     <input id="filterBuilder" placeholder="Builder">
     <input id="filterFloorplan" placeholder="Floorplan">
 
+    <button class="btn" onclick="showNewLots()">🆕</button>
     <button class="btn" onclick="refreshData()">🔄</button>
     <button class="btn" onclick="clearFilters()">Clear</button>
   </div>
 </div>
 
+<div id="builderUpdates">
+  <strong>Last Updated:</strong>
+  <span id="builderUpdateList"></span>
+</div>
+
+<!-- NEW LOTS MODAL -->
+<div id="newLotsModal">
+  <div style="background:#111;padding:20px;border-radius:10px;width:90%;max-width:500px;">
+    <h3>New Lots This Week</h3>
+    <div id="newLotsList"></div>
+    <button class="btn" onclick="closeNewLots()">Close</button>
+  </div>
+</div>
+
 <div class="table-container">
-  <table>
-    <thead>
-      <tr>
-        <th onclick="sortTable('lotNumber')">Lot<span id="sort-lotNumber" class="sort-indicator"></span></th>
-        <th onclick="sortTable('subdivision')">Subdivision<span id="sort-subdivision" class="sort-indicator"></span></th>
-        <th onclick="sortTable('builder')">Builder<span id="sort-builder" class="sort-indicator"></span></th>
-        <th onclick="sortTable('address')">Address<span id="sort-address" class="sort-indicator"></span></th>
-        <th onclick="sortTable('floorplan')">Floorplan<span id="sort-floorplan" class="sort-indicator"></span></th>
-      </tr>
-    </thead>
-    <tbody id="resultsTable"></tbody>
-  </table>
+<table>
+<thead>
+<tr>
+<th onclick="sortTable('lotNumber')">Lot<span id="sort-lotNumber"></span></th>
+<th onclick="sortTable('subdivision')">Subdivision</th>
+<th onclick="sortTable('builder')">Builder</th>
+<th>Address</th>
+<th onclick="sortTable('floorplan')">Floorplan</th>
+</tr>
+</thead>
+<tbody id="resultsTable"></tbody>
+</table>
 </div>
 
 <script>
@@ -159,138 +178,149 @@ function loadData() {
     .then(res => res.json())
     .then(data => {
       lots = data;
+      buildBuilderUpdates();
       filterLots();
     });
 }
-
 loadData();
 
-function refreshData() {
-  loadData();
-}
+function refreshData() { loadData(); }
 
-function highlight(text, query) {
-  if (!query) return text || '';
-  const regex = new RegExp(`(${query})`, 'gi');
-  return (text || '').replace(regex, '<span class="highlight">$1</span>');
-}
+/* BUILDER UPDATE */
+function buildBuilderUpdates() {
+  const latest = {};
+  lots.forEach(lot => {
+    if (!lot.lastUpdated) return;
+    const d = new Date(lot.lastUpdated);
+    if (!latest[lot.builder] || d > latest[lot.builder]) {
+      latest[lot.builder] = d;
+    }
+  });
 
-function renderTable(data) {
-  const table = document.getElementById('resultsTable');
-  table.innerHTML = '';
+  const el = document.getElementById('builderUpdateList');
+  el.innerHTML = '';
 
-  if (data.length === 0) {
-    table.innerHTML = `<tr><td colspan="5" class="no-results">No results found</td></tr>`;
-    return;
-  }
+  Object.entries(latest).forEach(([builder, date]) => {
+    const span = document.createElement('span');
+    span.className = 'builder-pill';
+    span.textContent = `${builder} – ${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`;
 
-  const lotQ = document.getElementById('filterLot').value;
-  const subQ = document.getElementById('filterSubdivision').value;
-  const builderQ = document.getElementById('filterBuilder').value;
-  const floorQ = document.getElementById('filterFloorplan').value;
+    if (Date.now() - date.getTime() > 30*86400000) {
+      span.style.color = '#ff6b6b';
+    }
 
-  data.forEach(lot => {
-    const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lot.address)}`;
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${highlight(lot.lotNumber, lotQ)}</td>
-      <td>${highlight(lot.subdivision, subQ)}</td>
-      <td>${highlight(lot.builder, builderQ)}</td>
-      <td><a class="address-link" href="${mapsLink}" target="_blank">${lot.address}</a></td>
-      <td>${highlight(lot.floorplan || 'N/A', floorQ)}</td>
-    `;
-
-    table.appendChild(row);
+    el.appendChild(span);
   });
 }
 
-/* FILTER + AUTO SORT */
-function filterLots() {
-  const lotVal = document.getElementById('filterLot').value.toLowerCase();
-  const subVal = document.getElementById('filterSubdivision').value.toLowerCase();
-  const builderVal = document.getElementById('filterBuilder').value.toLowerCase();
-  const floorVal = document.getElementById('filterFloorplan').value.toLowerCase();
+/* SMART LOT SORT */
+function smartLotSort(a,b){
+  const parse=x=>{
+    const m=x.toString().match(/^(\d+)([A-Za-z]*)$/);
+    return {num:m?parseInt(m[1]):0,suffix:m?m[2]:''};
+  };
+  const A=parse(a.lotNumber),B=parse(b.lotNumber);
+  return A.num!==B.num?A.num-B.num:A.suffix.localeCompare(B.suffix);
+}
 
-  let filtered = lots.filter(lot =>
-    (!lotVal || lot.lotNumber?.toLowerCase().includes(lotVal)) &&
-    (!subVal || lot.subdivision?.toLowerCase().includes(subVal)) &&
-    (!builderVal || lot.builder?.toLowerCase().includes(builderVal)) &&
-    (!floorVal || lot.floorplan?.toLowerCase().includes(floorVal))
+/* FILTER */
+function filterLots(){
+  const lotVal=filterLot.value.toLowerCase();
+  const subVal=filterSubdivision.value.toLowerCase();
+  const builderVal=filterBuilder.value.toLowerCase();
+  const floorVal=filterFloorplan.value.toLowerCase();
+
+  let filtered=lots.filter(l=>
+    (!lotVal||l.lotNumber.toLowerCase().includes(lotVal)) &&
+    (!subVal||l.subdivision.toLowerCase().includes(subVal)) &&
+    (!builderVal||l.builder.toLowerCase().includes(builderVal)) &&
+    (!floorVal||(l.floorplan||'').toLowerCase().includes(floorVal))
   );
 
-  // 🔥 AUTO SORT WHEN SUBDIVISION FILTER USED
-  if (subVal && !currentSort.key) {
-    filtered = filtered.sort((a, b) => a.lotNumber - b.lotNumber);
-  } else if (currentSort.key) {
-    filtered = sortData(filtered, currentSort.key, currentSort.asc);
-  }
+  if(subVal&&!currentSort.key) filtered.sort(smartLotSort);
+  else if(currentSort.key) filtered=sortData(filtered,currentSort.key,currentSort.asc);
 
   renderTable(filtered);
 }
 
 /* EXACT LOT */
-function exactLotSearch() {
-  const lotVal = document.getElementById('filterLot').value.trim().toLowerCase();
-  if (!lotVal) return;
-
-  const filtered = lots.filter(lot =>
-    lot.lotNumber?.toLowerCase() === lotVal
-  );
-
-  renderTable(filtered);
+function exactLotSearch(){
+  const v=filterLot.value.trim().toLowerCase();
+  if(!v)return;
+  renderTable(lots.filter(l=>l.lotNumber.toLowerCase()===v));
 }
 
-document.querySelectorAll('.filters input').forEach(input => {
-  input.addEventListener('input', filterLots);
-});
+/* NEW LOTS */
+function showNewLots(){
+  const week=new Date(Date.now()-7*86400000);
+  const newLots=lots.filter(l=>l.lastUpdated && new Date(l.lastUpdated)>=week);
 
-/* SORT */
-function sortTable(key) {
-  if (currentSort.key === key) {
-    currentSort.asc = !currentSort.asc;
-  } else {
-    currentSort = { key, asc: true };
-  }
+  const el=document.getElementById('newLotsList');
+  el.innerHTML='';
 
-  updateSortIndicators();
-  filterLots();
+  newLots.forEach(l=>{
+    const d=document.createElement('div');
+    d.style.padding='8px';
+    d.innerHTML=`<strong>${l.lotNumber}</strong> – ${l.subdivision}<br><span style="color:#888">${l.builder}</span>`;
+    d.onclick=()=>{
+      filterLot.value=l.lotNumber;
+      filterLots();
+      closeNewLots();
+    };
+    el.appendChild(d);
+  });
+
+  newLotsModal.style.display='flex';
 }
+function closeNewLots(){ newLotsModal.style.display='none'; }
 
-function sortData(data, key, asc) {
-  return [...data].sort((a, b) => {
-    let valA = a[key] || '';
-    let valB = b[key] || '';
+/* RENDER */
+function renderTable(data){
+  resultsTable.innerHTML='';
 
-    if (!isNaN(valA) && !isNaN(valB)) {
-      return asc ? valA - valB : valB - valA;
+  const week=new Date(Date.now()-7*86400000);
+
+  data.forEach(l=>{
+    const row=document.createElement('tr');
+
+    // 🔥 AUTO HIGHLIGHT NEW
+    if(l.lastUpdated && new Date(l.lastUpdated)>=week){
+      row.classList.add('new-row');
     }
 
-    valA = valA.toString().toLowerCase();
-    valB = valB.toString().toLowerCase();
-
-    if (valA < valB) return asc ? -1 : 1;
-    if (valA > valB) return asc ? 1 : -1;
-    return 0;
+    row.innerHTML=`
+      <td>${l.lotNumber}</td>
+      <td>${l.subdivision}</td>
+      <td>${l.builder}</td>
+      <td>${l.address}</td>
+      <td>${l.floorplan||'N/A'}</td>
+    `;
+    resultsTable.appendChild(row);
   });
 }
 
-function updateSortIndicators() {
-  document.querySelectorAll('.sort-indicator').forEach(el => el.textContent = '');
+/* SORT */
+function sortTable(key){
+  currentSort.key===key?currentSort.asc=!currentSort.asc:currentSort={key,asc:true};
+  filterLots();
+}
 
-  if (currentSort.key) {
-    document.getElementById(`sort-${currentSort.key}`).textContent =
-      currentSort.asc ? '▲' : '▼';
-  }
+function sortData(d,k,a){
+  return [...d].sort((x,y)=>{
+    let A=x[k]||'',B=y[k]||'';
+    if(!isNaN(A)&&!isNaN(B)) return a?A-B:B-A;
+    return a?A.localeCompare(B):B.localeCompare(A);
+  });
 }
 
 /* CLEAR */
-function clearFilters() {
-  document.querySelectorAll('.filters input').forEach(i => i.value = '');
-  currentSort = { key: null, asc: true };
-  updateSortIndicators();
+function clearFilters(){
+  document.querySelectorAll('.filters input').forEach(i=>i.value='');
+  currentSort={key:null,asc:true};
   renderTable(lots);
 }
+
+document.querySelectorAll('.filters input').forEach(i=>i.addEventListener('input',filterLots));
 </script>
 
 </body>
