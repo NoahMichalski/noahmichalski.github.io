@@ -31,7 +31,7 @@ h1 {
 /* FILTER GRID */
 .filters {
   display: grid;
-  grid-template-columns: 120px 1fr 180px 180px auto auto auto;
+  grid-template-columns: 120px auto 1fr 180px 180px auto auto;
   gap: 10px;
 }
 
@@ -124,12 +124,13 @@ tr:hover {
 
   <div class="filters">
     <input id="filterLot" placeholder="Lot">
+    <button class="btn" onclick="exactLotSearch()">🎯</button>
+
     <input id="filterSubdivision" placeholder="Subdivision">
     <input id="filterBuilder" placeholder="Builder">
     <input id="filterFloorplan" placeholder="Floorplan">
 
-    <button class="btn" onclick="exactLotSearch()">🎯 Lot</button>
-    <button class="btn" onclick="refreshData()">🔄 Refresh</button>
+    <button class="btn" onclick="refreshData()">🔄</button>
     <button class="btn" onclick="clearFilters()">Clear</button>
   </div>
 </div>
@@ -153,9 +154,8 @@ tr:hover {
 let lots = [];
 let currentSort = { key: null, asc: true };
 
-/* LOAD DATA */
 function loadData() {
-  fetch('lots(1).json?t=' + Date.now()) // cache bust
+  fetch('lots(1).json?t=' + Date.now())
     .then(res => res.json())
     .then(data => {
       lots = data;
@@ -165,19 +165,16 @@ function loadData() {
 
 loadData();
 
-/* REFRESH BUTTON */
 function refreshData() {
   loadData();
 }
 
-/* HIGHLIGHT */
 function highlight(text, query) {
   if (!query) return text || '';
   const regex = new RegExp(`(${query})`, 'gi');
   return (text || '').replace(regex, '<span class="highlight">$1</span>');
 }
 
-/* RENDER */
 function renderTable(data) {
   const table = document.getElementById('resultsTable');
   table.innerHTML = '';
@@ -208,7 +205,7 @@ function renderTable(data) {
   });
 }
 
-/* FILTER */
+/* FILTER + AUTO SORT */
 function filterLots() {
   const lotVal = document.getElementById('filterLot').value.toLowerCase();
   const subVal = document.getElementById('filterSubdivision').value.toLowerCase();
@@ -222,20 +219,22 @@ function filterLots() {
     (!floorVal || lot.floorplan?.toLowerCase().includes(floorVal))
   );
 
-  if (currentSort.key) {
+  // 🔥 AUTO SORT WHEN SUBDIVISION FILTER USED
+  if (subVal && !currentSort.key) {
+    filtered = filtered.sort((a, b) => a.lotNumber - b.lotNumber);
+  } else if (currentSort.key) {
     filtered = sortData(filtered, currentSort.key, currentSort.asc);
   }
 
   renderTable(filtered);
 }
 
-/* EXACT LOT SEARCH */
+/* EXACT LOT */
 function exactLotSearch() {
   const lotVal = document.getElementById('filterLot').value.trim().toLowerCase();
-
   if (!lotVal) return;
 
-  let filtered = lots.filter(lot =>
+  const filtered = lots.filter(lot =>
     lot.lotNumber?.toLowerCase() === lotVal
   );
 
