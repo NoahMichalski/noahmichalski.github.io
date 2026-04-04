@@ -61,10 +61,6 @@ body {
   cursor: pointer;
 }
 
-.btn:hover {
-  background: #333;
-}
-
 /* TABLE */
 .table-container {
   height: calc(100vh - 180px);
@@ -85,11 +81,6 @@ th, td {
   text-overflow: ellipsis;
   text-align: center;
   position: relative;
-}
-
-/* 🔥 CENTER ADDRESS NOW TOO */
-td:nth-child(4) {
-  text-align: center;
 }
 
 /* COLUMN WIDTHS */
@@ -121,6 +112,13 @@ thead th {
 .resizer:hover {
   background: #4da3ff;
 }
+
+/* COPY FEEDBACK */
+.copied {
+  background: #1f3d2b !important;
+  transition: 0.3s;
+}
+
 </style>
 </head>
 
@@ -142,7 +140,6 @@ thead th {
   </div>
 </div>
 
-<!-- 🔥 BUILDER LAST UPDATED -->
 <div id="builderUpdates">
   <strong>Last Updated:</strong>
   <span id="builderUpdateList"></span>
@@ -189,7 +186,7 @@ function daysAgo(d) {
   return diff + 'd ago';
 }
 
-/* 🔥 BUILDER UPDATE BAR */
+/* BUILDER UPDATES */
 function buildBuilderUpdates() {
   const latest = {};
 
@@ -211,13 +208,9 @@ function buildBuilderUpdates() {
 
     const span = document.createElement('span');
     span.className = 'builder-pill';
-
     span.textContent = `${builder} – ${diff === 0 ? 'Today' : diff + 'd ago'}`;
 
-    // 🔴 older than 30 days
-    if (diff > 30) {
-      span.style.color = '#ff6b6b';
-    }
+    if (diff > 30) span.style.color = '#ff6b6b';
 
     builderUpdateList.appendChild(span);
   });
@@ -241,10 +234,25 @@ function filterLots() {
 document.querySelectorAll('.filters input')
   .forEach(i => i.addEventListener('input', filterLots));
 
-/* EXACT */
+/* ENTER KEY FOR LOT SEARCH */
+filterLot.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    exactLotSearch();
+  }
+});
+
+/* EXACT LOT */
 function exactLotSearch() {
   const v = filterLot.value.toLowerCase();
   renderTable(lots.filter(l => l.lotNumber.toLowerCase() === v));
+}
+
+/* COPY ADDRESS */
+function copyAddress(text, row) {
+  navigator.clipboard.writeText(text);
+
+  row.classList.add('copied');
+  setTimeout(() => row.classList.remove('copied'), 500);
 }
 
 /* RENDER */
@@ -253,6 +261,7 @@ function renderTable(data) {
 
   data.forEach(l => {
     const row = document.createElement('tr');
+
     row.innerHTML = `
       <td>${l.lotNumber}</td>
       <td>${l.subdivision}</td>
@@ -261,6 +270,12 @@ function renderTable(data) {
       <td>${l.floorplan || ''}</td>
       <td>${daysAgo(l.lastUpdated)}</td>
     `;
+
+    // CLICK TO COPY ADDRESS
+    row.addEventListener('click', () => {
+      copyAddress(l.address, row);
+    });
+
     resultsTable.appendChild(row);
   });
 }
