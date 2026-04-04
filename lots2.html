@@ -23,15 +23,10 @@ body {
   border-bottom: 1px solid #222;
 }
 
-h1 {
-  margin: 0 0 10px 0;
-  font-size: 1.4rem;
-}
-
-/* FILTER GRID */
+/* FILTERS */
 .filters {
   display: grid;
-  grid-template-columns: 120px 1fr 180px 180px auto;
+  grid-template-columns: 120px auto 1fr 180px 180px auto auto auto;
   gap: 10px;
 }
 
@@ -43,8 +38,7 @@ h1 {
   color: #fff;
 }
 
-/* CLEAR BUTTON */
-.clear-btn {
+.btn {
   background: #222;
   border: none;
   color: #fff;
@@ -53,221 +47,220 @@ h1 {
   cursor: pointer;
 }
 
-.clear-btn:hover {
-  background: #333;
-}
-
 /* TABLE */
 .table-container {
-  height: calc(100vh - 120px);
-  overflow-y: auto;
+  height: calc(100vh - 150px);
+  overflow: auto;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 700px;
-}
-
-thead th {
-  position: sticky;
-  top: 0; /* FIXED */
-  background: #1a1a1a;
-  z-index: 5;
-  cursor: pointer;
-  border-bottom: 2px solid #333;
+  table-layout: fixed;
 }
 
 th, td {
-  padding: 12px;
+  padding: 10px;
   border-bottom: 1px solid #222;
-  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
 }
 
-th {
-  font-size: 0.8rem;
-  color: #aaa;
-  text-transform: uppercase;
+/* DEFAULT WIDTHS */
+th:nth-child(1), td:nth-child(1) { width: 80px; }
+th:nth-child(2), td:nth-child(2) { width: 220px; }
+th:nth-child(3), td:nth-child(3) { width: 160px; }
+th:nth-child(4), td:nth-child(4) { width: auto; }
+th:nth-child(5), td:nth-child(5) { width: 140px; }
+th:nth-child(6), td:nth-child(6) { width: 120px; }
+
+/* STICKY HEADER */
+thead th {
+  position: sticky;
+  top: 0;
+  background: #1a1a1a;
+  z-index: 5;
 }
 
-tr:hover {
-  background: #1c1c1c;
+/* RESIZER */
+.resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
 }
 
-.address-link {
-  color: #4da3ff;
-  text-decoration: none;
+.resizer:hover {
+  background: #4da3ff;
 }
 
-.address-link:hover {
-  text-decoration: underline;
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  th:nth-child(2), td:nth-child(2) { width: 160px; }
+  th:nth-child(3), td:nth-child(3) { width: 120px; }
 }
 
-.highlight {
-  color: #4da3ff;
-  font-weight: 600;
-}
-
-.no-results {
-  text-align: center;
-  padding: 20px;
-  color: #888;
-}
-
-.sort-indicator {
-  margin-left: 5px;
-  font-size: 0.7rem;
-}
 </style>
 </head>
 
 <body>
 
 <div class="header">
-  <h1>Lot Lookup</h1>
-
+  <h2>Lot Lookup</h2>
   <div class="filters">
     <input id="filterLot" placeholder="Lot">
+    <button class="btn" onclick="exactLotSearch()">🎯</button>
+
     <input id="filterSubdivision" placeholder="Subdivision">
     <input id="filterBuilder" placeholder="Builder">
     <input id="filterFloorplan" placeholder="Floorplan">
-    <button class="clear-btn" onclick="clearFilters()">Clear</button>
+
+    <button class="btn" onclick="showNewLots()">🆕</button>
+    <button class="btn" onclick="refreshData()">🔄</button>
+    <button class="btn" onclick="clearFilters()">Clear</button>
   </div>
 </div>
 
 <div class="table-container">
-  <table>
-    <thead>
-      <tr>
-        <th onclick="sortTable('lotNumber')">Lot<span id="sort-lotNumber" class="sort-indicator"></span></th>
-        <th onclick="sortTable('subdivision')">Subdivision<span id="sort-subdivision" class="sort-indicator"></span></th>
-        <th onclick="sortTable('builder')">Builder<span id="sort-builder" class="sort-indicator"></span></th>
-        <th onclick="sortTable('address')">Address<span id="sort-address" class="sort-indicator"></span></th>
-        <th onclick="sortTable('floorplan')">Floorplan<span id="sort-floorplan" class="sort-indicator"></span></th>
-      </tr>
-    </thead>
-    <tbody id="resultsTable"></tbody>
-  </table>
+<table>
+<thead>
+<tr>
+<th>Lot</th>
+<th>Subdivision</th>
+<th>Builder</th>
+<th>Address</th>
+<th>Floorplan</th>
+<th>Updated</th>
+</tr>
+</thead>
+<tbody id="resultsTable"></tbody>
+</table>
 </div>
 
 <script>
 let lots = [];
-let currentSort = { key: null, asc: true };
 
-fetch('lots(1).json')
-  .then(res => res.json())
-  .then(data => {
-    lots = data;
-    renderTable(lots);
-  });
-
-function highlight(text, query) {
-  if (!query) return text || '';
-  const regex = new RegExp(`(${query})`, 'gi');
-  return (text || '').replace(regex, '<span class="highlight">$1</span>');
+function loadData() {
+  fetch('lots(1).json?t=' + Date.now())
+    .then(r => r.json())
+    .then(data => {
+      lots = data;
+      renderTable(lots);
+    });
 }
-
-function renderTable(data) {
-  const table = document.getElementById('resultsTable');
-  table.innerHTML = '';
-
-  if (data.length === 0) {
-    table.innerHTML = `<tr><td colspan="5" class="no-results">No results found</td></tr>`;
-    return;
-  }
-
-  const lotQ = document.getElementById('filterLot').value;
-  const subQ = document.getElementById('filterSubdivision').value;
-  const builderQ = document.getElementById('filterBuilder').value;
-  const floorQ = document.getElementById('filterFloorplan').value;
-
-  data.forEach(lot => {
-    const mapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lot.address)}`;
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${highlight(lot.lotNumber, lotQ)}</td>
-      <td>${highlight(lot.subdivision, subQ)}</td>
-      <td>${highlight(lot.builder, builderQ)}</td>
-      <td><a class="address-link" href="${mapsLink}" target="_blank">${lot.address}</a></td>
-      <td>${highlight(lot.floorplan || 'N/A', floorQ)}</td>
-    `;
-
-    table.appendChild(row);
-  });
-}
+loadData();
 
 /* FILTER */
 function filterLots() {
-  const lotVal = document.getElementById('filterLot').value.toLowerCase();
-  const subVal = document.getElementById('filterSubdivision').value.toLowerCase();
-  const builderVal = document.getElementById('filterBuilder').value.toLowerCase();
-  const floorVal = document.getElementById('filterFloorplan').value.toLowerCase();
+  const lot = filterLot.value.toLowerCase();
+  const sub = filterSubdivision.value.toLowerCase();
+  const builder = filterBuilder.value.toLowerCase();
+  const floor = filterFloorplan.value.toLowerCase();
 
-  let filtered = lots.filter(lot =>
-    (!lotVal || lot.lotNumber?.toLowerCase().includes(lotVal)) &&
-    (!subVal || lot.subdivision?.toLowerCase().includes(subVal)) &&
-    (!builderVal || lot.builder?.toLowerCase().includes(builderVal)) &&
-    (!floorVal || lot.floorplan?.toLowerCase().includes(floorVal))
-  );
-
-  if (currentSort.key) {
-    filtered = sortData(filtered, currentSort.key, currentSort.asc);
-  }
-
-  renderTable(filtered);
+  renderTable(lots.filter(l =>
+    (!lot || l.lotNumber.toLowerCase().includes(lot)) &&
+    (!sub || l.subdivision.toLowerCase().includes(sub)) &&
+    (!builder || l.builder.toLowerCase().includes(builder)) &&
+    (!floor || (l.floorplan||'').toLowerCase().includes(floor))
+  ));
 }
 
-document.querySelectorAll('.filters input').forEach(input => {
-  input.addEventListener('input', filterLots);
-});
+document.querySelectorAll('.filters input')
+  .forEach(i => i.addEventListener('input', filterLots));
 
-/* SORT */
-function sortTable(key) {
-  if (currentSort.key === key) {
-    currentSort.asc = !currentSort.asc;
-  } else {
-    currentSort = { key, asc: true };
-  }
-
-  updateSortIndicators();
-  filterLots();
+/* EXACT */
+function exactLotSearch() {
+  const v = filterLot.value.toLowerCase();
+  renderTable(lots.filter(l => l.lotNumber.toLowerCase() === v));
 }
 
-function sortData(data, key, asc) {
-  return [...data].sort((a, b) => {
-    let valA = a[key] || '';
-    let valB = b[key] || '';
+/* RENDER */
+function renderTable(data) {
+  resultsTable.innerHTML = '';
 
-    if (!isNaN(valA) && !isNaN(valB)) {
-      return asc ? valA - valB : valB - valA;
-    }
-
-    valA = valA.toString().toLowerCase();
-    valB = valB.toString().toLowerCase();
-
-    if (valA < valB) return asc ? -1 : 1;
-    if (valA > valB) return asc ? 1 : -1;
-    return 0;
+  data.forEach(l => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${l.lotNumber}</td>
+      <td>${l.subdivision}</td>
+      <td>${l.builder}</td>
+      <td>${l.address}</td>
+      <td>${l.floorplan || ''}</td>
+      <td>${daysAgo(l.lastUpdated)}</td>
+    `;
+    resultsTable.appendChild(row);
   });
 }
 
-function updateSortIndicators() {
-  document.querySelectorAll('.sort-indicator').forEach(el => el.textContent = '');
-
-  if (currentSort.key) {
-    document.getElementById(`sort-${currentSort.key}`).textContent =
-      currentSort.asc ? '▲' : '▼';
-  }
+/* DAYS AGO */
+function daysAgo(d) {
+  if (!d) return '';
+  const [y,m,day] = d.split('-');
+  const date = new Date(y,m-1,day);
+  const diff = Math.floor((Date.now()-date)/86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return '1d ago';
+  return diff + 'd ago';
 }
+
+/* REFRESH */
+function refreshData(){ loadData(); }
 
 /* CLEAR */
-function clearFilters() {
-  document.querySelectorAll('.filters input').forEach(i => i.value = '');
-  currentSort = { key: null, asc: true };
-  updateSortIndicators();
+function clearFilters(){
+  document.querySelectorAll('.filters input').forEach(i=>i.value='');
   renderTable(lots);
 }
+
+/* NEW LOTS MODAL (simple alert version for now) */
+function showNewLots(){
+  const week = Date.now() - 7*86400000;
+  const newLots = lots.filter(l=>new Date(l.lastUpdated)>=week);
+  alert(newLots.map(l=>l.lotNumber+" - "+l.subdivision).join("\n") || "No new lots");
+}
+
+/* 🔥 COLUMN RESIZE + SAVE */
+function enableResize(){
+  const ths = document.querySelectorAll("th");
+
+  const saved = JSON.parse(localStorage.getItem("colWidths")||"{}");
+
+  ths.forEach((th,i)=>{
+    if(saved[i]) th.style.width = saved[i]+"px";
+
+    const r = document.createElement("div");
+    r.classList.add("resizer");
+    th.appendChild(r);
+
+    let startX, startW;
+
+    r.addEventListener("mousedown",e=>{
+      startX=e.pageX;
+      startW=th.offsetWidth;
+
+      function move(e){
+        const w = startW + (e.pageX-startX);
+        th.style.width = w+"px";
+        saved[i]=w;
+        localStorage.setItem("colWidths",JSON.stringify(saved));
+      }
+
+      function up(){
+        document.removeEventListener("mousemove",move);
+        document.removeEventListener("mouseup",up);
+      }
+
+      document.addEventListener("mousemove",move);
+      document.addEventListener("mouseup",up);
+    });
+  });
+}
+
+window.addEventListener("load", enableResize);
 </script>
 
 </body>
