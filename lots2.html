@@ -23,10 +23,24 @@ body {
   border-bottom: 1px solid #222;
 }
 
+/* BUILDER UPDATE BAR */
+#builderUpdates {
+  padding: 8px 15px;
+  background: #0d0d0d;
+  border-bottom: 1px solid #222;
+  font-size: 0.85rem;
+}
+
+.builder-pill {
+  margin-right: 14px;
+  display: inline-block;
+  color: #aaa;
+}
+
 /* FILTERS */
 .filters {
   display: grid;
-  grid-template-columns: 120px auto 1fr 180px 180px auto auto auto;
+  grid-template-columns: 120px auto 1fr 180px 180px auto auto;
   gap: 10px;
 }
 
@@ -47,9 +61,13 @@ body {
   cursor: pointer;
 }
 
+.btn:hover {
+  background: #333;
+}
+
 /* TABLE */
 .table-container {
-  height: calc(100vh - 150px);
+  height: calc(100vh - 180px);
   overflow: auto;
 }
 
@@ -65,16 +83,16 @@ th, td {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
   position: relative;
-  text-align: center; /* 🔥 CENTER EVERYTHING */
 }
 
-/* KEEP ADDRESS LEFT (better readability) */
+/* 🔥 CENTER ADDRESS NOW TOO */
 td:nth-child(4) {
-  text-align: left;
+  text-align: center;
 }
 
-/* DEFAULT WIDTHS */
+/* COLUMN WIDTHS */
 th:nth-child(1), td:nth-child(1) { width: 80px; }
 th:nth-child(2), td:nth-child(2) { width: 220px; }
 th:nth-child(3), td:nth-child(3) { width: 160px; }
@@ -103,7 +121,6 @@ thead th {
 .resizer:hover {
   background: #4da3ff;
 }
-
 </style>
 </head>
 
@@ -123,6 +140,12 @@ thead th {
     <button class="btn" onclick="refreshData()">🔄</button>
     <button class="btn" onclick="clearFilters()">Clear</button>
   </div>
+</div>
+
+<!-- 🔥 BUILDER LAST UPDATED -->
+<div id="builderUpdates">
+  <strong>Last Updated:</strong>
+  <span id="builderUpdateList"></span>
 </div>
 
 <div class="table-container">
@@ -149,10 +172,56 @@ function loadData() {
     .then(r => r.json())
     .then(data => {
       lots = data;
+      buildBuilderUpdates();
       renderTable(lots);
     });
 }
 loadData();
+
+/* DAYS AGO */
+function daysAgo(d) {
+  if (!d) return '';
+  const [y,m,day] = d.split('-');
+  const date = new Date(y,m-1,day);
+  const diff = Math.floor((Date.now()-date)/86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return '1d ago';
+  return diff + 'd ago';
+}
+
+/* 🔥 BUILDER UPDATE BAR */
+function buildBuilderUpdates() {
+  const latest = {};
+
+  lots.forEach(l => {
+    if (!l.lastUpdated) return;
+
+    const [y,m,d] = l.lastUpdated.split('-');
+    const date = new Date(y,m-1,d);
+
+    if (!latest[l.builder] || date > latest[l.builder]) {
+      latest[l.builder] = date;
+    }
+  });
+
+  builderUpdateList.innerHTML = '';
+
+  Object.entries(latest).forEach(([builder, date]) => {
+    const diff = Math.floor((Date.now() - date.getTime()) / 86400000);
+
+    const span = document.createElement('span');
+    span.className = 'builder-pill';
+
+    span.textContent = `${builder} – ${diff === 0 ? 'Today' : diff + 'd ago'}`;
+
+    // 🔴 older than 30 days
+    if (diff > 30) {
+      span.style.color = '#ff6b6b';
+    }
+
+    builderUpdateList.appendChild(span);
+  });
+}
 
 /* FILTER */
 function filterLots() {
@@ -196,17 +265,6 @@ function renderTable(data) {
   });
 }
 
-/* DAYS AGO */
-function daysAgo(d) {
-  if (!d) return '';
-  const [y,m,day] = d.split('-');
-  const date = new Date(y,m-1,day);
-  const diff = Math.floor((Date.now()-date)/86400000);
-  if (diff === 0) return 'Today';
-  if (diff === 1) return '1d ago';
-  return diff + 'd ago';
-}
-
 /* REFRESH */
 function refreshData(){ loadData(); }
 
@@ -216,7 +274,7 @@ function clearFilters(){
   renderTable(lots);
 }
 
-/* RESIZE + SAVE */
+/* RESIZE */
 function enableResize(){
   const ths = document.querySelectorAll("th");
   const saved = JSON.parse(localStorage.getItem("colWidths")||"{}");
