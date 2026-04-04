@@ -66,6 +66,12 @@ th, td {
   overflow: hidden;
   text-overflow: ellipsis;
   position: relative;
+  text-align: center; /* 🔥 CENTER EVERYTHING */
+}
+
+/* KEEP ADDRESS LEFT (better readability) */
+td:nth-child(4) {
+  text-align: left;
 }
 
 /* DEFAULT WIDTHS */
@@ -98,12 +104,6 @@ thead th {
   background: #4da3ff;
 }
 
-/* RESPONSIVE */
-@media (max-width: 900px) {
-  th:nth-child(2), td:nth-child(2) { width: 160px; }
-  th:nth-child(3), td:nth-child(3) { width: 120px; }
-}
-
 </style>
 </head>
 
@@ -111,6 +111,7 @@ thead th {
 
 <div class="header">
   <h2>Lot Lookup</h2>
+
   <div class="filters">
     <input id="filterLot" placeholder="Lot">
     <button class="btn" onclick="exactLotSearch()">🎯</button>
@@ -119,7 +120,6 @@ thead th {
     <input id="filterBuilder" placeholder="Builder">
     <input id="filterFloorplan" placeholder="Floorplan">
 
-    <button class="btn" onclick="showNewLots()">🆕</button>
     <button class="btn" onclick="refreshData()">🔄</button>
     <button class="btn" onclick="clearFilters()">Clear</button>
   </div>
@@ -216,17 +216,9 @@ function clearFilters(){
   renderTable(lots);
 }
 
-/* NEW LOTS MODAL (simple alert version for now) */
-function showNewLots(){
-  const week = Date.now() - 7*86400000;
-  const newLots = lots.filter(l=>new Date(l.lastUpdated)>=week);
-  alert(newLots.map(l=>l.lotNumber+" - "+l.subdivision).join("\n") || "No new lots");
-}
-
-/* 🔥 COLUMN RESIZE + SAVE */
+/* RESIZE + SAVE */
 function enableResize(){
   const ths = document.querySelectorAll("th");
-
   const saved = JSON.parse(localStorage.getItem("colWidths")||"{}");
 
   ths.forEach((th,i)=>{
