@@ -13,7 +13,6 @@ body {
   color: #fff;
 }
 
-/* HEADER */
 .header {
   padding: 15px;
   background: #111;
@@ -23,7 +22,6 @@ body {
   border-bottom: 1px solid #222;
 }
 
-/* FILTER BAR */
 .filters {
   display: grid;
   grid-template-columns: 120px auto 1fr 180px 180px auto auto;
@@ -47,9 +45,6 @@ body {
   cursor: pointer;
 }
 
-.btn:hover { background: #333; }
-
-/* BUILDER UPDATE BAR */
 #builderUpdates {
   padding: 8px 15px;
   background: #0d0d0d;
@@ -62,7 +57,6 @@ body {
   color: #aaa;
 }
 
-/* TABLE */
 .table-container {
   height: calc(100vh - 180px);
   overflow: auto;
@@ -84,6 +78,17 @@ th, td {
   position: relative;
 }
 
+th {
+  cursor: pointer;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: #1a1a1a;
+  z-index: 5;
+}
+
 /* COLUMN WIDTHS */
 th:nth-child(1), td:nth-child(1) { width: 80px; }
 th:nth-child(2), td:nth-child(2) { width: 220px; }
@@ -91,14 +96,6 @@ th:nth-child(3), td:nth-child(3) { width: 160px; }
 th:nth-child(4), td:nth-child(4) { width: auto; }
 th:nth-child(5), td:nth-child(5) { width: 140px; }
 th:nth-child(6), td:nth-child(6) { width: 120px; }
-
-/* HEADER STICKY */
-thead th {
-  position: sticky;
-  top: 0;
-  background: #1a1a1a;
-  z-index: 5;
-}
 
 /* RESIZER */
 .resizer {
@@ -112,11 +109,6 @@ thead th {
 
 .resizer:hover {
   background: #4da3ff;
-}
-
-/* COPY FEEDBACK */
-.copied {
-  background: #1f3d2b !important;
 }
 </style>
 </head>
@@ -148,12 +140,12 @@ thead th {
 <table>
 <thead>
 <tr>
-<th>Lot</th>
-<th>Subdivision</th>
-<th>Builder</th>
-<th>Address</th>
-<th>Floorplan</th>
-<th>Updated</th>
+<th onclick="sortTable('lotNumber')">Lot</th>
+<th onclick="sortTable('subdivision')">Subdivision</th>
+<th onclick="sortTable('builder')">Builder</th>
+<th onclick="sortTable('address')">Address</th>
+<th onclick="sortTable('floorplan')">Floorplan</th>
+<th onclick="sortTable('lastUpdated')">Updated</th>
 </tr>
 </thead>
 <tbody id="resultsTable"></tbody>
@@ -162,15 +154,15 @@ thead th {
 
 <script>
 let lots = [];
+let currentSort = { key: null, asc: true };
 
-/* LOAD */
 function loadData() {
   fetch('lots(1).json?t=' + Date.now())
     .then(r => r.json())
     .then(data => {
       lots = data;
       buildBuilderUpdates();
-      filterLots(); // 🔥 IMPORTANT (not renderTable)
+      filterLots();
     });
 }
 loadData();
@@ -193,8 +185,7 @@ function buildBuilderUpdates() {
   lots.forEach(l => {
     if (!l.lastUpdated) return;
 
-    const [y,m,d] = l.lastUpdated.split('-');
-    const date = new Date(y,m-1,d);
+    const date = new Date(l.lastUpdated);
 
     if (!latest[l.builder] || date > latest[l.builder]) {
       latest[l.builder] = date;
@@ -216,29 +207,74 @@ function buildBuilderUpdates() {
   });
 }
 
-/* 🔥 FILTER FUNCTION (RESTORED PROPERLY) */
+/* FILTER */
 function filterLots() {
   const lot = filterLot.value.toLowerCase();
   const sub = filterSubdivision.value.toLowerCase();
   const builder = filterBuilder.value.toLowerCase();
   const floor = filterFloorplan.value.toLowerCase();
 
-  const filtered = lots.filter(l =>
+  let filtered = lots.filter(l =>
     (!lot || l.lotNumber.toLowerCase().includes(lot)) &&
     (!sub || l.subdivision.toLowerCase().includes(sub)) &&
     (!builder || l.builder.toLowerCase().includes(builder)) &&
     (!floor || (l.floorplan||'').toLowerCase().includes(floor))
   );
 
+  if (currentSort.key) {
+    filtered = sortData(filtered, currentSort.key, currentSort.asc);
+  }
+
   renderTable(filtered);
 }
 
-/* 🔥 INPUT LISTENERS */
+/* SORT LOGIC */
+function sortTable(key) {
+  if (currentSort.key === key) {
+    currentSort.asc = !currentSort.asc;
+  } else {
+    currentSort = { key, asc: true };
+  }
+  filterLots();
+}
+
+function sortData(data, key, asc) {
+  return [...data].sort((a, b) => {
+
+    if (key === 'lotNumber') {
+      return asc ? smartLotSort(a, b) : smartLotSort(b, a);
+    }
+
+    if (key === 'lastUpdated') {
+      return asc
+        ? new Date(a.lastUpdated) - new Date(b.lastUpdated)
+        : new Date(b.lastUpdated) - new Date(a.lastUpdated);
+    }
+
+    let A = (a[key] || '').toString().toLowerCase();
+    let B = (b[key] || '').toString().toLowerCase();
+
+    if (A < B) return asc ? -1 : 1;
+    if (A > B) return asc ? 1 : -1;
+    return 0;
+  });
+}
+
+/* SMART LOT SORT */
+function smartLotSort(a,b){
+  const parse=x=>{
+    const m=x.toString().match(/^(\d+)([A-Za-z]*)$/);
+    return {num:m?parseInt(m[1]):0,suffix:m?m[2]:''};
+  };
+  const A=parse(a.lotNumber),B=parse(b.lotNumber);
+  return A.num!==B.num?A.num-B.num:A.suffix.localeCompare(B.suffix);
+}
+
+/* INPUT LISTENERS */
 document.querySelectorAll('.filters input')
   .forEach(i => i.addEventListener('input', filterLots));
 
-/* ENTER KEY = EXACT SEARCH */
-filterLot.addEventListener('keydown', function(e) {
+filterLot.addEventListener('keydown', e => {
   if (e.key === 'Enter') exactLotSearch();
 });
 
@@ -246,13 +282,6 @@ filterLot.addEventListener('keydown', function(e) {
 function exactLotSearch() {
   const v = filterLot.value.toLowerCase();
   renderTable(lots.filter(l => l.lotNumber.toLowerCase() === v));
-}
-
-/* COPY */
-function copyAddress(text, row) {
-  navigator.clipboard.writeText(text);
-  row.classList.add('copied');
-  setTimeout(() => row.classList.remove('copied'), 400);
 }
 
 /* RENDER */
@@ -271,8 +300,6 @@ function renderTable(data) {
       <td>${daysAgo(l.lastUpdated)}</td>
     `;
 
-    row.addEventListener('click', () => copyAddress(l.address, row));
-
     resultsTable.appendChild(row);
   });
 }
@@ -285,44 +312,6 @@ function clearFilters(){
   document.querySelectorAll('.filters input').forEach(i=>i.value='');
   filterLots();
 }
-
-/* RESIZE */
-function enableResize(){
-  const ths = document.querySelectorAll("th");
-  const saved = JSON.parse(localStorage.getItem("colWidths")||"{}");
-
-  ths.forEach((th,i)=>{
-    if(saved[i]) th.style.width = saved[i]+"px";
-
-    const r = document.createElement("div");
-    r.classList.add("resizer");
-    th.appendChild(r);
-
-    let startX, startW;
-
-    r.addEventListener("mousedown",e=>{
-      startX=e.pageX;
-      startW=th.offsetWidth;
-
-      function move(e){
-        const w = startW + (e.pageX-startX);
-        th.style.width = w+"px";
-        saved[i]=w;
-        localStorage.setItem("colWidths",JSON.stringify(saved));
-      }
-
-      function up(){
-        document.removeEventListener("mousemove",move);
-        document.removeEventListener("mouseup",up);
-      }
-
-      document.addEventListener("mousemove",move);
-      document.addEventListener("mouseup",up);
-    });
-  });
-}
-
-window.addEventListener("load", enableResize);
 </script>
 
 </body>
