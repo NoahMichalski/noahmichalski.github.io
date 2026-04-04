@@ -23,21 +23,7 @@ body {
   border-bottom: 1px solid #222;
 }
 
-/* BUILDER UPDATE BAR */
-#builderUpdates {
-  padding: 8px 15px;
-  background: #0d0d0d;
-  border-bottom: 1px solid #222;
-  font-size: 0.85rem;
-}
-
-.builder-pill {
-  margin-right: 14px;
-  display: inline-block;
-  color: #aaa;
-}
-
-/* FILTERS */
+/* FILTER BAR */
 .filters {
   display: grid;
   grid-template-columns: 120px auto 1fr 180px 180px auto auto;
@@ -61,6 +47,21 @@ body {
   cursor: pointer;
 }
 
+.btn:hover { background: #333; }
+
+/* BUILDER UPDATE BAR */
+#builderUpdates {
+  padding: 8px 15px;
+  background: #0d0d0d;
+  border-bottom: 1px solid #222;
+  font-size: 0.85rem;
+}
+
+.builder-pill {
+  margin-right: 12px;
+  color: #aaa;
+}
+
 /* TABLE */
 .table-container {
   height: calc(100vh - 180px);
@@ -76,10 +77,10 @@ table {
 th, td {
   padding: 10px;
   border-bottom: 1px solid #222;
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-align: center;
   position: relative;
 }
 
@@ -91,7 +92,7 @@ th:nth-child(4), td:nth-child(4) { width: auto; }
 th:nth-child(5), td:nth-child(5) { width: 140px; }
 th:nth-child(6), td:nth-child(6) { width: 120px; }
 
-/* STICKY HEADER */
+/* HEADER STICKY */
 thead th {
   position: sticky;
   top: 0;
@@ -116,9 +117,7 @@ thead th {
 /* COPY FEEDBACK */
 .copied {
   background: #1f3d2b !important;
-  transition: 0.3s;
 }
-
 </style>
 </head>
 
@@ -164,13 +163,14 @@ thead th {
 <script>
 let lots = [];
 
+/* LOAD */
 function loadData() {
   fetch('lots(1).json?t=' + Date.now())
     .then(r => r.json())
     .then(data => {
       lots = data;
       buildBuilderUpdates();
-      renderTable(lots);
+      filterLots(); // 🔥 IMPORTANT (not renderTable)
     });
 }
 loadData();
@@ -216,43 +216,43 @@ function buildBuilderUpdates() {
   });
 }
 
-/* FILTER */
+/* 🔥 FILTER FUNCTION (RESTORED PROPERLY) */
 function filterLots() {
   const lot = filterLot.value.toLowerCase();
   const sub = filterSubdivision.value.toLowerCase();
   const builder = filterBuilder.value.toLowerCase();
   const floor = filterFloorplan.value.toLowerCase();
 
-  renderTable(lots.filter(l =>
+  const filtered = lots.filter(l =>
     (!lot || l.lotNumber.toLowerCase().includes(lot)) &&
     (!sub || l.subdivision.toLowerCase().includes(sub)) &&
     (!builder || l.builder.toLowerCase().includes(builder)) &&
     (!floor || (l.floorplan||'').toLowerCase().includes(floor))
-  ));
+  );
+
+  renderTable(filtered);
 }
 
+/* 🔥 INPUT LISTENERS */
 document.querySelectorAll('.filters input')
   .forEach(i => i.addEventListener('input', filterLots));
 
-/* ENTER KEY FOR LOT SEARCH */
+/* ENTER KEY = EXACT SEARCH */
 filterLot.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    exactLotSearch();
-  }
+  if (e.key === 'Enter') exactLotSearch();
 });
 
-/* EXACT LOT */
+/* EXACT */
 function exactLotSearch() {
   const v = filterLot.value.toLowerCase();
   renderTable(lots.filter(l => l.lotNumber.toLowerCase() === v));
 }
 
-/* COPY ADDRESS */
+/* COPY */
 function copyAddress(text, row) {
   navigator.clipboard.writeText(text);
-
   row.classList.add('copied');
-  setTimeout(() => row.classList.remove('copied'), 500);
+  setTimeout(() => row.classList.remove('copied'), 400);
 }
 
 /* RENDER */
@@ -271,10 +271,7 @@ function renderTable(data) {
       <td>${daysAgo(l.lastUpdated)}</td>
     `;
 
-    // CLICK TO COPY ADDRESS
-    row.addEventListener('click', () => {
-      copyAddress(l.address, row);
-    });
+    row.addEventListener('click', () => copyAddress(l.address, row));
 
     resultsTable.appendChild(row);
   });
@@ -286,7 +283,7 @@ function refreshData(){ loadData(); }
 /* CLEAR */
 function clearFilters(){
   document.querySelectorAll('.filters input').forEach(i=>i.value='');
-  renderTable(lots);
+  filterLots();
 }
 
 /* RESIZE */
