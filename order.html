@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Job Formatter v2</title>
+<title>Job Formatter v2.1</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
@@ -40,8 +40,15 @@ h1 {
     transition: 0.2s;
 }
 
-.drop-zone:hover {
-    border-color: #888;
+.drop-zone.dragover {
+    border-color: #fff;
+    background: #222;
+}
+
+.file-name {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #aaa;
 }
 
 .buttons {
@@ -101,10 +108,11 @@ textarea {
 <div class="container">
 <div class="card">
 
-<h1>Job Formatter v2</h1>
+<h1>Job Formatter v2.1</h1>
 
-<div class="drop-zone" onclick="document.getElementById('fileInput').click()">
+<div class="drop-zone" id="dropZone">
     Drag & Drop Excel File or Click to Upload
+    <div class="file-name" id="fileName"></div>
 </div>
 
 <input type="file" id="fileInput" hidden />
@@ -112,6 +120,7 @@ textarea {
 <div class="buttons">
     <button onclick="processFile()">Process</button>
     <button onclick="copyOutput()">Copy Output</button>
+    <button onclick="clearAll()">Clear</button>
 </div>
 
 <div class="output-container">
@@ -124,19 +133,44 @@ textarea {
 
 <script>
 let file;
+const dropZone = document.getElementById("dropZone");
+
+dropZone.addEventListener("click", () => {
+    document.getElementById("fileInput").click();
+});
 
 document.getElementById("fileInput").addEventListener("change", e => {
     file = e.target.files[0];
+    showFileName();
 });
 
-document.querySelector(".drop-zone").addEventListener("dragover", e => {
+dropZone.addEventListener("dragover", e => {
     e.preventDefault();
+    dropZone.classList.add("dragover");
+    dropZone.innerText = "Drop file here";
 });
 
-document.querySelector(".drop-zone").addEventListener("drop", e => {
+dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("dragover");
+    resetDropText();
+});
+
+dropZone.addEventListener("drop", e => {
     e.preventDefault();
+    dropZone.classList.remove("dragover");
+
     file = e.dataTransfer.files[0];
+    showFileName();
+    resetDropText();
 });
+
+function showFileName() {
+    document.getElementById("fileName").innerText = file ? `Loaded: ${file.name}` : "";
+}
+
+function resetDropText() {
+    dropZone.childNodes[0].nodeValue = "Drag & Drop Excel File or Click to Upload";
+}
 
 function processFile() {
     if (!file) return alert("Upload a file first");
@@ -169,7 +203,6 @@ function processFile() {
 
         Object.keys(grouped).forEach(sub => {
             output += `*${sub}\n`;
-
             previewHTML += `<h3>${sub}</h3>`;
 
             grouped[sub].forEach(entry => {
@@ -190,6 +223,15 @@ function copyOutput() {
     textarea.select();
     document.execCommand("copy");
     alert("Copied!");
+}
+
+function clearAll() {
+    file = null;
+    document.getElementById("fileInput").value = "";
+    document.getElementById("output").value = "";
+    document.getElementById("preview").innerHTML = "";
+    document.getElementById("fileName").innerText = "";
+    resetDropText();
 }
 </script>
 
