@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VIP Parser Tool v1.0</title>
+<style>
+body {
+    font-family: Arial;
+    background: #111;
+    color: #fff;
+    padding: 20px;
+}
+
+textarea {
+    width: 100%;
+    height: 200px;
+    background: #222;
+    color: #fff;
+    border: 1px solid #444;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 10px 5px 10px 0;
+    background: #fff;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#output {
+    white-space: pre-wrap;
+    background: #000;
+    padding: 15px;
+    margin-top: 10px;
+    border: 1px solid #444;
+}
+
+.status {
+    margin-top: 10px;
+    color: #0f0;
+}
+</style>
+</head>
+<body>
+
+<h2>VIP Job Parser</h2>
+
+<textarea id="input" placeholder="Paste your raw jobs here..."></textarea>
+
+<br>
+<button onclick="parse()">Parse</button>
+<button onclick="clearAll()">Clear</button>
+
+<div class="status" id="status"></div>
+<div id="output"></div>
+
+<script>
+
+// 🔥 Subdivision normalization
+const subs = {
+    "JV": "Jerome Village",
+    "LH": "Longview Highlands",
+    "CAV": "CAV",
+    "Scotts": "Scotts",
+    "Price Ponds": "Price Ponds",
+    "Berlin": "Berlin Farm",
+    "Hill Farms": "Hill Farm",
+    "Hill Farm": "Hill Farm",
+    "Glenross": "Glenross",
+    "Slate": "Slate",
+    "Forest": "Forest Ridge",
+    "Clarkshaw": "Clarkshaw Crossing",
+    "Lansdowne": "Lansdowne",
+    "Orchard": "Orchard Lakes",
+    "Miller": "Miller Farm",
+    "Darby": "Darby Station",
+    "Pinnacle": "Pinnacle Quarry",
+    "Foxfire": "Foxfire",
+    "Meadow Grove": "Meadow Grove",
+    "Hyatts Village": "Hyatts Village",
+    "Hebron": "Hebron",
+    "CF": "Carriage Farms"
+};
+
+// 🔥 Job expansion
+function expandJob(text) {
+    text = text.toLowerCase();
+
+    if (text.includes("p/w")) return "p/w Basement/Garage/drive/walks/porch";
+    if (text.includes("car")) return "Car";
+    if (text.includes("laq")) return "Laq";
+    if (text.includes("bolts")) return "Bolts";
+    if (text.includes("insul")) return "Insulation Prep";
+    if (text.includes("scrap")) return "Scrap";
+    if (text.includes("relay")) return "Relay";
+    if (text.includes("2nd roll")) return "2nd Roll";
+    if (text.includes("po")) return "Punch Out";
+
+    return text;
+}
+
+// 🔥 Extract subdivision
+function getSubdivision(line) {
+    for (let key in subs) {
+        if (line.includes(key)) return subs[key];
+    }
+    return "UNKNOWN";
+}
+
+// 🔥 Extract lots
+function getLots(line) {
+    let matches = line.match(/(\d+[A-Z]?\/?\d*[A-Z]?)/g);
+    return matches ? matches.join("/") : "";
+}
+
+function parse() {
+    let input = document.getElementById("input").value;
+    let lines = input.split("\n");
+
+    let output = [];
+    let count = 0;
+
+    lines.forEach(line => {
+        if (!line.trim()) return;
+
+        let subdivision = getSubdivision(line);
+        let lots = getLots(line);
+        let job = expandJob(line);
+
+        if (lots && subdivision !== "UNKNOWN") {
+            output.push(`${subdivision}\t${lots}\t${job}`);
+            count++;
+        }
+    });
+
+    document.getElementById("output").innerText = output.join("\n");
+    document.getElementById("status").innerText = `✔ Parsed ${count} rows`;
+}
+
+function clearAll() {
+    document.getElementById("input").value = "";
+    document.getElementById("output").innerText = "";
+    document.getElementById("status").innerText = "";
+}
+
+</script>
+
+</body>
+</html>
