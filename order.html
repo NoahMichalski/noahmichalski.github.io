@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Job Formatter v4</title>
+<title>Job Formatter v4.1</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
@@ -21,23 +21,11 @@ body {
     padding: 15px 30px;
     border-bottom: 1px solid #222;
     display: flex;
-    align-items: center;
     justify-content: space-between;
 }
 
-.title {
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.controls button {
-    margin-left: 10px;
-}
-
-/* BUTTONS */
 button {
     background: #fff;
-    color: #000;
     border: none;
     padding: 8px 16px;
     border-radius: 6px;
@@ -45,70 +33,51 @@ button {
     font-weight: bold;
 }
 
-button:hover {
-    background: #ddd;
-}
-
-/* MAIN */
+/* LAYOUT */
 .main {
     display: flex;
-    height: calc(100vh - 70px);
+    height: calc(100vh - 60px);
 }
 
-/* LEFT PANEL */
 .left {
     width: 40%;
-    border-right: 1px solid #222;
     padding: 20px;
     overflow-y: auto;
+    border-right: 1px solid #222;
 }
 
-/* RIGHT PANEL */
 .right {
     width: 60%;
     padding: 20px;
 }
 
-/* DROP ZONE */
+/* DROP */
 .drop-zone {
     border: 2px dashed #333;
-    border-radius: 10px;
-    padding: 25px;
+    padding: 20px;
     text-align: center;
     margin-bottom: 15px;
     cursor: pointer;
-    transition: 0.2s;
 }
 
 .drop-zone.dragover {
     border-color: #4caf50;
-    background: #1a1a1a;
 }
 
-.file-info {
-    font-size: 13px;
-    color: #aaa;
-    margin-top: 5px;
-}
-
-.status {
-    font-size: 13px;
-    color: #4caf50;
-    font-weight: bold;
-}
+.file-info { color: #aaa; font-size: 13px; }
+.status { color: #4caf50; font-size: 13px; }
 
 /* PREVIEW */
 .subdivision {
-    margin-bottom: 15px;
-    padding: 10px;
     background: #161616;
+    margin-bottom: 10px;
+    padding: 10px;
     border-radius: 6px;
 }
 
 .subdivision h3 {
     margin: 0 0 5px;
     font-size: 14px;
-    border-bottom: 1px solid #333;
 }
 
 .job {
@@ -125,7 +94,6 @@ textarea {
     border: none;
     padding: 15px;
     font-family: monospace;
-    font-size: 14px;
 }
 </style>
 </head>
@@ -133,8 +101,8 @@ textarea {
 <body>
 
 <div class="header">
-    <div class="title">Job Formatter v4</div>
-    <div class="controls">
+    <div>Job Formatter v4.1</div>
+    <div>
         <button onclick="copyOutput()">Copy</button>
         <button onclick="clearAll()">Clear</button>
     </div>
@@ -170,9 +138,9 @@ const dropText = document.getElementById("dropText");
 const fileName = document.getElementById("fileName");
 const status = document.getElementById("status");
 
-dropZone.onclick = () => document.getElementById("fileInput").click();
+dropZone.onclick = () => fileInput.click();
 
-document.getElementById("fileInput").onchange = e => {
+fileInput.onchange = e => {
     file = e.target.files[0];
     handleFile();
 };
@@ -180,12 +148,6 @@ document.getElementById("fileInput").onchange = e => {
 dropZone.ondragover = e => {
     e.preventDefault();
     dropZone.classList.add("dragover");
-    dropText.innerText = "Release to upload";
-};
-
-dropZone.ondragleave = () => {
-    dropZone.classList.remove("dragover");
-    dropText.innerText = "Drop Excel File";
 };
 
 dropZone.ondrop = e => {
@@ -196,57 +158,69 @@ dropZone.ondrop = e => {
 };
 
 function handleFile() {
+    if (!file) return;
+
     fileName.innerText = file.name;
-    status.innerText = "✔ Processing...";
-    processFile();
+    status.innerText = "Processing...";
+
+    setTimeout(processFile, 10); // prevents UI freeze
 }
 
 function processFile() {
     const reader = new FileReader();
 
     reader.onload = function(e) {
-        const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+        try {
+            const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            const rows = XLSX.utils.sheet_to_json(
+                workbook.Sheets[workbook.SheetNames[0]],
+                { header: 1 }
+            );
 
-        let grouped = {};
-        let count = 0;
+            let grouped = {};
+            let count = 0;
 
-        rows.forEach(r => {
-            let sub = (r[0] || "").trim();
-            let lot = (r[1] || "").trim();
-            let job = (r[2] || "").trim();
-            let am = (r[3] || "").trim();
+            rows.forEach(r => {
+                let sub = String(r[0] || "").trim();
+                let lot = String(r[1] || "").trim();
+                let job = String(r[2] || "").trim();
+                let am = String(r[3] || "").trim();
 
-            if (!sub || !lot || !job) return;
+                if (!sub || !lot || !job) return;
 
-            if (!grouped[sub]) grouped[sub] = [];
+                if (!grouped[sub]) grouped[sub] = [];
 
-            let entry = `${lot}-${job}`;
-            if (am) entry = `*${am} - ${entry}`;
+                let entry = `${lot}-${job}`;
+                if (am) entry = `*${am} - ${entry}`;
 
-            grouped[sub].push(entry);
-            count++;
-        });
-
-        let out = "";
-        let previewHTML = "";
-
-        Object.keys(grouped).forEach(sub => {
-            out += `*${sub}\n`;
-
-            previewHTML += `<div class="subdivision"><h3>${sub}</h3>`;
-
-            grouped[sub].forEach(e => {
-                out += e + "\n";
-                previewHTML += `<div class="job">${e}</div>`;
+                grouped[sub].push(entry);
+                count++;
             });
 
-            previewHTML += `</div>`;
-        });
+            let out = "";
+            let previewHTML = "";
 
-        output.value = out.trim();
-        preview.innerHTML = previewHTML;
-        status.innerText = `✔ ${count} jobs`;
+            for (let sub in grouped) {
+                out += `*${sub}\n`;
+
+                previewHTML += `<div class="subdivision"><h3>${sub}</h3>`;
+
+                grouped[sub].forEach(e => {
+                    out += e + "\n";
+                    previewHTML += `<div class="job">${e}</div>`;
+                });
+
+                previewHTML += `</div>`;
+            }
+
+            output.value = out.trim();
+            preview.innerHTML = previewHTML;
+
+            status.innerText = `✔ ${count} jobs`;
+        } catch (err) {
+            console.error(err);
+            status.innerText = "❌ Error reading file";
+        }
     };
 
     reader.readAsArrayBuffer(file);
@@ -263,7 +237,6 @@ function clearAll() {
     preview.innerHTML = "";
     fileName.innerText = "";
     status.innerText = "";
-    dropText.innerText = "Drop Excel File";
 }
 </script>
 
