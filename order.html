@@ -2,73 +2,44 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Job Formatter v3.2</title>
+<title>Job Formatter v4</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
 body {
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: #0f0f0f;
+    font-family: "Segoe UI", sans-serif;
+    background: #0d0d0d;
     color: #fff;
 }
 
-.container {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 20px;
+/* HEADER */
+.header {
+    position: sticky;
+    top: 0;
+    background: #121212;
+    padding: 15px 30px;
+    border-bottom: 1px solid #222;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.card {
-    background: #1a1a1a;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 0 25px rgba(0,0,0,0.6);
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 25px;
-}
-
-.drop-zone {
-    border: 2px dashed #444;
-    border-radius: 12px;
-    padding: 40px;
-    text-align: center;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.drop-zone.dragover {
-    border-color: #4caf50;
-    background: #1f1f1f;
-}
-
-.file-name {
-    margin-top: 10px;
-    font-size: 14px;
-    color: #aaa;
-}
-
-.status {
-    margin-top: 6px;
-    font-size: 14px;
-    color: #4caf50;
+.title {
+    font-size: 20px;
     font-weight: bold;
 }
 
-.buttons {
-    margin-top: 20px;
-    text-align: center;
+.controls button {
+    margin-left: 10px;
 }
 
+/* BUTTONS */
 button {
     background: #fff;
     color: #000;
     border: none;
-    padding: 10px 18px;
-    margin: 5px;
+    padding: 8px 16px;
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
@@ -78,67 +49,118 @@ button:hover {
     background: #ddd;
 }
 
-.output-container {
-    margin-top: 25px;
+/* MAIN */
+.main {
     display: flex;
-    gap: 20px;
+    height: calc(100vh - 70px);
 }
 
-.preview {
-    flex: 1;
-    background: #121212;
-    padding: 15px;
-    border-radius: 8px;
+/* LEFT PANEL */
+.left {
+    width: 40%;
+    border-right: 1px solid #222;
+    padding: 20px;
     overflow-y: auto;
-    max-height: 450px;
 }
 
-.preview h3 {
-    margin: 12px 0 6px;
+/* RIGHT PANEL */
+.right {
+    width: 60%;
+    padding: 20px;
+}
+
+/* DROP ZONE */
+.drop-zone {
+    border: 2px dashed #333;
+    border-radius: 10px;
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.drop-zone.dragover {
+    border-color: #4caf50;
+    background: #1a1a1a;
+}
+
+.file-info {
+    font-size: 13px;
+    color: #aaa;
+    margin-top: 5px;
+}
+
+.status {
+    font-size: 13px;
+    color: #4caf50;
+    font-weight: bold;
+}
+
+/* PREVIEW */
+.subdivision {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #161616;
+    border-radius: 6px;
+}
+
+.subdivision h3 {
+    margin: 0 0 5px;
+    font-size: 14px;
     border-bottom: 1px solid #333;
-    padding-bottom: 3px;
 }
 
+.job {
+    font-size: 13px;
+    margin-left: 5px;
+}
+
+/* OUTPUT */
 textarea {
-    flex: 1;
+    width: 100%;
+    height: 100%;
     background: #000;
     color: #0f0;
+    border: none;
     padding: 15px;
-    border-radius: 8px;
     font-family: monospace;
-    height: 450px;
-    resize: none;
+    font-size: 14px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-<div class="card">
+<div class="header">
+    <div class="title">Job Formatter v4</div>
+    <div class="controls">
+        <button onclick="copyOutput()">Copy</button>
+        <button onclick="clearAll()">Clear</button>
+    </div>
+</div>
 
-<h1>Job Formatter v3.2 (AM + Dash)</h1>
+<div class="main">
+
+<div class="left">
 
 <div class="drop-zone" id="dropZone">
-    <div id="dropText">Drag & Drop Excel File or Click to Upload</div>
-    <div class="file-name" id="fileName"></div>
+    <div id="dropText">Drop Excel File</div>
+    <div class="file-info" id="fileName"></div>
     <div class="status" id="status"></div>
 </div>
 
+<div id="preview"></div>
+
+</div>
+
+<div class="right">
+<textarea id="output"></textarea>
+</div>
+
+</div>
+
 <input type="file" id="fileInput" hidden />
-
-<div class="buttons">
-    <button onclick="copyOutput()">Copy Output</button>
-    <button onclick="clearAll()">Clear</button>
-</div>
-
-<div class="output-container">
-    <div class="preview" id="preview"></div>
-    <textarea id="output"></textarea>
-</div>
-
-</div>
-</div>
 
 <script>
 let file;
@@ -148,40 +170,34 @@ const dropText = document.getElementById("dropText");
 const fileName = document.getElementById("fileName");
 const status = document.getElementById("status");
 
-dropZone.addEventListener("click", () => {
-    document.getElementById("fileInput").click();
-});
+dropZone.onclick = () => document.getElementById("fileInput").click();
 
-document.getElementById("fileInput").addEventListener("change", e => {
+document.getElementById("fileInput").onchange = e => {
     file = e.target.files[0];
     handleFile();
-});
+};
 
-dropZone.addEventListener("dragover", e => {
+dropZone.ondragover = e => {
     e.preventDefault();
     dropZone.classList.add("dragover");
-    dropText.innerText = "Drop file here";
-});
+    dropText.innerText = "Release to upload";
+};
 
-dropZone.addEventListener("dragleave", () => {
+dropZone.ondragleave = () => {
     dropZone.classList.remove("dragover");
-    resetDropText();
-});
+    dropText.innerText = "Drop Excel File";
+};
 
-dropZone.addEventListener("drop", e => {
+dropZone.ondrop = e => {
     e.preventDefault();
     dropZone.classList.remove("dragover");
     file = e.dataTransfer.files[0];
     handleFile();
-});
+};
 
 function handleFile() {
-    if (!file) return;
-
-    fileName.innerText = `Loaded: ${file.name}`;
-    dropText.innerText = "File ready";
+    fileName.innerText = file.name;
     status.innerText = "✔ Processing...";
-
     processFile();
 }
 
@@ -189,77 +205,65 @@ function processFile() {
     const reader = new FileReader();
 
     reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
 
         let grouped = {};
         let count = 0;
 
-        rows.forEach(row => {
-            let subdivision = (row[0] || "").toString().trim();
-            let lot = (row[1] || "").toString().trim();
-            let job = (row[2] || "").toString().trim();
-            let am = (row[3] || "").toString().trim();
+        rows.forEach(r => {
+            let sub = (r[0] || "").trim();
+            let lot = (r[1] || "").trim();
+            let job = (r[2] || "").trim();
+            let am = (r[3] || "").trim();
 
-            if (!subdivision || !lot || !job) return;
+            if (!sub || !lot || !job) return;
 
-            if (!grouped[subdivision]) grouped[subdivision] = [];
+            if (!grouped[sub]) grouped[sub] = [];
 
             let entry = `${lot}-${job}`;
+            if (am) entry = `*${am} - ${entry}`;
 
-            // ✅ NEW AM FORMAT WITH DASH
-            if (am) {
-                entry = `*${am} - ${entry}`;
-            }
-
-            grouped[subdivision].push(entry);
+            grouped[sub].push(entry);
             count++;
         });
 
-        let output = "";
+        let out = "";
         let previewHTML = "";
 
         Object.keys(grouped).forEach(sub => {
-            output += `*${sub}\n`;
-            previewHTML += `<h3>${sub}</h3>`;
+            out += `*${sub}\n`;
 
-            grouped[sub].forEach(entry => {
-                output += entry + "\n";
-                previewHTML += `<div>${entry}</div>`;
+            previewHTML += `<div class="subdivision"><h3>${sub}</h3>`;
+
+            grouped[sub].forEach(e => {
+                out += e + "\n";
+                previewHTML += `<div class="job">${e}</div>`;
             });
+
+            previewHTML += `</div>`;
         });
 
-        document.getElementById("output").value = output.trim();
-        document.getElementById("preview").innerHTML = previewHTML;
-
-        status.innerText = `✔ ${count} jobs loaded`;
+        output.value = out.trim();
+        preview.innerHTML = previewHTML;
+        status.innerText = `✔ ${count} jobs`;
     };
 
     reader.readAsArrayBuffer(file);
 }
 
 function copyOutput() {
-    const textarea = document.getElementById("output");
-    textarea.select();
+    output.select();
     document.execCommand("copy");
-    alert("Copied!");
 }
 
 function clearAll() {
     file = null;
-    document.getElementById("fileInput").value = "";
-    document.getElementById("output").value = "";
-    document.getElementById("preview").innerHTML = "";
+    output.value = "";
+    preview.innerHTML = "";
     fileName.innerText = "";
     status.innerText = "";
-    dropText.innerText = "Drag & Drop Excel File or Click to Upload";
-}
-
-function resetDropText() {
-    dropText.innerText = file ? "File ready" : "Drag & Drop Excel File or Click to Upload";
+    dropText.innerText = "Drop Excel File";
 }
 </script>
 
