@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Job Formatter v4.2</title>
+<title>Job Formatter v4.3</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
@@ -13,7 +13,6 @@ body {
     color: #fff;
 }
 
-/* HEADER */
 .header {
     position: sticky;
     top: 0;
@@ -33,7 +32,6 @@ button {
     font-weight: bold;
 }
 
-/* LAYOUT */
 .main {
     display: flex;
     height: calc(100vh - 60px);
@@ -51,7 +49,6 @@ button {
     padding: 20px;
 }
 
-/* DROP */
 .drop-zone {
     border: 2px dashed #333;
     padding: 20px;
@@ -67,6 +64,25 @@ button {
 .file-info { color: #aaa; font-size: 13px; }
 .status { color: #4caf50; font-size: 13px; }
 
+/* ERROR BOX */
+.error-box {
+    background: #2a1212;
+    border: 1px solid #ff5252;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.error-title {
+    font-weight: bold;
+    color: #ff5252;
+    margin-bottom: 5px;
+}
+
+.error-line {
+    font-size: 13px;
+}
+
 /* TIME BOX */
 .time-box {
     background: #1a1a1a;
@@ -76,27 +92,12 @@ button {
     margin-bottom: 15px;
 }
 
-.time-box-title {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
 /* PREVIEW */
 .subdivision {
     background: #161616;
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 6px;
-}
-
-.subdivision h3 {
-    margin: 0 0 5px;
-    font-size: 14px;
-}
-
-.job {
-    font-size: 13px;
-    margin-left: 5px;
 }
 
 .job.highlight {
@@ -120,7 +121,7 @@ textarea {
 <body>
 
 <div class="header">
-    <div>Job Formatter v4.2</div>
+    <div>Job Formatter v4.3</div>
     <div>
         <button onclick="copyOutput()">Copy</button>
         <button onclick="clearAll()">Clear</button>
@@ -137,8 +138,10 @@ textarea {
     <div class="status" id="status"></div>
 </div>
 
+<div id="errorBox"></div>
+
 <div class="time-box">
-    <div class="time-box-title">⏰ Time / Priority Tasks</div>
+    <b>⏰ Time / Priority Tasks</b>
     <div id="timeContent"></div>
 </div>
 
@@ -158,10 +161,6 @@ textarea {
 let file;
 
 const dropZone = document.getElementById("dropZone");
-const dropText = document.getElementById("dropText");
-const fileName = document.getElementById("fileName");
-const status = document.getElementById("status");
-
 dropZone.onclick = () => fileInput.click();
 
 fileInput.onchange = e => {
@@ -182,8 +181,6 @@ dropZone.ondrop = e => {
 };
 
 function handleFile() {
-    if (!file) return;
-
     fileName.innerText = file.name;
     status.innerText = "Processing...";
     setTimeout(processFile, 10);
@@ -191,11 +188,7 @@ function handleFile() {
 
 function isTimeSensitive(text) {
     text = text.toLowerCase();
-    return (
-        text.includes("am") ||
-        text.includes("pm") ||
-        /\d{1,2}:\d{2}/.test(text)
-    );
+    return text.includes("am") || text.includes("pm") || /\d{1,2}:\d{2}/.test(text);
 }
 
 function processFile() {
@@ -204,22 +197,32 @@ function processFile() {
     reader.onload = function(e) {
         try {
             const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-            const rows = XLSX.utils.sheet_to_json(
-                workbook.Sheets[workbook.SheetNames[0]],
-                { header: 1 }
-            );
+            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
 
             let grouped = {};
-            let count = 0;
             let timeEntries = [];
+            let errors = [];
+            let count = 0;
 
-            rows.forEach(r => {
+            rows.forEach((r, i) => {
                 let sub = String(r[0] || "").trim();
                 let lot = String(r[1] || "").trim();
                 let job = String(r[2] || "").trim();
                 let am = String(r[3] || "").trim();
 
-                if (!sub || !lot || !job) return;
+                // ❌ ERROR DETECTION
+                if (!sub || !lot || !job) {
+                    let missing = [];
+                    if (!sub) missing.push("Subdivision");
+                    if (!lot) missing.push("Lot");
+                    if (!job) missing.push("Job");
+
+                    if (sub || lot || job) {
+                        errors.push(`Row ${i+1}: Missing ${missing.join(", ")}`);
+                    }
+
+                    return;
+                }
 
                 if (!grouped[sub]) grouped[sub] = [];
 
@@ -239,12 +242,13 @@ function processFile() {
                 count++;
             });
 
+            // OUTPUT
             let out = "";
             let previewHTML = "";
 
             for (let sub in grouped) {
                 out += `*${sub}\n`;
-                previewHTML += `<div class="subdivision"><h3>${sub}</h3>`;
+                previewHTML += `<div class="subdivision"><b>${sub}</b>`;
 
                 grouped[sub].forEach(obj => {
                     out += obj.text + "\n";
@@ -257,18 +261,19 @@ function processFile() {
             output.value = out.trim();
             preview.innerHTML = previewHTML;
 
-            // Time box
-            let timeHTML = "";
+            // TIME BOX
+            timeContent.innerHTML = timeEntries.length
+                ? timeEntries.map(t => `<div>${t}</div>`).join("")
+                : "<div style='color:#777;'>No time-specific tasks</div>";
 
-            if (timeEntries.length === 0) {
-                timeHTML = "<div style='color:#777;'>No time-specific tasks</div>";
-            } else {
-                timeEntries.forEach(t => {
-                    timeHTML += `<div>${t}</div>`;
-                });
+            // ERROR BOX
+            let errorHTML = "";
+            if (errors.length) {
+                errorHTML += `<div class="error-box"><div class="error-title">❌ Errors Found</div>`;
+                errors.forEach(e => errorHTML += `<div class="error-line">${e}</div>`);
+                errorHTML += `</div>`;
             }
-
-            document.getElementById("timeContent").innerHTML = timeHTML;
+            errorBox.innerHTML = errorHTML;
 
             status.innerText = `✔ ${count} jobs`;
         } catch (err) {
@@ -291,7 +296,8 @@ function clearAll() {
     preview.innerHTML = "";
     fileName.innerText = "";
     status.innerText = "";
-    document.getElementById("timeContent").innerHTML = "";
+    timeContent.innerHTML = "";
+    errorBox.innerHTML = "";
 }
 </script>
 
