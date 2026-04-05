@@ -2,118 +2,61 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Job Formatter v4.3</title>
+<title>Job Formatter v4.5</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
-body {
-    margin: 0;
-    font-family: "Segoe UI", sans-serif;
-    background: #0d0d0d;
-    color: #fff;
-}
+body { margin:0; font-family:"Segoe UI"; background:#0d0d0d; color:#fff; }
 
 .header {
-    position: sticky;
-    top: 0;
-    background: #121212;
-    padding: 15px 30px;
-    border-bottom: 1px solid #222;
-    display: flex;
-    justify-content: space-between;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:15px 30px; background:#121212; border-bottom:1px solid #222;
 }
+
+.header-left { display:flex; align-items:center; gap:12px; }
+.logo { height:32px; }
 
 button {
-    background: #fff;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
+    background:#fff; border:none; padding:8px 16px;
+    border-radius:6px; font-weight:bold; cursor:pointer;
 }
 
-.main {
-    display: flex;
-    height: calc(100vh - 60px);
-}
+.main { display:flex; height:calc(100vh - 60px); }
 
-.left {
-    width: 40%;
-    padding: 20px;
-    overflow-y: auto;
-    border-right: 1px solid #222;
-}
-
-.right {
-    width: 60%;
-    padding: 20px;
-}
+.left { width:40%; padding:20px; overflow-y:auto; border-right:1px solid #222; }
+.right { width:60%; padding:20px; }
 
 .drop-zone {
-    border: 2px dashed #333;
-    padding: 20px;
-    text-align: center;
-    margin-bottom: 15px;
-    cursor: pointer;
+    border:2px dashed #333; padding:20px; text-align:center;
+    margin-bottom:15px; cursor:pointer;
 }
+.drop-zone.dragover { border-color:#4caf50; }
 
-.drop-zone.dragover {
-    border-color: #4caf50;
-}
+.file-info { color:#aaa; font-size:13px; }
+.status { color:#4caf50; font-size:13px; }
 
-.file-info { color: #aaa; font-size: 13px; }
-.status { color: #4caf50; font-size: 13px; }
-
-/* ERROR BOX */
+/* ERROR */
 .error-box {
-    background: #2a1212;
-    border: 1px solid #ff5252;
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 15px;
+    background:#2a1212; border:1px solid #ff5252;
+    border-radius:8px; padding:10px; margin-bottom:15px;
 }
 
-.error-title {
-    font-weight: bold;
-    color: #ff5252;
-    margin-bottom: 5px;
-}
-
-.error-line {
-    font-size: 13px;
-}
-
-/* TIME BOX */
+/* TIME */
 .time-box {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 15px;
+    background:#1a1a1a; border:1px solid #333;
+    border-radius:8px; padding:10px; margin-bottom:15px;
 }
 
 /* PREVIEW */
-.subdivision {
-    background: #161616;
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 6px;
-}
-
-.job.highlight {
-    color: #ffd54f;
-    font-weight: bold;
-}
+.subdivision { background:#161616; margin-bottom:10px; padding:10px; border-radius:6px; }
+.job.highlight { color:#ffd54f; font-weight:bold; }
 
 /* OUTPUT */
 textarea {
-    width: 100%;
-    height: 100%;
-    background: #000;
-    color: #0f0;
-    border: none;
-    padding: 15px;
-    font-family: monospace;
+    width:100%; height:100%;
+    background:#000; color:#0f0;
+    border:none; padding:15px;
+    font-family:monospace;
 }
 </style>
 </head>
@@ -121,7 +64,10 @@ textarea {
 <body>
 
 <div class="header">
-    <div>Job Formatter v4.3</div>
+    <div class="header-left">
+        <img src="/images/logo-VIP.png" class="logo">
+        <div>Job Formatter v4.5</div>
+    </div>
     <div>
         <button onclick="copyOutput()">Copy</button>
         <button onclick="clearAll()">Clear</button>
@@ -133,7 +79,7 @@ textarea {
 <div class="left">
 
 <div class="drop-zone" id="dropZone">
-    <div id="dropText">Drop Excel File</div>
+    <div>Drop Excel File</div>
     <div class="file-info" id="fileName"></div>
     <div class="status" id="status"></div>
 </div>
@@ -159,8 +105,6 @@ textarea {
 
 <script>
 let file;
-
-const dropZone = document.getElementById("dropZone");
 dropZone.onclick = () => fileInput.click();
 
 fileInput.onchange = e => {
@@ -168,11 +112,7 @@ fileInput.onchange = e => {
     handleFile();
 };
 
-dropZone.ondragover = e => {
-    e.preventDefault();
-    dropZone.classList.add("dragover");
-};
-
+dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add("dragover"); };
 dropZone.ondrop = e => {
     e.preventDefault();
     dropZone.classList.remove("dragover");
@@ -186,9 +126,9 @@ function handleFile() {
     setTimeout(processFile, 10);
 }
 
-function isTimeSensitive(text) {
-    text = text.toLowerCase();
-    return text.includes("am") || text.includes("pm") || /\d{1,2}:\d{2}/.test(text);
+function isTimeSensitive(t) {
+    t = t.toLowerCase();
+    return t.includes("am") || t.includes("pm") || /\d{1,2}:\d{2}/.test(t);
 }
 
 function processFile() {
@@ -196,63 +136,55 @@ function processFile() {
 
     reader.onload = function(e) {
         try {
-            const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type:'array' });
+            const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header:1 });
 
-            let grouped = {};
-            let timeEntries = [];
-            let errors = [];
-            let count = 0;
+            let grouped={}, errors=[], timeEntries=[], count=0;
 
-            rows.forEach((r, i) => {
-                let sub = String(r[0] || "").trim();
-                let lot = String(r[1] || "").trim();
-                let job = String(r[2] || "").trim();
-                let am = String(r[3] || "").trim();
+            rows.forEach((r,i)=>{
+                let sub=String(r[0]||"").trim();
+                let lot=String(r[1]||"").trim();
+                let job=String(r[2]||"").trim();
+                let am=String(r[3]||"").trim();
 
-                // ❌ ERROR DETECTION
-                if (!sub || !lot || !job) {
-                    let missing = [];
-                    if (!sub) missing.push("Subdivision");
-                    if (!lot) missing.push("Lot");
-                    if (!job) missing.push("Job");
-
-                    if (sub || lot || job) {
+                // ❌ only require subdivision + job now
+                if (!sub || !job) {
+                    if (sub || job) {
+                        let missing=[];
+                        if(!sub) missing.push("Subdivision");
+                        if(!job) missing.push("Job");
                         errors.push(`Row ${i+1}: Missing ${missing.join(", ")}`);
                     }
-
                     return;
                 }
 
-                if (!grouped[sub]) grouped[sub] = [];
+                if(!grouped[sub]) grouped[sub]=[];
 
-                let entry = `${lot}-${job}`;
-                let highlight = false;
+                let entry = lot ? `${lot}-${job}` : `${job}`;
+                let highlight=false;
 
-                if (am) {
+                if(am){
                     entry = `*${am} - ${entry}`;
                     highlight = isTimeSensitive(am);
                 }
 
-                if (highlight) {
+                if(highlight){
                     timeEntries.push(`${sub} → ${entry}`);
                 }
 
-                grouped[sub].push({ text: entry, highlight });
+                grouped[sub].push({text:entry, highlight});
                 count++;
             });
 
-            // OUTPUT
-            let out = "";
-            let previewHTML = "";
+            let out="", previewHTML="";
 
-            for (let sub in grouped) {
+            for(let sub in grouped){
                 out += `*${sub}\n`;
                 previewHTML += `<div class="subdivision"><b>${sub}</b>`;
 
-                grouped[sub].forEach(obj => {
-                    out += obj.text + "\n";
-                    previewHTML += `<div class="job ${obj.highlight ? "highlight" : ""}">${obj.text}</div>`;
+                grouped[sub].forEach(o=>{
+                    out += o.text+"\n";
+                    previewHTML += `<div class="job ${o.highlight?"highlight":""}">${o.text}</div>`;
                 });
 
                 previewHTML += `</div>`;
@@ -261,43 +193,35 @@ function processFile() {
             output.value = out.trim();
             preview.innerHTML = previewHTML;
 
-            // TIME BOX
             timeContent.innerHTML = timeEntries.length
-                ? timeEntries.map(t => `<div>${t}</div>`).join("")
+                ? timeEntries.map(t=>`<div>${t}</div>`).join("")
                 : "<div style='color:#777;'>No time-specific tasks</div>";
 
-            // ERROR BOX
-            let errorHTML = "";
-            if (errors.length) {
-                errorHTML += `<div class="error-box"><div class="error-title">❌ Errors Found</div>`;
-                errors.forEach(e => errorHTML += `<div class="error-line">${e}</div>`);
-                errorHTML += `</div>`;
-            }
-            errorBox.innerHTML = errorHTML;
+            errorBox.innerHTML = errors.length
+                ? `<div class="error-box"><b>❌ Errors</b>${errors.map(e=>`<div>${e}</div>`).join("")}</div>`
+                : "";
 
             status.innerText = `✔ ${count} jobs`;
-        } catch (err) {
-            console.error(err);
-            status.innerText = "❌ Error reading file";
+
+        } catch(e){
+            console.error(e);
+            status.innerText="❌ Error";
         }
     };
 
     reader.readAsArrayBuffer(file);
 }
 
-function copyOutput() {
-    output.select();
-    document.execCommand("copy");
-}
+function copyOutput(){ output.select(); document.execCommand("copy"); }
 
-function clearAll() {
-    file = null;
-    output.value = "";
-    preview.innerHTML = "";
-    fileName.innerText = "";
-    status.innerText = "";
-    timeContent.innerHTML = "";
-    errorBox.innerHTML = "";
+function clearAll(){
+    file=null;
+    output.value="";
+    preview.innerHTML="";
+    fileName.innerText="";
+    status.innerText="";
+    timeContent.innerHTML="";
+    errorBox.innerHTML="";
 }
 </script>
 
