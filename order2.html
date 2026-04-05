@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>VIP Job Formatter v5</title>
+<title>VIP Job Formatter v5.1</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
@@ -68,13 +68,29 @@ button {
 .file-info { color:#aaa; font-size:13px; }
 .status { color:#4caf50; font-size:13px; }
 
-/* PANELS */
+/* BOXES */
 .box {
     background:#1a1a1a;
     border:1px solid #333;
     border-radius:8px;
     padding:10px;
     margin-bottom:15px;
+}
+
+/* FIX ROW */
+.fix-row {
+    display:flex;
+    gap:6px;
+    margin-bottom:6px;
+}
+
+input {
+    flex:1;
+    min-width:0;
+    padding:6px;
+    background:#222;
+    border:1px solid #444;
+    color:#fff;
 }
 
 /* PREVIEW */
@@ -100,13 +116,6 @@ textarea {
     padding:15px;
     font-family:monospace;
 }
-input {
-    margin:2px;
-    padding:4px;
-    background:#222;
-    border:1px solid #444;
-    color:#fff;
-}
 </style>
 </head>
 
@@ -115,7 +124,7 @@ input {
 <div class="header">
     <div class="header-left">
         <img src="/images/VIP-logo-white.png" class="logo" onclick="clearAll()">
-        <div>VIP Job Formatter v5</div>
+        <div>VIP Job Formatter v5.1</div>
     </div>
     <div>
         <button onclick="copyOutput()">Copy</button>
@@ -134,13 +143,15 @@ input {
 </div>
 
 <div class="box">
-    <b>✏️ Fix Missing Data</b>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <b>Fix Missing Data</b>
+        <button onclick="applyFixes()">Apply Fixes</button>
+    </div>
     <div id="editContent"></div>
-    <button onclick="applyFixes()">Apply Fixes</button>
 </div>
 
 <div class="box">
-    <b>⏰ Time / Priority Tasks</b>
+    <b>Time / Priority Tasks</b>
     <div id="timeContent"></div>
 </div>
 
@@ -211,15 +222,13 @@ function render(rows){
         let job=String(r[2]||"").trim();
         let am =String(r[3]||"").trim();
 
-        // editable missing
         if(!sub||!job){
             editHTML+=`
-            <div>
-                Row ${i+1}<br>
+            <div class="fix-row">
                 <input placeholder="Subdivision" value="${sub}" id="sub-${i}">
                 <input placeholder="Lot" value="${lot}" id="lot-${i}">
                 <input placeholder="Job" value="${job}" id="job-${i}">
-                <input placeholder="AM/Time" value="${am}" id="am-${i}">
+                <input placeholder="Time/Note" value="${am}" id="am-${i}">
             </div>`;
             return;
         }
@@ -262,9 +271,9 @@ function render(rows){
 
     timeContent.innerHTML=timeEntries.length
         ?timeEntries.map(t=>`<div>${t}</div>`).join("")
-        :"<div style='color:#777;'>No time-specific tasks</div>";
+        :"<div style='color:#777;'>None</div>";
 
-    status.innerText=`✔ ${count} jobs`;
+    status.innerText=`${count} jobs loaded`;
 }
 
 function applyFixes(){
