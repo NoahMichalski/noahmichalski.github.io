@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Job Formatter v3</title>
+<title>Job Formatter v3.1</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
@@ -117,7 +117,7 @@ textarea {
 <div class="container">
 <div class="card">
 
-<h1>Job Formatter v3</h1>
+<h1>Job Formatter v3.1 (AM Enabled)</h1>
 
 <div class="drop-zone" id="dropZone">
     <div id="dropText">Drag & Drop Excel File or Click to Upload</div>
@@ -148,7 +148,7 @@ const dropText = document.getElementById("dropText");
 const fileName = document.getElementById("fileName");
 const status = document.getElementById("status");
 
-// CLICK TO UPLOAD
+// CLICK
 dropZone.addEventListener("click", () => {
     document.getElementById("fileInput").click();
 });
@@ -159,20 +159,18 @@ document.getElementById("fileInput").addEventListener("change", e => {
     handleFile();
 });
 
-// DRAG OVER
+// DRAG EVENTS
 dropZone.addEventListener("dragover", e => {
     e.preventDefault();
     dropZone.classList.add("dragover");
     dropText.innerText = "Drop file here";
 });
 
-// DRAG LEAVE
 dropZone.addEventListener("dragleave", () => {
     dropZone.classList.remove("dragover");
     resetDropText();
 });
 
-// DROP
 dropZone.addEventListener("drop", e => {
     e.preventDefault();
     dropZone.classList.remove("dragover");
@@ -180,7 +178,6 @@ dropZone.addEventListener("drop", e => {
     handleFile();
 });
 
-// HANDLE FILE
 function handleFile() {
     if (!file) return;
 
@@ -191,7 +188,6 @@ function handleFile() {
     processFile();
 }
 
-// PROCESS FILE
 function processFile() {
     const reader = new FileReader();
 
@@ -209,12 +205,20 @@ function processFile() {
             let subdivision = (row[0] || "").toString().trim();
             let lot = (row[1] || "").toString().trim();
             let job = (row[2] || "").toString().trim();
+            let am = (row[3] || "").toString().trim();
 
             if (!subdivision || !lot || !job) return;
 
             if (!grouped[subdivision]) grouped[subdivision] = [];
 
-            grouped[subdivision].push(`${lot}-${job}`);
+            let entry = `${lot}-${job}`;
+
+            // ✅ AM LOGIC
+            if (am) {
+                entry = `*AM ${entry}`;
+            }
+
+            grouped[subdivision].push(entry);
             count++;
         });
 
@@ -240,7 +244,6 @@ function processFile() {
     reader.readAsArrayBuffer(file);
 }
 
-// COPY
 function copyOutput() {
     const textarea = document.getElementById("output");
     textarea.select();
@@ -248,7 +251,6 @@ function copyOutput() {
     alert("Copied!");
 }
 
-// CLEAR
 function clearAll() {
     file = null;
     document.getElementById("fileInput").value = "";
@@ -257,6 +259,10 @@ function clearAll() {
     fileName.innerText = "";
     status.innerText = "";
     dropText.innerText = "Drag & Drop Excel File or Click to Upload";
+}
+
+function resetDropText() {
+    dropText.innerText = file ? "File ready" : "Drag & Drop Excel File or Click to Upload";
 }
 </script>
 
