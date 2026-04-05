@@ -15,7 +15,7 @@ body {
 
 /* HEADER */
 .header {
-  padding: 15px;
+  padding: 12px;
   background: #111;
   position: sticky;
   top: 0;
@@ -23,50 +23,46 @@ body {
   border-bottom: 1px solid #222;
 }
 
-/* BUILDER UPDATE BAR */
-#builderUpdates {
-  padding: 8px 15px;
-  background: #0d0d0d;
-  border-bottom: 1px solid #222;
-  font-size: 0.85rem;
-}
-
-.builder-pill {
-  margin-right: 12px;
-  color: #aaa;
-}
-
 /* FILTERS */
 .filters {
   display: grid;
-  grid-template-columns: 120px auto 1fr 180px 180px auto auto auto;
-  gap: 10px;
+  grid-template-columns: 100px auto 1fr 140px 140px auto auto;
+  gap: 8px;
 }
 
 .filters input {
-  padding: 10px;
-  border-radius: 8px;
+  padding: 8px;
+  border-radius: 6px;
   border: none;
   background: #1e1e1e;
   color: #fff;
 }
 
-/* BUTTONS */
 .btn {
   background: #222;
   border: none;
   color: #fff;
-  border-radius: 8px;
-  padding: 10px;
+  border-radius: 6px;
+  padding: 8px;
   cursor: pointer;
 }
 
-.btn:hover { background: #333; }
+/* BUILDER BAR */
+#builderUpdates {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-bottom: 1px solid #222;
+}
+
+.builder-pill {
+  margin-right: 10px;
+  color: #aaa;
+}
 
 /* TABLE */
 .table-container {
-  height: calc(100vh - 160px);
-  overflow-y: auto;
+  height: calc(100vh - 150px);
+  overflow: auto;
 }
 
 table {
@@ -74,33 +70,56 @@ table {
   border-collapse: collapse;
 }
 
-thead th {
-  position: sticky;
-  top: 0;
-  background: #1a1a1a;
-  z-index: 5;
-  cursor: pointer;
-}
-
 th, td {
-  padding: 12px;
+  padding: 8px;
   border-bottom: 1px solid #222;
+  text-align: center;
 }
 
-tr:hover { background: #1c1c1c; }
+th {
+  cursor: pointer;
+  background: #1a1a1a;
+}
 
-.sort-indicator { margin-left: 5px; }
+/* MOBILE MODE */
+@media (max-width: 700px) {
 
-/* MODAL */
-#newLotsModal {
-  display:none;
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,0.7);
-  z-index:100;
-  justify-content:center;
-  align-items:center;
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead { display: none; }
+
+  tr {
+    background: #141414;
+    margin: 10px;
+    border-radius: 8px;
+    padding: 10px;
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+  }
+
+  td::before {
+    font-weight: 600;
+    color: #888;
+  }
+
+  td:nth-child(1)::before { content: "Lot"; }
+  td:nth-child(2)::before { content: "Subdivision"; }
+  td:nth-child(3)::before { content: "Builder"; }
+  td:nth-child(4)::before { content: "Address"; }
+  td:nth-child(5)::before { content: "Floorplan"; }
+  td:nth-child(6)::before { content: "Updated"; }
+
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .btn { width: 100%; }
 }
 </style>
 </head>
@@ -108,7 +127,7 @@ tr:hover { background: #1c1c1c; }
 <body>
 
 <div class="header">
-  <h1>Lot Lookup</h1>
+  <h3>Lot Lookup</h3>
 
   <div class="filters">
     <input id="filterLot" placeholder="Lot">
@@ -118,7 +137,6 @@ tr:hover { background: #1c1c1c; }
     <input id="filterBuilder" placeholder="Builder">
     <input id="filterFloorplan" placeholder="Floorplan">
 
-    <button class="btn" onclick="showNewLots()">🆕</button>
     <button class="btn" onclick="refreshData()">🔄</button>
     <button class="btn" onclick="clearFilters()">Clear</button>
   </div>
@@ -129,15 +147,6 @@ tr:hover { background: #1c1c1c; }
   <span id="builderUpdateList"></span>
 </div>
 
-<!-- MODAL -->
-<div id="newLotsModal">
-  <div style="background:#111;padding:20px;border-radius:10px;width:90%;max-width:500px;">
-    <h3>New Lots This Week</h3>
-    <div id="newLotsList"></div>
-    <button class="btn" onclick="closeNewLots()">Close</button>
-  </div>
-</div>
-
 <div class="table-container">
 <table>
 <thead>
@@ -145,9 +154,9 @@ tr:hover { background: #1c1c1c; }
 <th onclick="sortTable('lotNumber')">Lot</th>
 <th onclick="sortTable('subdivision')">Subdivision</th>
 <th onclick="sortTable('builder')">Builder</th>
-<th>Address</th>
+<th onclick="sortTable('address')">Address</th>
 <th onclick="sortTable('floorplan')">Floorplan</th>
-<th>Updated</th>
+<th onclick="sortTable('lastUpdated')">Updated</th>
 </tr>
 </thead>
 <tbody id="resultsTable"></tbody>
@@ -160,7 +169,7 @@ let currentSort = { key: null, asc: true };
 
 function loadData() {
   fetch('lots(1).json?t=' + Date.now())
-    .then(res => res.json())
+    .then(r => r.json())
     .then(data => {
       lots = data;
       buildBuilderUpdates();
@@ -169,110 +178,75 @@ function loadData() {
 }
 loadData();
 
-function refreshData() { loadData(); }
-
-/* DAYS AGO FUNCTION */
-function daysAgo(dateStr) {
-  if (!dateStr) return '';
-
-  const [y,m,d] = dateStr.split('-');
-  const date = new Date(y, m-1, d);
-  const diff = Math.floor((Date.now() - date.getTime()) / 86400000);
-
+/* DAYS AGO */
+function daysAgo(d) {
+  const date = new Date(d);
+  const diff = Math.floor((Date.now()-date)/86400000);
   if (diff === 0) return 'Today';
-  if (diff === 1) return '1 day ago';
-  return diff + ' days ago';
+  if (diff === 1) return '1d ago';
+  return diff + 'd ago';
 }
 
-/* BUILDER UPDATES */
+/* BUILDER BAR */
 function buildBuilderUpdates() {
   const latest = {};
 
   lots.forEach(l => {
-    if (!l.lastUpdated) return;
-
-    const [y,m,d] = l.lastUpdated.split('-');
-    const date = new Date(y, m-1, d);
-
-    if (!latest[l.builder] || date > latest[l.builder]) {
-      latest[l.builder] = date;
+    if (!latest[l.builder] || new Date(l.lastUpdated) > new Date(latest[l.builder])) {
+      latest[l.builder] = l.lastUpdated;
     }
   });
 
   builderUpdateList.innerHTML = '';
 
-  Object.entries(latest).forEach(([builder, date]) => {
-    const diff = Math.floor((Date.now() - date.getTime()) / 86400000);
-
+  Object.entries(latest).forEach(([b,d])=>{
+    const diff = Math.floor((Date.now()-new Date(d))/86400000);
     const span = document.createElement('span');
     span.className = 'builder-pill';
-    span.textContent = `${builder} – ${diff === 0 ? 'Today' : diff + 'd ago'}`;
-
+    span.textContent = `${b} – ${diff}d`;
     if (diff > 30) span.style.color = '#ff6b6b';
-
     builderUpdateList.appendChild(span);
   });
 }
 
-/* SMART SORT */
-function smartLotSort(a,b){
-  const parse=x=>{
-    const m=x.toString().match(/^(\d+)([A-Za-z]*)$/);
-    return {num:m?parseInt(m[1]):0,suffix:m?m[2]:''};
-  };
-  const A=parse(a.lotNumber),B=parse(b.lotNumber);
-  return A.num!==B.num?A.num-B.num:A.suffix.localeCompare(B.suffix);
-}
-
 /* FILTER */
-function filterLots(){
-  const lotVal=filterLot.value.toLowerCase();
-  const subVal=filterSubdivision.value.toLowerCase();
-  const builderVal=filterBuilder.value.toLowerCase();
-  const floorVal=filterFloorplan.value.toLowerCase();
-
-  let filtered=lots.filter(l=>
-    (!lotVal||l.lotNumber.toLowerCase().includes(lotVal)) &&
-    (!subVal||l.subdivision.toLowerCase().includes(subVal)) &&
-    (!builderVal||l.builder.toLowerCase().includes(builderVal)) &&
-    (!floorVal||(l.floorplan||'').toLowerCase().includes(floorVal))
+function filterLots() {
+  let filtered = lots.filter(l =>
+    (!filterLot.value || l.lotNumber.includes(filterLot.value)) &&
+    (!filterSubdivision.value || l.subdivision.toLowerCase().includes(filterSubdivision.value.toLowerCase())) &&
+    (!filterBuilder.value || l.builder.toLowerCase().includes(filterBuilder.value.toLowerCase())) &&
+    (!filterFloorplan.value || (l.floorplan||'').toLowerCase().includes(filterFloorplan.value.toLowerCase()))
   );
 
-  if(subVal&&!currentSort.key) filtered.sort(smartLotSort);
-  else if(currentSort.key) filtered=sortData(filtered,currentSort.key,currentSort.asc);
+  if (currentSort.key) {
+    filtered.sort((a,b)=>{
+      let A = a[currentSort.key] || '';
+      let B = b[currentSort.key] || '';
+      return currentSort.asc ? A.localeCompare(B) : B.localeCompare(A);
+    });
+  }
 
   renderTable(filtered);
 }
 
-/* EXACT LOT */
+document.querySelectorAll('.filters input')
+  .forEach(i=>i.addEventListener('input', filterLots));
+
+/* ENTER SEARCH */
+filterLot.addEventListener('keydown', e=>{
+  if(e.key==='Enter') exactLotSearch();
+});
+
+/* EXACT */
 function exactLotSearch(){
-  const v=filterLot.value.trim().toLowerCase();
-  if(!v)return;
-  renderTable(lots.filter(l=>l.lotNumber.toLowerCase()===v));
+  renderTable(lots.filter(l=>l.lotNumber===filterLot.value));
 }
 
-/* NEW LOTS MODAL */
-function showNewLots(){
-  const week=new Date(Date.now()-7*86400000);
-  const newLots=lots.filter(l=>l.lastUpdated && new Date(l.lastUpdated)>=week);
-
-  newLotsList.innerHTML='';
-
-  newLots.forEach(l=>{
-    const d=document.createElement('div');
-    d.style.padding='8px';
-    d.innerHTML=`<strong>${l.lotNumber}</strong> – ${l.subdivision}`;
-    d.onclick=()=>{
-      filterLot.value=l.lotNumber;
-      filterLots();
-      closeNewLots();
-    };
-    newLotsList.appendChild(d);
-  });
-
-  newLotsModal.style.display='flex';
+/* SORT */
+function sortTable(key){
+  currentSort.key===key ? currentSort.asc=!currentSort.asc : currentSort={key,asc:true};
+  filterLots();
 }
-function closeNewLots(){ newLotsModal.style.display='none'; }
 
 /* RENDER */
 function renderTable(data){
@@ -280,40 +254,33 @@ function renderTable(data){
 
   data.forEach(l=>{
     const row=document.createElement('tr');
+
     row.innerHTML=`
       <td>${l.lotNumber}</td>
       <td>${l.subdivision}</td>
       <td>${l.builder}</td>
       <td>${l.address}</td>
-      <td>${l.floorplan||'N/A'}</td>
+      <td>${l.floorplan||''}</td>
       <td>${daysAgo(l.lastUpdated)}</td>
     `;
+
+    // 🔥 TAP → GOOGLE MAPS
+    row.addEventListener('click',()=>{
+      window.open(`https://maps.google.com/?q=${encodeURIComponent(l.address)}`);
+    });
+
     resultsTable.appendChild(row);
   });
 }
 
-/* SORT */
-function sortTable(key){
-  currentSort.key===key?currentSort.asc=!currentSort.asc:currentSort={key,asc:true};
-  filterLots();
-}
-
-function sortData(d,k,a){
-  return [...d].sort((x,y)=>{
-    let A=x[k]||'',B=y[k]||'';
-    if(!isNaN(A)&&!isNaN(B)) return a?A-B:B-A;
-    return a?A.localeCompare(B):B.localeCompare(A);
-  });
-}
+/* REFRESH */
+function refreshData(){ loadData(); }
 
 /* CLEAR */
 function clearFilters(){
-  document.querySelectorAll('.filters input').forEach(i=>i.value='');
-  currentSort={key:null,asc:true};
-  renderTable(lots);
+  document.querySelectorAll('input').forEach(i=>i.value='');
+  filterLots();
 }
-
-document.querySelectorAll('.filters input').forEach(i=>i.addEventListener('input',filterLots));
 </script>
 
 </body>
