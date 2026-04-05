@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Job Formatter v4.1</title>
+<title>Job Formatter v4.2</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
@@ -67,6 +67,20 @@ button {
 .file-info { color: #aaa; font-size: 13px; }
 .status { color: #4caf50; font-size: 13px; }
 
+/* TIME BOX */
+.time-box {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.time-box-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
 /* PREVIEW */
 .subdivision {
     background: #161616;
@@ -85,6 +99,11 @@ button {
     margin-left: 5px;
 }
 
+.job.highlight {
+    color: #ffd54f;
+    font-weight: bold;
+}
+
 /* OUTPUT */
 textarea {
     width: 100%;
@@ -101,7 +120,7 @@ textarea {
 <body>
 
 <div class="header">
-    <div>Job Formatter v4.1</div>
+    <div>Job Formatter v4.2</div>
     <div>
         <button onclick="copyOutput()">Copy</button>
         <button onclick="clearAll()">Clear</button>
@@ -116,6 +135,11 @@ textarea {
     <div id="dropText">Drop Excel File</div>
     <div class="file-info" id="fileName"></div>
     <div class="status" id="status"></div>
+</div>
+
+<div class="time-box">
+    <div class="time-box-title">⏰ Time / Priority Tasks</div>
+    <div id="timeContent"></div>
 </div>
 
 <div id="preview"></div>
@@ -162,8 +186,16 @@ function handleFile() {
 
     fileName.innerText = file.name;
     status.innerText = "Processing...";
+    setTimeout(processFile, 10);
+}
 
-    setTimeout(processFile, 10); // prevents UI freeze
+function isTimeSensitive(text) {
+    text = text.toLowerCase();
+    return (
+        text.includes("am") ||
+        text.includes("pm") ||
+        /\d{1,2}:\d{2}/.test(text)
+    );
 }
 
 function processFile() {
@@ -179,6 +211,7 @@ function processFile() {
 
             let grouped = {};
             let count = 0;
+            let timeEntries = [];
 
             rows.forEach(r => {
                 let sub = String(r[0] || "").trim();
@@ -191,9 +224,18 @@ function processFile() {
                 if (!grouped[sub]) grouped[sub] = [];
 
                 let entry = `${lot}-${job}`;
-                if (am) entry = `*${am} - ${entry}`;
+                let highlight = false;
 
-                grouped[sub].push(entry);
+                if (am) {
+                    entry = `*${am} - ${entry}`;
+                    highlight = isTimeSensitive(am);
+                }
+
+                if (highlight) {
+                    timeEntries.push(`${sub} → ${entry}`);
+                }
+
+                grouped[sub].push({ text: entry, highlight });
                 count++;
             });
 
@@ -202,12 +244,11 @@ function processFile() {
 
             for (let sub in grouped) {
                 out += `*${sub}\n`;
-
                 previewHTML += `<div class="subdivision"><h3>${sub}</h3>`;
 
-                grouped[sub].forEach(e => {
-                    out += e + "\n";
-                    previewHTML += `<div class="job">${e}</div>`;
+                grouped[sub].forEach(obj => {
+                    out += obj.text + "\n";
+                    previewHTML += `<div class="job ${obj.highlight ? "highlight" : ""}">${obj.text}</div>`;
                 });
 
                 previewHTML += `</div>`;
@@ -215,6 +256,19 @@ function processFile() {
 
             output.value = out.trim();
             preview.innerHTML = previewHTML;
+
+            // Time box
+            let timeHTML = "";
+
+            if (timeEntries.length === 0) {
+                timeHTML = "<div style='color:#777;'>No time-specific tasks</div>";
+            } else {
+                timeEntries.forEach(t => {
+                    timeHTML += `<div>${t}</div>`;
+                });
+            }
+
+            document.getElementById("timeContent").innerHTML = timeHTML;
 
             status.innerText = `✔ ${count} jobs`;
         } catch (err) {
@@ -237,6 +291,7 @@ function clearAll() {
     preview.innerHTML = "";
     fileName.innerText = "";
     status.innerText = "";
+    document.getElementById("timeContent").innerHTML = "";
 }
 </script>
 
