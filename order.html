@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Job Formatter v3.1</title>
+<title>Job Formatter v3.2</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
@@ -117,7 +117,7 @@ textarea {
 <div class="container">
 <div class="card">
 
-<h1>Job Formatter v3.1 (AM Enabled)</h1>
+<h1>Job Formatter v3.2 (AM + Dash)</h1>
 
 <div class="drop-zone" id="dropZone">
     <div id="dropText">Drag & Drop Excel File or Click to Upload</div>
@@ -148,18 +148,15 @@ const dropText = document.getElementById("dropText");
 const fileName = document.getElementById("fileName");
 const status = document.getElementById("status");
 
-// CLICK
 dropZone.addEventListener("click", () => {
     document.getElementById("fileInput").click();
 });
 
-// FILE PICK
 document.getElementById("fileInput").addEventListener("change", e => {
     file = e.target.files[0];
     handleFile();
 });
 
-// DRAG EVENTS
 dropZone.addEventListener("dragover", e => {
     e.preventDefault();
     dropZone.classList.add("dragover");
@@ -213,9 +210,9 @@ function processFile() {
 
             let entry = `${lot}-${job}`;
 
-            // ✅ AM LOGIC
+            // ✅ NEW AM FORMAT WITH DASH
             if (am) {
-                entry = `*AM ${entry}`;
+                entry = `*${am} - ${entry}`;
             }
 
             grouped[subdivision].push(entry);
