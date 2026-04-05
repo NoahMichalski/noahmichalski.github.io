@@ -1,110 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lot Lookup</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #ffffff;
-      color: #000000;
-    }
-    #searchBox {
-      width: 200px;
-      padding: 8px;
-      font-size: 1rem;
-      background-color: #ffffff;
-      color: #000000;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    #searchBtn {
-      padding: 8px 12px;
-      font-size: 1rem;
-      margin-left: 8px;
-      background-color: #ffffff;
-      color: #000000;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #searchBtn:hover {
-      background-color: #f0f0f0;
-    }
-    #result {
-      margin-top: 20px;
-    }
-    .lot-info {
-      background-color: #ffffff;
-      border: 1px solid #ccc;
-      padding: 12px;
-      border-radius: 4px;
-      margin-bottom: 12px;
-    }
-    .lot-info p {
-      margin: 4px 0;
-      color: #000000;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lot Lookup</title>
+
+<style>
+
+#versionTag {
+  position: fixed;
+  bottom: 8px;
+  right: 12px;
+  font-size: 0.75rem;
+  color: #666;
+  background: rgba(0,0,0,0.4);
+  padding: 4px 8px;
+  border-radius: 6px;
+  pointer-events: none;
+}
+  
+  
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  background: #0f0f0f;
+  color: #fff;
+}
+
+/* HEADER */
+.header {
+  padding: 12px;
+  background: #111;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid #222;
+}
+
+/* FILTERS */
+.filters {
+  display: grid;
+  grid-template-columns: 100px auto 1fr 140px 140px auto auto;
+  gap: 8px;
+}
+
+.filters input {
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  background: #1e1e1e;
+  color: #fff;
+}
+
+.btn {
+  background: #222;
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+/* BUILDER BAR */
+#builderUpdates {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-bottom: 1px solid #222;
+}
+
+.builder-pill {
+  margin-right: 10px;
+  color: #aaa;
+}
+
+/* TABLE */
+.table-container {
+  height: calc(100vh - 150px);
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 8px;
+  border-bottom: 1px solid #222;
+  text-align: center;
+}
+
+th {
+  cursor: pointer;
+  background: #1a1a1a;
+}
+
+/* MOBILE MODE */
+@media (max-width: 700px) {
+
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead { display: none; }
+
+  tr {
+    background: #141414;
+    margin: 10px;
+    border-radius: 8px;
+    padding: 10px;
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+  }
+
+  td::before {
+    font-weight: 600;
+    color: #888;
+  }
+
+  td:nth-child(1)::before { content: "Lot"; }
+  td:nth-child(2)::before { content: "Subdivision"; }
+  td:nth-child(3)::before { content: "Builder"; }
+  td:nth-child(4)::before { content: "Address"; }
+  td:nth-child(5)::before { content: "Floorplan"; }
+  td:nth-child(6)::before { content: "Updated"; }
+
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .btn { width: 100%; }
+}
+</style>
 </head>
+
 <body>
-  <h1>Lot Lookup</h1>
-  <input type="text" id="searchBox" placeholder="Enter lot number" />
-  <button id="searchBtn">Search</button>
-  <div id="result"></div>
 
-  <script>
-    let lots = [];
+   <div id="versionTag">v1.21</div>
 
-    // Fetch the datasheet (lots.json should be located in the same directory)
-    fetch('lots(1).json')
-      .then(response => response.ok ? response.json() : Promise.reject('Network response was not ok'))
-      .then(data => {
-        lots = data;
-      })
-      .catch(error => {
-        console.error('Error loading datasheet:', error);
-        document.getElementById('result').innerText = 'Failed to load datasheet.';
-      });
+<div class="header">
+  <h3>Lot Lookup</h3>
 
-    // Function to perform search
-    function performSearch() {
-      const query = document.getElementById('searchBox').value.trim();
-      const resultDiv = document.getElementById('result');
-      resultDiv.innerHTML = '';
+  <div class="filters">
+    <input id="filterLot" placeholder="Lot">
+    <button class="btn" onclick="exactLotSearch()">🎯</button>
 
-      if (!query) {
-        resultDiv.innerText = 'Please enter a lot number.';
-        return;
-      }
+    <input id="filterSubdivision" placeholder="Subdivision">
+    <input id="filterBuilder" placeholder="Builder">
+    <input id="filterFloorplan" placeholder="Floorplan">
 
-      const matched = lots.filter(lot => lot.lotNumber === query);
-      if (matched.length > 0) {
-        matched.forEach(lot => {
-          const div = document.createElement('div');
-          div.classList.add('lot-info');
-          div.innerHTML = `
-            <p><strong>Lot Number:</strong> ${lot.lotNumber}</p>
-            <p><strong>Subdivision:</strong> ${lot.subdivision}</p>
-            <p><strong>Builder:</strong> ${lot.builder}</p>
-            <p><strong>Address:</strong> ${lot.address}</p>
-            <p><strong>Floorplan:</strong> ${lot.floorplan || 'N/A'}</p>
-          `;
-          resultDiv.appendChild(div);
-        });
-      } else {
-        resultDiv.innerText = `No data found for lot "${query}".`;
-      }
-    }
+    <button class="btn" onclick="refreshData()">🔄</button>
+    <button class="btn" onclick="clearFilters()">Clear</button>
+  </div>
+</div>
 
-    // Event listeners
-    document.getElementById('searchBtn').addEventListener('click', performSearch);
-    document.getElementById('searchBox').addEventListener('keyup', e => {
-      if (e.key === 'Enter') performSearch();
+<div id="builderUpdates">
+  <strong>Last Updated:</strong>
+  <span id="builderUpdateList"></span>
+</div>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th onclick="sortTable('lotNumber')">Lot</th>
+<th onclick="sortTable('subdivision')">Subdivision</th>
+<th onclick="sortTable('builder')">Builder</th>
+<th onclick="sortTable('address')">Address</th>
+<th onclick="sortTable('floorplan')">Floorplan</th>
+<th onclick="sortTable('lastUpdated')">Updated</th>
+</tr>
+</thead>
+<tbody id="resultsTable"></tbody>
+</table>
+</div>
+
+<script>
+let lots = [];
+let currentSort = { key: null, asc: true };
+
+function loadData() {
+  fetch('lots(1).json?t=' + Date.now())
+    .then(r => r.json())
+    .then(data => {
+      lots = data;
+      buildBuilderUpdates();
+      filterLots();
     });
-  </script>
+}
+loadData();
+
+/* DAYS AGO */
+function daysAgo(d) {
+  const date = new Date(d);
+  const diff = Math.floor((Date.now()-date)/86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return '1d ago';
+  return diff + 'd ago';
+}
+
+/* BUILDER BAR */
+function buildBuilderUpdates() {
+  const latest = {};
+
+  lots.forEach(l => {
+    if (!latest[l.builder] || new Date(l.lastUpdated) > new Date(latest[l.builder])) {
+      latest[l.builder] = l.lastUpdated;
+    }
+  });
+
+  builderUpdateList.innerHTML = '';
+
+  Object.entries(latest).forEach(([b,d])=>{
+    const diff = Math.floor((Date.now()-new Date(d))/86400000);
+    const span = document.createElement('span');
+    span.className = 'builder-pill';
+    span.textContent = `${b} – ${diff}d`;
+    if (diff > 30) span.style.color = '#ff6b6b';
+    builderUpdateList.appendChild(span);
+  });
+}
+
+/* FILTER */
+function filterLots() {
+  let filtered = lots.filter(l =>
+    (!filterLot.value || l.lotNumber.includes(filterLot.value)) &&
+    (!filterSubdivision.value || l.subdivision.toLowerCase().includes(filterSubdivision.value.toLowerCase())) &&
+    (!filterBuilder.value || l.builder.toLowerCase().includes(filterBuilder.value.toLowerCase())) &&
+    (!filterFloorplan.value || (l.floorplan||'').toLowerCase().includes(filterFloorplan.value.toLowerCase()))
+  );
+
+  if (currentSort.key) {
+    filtered.sort((a,b)=>{
+      let A = a[currentSort.key] || '';
+      let B = b[currentSort.key] || '';
+      return currentSort.asc ? A.localeCompare(B) : B.localeCompare(A);
+    });
+  }
+
+  renderTable(filtered);
+}
+
+document.querySelectorAll('.filters input')
+  .forEach(i=>i.addEventListener('input', filterLots));
+
+/* ENTER SEARCH */
+filterLot.addEventListener('keydown', e=>{
+  if(e.key==='Enter') exactLotSearch();
+});
+
+/* EXACT */
+function exactLotSearch(){
+  renderTable(lots.filter(l=>l.lotNumber===filterLot.value));
+}
+
+/* SORT */
+function sortTable(key){
+  currentSort.key===key ? currentSort.asc=!currentSort.asc : currentSort={key,asc:true};
+  filterLots();
+}
+
+/* RENDER */
+function renderTable(data){
+  resultsTable.innerHTML='';
+
+  data.forEach(l=>{
+    const row=document.createElement('tr');
+
+    row.innerHTML=`
+      <td>${l.lotNumber}</td>
+      <td>${l.subdivision}</td>
+      <td>${l.builder}</td>
+      <td>${l.address}</td>
+      <td>${l.floorplan||''}</td>
+      <td>${daysAgo(l.lastUpdated)}</td>
+    `;
+
+    // 🔥 TAP → GOOGLE MAPS
+    row.addEventListener('click',()=>{
+      window.open(`https://maps.google.com/?q=${encodeURIComponent(l.address)}`);
+    });
+
+    resultsTable.appendChild(row);
+  });
+}
+
+/* REFRESH */
+function refreshData(){ loadData(); }
+
+/* CLEAR */
+function clearFilters(){
+  document.querySelectorAll('input').forEach(i=>i.value='');
+  filterLots();
+}
+</script>
+
 </body>
 </html>
