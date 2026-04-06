@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>VIP Dashboard v6</title>
+<title>VIP Dashboard v7</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -63,14 +63,14 @@ td,th { padding:8px; border-bottom:1px solid #333; }
 
 <div class="container">
 
-<h1>VIP Performance Dashboard (Normalized)</h1>
+<h1>VIP Performance Dashboard</h1>
 
 <input type="file" id="upload">
 
 <div class="grid">
 
 <div class="card">
-<h3>🏆 Crew Efficiency (vs Budget)</h3>
+<h3>🏆 Crew Efficiency</h3>
 <table id="crewTable"></table>
 </div>
 
@@ -122,7 +122,6 @@ document.getElementById('upload').onchange=e=>{
         let sheet=wb.Sheets[wb.SheetNames[0]];
         data=XLSX.utils.sheet_to_json(sheet);
 
-        // compute efficiency per job
         data.forEach(d=>{
             let b = d["Budgetted Hours"] || 0;
             d.eff = b ? d.Hours / b : null;
@@ -158,10 +157,7 @@ function renderCrew(){
     });
 
     let rows = Object.entries(map).map(([crew,vals])=>{
-        return {
-            crew,
-            eff: avg(vals)
-        };
+        return { crew, eff: avg(vals) };
     });
 
     rows.sort((a,b)=>a.eff-b.eff);
@@ -189,14 +185,20 @@ function renderFloor(){
         map[d.Floorplan].push(d);
     });
 
-    let html="<tr><th>Floorplan</th><th>Efficiency</th></tr>";
+    let html="<tr><th>Floorplan</th><th>Avg Hours</th><th>Budget</th><th>Efficiency</th></tr>";
 
     for(let f in map){
-        let eff = avg(map[f].map(j=>j.eff));
+        let jobs=map[f];
+
+        let avgH = avg(jobs.map(j=>j.Hours));
+        let avgB = avg(jobs.map(j=>j["Budgetted Hours"]||0));
+        let eff = avg(jobs.map(j=>j.eff));
 
         html+=`
         <tr class="click" onclick="openModal('${f}')">
         <td>${f}</td>
+        <td>${avgH.toFixed(1)}</td>
+        <td>${avgB.toFixed(1)}</td>
         <td class="${eff<1?'good':'bad'}">${eff.toFixed(2)}</td>
         </tr>`;
     }
@@ -214,14 +216,23 @@ function renderCharts(){
         crewMap[d.Employee].push(d.eff);
     });
 
+    let labels = Object.keys(crewMap);
+    let values = Object.values(crewMap).map(avg);
+
     new Chart(document.getElementById("crewChart"),{
         type:'bar',
         data:{
-            labels:Object.keys(crewMap),
+            labels:labels,
             datasets:[{
-                label:'Efficiency',
-                data:Object.values(crewMap).map(avg)
+                label:'Efficiency (1.0 = Budget)',
+                data:values,
+                backgroundColor: values.map(v => v < 1 ? '#4caf50' : '#ff5252')
             }]
+        },
+        options:{
+            scales:{
+                y:{ beginAtZero:true, suggestedMax:1.5 }
+            }
         }
     });
 
@@ -277,9 +288,9 @@ function openModal(floor){
         <tr>
         <td>${j.Employee}</td>
         <td>${j.Task}</td>
-        <td>${j.Hours}</td>
-        <td>${j["Budgetted Hours"]||0}</td>
-        <td class="${j.eff<1?'good':'bad'}">${j.eff?.toFixed(2)}</td>
+        <td>${j.Hours.toFixed(1)}</td>
+        <td>${(j["Budgetted Hours"]||0).toFixed(1)}</td>
+        <td class="${j.eff<1?'good':'bad'}">${j.eff.toFixed(2)}</td>
         <td class="${j.varp<0?'good':'bad'}">${j.varp.toFixed(1)}%</td>
         </tr>`;
     });
@@ -302,8 +313,8 @@ function renderOutliers(){
         if(Math.abs(d.diff)>2){
             html+=`
             <div class="${d.diff>0?'bad':'good'}">
-            ${d.Floorplan} | ${d.Employee} | ${d.Task}  
-            → ${d.Hours}h vs ${d["Budgetted Hours"]||0}h  
+            ${d.Employee} | ${d.Floorplan} | ${d.Task}  
+            → ${d.Hours.toFixed(1)}h vs ${(d["Budgetted Hours"]||0).toFixed(1)}h  
             (${d.varp.toFixed(1)}%)
             </div>`;
         }
