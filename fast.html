@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>VIP Performance Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    background: #111;
+    color: #fff;
+    margin: 0;
+    padding: 20px;
+}
+h1 { text-align: center; }
+
+.container {
+    max-width: 1400px;
+    margin: auto;
+}
+
+.card {
+    background: #1c1c1c;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 10px;
+}
+
+input {
+    margin: 10px 0;
+}
+
+select {
+    margin-right: 10px;
+    padding: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td, th {
+    padding: 8px;
+    border-bottom: 1px solid #333;
+}
+
+.highlight { color: #4caf50; }
+.bad { color: #ff5252; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>VIP Performance Dashboard</h1>
+
+<input type="file" id="upload" />
+
+<div class="card">
+    <h3>Filters</h3>
+    <select id="taskFilter"><option value="">All Tasks</option></select>
+    <select id="floorFilter"><option value="">All Floorplans</option></select>
+    <select id="crewFilter"><option value="">All Crews</option></select>
+</div>
+
+<div class="card">
+    <h3>Average by Floorplan + Task</h3>
+    <table id="avgTable"></table>
+</div>
+
+<div class="card">
+    <h3>Crew Efficiency</h3>
+    <table id="crewTable"></table>
+</div>
+
+<div class="card">
+    <h3>Outliers / Extremes</h3>
+    <div id="outliers"></div>
+</div>
+
+</div>
+
+<script>
+
+let data = [];
+
+document.getElementById('upload').addEventListener('change', handleFile);
+
+function handleFile(e) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(evt) {
+        const workbook = XLSX.read(evt.target.result, { type: 'binary' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        data = XLSX.utils.sheet_to_json(sheet);
+        init();
+    };
+
+    reader.readAsBinaryString(file);
+}
+
+function init() {
+    populateFilters();
+    render();
+}
+
+function populateFilters() {
+    let tasks = [...new Set(data.map(d => d.Task))];
+    let floors = [...new Set(data.map(d => d.Floorplan))];
+    let crews = [...new Set(data.map(d => d.Employee))];
+
+    fillSelect('taskFilter', tasks);
+    fillSelect('floorFilter', floors);
+    fillSelect('crewFilter', crews);
+}
+
+function fillSelect(id, values) {
+    let select = document.getElementById(id);
+    select.innerHTML = '<option value="">All</option>';
+    values.forEach(v => {
+        select.innerHTML += `<option value="${v}">${v}</option>`;
+    });
+}
+
+document.querySelectorAll('select').forEach(s => {
+    s.addEventListener('change', render);
+});
+
+function filterData() {
+    let task = document.getElementById('taskFilter').value;
+    let floor = document.getElementById('floorFilter').value;
+    let crew = document.getElementById('crewFilter').value;
+
+    return data.filter(d =>
+        (!task || d.Task === task) &&
+        (!floor || d.Floorplan === floor) &&
+        (!crew || d.Employee === crew)
+    );
+}
+
+function render() {
+    let filtered = filterData();
+    renderAverages(filtered);
+    renderCrew(filtered);
+    renderOutliers(filtered);
+}
+
+function renderAverages(data) {
+    let map = {};
+
+    data.forEach(d => {
+        let key = d.Floorplan + "|" + d.Task;
+        if (!map[key]) map[key] = [];
+        map[key].push(d.Hours);
+    });
+
+    let html = "<tr><th>Floorplan</th><th>Task</th><th>Avg Hours</th></tr>";
+
+    for (let key in map) {
+        let [floor, task] = key.split("|");
+        let avg = avgCalc(map[key]);
+        html += `<tr><td>${floor}</td><td>${task}</td><td>${avg.toFixed(2)}</td></tr>`;
+    }
+
+    document.getElementById('avgTable').innerHTML = html;
+}
+
+function renderCrew(data) {
+    let map = {};
+
+    data.forEach(d => {
+        if (!map[d.Employee]) map[d.Employee] = [];
+        map[d.Employee].push(d.Hours);
+    });
+
+    let html = "<tr><th>Crew</th><th>Avg Hours</th></tr>";
+
+    for (let crew in map) {
+        let avg = avgCalc(map[crew]);
+        html += `<tr><td>${crew}</td><td>${avg.toFixed(2)}</td></tr>`;
+    }
+
+    document.getElementById('crewTable').innerHTML = html;
+}
+
+function renderOutliers(data) {
+    let hours = data.map(d => d.Hours);
+    let avg = avgCalc(hours);
+    let std = stdDev(hours);
+
+    let high = data.filter(d => d.Hours > avg + 2 * std);
+    let low = data.filter(d => d.Hours < avg - 2 * std);
+
+    let html = `<p>Average: ${avg.toFixed(2)} hrs</p>`;
+
+    html += "<h4>Longest Jobs</h4>";
+    html += data.sort((a,b)=>b.Hours-a.Hours).slice(0,5)
+        .map(d => `<div class="bad">${d.Employee} - ${d.Hours} hrs (${d.Task})</div>`).join("");
+
+    html += "<h4>Shortest Jobs</h4>";
+    html += data.sort((a,b)=>a.Hours-b.Hours).slice(0,5)
+        .map(d => `<div class="highlight">${d.Employee} - ${d.Hours} hrs (${d.Task})</div>`).join("");
+
+    html += "<h4>Outliers (High)</h4>";
+    html += high.map(d => `<div>${d.Employee} - ${d.Hours}</div>`).join("");
+
+    html += "<h4>Outliers (Low)</h4>";
+    html += low.map(d => `<div>${d.Employee} - ${d.Hours}</div>`).join("");
+
+    document.getElementById('outliers').innerHTML = html;
+}
+
+function avgCalc(arr) {
+    return arr.reduce((a,b)=>a+b,0)/arr.length;
+}
+
+function stdDev(arr) {
+    let avg = avgCalc(arr);
+    return Math.sqrt(arr.map(x => (x-avg)**2).reduce((a,b)=>a+b)/arr.length);
+}
+
+</script>
+
+</body>
+</html>
