@@ -2,9 +2,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>VIP Dashboard v4</title>
+<title>VIP Dashboard v5</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
@@ -14,7 +15,7 @@ body {
     padding:20px;
 }
 
-.container { max-width:1400px; margin:auto; }
+.container { max-width:1500px; margin:auto; }
 
 .card {
     background:#181818;
@@ -26,9 +27,15 @@ body {
 table { width:100%; border-collapse:collapse; }
 td,th { padding:8px; border-bottom:1px solid #333; }
 
-.click { cursor:pointer; }
 .good { color:#4caf50; }
 .bad { color:#ff5252; }
+.click { cursor:pointer; }
+
+.grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
 
 /* MODAL */
 .modal {
@@ -49,11 +56,6 @@ td,th { padding:8px; border-bottom:1px solid #333; }
     padding:20px;
     border-radius:10px;
 }
-
-.controls select {
-    margin-right:10px;
-    padding:5px;
-}
 </style>
 </head>
 
@@ -61,17 +63,41 @@ td,th { padding:8px; border-bottom:1px solid #333; }
 
 <div class="container">
 
-<h1>VIP Performance Intelligence</h1>
+<h1>VIP Performance Dashboard</h1>
 
 <input type="file" id="upload">
 
+<div class="grid">
+
 <div class="card">
-<h3>Floorplans</h3>
+<h3>🏆 Crew Efficiency</h3>
+<table id="crewTable"></table>
+</div>
+
+<div class="card">
+<h3>📊 Floorplans</h3>
 <table id="floorTable"></table>
 </div>
 
 <div class="card">
-<h3>Outliers</h3>
+<h3>📈 Crew Efficiency Chart</h3>
+<canvas id="crewChart"></canvas>
+</div>
+
+<div class="card">
+<h3>📊 Task Averages</h3>
+<canvas id="taskChart"></canvas>
+</div>
+
+<div class="card">
+<h3>📅 Trend Over Time</h3>
+<canvas id="trendChart"></canvas>
+</div>
+
+</div>
+
+<div class="card">
+<h3>🚨 Outliers</h3>
 <div id="outliers"></div>
 </div>
 
@@ -80,33 +106,14 @@ td,th { padding:8px; border-bottom:1px solid #333; }
 <!-- MODAL -->
 <div class="modal" id="modal">
 <div class="modal-box">
-
-<div style="display:flex;justify-content:space-between;">
-<h2 id="modalTitle"></h2>
 <span onclick="closeModal()" style="cursor:pointer;">✖</span>
-</div>
-
-<div class="controls">
-<select id="taskFilter" onchange="renderModal()">
-<option value="">All Tasks</option>
-</select>
-
-<select id="sortFilter" onchange="renderModal()">
-<option value="worst">Worst First</option>
-<option value="best">Best First</option>
-<option value="hours">Hours High → Low</option>
-</select>
-</div>
-
-<div id="modalStats"></div>
-<div id="modalTable"></div>
-
+<div id="modalContent"></div>
 </div>
 </div>
 
 <script>
 
-let data=[], currentFloor="";
+let data=[];
 
 document.getElementById('upload').onchange=e=>{
     let r=new FileReader();
@@ -122,7 +129,50 @@ document.getElementById('upload').onchange=e=>{
 function avg(a){return a.reduce((x,y)=>x+y,0)/a.length;}
 
 function render(){
+    renderCrew();
+    renderFloor();
+    renderCharts();
+    renderOutliers();
+}
 
+function renderCrew(){
+    let map={};
+
+    data.forEach(d=>{
+        if(!map[d.Employee]) map[d.Employee]=[];
+        map[d.Employee].push(d);
+    });
+
+    let global=avg(data.map(d=>d.Hours));
+
+    let rows=Object.entries(map).map(([crew,jobs])=>{
+        let avgH=avg(jobs.map(j=>j.Hours));
+        let avgB=avg(jobs.map(j=>j["Budgetted Hours"]||0));
+        let eff=avgH/global;
+        let varp=((avgH-avgB)/avgB)*100;
+
+        return {crew,avgH,avgB,eff,varp};
+    });
+
+    rows.sort((a,b)=>a.eff-b.eff);
+
+    let html="<tr><th>#</th><th>Crew</th><th>Avg</th><th>Budget</th><th>%</th><th>Eff</th></tr>";
+
+    rows.forEach((r,i)=>{
+        html+=`<tr>
+        <td>${i+1}</td>
+        <td>${r.crew}</td>
+        <td>${r.avgH.toFixed(2)}</td>
+        <td>${r.avgB.toFixed(2)}</td>
+        <td class="${r.varp<0?'good':'bad'}">${r.varp.toFixed(1)}%</td>
+        <td class="${r.eff<1?'good':'bad'}">${r.eff.toFixed(2)}</td>
+        </tr>`;
+    });
+
+    document.getElementById("crewTable").innerHTML=html;
+}
+
+function renderFloor(){
     let map={};
 
     data.forEach(d=>{
@@ -142,78 +192,86 @@ function render(){
     }
 
     document.getElementById("floorTable").innerHTML=html;
+}
 
-    renderOutliers();
+function renderCharts(){
+
+    // crew chart
+    let crewMap={};
+    data.forEach(d=>{
+        if(!crewMap[d.Employee]) crewMap[d.Employee]=[];
+        crewMap[d.Employee].push(d.Hours);
+    });
+
+    new Chart(document.getElementById("crewChart"),{
+        type:'bar',
+        data:{
+            labels:Object.keys(crewMap),
+            datasets:[{
+                label:'Avg Hours',
+                data:Object.values(crewMap).map(avg)
+            }]
+        }
+    });
+
+    // task chart
+    let taskMap={};
+    data.forEach(d=>{
+        if(!taskMap[d.Task]) taskMap[d.Task]=[];
+        taskMap[d.Task].push(d.Hours);
+    });
+
+    new Chart(document.getElementById("taskChart"),{
+        type:'bar',
+        data:{
+            labels:Object.keys(taskMap),
+            datasets:[{
+                label:'Avg Hours',
+                data:Object.values(taskMap).map(avg)
+            }]
+        }
+    });
+
+    // trend chart
+    let dates=[...new Set(data.map(d=>d.Date))].sort();
+
+    let trend=dates.map(dt=>{
+        let day=data.filter(d=>d.Date===dt);
+        return avg(day.map(d=>d.Hours));
+    });
+
+    new Chart(document.getElementById("trendChart"),{
+        type:'line',
+        data:{
+            labels:dates,
+            datasets:[{label:'Avg Hours',data:trend}]
+        }
+    });
 }
 
 function openModal(floor){
-    currentFloor=floor;
+    let jobs=data.filter(d=>d.Floorplan===floor);
 
-    let tasks=[...new Set(data.map(d=>d.Task))];
-    let sel=document.getElementById("taskFilter");
-    sel.innerHTML='<option value="">All Tasks</option>';
-    tasks.forEach(t=> sel.innerHTML+=`<option>${t}</option>`);
-
-    document.getElementById("modal").style.display="flex";
-    renderModal();
-}
-
-function renderModal(){
-
-    let jobs=data.filter(d=>d.Floorplan===currentFloor);
-
-    let task=document.getElementById("taskFilter").value;
-    if(task) jobs=jobs.filter(j=>j.Task===task);
+    let html=`<h2>${floor}</h2><table>
+    <tr><th>Crew</th><th>Task</th><th>Hours</th><th>Budget</th><th>%</th></tr>`;
 
     jobs.forEach(j=>{
-        j.diff=j.Hours-(j["Budgetted Hours"]||0);
-        j.varp=(j.diff/(j["Budgetted Hours"]||1))*100;
-    });
+        let diff=j.Hours-(j["Budgetted Hours"]||0);
+        let pct=(diff/(j["Budgetted Hours"]||1))*100;
 
-    let sort=document.getElementById("sortFilter").value;
-
-    if(sort==="worst") jobs.sort((a,b)=>b.diff-a.diff);
-    if(sort==="best") jobs.sort((a,b)=>a.diff-b.diff);
-    if(sort==="hours") jobs.sort((a,b)=>b.Hours-a.Hours);
-
-    // stats
-    let crews={};
-    jobs.forEach(j=>{
-        if(!crews[j.Employee]) crews[j.Employee]=[];
-        crews[j.Employee].push(j.Hours);
-    });
-
-    let best=Object.entries(crews).sort((a,b)=>avg(a[1])-avg(b[1]))[0];
-    let worst=Object.entries(crews).sort((a,b)=>avg(b[1])-avg(a[1]))[0];
-
-    let avgH=avg(jobs.map(j=>j.Hours));
-    let avgB=avg(jobs.map(j=>j["Budgetted Hours"]||0));
-
-    document.getElementById("modalStats").innerHTML=`
-    <p>🏆 Best Crew: ${best[0]}</p>
-    <p>⚠️ Worst Crew: ${worst[0]}</p>
-    <p>Avg: ${avgH.toFixed(2)} | Budget: ${avgB.toFixed(2)}</p>
-    <p>Variance: ${(((avgH-avgB)/avgB)*100).toFixed(1)}%</p>
-    `;
-
-    // table
-    let html="<table><tr><th>Crew</th><th>Task</th><th>Hours</th><th>Budget</th><th>Diff</th><th>%</th></tr>";
-
-    jobs.forEach(j=>{
         html+=`<tr>
         <td>${j.Employee}</td>
         <td>${j.Task}</td>
         <td>${j.Hours}</td>
         <td>${j["Budgetted Hours"]||0}</td>
-        <td class="${j.diff>0?'bad':'good'}">${j.diff.toFixed(2)}</td>
-        <td class="${j.varp>0?'bad':'good'}">${j.varp.toFixed(1)}%</td>
+        <td class="${pct<0?'good':'bad'}">${pct.toFixed(1)}%</td>
         </tr>`;
     });
 
     html+="</table>";
 
-    document.getElementById("modalTable").innerHTML=html;
-    document.getElementById("modalTitle").innerText=currentFloor;
+    document.getElementById("modalContent").innerHTML=html;
+    document.getElementById("modal").style.display="flex";
 }
 
 function closeModal(){
@@ -221,7 +279,6 @@ function closeModal(){
 }
 
 function renderOutliers(){
-
     let html="";
 
     data.forEach(d=>{
@@ -229,11 +286,10 @@ function renderOutliers(){
         let pct=(diff/(d["Budgetted Hours"]||1))*100;
 
         if(Math.abs(diff)>2){
-            html+=`
-            <div class="${diff>0?'bad':'good'}">
-            ${d.Floorplan} | ${d.Employee} | ${d.Task}  
-            → ${d.Hours}h (Budget ${d["Budgetted Hours"]||0})  
-            Diff: ${diff.toFixed(2)} (${pct.toFixed(1)}%)
+            html+=`<div class="${pct>0?'bad':'good'}">
+            ${d.Employee} | ${d.Floorplan} | ${d.Task}  
+            → ${d.Hours}h vs ${d["Budgetted Hours"]||0}h  
+            (${pct.toFixed(1)}%)
             </div>`;
         }
     });
