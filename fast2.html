@@ -2,43 +2,55 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>VIP Advanced Dashboard</title>
+<title>VIP Dashboard v2</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
-    font-family: Arial;
-    background: #0f0f0f;
-    color: #fff;
-    margin: 0;
-    padding: 20px;
+    background:#0e0e0e;
+    color:#fff;
+    font-family:system-ui;
+    margin:0;
+    padding:20px;
 }
-h1 { text-align: center; }
 
-.container { max-width: 1500px; margin: auto; }
+h1 { text-align:center; margin-bottom:20px; }
+
+.container { max-width:1400px; margin:auto; }
+
+.grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
 
 .card {
-    background: #1b1b1b;
-    padding: 15px;
-    margin: 15px 0;
-    border-radius: 10px;
+    background:#181818;
+    border-radius:12px;
+    padding:15px;
+    box-shadow:0 0 10px rgba(0,0,0,.4);
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
-}
-td, th {
-    padding: 8px;
-    border-bottom: 1px solid #333;
+    width:100%;
+    border-collapse:collapse;
 }
 
-.good { color: #4caf50; }
-.bad { color: #ff5252; }
-.clickable { cursor: pointer; text-decoration: underline; }
+td,th {
+    padding:8px;
+    border-bottom:1px solid #333;
+}
 
+.click { cursor:pointer; }
+.good { color:#4caf50; }
+.bad { color:#ff5252; }
+
+input {
+    padding:6px;
+    margin-right:10px;
+}
 </style>
 </head>
 
@@ -46,177 +58,194 @@ td, th {
 
 <div class="container">
 
-<h1>VIP Performance Intelligence Dashboard</h1>
+<h1>VIP Operations Dashboard</h1>
 
 <input type="file" id="upload">
+<input type="date" id="startDate">
+<input type="date" id="endDate">
+
+<div class="grid">
 
 <div class="card">
-<h3>Crew Performance (Click to Drill Down)</h3>
+<h3>🏆 Crew Rankings</h3>
 <table id="crewTable"></table>
 </div>
 
 <div class="card">
-<h3>Floorplan + Task Averages</h3>
-<table id="avgTable"></table>
+<h3>📊 Floorplan Performance</h3>
+<table id="floorTable"></table>
 </div>
 
 <div class="card">
-<h3>Predicted Times</h3>
-<div id="predictions"></div>
+<h3>📈 Task Averages</h3>
+<canvas id="taskChart"></canvas>
 </div>
 
 <div class="card">
-<h3>Outliers</h3>
-<div id="outliers"></div>
+<h3>📅 Trend Over Time</h3>
+<canvas id="trendChart"></canvas>
+</div>
+
 </div>
 
 <div class="card">
-<h3>Crew Drilldown</h3>
-<div id="drilldown">Click a crew to view details</div>
+<h3>🔎 Floorplan Drilldown</h3>
+<div id="drill"></div>
 </div>
 
 </div>
 
 <script>
 
-let data = [];
-let globalAvg = 0;
+let raw=[],data=[];
 
-document.getElementById('upload').addEventListener('change', e => {
-    let reader = new FileReader();
-    reader.onload = evt => {
-        let wb = XLSX.read(evt.target.result, {type:'binary'});
-        let sheet = wb.Sheets[wb.SheetNames[0]];
-        data = XLSX.utils.sheet_to_json(sheet);
-        init();
+document.getElementById('upload').onchange=e=>{
+    let r=new FileReader();
+    r.onload=evt=>{
+        let wb=XLSX.read(evt.target.result,{type:'binary'});
+        let sheet=wb.Sheets[wb.SheetNames[0]];
+        raw=XLSX.utils.sheet_to_json(sheet);
+        data=raw;
+        render();
     };
-    reader.readAsBinaryString(e.target.files[0]);
-});
+    r.readAsBinaryString(e.target.files[0]);
+};
 
-function init(){
-    globalAvg = avg(data.map(d => d.Hours));
-    renderAll();
-}
+document.getElementById('startDate').onchange=applyFilter;
+document.getElementById('endDate').onchange=applyFilter;
 
-function renderAll(){
-    renderCrew();
-    renderAverages();
-    renderOutliers();
-    renderPredictions();
-}
+function applyFilter(){
+    let s=document.getElementById('startDate').value;
+    let e=document.getElementById('endDate').value;
 
-function renderCrew(){
-    let map = {};
-
-    data.forEach(d=>{
-        if(!map[d.Employee]) map[d.Employee] = [];
-        map[d.Employee].push(d);
+    data=raw.filter(d=>{
+        let dt=new Date(d.Date);
+        return (!s||dt>=new Date(s)) && (!e||dt<=new Date(e));
     });
 
-    let html = "<tr><th>Crew</th><th>Avg Hours</th><th>Efficiency</th><th>Budget Diff</th></tr>";
+    render();
+}
 
-    for(let crew in map){
-        let jobs = map[crew];
-        let avgH = avg(jobs.map(j=>j.Hours));
-        let eff = avgH / globalAvg;
+function render(){
+    renderCrew();
+    renderFloorplans();
+    renderCharts();
+}
 
-        let budgetDiff = jobs.reduce((sum,j)=>sum+(j.Hours - j["Budgetted Hours"]||0),0);
+function avg(a){return a.reduce((x,y)=>x+y,0)/a.length;}
 
-        html += `
-        <tr>
-            <td class="clickable" onclick="drill('${crew}')">${crew}</td>
-            <td>${avgH.toFixed(2)}</td>
-            <td class="${eff<1?'good':'bad'}">${eff.toFixed(2)}</td>
-            <td>${budgetDiff.toFixed(2)}</td>
+function renderCrew(){
+    let map={};
+
+    data.forEach(d=>{
+        if(!map[d.Employee]) map[d.Employee]=[];
+        map[d.Employee].push(d.Hours);
+    });
+
+    let global=avg(data.map(d=>d.Hours));
+
+    let rows=Object.entries(map).map(([k,v])=>{
+        let a=avg(v);
+        return {crew:k,avg:a,eff:a/global};
+    });
+
+    rows.sort((a,b)=>a.eff-b.eff);
+
+    let html="<tr><th>#</th><th>Crew</th><th>Avg</th><th>Eff</th></tr>";
+
+    rows.forEach((r,i)=>{
+        html+=`<tr>
+        <td>${i+1}</td>
+        <td>${r.crew}</td>
+        <td>${r.avg.toFixed(2)}</td>
+        <td class="${r.eff<1?'good':'bad'}">${r.eff.toFixed(2)}</td>
+        </tr>`;
+    });
+
+    document.getElementById("crewTable").innerHTML=html;
+}
+
+function renderFloorplans(){
+    let map={};
+
+    data.forEach(d=>{
+        let key=d.Floorplan;
+        if(!map[key]) map[key]=[];
+        map[key].push(d);
+    });
+
+    let html="<tr><th>Floorplan</th><th>Avg</th><th>Budget</th><th>Variance</th></tr>";
+
+    for(let f in map){
+        let jobs=map[f];
+        let avgH=avg(jobs.map(j=>j.Hours));
+        let avgB=avg(jobs.map(j=>j["Budgetted Hours"]||0));
+        let varr=((avgH-avgB)/avgB)*100;
+
+        html+=`<tr class="click" onclick="drill('${f}')">
+        <td>${f}</td>
+        <td>${avgH.toFixed(2)}</td>
+        <td>${avgB.toFixed(2)}</td>
+        <td class="${varr<0?'good':'bad'}">${varr.toFixed(1)}%</td>
         </tr>`;
     }
 
-    document.getElementById("crewTable").innerHTML = html;
+    document.getElementById("floorTable").innerHTML=html;
 }
 
-function renderAverages(){
-    let map = {};
+function drill(floor){
+    let jobs=data.filter(d=>d.Floorplan===floor);
 
-    data.forEach(d=>{
-        let key = d.Floorplan+"|"+d.Task;
-        if(!map[key]) map[key]=[];
-        map[key].push(d.Hours);
-    });
+    let html=`<h3>${floor}</h3>`;
 
-    let html="<tr><th>Floorplan</th><th>Task</th><th>Avg Hours</th></tr>";
-
-    for(let key in map){
-        let [f,t]=key.split("|");
-        html+=`<tr><td>${f}</td><td>${t}</td><td>${avg(map[key]).toFixed(2)}</td></tr>`;
-    }
-
-    document.getElementById("avgTable").innerHTML=html;
-}
-
-function renderPredictions(){
-    let map = {};
-
-    data.forEach(d=>{
-        let key = d.Floorplan+"|"+d.Task;
-        if(!map[key]) map[key]=[];
-        map[key].push(d.Hours);
-    });
-
-    let html="";
-
-    for(let key in map){
-        let [f,t]=key.split("|");
-        let val=avg(map[key]);
-        html+=`<div>${f} (${t}) → ${val.toFixed(2)} hrs</div>`;
-    }
-
-    document.getElementById("predictions").innerHTML=html;
-}
-
-function renderOutliers(){
-    let hours=data.map(d=>d.Hours);
-    let mean=avg(hours);
-    let sd=std(hours);
-
-    let high=data.filter(d=>d.Hours>mean+2*sd);
-    let low=data.filter(d=>d.Hours<mean-2*sd);
-
-    let html="<h4>Slow Jobs</h4>";
-    html+=high.map(d=>`<div class="bad">${d.Employee} - ${d.Hours}</div>`).join("");
-
-    html+="<h4>Fast Jobs</h4>";
-    html+=low.map(d=>`<div class="good">${d.Employee} - ${d.Hours}</div>`).join("");
-
-    document.getElementById("outliers").innerHTML=html;
-}
-
-function drill(crew){
-    let jobs=data.filter(d=>d.Employee===crew);
-
-    let html=`<h3>${crew}</h3>`;
-    html+=`<p>Avg: ${avg(jobs.map(j=>j.Hours)).toFixed(2)}</p>`;
-
-    html+="<table><tr><th>Date</th><th>Floor</th><th>Task</th><th>Hours</th></tr>";
+    html+="<table><tr><th>Crew</th><th>Task</th><th>Hours</th><th>Budget</th></tr>";
 
     jobs.forEach(j=>{
         html+=`<tr>
-            <td>${j.Date}</td>
-            <td>${j.Floorplan}</td>
-            <td>${j.Task}</td>
-            <td>${j.Hours}</td>
+        <td>${j.Employee}</td>
+        <td>${j.Task}</td>
+        <td>${j.Hours}</td>
+        <td>${j["Budgetted Hours"]}</td>
         </tr>`;
     });
 
     html+="</table>";
 
-    document.getElementById("drilldown").innerHTML=html;
+    document.getElementById("drill").innerHTML=html;
 }
 
-function avg(arr){ return arr.reduce((a,b)=>a+b,0)/arr.length; }
+function renderCharts(){
 
-function std(arr){
-    let m=avg(arr);
-    return Math.sqrt(arr.map(x=>(x-m)**2).reduce((a,b)=>a+b)/arr.length);
+    let taskMap={};
+    data.forEach(d=>{
+        if(!taskMap[d.Task]) taskMap[d.Task]=[];
+        taskMap[d.Task].push(d.Hours);
+    });
+
+    new Chart(document.getElementById("taskChart"),{
+        type:'bar',
+        data:{
+            labels:Object.keys(taskMap),
+            datasets:[{
+                label:'Avg Hours',
+                data:Object.values(taskMap).map(avg)
+            }]
+        }
+    });
+
+    let dates=[...new Set(data.map(d=>d.Date))].sort();
+    let trend=dates.map(dt=>{
+        let day=data.filter(d=>d.Date===dt);
+        return avg(day.map(d=>d.Hours));
+    });
+
+    new Chart(document.getElementById("trendChart"),{
+        type:'line',
+        data:{
+            labels:dates,
+            datasets:[{label:'Avg Hours',data:trend}]
+        }
+    });
 }
 
 </script>
