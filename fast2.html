@@ -25,7 +25,6 @@ h1 { text-align:center; margin-bottom:20px; }
     border-radius:14px;
     padding:18px;
     margin-bottom:18px;
-    box-shadow:0 4px 20px rgba(0,0,0,.5);
 }
 
 .grid {
@@ -39,21 +38,12 @@ table {
     border-collapse:collapse;
 }
 
-th {
-    text-align:left;
-    font-weight:600;
-    color:#aaa;
-    padding:10px 8px;
-}
-
-td {
-    padding:10px 8px;
+th, td {
+    padding:10px;
     border-bottom:1px solid #222;
 }
 
-tr:hover {
-    background:#1f1f1f;
-}
+tr:hover { background:#1f1f1f; }
 
 .click { cursor:pointer; }
 
@@ -83,13 +73,6 @@ tr:hover {
     float:right;
     cursor:pointer;
     font-size:18px;
-    color:#aaa;
-}
-
-.section-title {
-    margin:15px 0 8px;
-    font-weight:600;
-    color:#ccc;
 }
 </style>
 </head>
@@ -110,7 +93,7 @@ tr:hover {
 </div>
 
 <div class="card">
-<h3>📊 Floorplan Performance</h3>
+<h3>📊 Floorplans</h3>
 <table id="floorTable"></table>
 </div>
 
@@ -144,7 +127,13 @@ tr:hover {
 
 let data=[];
 let currentCrew="";
-let currentFloor="";
+let crewChartInstance=null;
+let taskChartInstance=null;
+
+const crewTable = document.getElementById("crewTable");
+const floorTable = document.getElementById("floorTable");
+const modal = document.getElementById("modal");
+const modalContent = document.getElementById("modalContent");
 
 document.getElementById('upload').onchange=e=>{
     let r=new FileReader();
@@ -214,10 +203,7 @@ function openCrew(crew){
         map[j.Floorplan].push(j.eff);
     });
 
-    let html=`<h2>${crew}</h2>`;
-    html+=`<div class="section-title">Floorplans</div>`;
-
-    html+="<table><tr><th>Floorplan</th><th>Efficiency</th></tr>";
+    let html=`<h2>${crew}</h2><table><tr><th>Floorplan</th><th>Efficiency</th></tr>`;
 
     for(let f in map){
         html+=`
@@ -234,16 +220,13 @@ function openCrew(crew){
 }
 
 function openFloor(floor){
-    currentFloor=floor;
 
     let jobs=data.filter(d=>d.Employee===currentCrew && d.Floorplan===floor);
 
-    let html=`<h2>${currentCrew} → ${floor}</h2>`;
-    html+=`<div class="section-title">Jobs</div>`;
-
-    html+="<table><tr>
-    <th>Date</th><th>Subdivision</th><th>Lot</th><th>Task</th>
-    <th>Hours</th><th>Budget</th><th>Eff</th></tr>";
+    let html=`<h2>${currentCrew} → ${floor}</h2>
+    <table>
+    <tr><th>Date</th><th>Subdivision</th><th>Lot</th><th>Task</th>
+    <th>Hours</th><th>Budget</th><th>Eff</th></tr>`;
 
     jobs.forEach(j=>{
         html+=`
@@ -274,12 +257,11 @@ function renderFloor(){
     let html="<tr><th>Floorplan</th><th>Eff</th></tr>";
 
     for(let f in map){
+        let eff=avg(map[f].map(j=>j.eff));
         html+=`
         <tr>
         <td>${f}</td>
-        <td class="${avg(map[f].map(j=>j.eff))<1?'good':'bad'}">
-        ${avg(map[f].map(j=>j.eff)).toFixed(2)}
-        </td>
+        <td class="${eff<1?'good':'bad'}">${eff.toFixed(2)}</td>
         </tr>`;
     }
 
@@ -288,13 +270,17 @@ function renderFloor(){
 
 function renderCharts(){
 
+    // destroy old charts
+    if(crewChartInstance) crewChartInstance.destroy();
+    if(taskChartInstance) taskChartInstance.destroy();
+
     let crewMap={};
     data.forEach(d=>{
         if(!crewMap[d.Employee]) crewMap[d.Employee]=[];
         crewMap[d.Employee].push(d.eff);
     });
 
-    new Chart(crewChart,{
+    crewChartInstance = new Chart(document.getElementById("crewChart"),{
         type:'bar',
         data:{
             labels:Object.keys(crewMap),
@@ -311,7 +297,7 @@ function renderCharts(){
         taskMap[d.Task].push(d.eff);
     });
 
-    new Chart(taskChart,{
+    taskChartInstance = new Chart(document.getElementById("taskChart"),{
         type:'bar',
         data:{
             labels:Object.keys(taskMap),
