@@ -6,20 +6,6 @@
 <title>Lot Lookup</title>
 
 <style>
-
-#versionTag {
-  position: fixed;
-  bottom: 8px;
-  right: 12px;
-  font-size: 0.75rem;
-  color: #666;
-  background: rgba(0,0,0,0.4);
-  padding: 4px 8px;
-  border-radius: 6px;
-  pointer-events: none;
-}
-  
-  
 body {
   font-family: 'Segoe UI', sans-serif;
   margin: 0;
@@ -95,6 +81,16 @@ th {
   background: #1a1a1a;
 }
 
+/* ADDRESS CLICKABLE */
+.address-cell {
+  cursor: pointer;
+  color: #4da3ff;
+}
+
+.address-cell:hover {
+  text-decoration: underline;
+}
+
 /* MOBILE MODE */
 @media (max-width: 700px) {
 
@@ -135,12 +131,22 @@ th {
 
   .btn { width: 100%; }
 }
+
+/* VERSION */
+#versionTag {
+  position: fixed;
+  bottom: 8px;
+  right: 12px;
+  font-size: 0.75rem;
+  color: #666;
+  background: rgba(0,0,0,0.4);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
 </style>
 </head>
 
 <body>
-
-   <div id="versionTag">v1.21</div>
 
 <div class="header">
   <h3>Lot Lookup</h3>
@@ -179,6 +185,8 @@ th {
 </table>
 </div>
 
+<div id="versionTag">v1.21</div>
+
 <script>
 let lots = [];
 let currentSort = { key: null, asc: true };
@@ -196,8 +204,7 @@ loadData();
 
 /* DAYS AGO */
 function daysAgo(d) {
-  const date = new Date(d);
-  const diff = Math.floor((Date.now()-date)/86400000);
+  const diff = Math.floor((Date.now() - new Date(d)) / 86400000);
   if (diff === 0) return 'Today';
   if (diff === 1) return '1d ago';
   return diff + 'd ago';
@@ -245,9 +252,6 @@ function filterLots() {
   renderTable(filtered);
 }
 
-document.querySelectorAll('.filters input')
-  .forEach(i=>i.addEventListener('input', filterLots));
-
 /* ENTER SEARCH */
 filterLot.addEventListener('keydown', e=>{
   if(e.key==='Enter') exactLotSearch();
@@ -275,13 +279,13 @@ function renderTable(data){
       <td>${l.lotNumber}</td>
       <td>${l.subdivision}</td>
       <td>${l.builder}</td>
-      <td>${l.address}</td>
+      <td class="address-cell">📍 ${l.address}</td>
       <td>${l.floorplan||''}</td>
       <td>${daysAgo(l.lastUpdated)}</td>
     `;
 
-    // 🔥 TAP → GOOGLE MAPS
-    row.addEventListener('click',()=>{
+    row.querySelector('.address-cell').addEventListener('click', (e)=>{
+      e.stopPropagation();
       window.open(`https://maps.google.com/?q=${encodeURIComponent(l.address)}`);
     });
 
