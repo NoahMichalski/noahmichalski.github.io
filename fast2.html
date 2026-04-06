@@ -2,59 +2,94 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>VIP Dashboard v8</title>
+<title>VIP Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
-    background:#0e0e0e;
-    color:#fff;
+    background:#0b0b0b;
+    color:#eaeaea;
     font-family:system-ui;
+    margin:0;
     padding:20px;
 }
 
-.container { max-width:1500px; margin:auto; }
+.container { max-width:1400px; margin:auto; }
+
+h1 { text-align:center; margin-bottom:20px; }
 
 .card {
-    background:#181818;
-    padding:15px;
-    border-radius:12px;
-    margin-bottom:15px;
+    background:#151515;
+    border-radius:14px;
+    padding:18px;
+    margin-bottom:18px;
+    box-shadow:0 4px 20px rgba(0,0,0,.5);
 }
 
 .grid {
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:15px;
+    gap:18px;
 }
 
-table { width:100%; border-collapse:collapse; }
-td,th { padding:8px; border-bottom:1px solid #333; }
+table {
+    width:100%;
+    border-collapse:collapse;
+}
 
-.good { color:#4caf50; }
-.bad { color:#ff5252; }
+th {
+    text-align:left;
+    font-weight:600;
+    color:#aaa;
+    padding:10px 8px;
+}
+
+td {
+    padding:10px 8px;
+    border-bottom:1px solid #222;
+}
+
+tr:hover {
+    background:#1f1f1f;
+}
+
 .click { cursor:pointer; }
+
+.good { color:#3ddc97; }
+.bad { color:#ff5c5c; }
 
 /* MODAL */
 .modal {
     position:fixed;
-    top:0; left:0;
-    width:100%; height:100%;
+    inset:0;
     background:rgba(0,0,0,.85);
     display:none;
-    align-items:center;
     justify-content:center;
+    align-items:center;
 }
 
 .modal-box {
-    background:#1c1c1c;
-    width:90%;
+    width:85%;
     max-height:85%;
     overflow:auto;
+    background:#121212;
+    border-radius:14px;
     padding:20px;
-    border-radius:10px;
+}
+
+.close {
+    float:right;
+    cursor:pointer;
+    font-size:18px;
+    color:#aaa;
+}
+
+.section-title {
+    margin:15px 0 8px;
+    font-weight:600;
+    color:#ccc;
 }
 </style>
 </head>
@@ -70,7 +105,7 @@ td,th { padding:8px; border-bottom:1px solid #333; }
 <div class="grid">
 
 <div class="card">
-<h3>🏆 Crew Efficiency (Click Crew)</h3>
+<h3>🏆 Crew Efficiency</h3>
 <table id="crewTable"></table>
 </div>
 
@@ -79,19 +114,18 @@ td,th { padding:8px; border-bottom:1px solid #333; }
 <table id="floorTable"></table>
 </div>
 
+</div>
+
+<div class="grid">
+
 <div class="card">
-<h3>📈 Crew Efficiency Chart</h3>
+<h3>📈 Crew Efficiency</h3>
 <canvas id="crewChart"></canvas>
 </div>
 
 <div class="card">
 <h3>📊 Task Efficiency</h3>
 <canvas id="taskChart"></canvas>
-</div>
-
-<div class="card">
-<h3>📅 Efficiency Trend</h3>
-<canvas id="trendChart"></canvas>
 </div>
 
 </div>
@@ -101,7 +135,7 @@ td,th { padding:8px; border-bottom:1px solid #333; }
 <!-- MODAL -->
 <div class="modal" id="modal">
 <div class="modal-box">
-<span onclick="closeModal()" style="cursor:pointer;">✖</span>
+<span class="close" onclick="closeModal()">✖</span>
 <div id="modalContent"></div>
 </div>
 </div>
@@ -109,6 +143,8 @@ td,th { padding:8px; border-bottom:1px solid #333; }
 <script>
 
 let data=[];
+let currentCrew="";
+let currentFloor="";
 
 document.getElementById('upload').onchange=e=>{
     let r=new FileReader();
@@ -118,8 +154,8 @@ document.getElementById('upload').onchange=e=>{
         data=XLSX.utils.sheet_to_json(sheet);
 
         data.forEach(d=>{
-            let b = d["Budgetted Hours"] || 0;
-            d.eff = b ? d.Hours / b : null;
+            let b=d["Budgetted Hours"]||0;
+            d.eff=b?d.Hours/b:null;
         });
 
         render();
@@ -127,9 +163,9 @@ document.getElementById('upload').onchange=e=>{
     r.readAsBinaryString(e.target.files[0]);
 };
 
-function avg(arr){
-    let valid = arr.filter(x => x !== null && !isNaN(x));
-    return valid.reduce((a,b)=>a+b,0)/valid.length;
+function avg(a){
+    let v=a.filter(x=>x!=null);
+    return v.reduce((x,y)=>x+y,0)/v.length;
 }
 
 function render(){
@@ -139,22 +175,21 @@ function render(){
 }
 
 function renderCrew(){
-
     let map={};
 
     data.forEach(d=>{
-        if(d.eff===null) return;
         if(!map[d.Employee]) map[d.Employee]=[];
         map[d.Employee].push(d.eff);
     });
 
-    let rows = Object.entries(map).map(([crew,vals])=>{
-        return { crew, eff: avg(vals) };
-    });
+    let rows=Object.entries(map).map(([c,v])=>({
+        crew:c,
+        eff:avg(v)
+    }));
 
     rows.sort((a,b)=>a.eff-b.eff);
 
-    let html="<tr><th>#</th><th>Crew</th><th>Efficiency</th></tr>";
+    let html="<tr><th>#</th><th>Crew</th><th>Eff</th></tr>";
 
     rows.forEach((r,i)=>{
         html+=`
@@ -165,36 +200,50 @@ function renderCrew(){
         </tr>`;
     });
 
-    document.getElementById("crewTable").innerHTML=html;
+    crewTable.innerHTML=html;
 }
 
 function openCrew(crew){
+    currentCrew=crew;
 
-    let jobs = data.filter(d=>d.Employee===crew);
+    let jobs=data.filter(d=>d.Employee===crew);
 
-    let html = `<h2>${crew}</h2>`;
-
-    // floorplan summary
-    let fpMap = {};
+    let map={};
     jobs.forEach(j=>{
-        if(!fpMap[j.Floorplan]) fpMap[j.Floorplan]=[];
-        fpMap[j.Floorplan].push(j.eff);
+        if(!map[j.Floorplan]) map[j.Floorplan]=[];
+        map[j.Floorplan].push(j.eff);
     });
 
-    html += "<h3>Floorplans</h3><table><tr><th>Floorplan</th><th>Efficiency</th></tr>";
+    let html=`<h2>${crew}</h2>`;
+    html+=`<div class="section-title">Floorplans</div>`;
 
-    for(let f in fpMap){
-        html += `<tr>
+    html+="<table><tr><th>Floorplan</th><th>Efficiency</th></tr>";
+
+    for(let f in map){
+        html+=`
+        <tr class="click" onclick="openFloor('${f}')">
         <td>${f}</td>
-        <td class="${avg(fpMap[f])<1?'good':'bad'}">${avg(fpMap[f]).toFixed(2)}</td>
+        <td class="${avg(map[f])<1?'good':'bad'}">${avg(map[f]).toFixed(2)}</td>
         </tr>`;
     }
 
-    html += "</table>";
+    html+="</table>";
 
-    // job history
-    html += "<h3>Job History</h3>";
-    html += "<table><tr><th>Date</th><th>Subdivision</th><th>Lot</th><th>Floorplan</th><th>Task</th><th>Hours</th><th>Budget</th><th>Eff</th></tr>";
+    modalContent.innerHTML=html;
+    modal.style.display="flex";
+}
+
+function openFloor(floor){
+    currentFloor=floor;
+
+    let jobs=data.filter(d=>d.Employee===currentCrew && d.Floorplan===floor);
+
+    let html=`<h2>${currentCrew} → ${floor}</h2>`;
+    html+=`<div class="section-title">Jobs</div>`;
+
+    html+="<table><tr>
+    <th>Date</th><th>Subdivision</th><th>Lot</th><th>Task</th>
+    <th>Hours</th><th>Budget</th><th>Eff</th></tr>";
 
     jobs.forEach(j=>{
         html+=`
@@ -202,7 +251,6 @@ function openCrew(crew){
         <td>${j.Date}</td>
         <td>${j.Subdivision}</td>
         <td>${j.Lot}</td>
-        <td>${j.Floorplan}</td>
         <td>${j.Task}</td>
         <td>${j.Hours.toFixed(1)}</td>
         <td>${(j["Budgetted Hours"]||0).toFixed(1)}</td>
@@ -212,12 +260,10 @@ function openCrew(crew){
 
     html+="</table>";
 
-    document.getElementById("modalContent").innerHTML=html;
-    document.getElementById("modal").style.display="flex";
+    modalContent.innerHTML=html;
 }
 
 function renderFloor(){
-
     let map={};
 
     data.forEach(d=>{
@@ -225,44 +271,36 @@ function renderFloor(){
         map[d.Floorplan].push(d);
     });
 
-    let html="<tr><th>Floorplan</th><th>Avg Hours</th><th>Budget</th><th>Efficiency</th></tr>";
+    let html="<tr><th>Floorplan</th><th>Eff</th></tr>";
 
     for(let f in map){
-        let jobs=map[f];
-
-        let avgH = avg(jobs.map(j=>j.Hours));
-        let avgB = avg(jobs.map(j=>j["Budgetted Hours"]||0));
-        let eff = avg(jobs.map(j=>j.eff));
-
         html+=`
         <tr>
         <td>${f}</td>
-        <td>${avgH.toFixed(1)}</td>
-        <td>${avgB.toFixed(1)}</td>
-        <td class="${eff<1?'good':'bad'}">${eff.toFixed(2)}</td>
+        <td class="${avg(map[f].map(j=>j.eff))<1?'good':'bad'}">
+        ${avg(map[f].map(j=>j.eff)).toFixed(2)}
+        </td>
         </tr>`;
     }
 
-    document.getElementById("floorTable").innerHTML=html;
+    floorTable.innerHTML=html;
 }
 
 function renderCharts(){
 
     let crewMap={};
     data.forEach(d=>{
-        if(d.eff===null) return;
         if(!crewMap[d.Employee]) crewMap[d.Employee]=[];
         crewMap[d.Employee].push(d.eff);
     });
 
-    new Chart(document.getElementById("crewChart"),{
+    new Chart(crewChart,{
         type:'bar',
         data:{
             labels:Object.keys(crewMap),
             datasets:[{
-                label:'Efficiency',
                 data:Object.values(crewMap).map(avg),
-                backgroundColor:Object.values(crewMap).map(v => avg(v)<1 ? '#4caf50' : '#ff5252')
+                backgroundColor:Object.values(crewMap).map(v=>avg(v)<1?'#3ddc97':'#ff5c5c')
             }]
         }
     });
@@ -273,35 +311,19 @@ function renderCharts(){
         taskMap[d.Task].push(d.eff);
     });
 
-    new Chart(document.getElementById("taskChart"),{
+    new Chart(taskChart,{
         type:'bar',
         data:{
             labels:Object.keys(taskMap),
             datasets:[{
-                label:'Efficiency',
                 data:Object.values(taskMap).map(avg)
             }]
-        }
-    });
-
-    let dates=[...new Set(data.map(d=>d.Date))].sort();
-
-    let trend=dates.map(dt=>{
-        let day=data.filter(d=>d.Date===dt);
-        return avg(day.map(d=>d.eff));
-    });
-
-    new Chart(document.getElementById("trendChart"),{
-        type:'line',
-        data:{
-            labels:dates,
-            datasets:[{label:'Efficiency',data:trend}]
         }
     });
 }
 
 function closeModal(){
-    document.getElementById("modal").style.display="none";
+    modal.style.display="none";
 }
 
 </script>
