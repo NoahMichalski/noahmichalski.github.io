@@ -2,21 +2,17 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>VIP Dashboard v3</title>
+<title>VIP Dashboard v4</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
     background:#0e0e0e;
     color:#fff;
     font-family:system-ui;
-    margin:0;
     padding:20px;
 }
-
-h1 { text-align:center; }
 
 .container { max-width:1400px; margin:auto; }
 
@@ -27,15 +23,8 @@ h1 { text-align:center; }
     margin-bottom:15px;
 }
 
-table {
-    width:100%;
-    border-collapse:collapse;
-}
-
-td,th {
-    padding:8px;
-    border-bottom:1px solid #333;
-}
+table { width:100%; border-collapse:collapse; }
+td,th { padding:8px; border-bottom:1px solid #333; }
 
 .click { cursor:pointer; }
 .good { color:#4caf50; }
@@ -46,25 +35,24 @@ td,th {
     position:fixed;
     top:0; left:0;
     width:100%; height:100%;
-    background:rgba(0,0,0,.7);
+    background:rgba(0,0,0,.8);
     display:none;
     align-items:center;
     justify-content:center;
 }
 
-.modal-content {
+.modal-box {
     background:#1c1c1c;
+    width:90%;
+    max-height:85%;
+    overflow:auto;
     padding:20px;
     border-radius:10px;
-    width:80%;
-    max-height:80%;
-    overflow:auto;
 }
 
-.close {
-    float:right;
-    cursor:pointer;
-    font-size:18px;
+.controls select {
+    margin-right:10px;
+    padding:5px;
 }
 </style>
 </head>
@@ -73,7 +61,7 @@ td,th {
 
 <div class="container">
 
-<h1>VIP Operations Dashboard</h1>
+<h1>VIP Performance Intelligence</h1>
 
 <input type="file" id="upload">
 
@@ -91,15 +79,34 @@ td,th {
 
 <!-- MODAL -->
 <div class="modal" id="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">✖</span>
-        <div id="modalData"></div>
-    </div>
+<div class="modal-box">
+
+<div style="display:flex;justify-content:space-between;">
+<h2 id="modalTitle"></h2>
+<span onclick="closeModal()" style="cursor:pointer;">✖</span>
+</div>
+
+<div class="controls">
+<select id="taskFilter" onchange="renderModal()">
+<option value="">All Tasks</option>
+</select>
+
+<select id="sortFilter" onchange="renderModal()">
+<option value="worst">Worst First</option>
+<option value="best">Best First</option>
+<option value="hours">Hours High → Low</option>
+</select>
+</div>
+
+<div id="modalStats"></div>
+<div id="modalTable"></div>
+
+</div>
 </div>
 
 <script>
 
-let data=[];
+let data=[], currentFloor="";
 
 document.getElementById('upload').onchange=e=>{
     let r=new FileReader();
@@ -116,11 +123,6 @@ function avg(a){return a.reduce((x,y)=>x+y,0)/a.length;}
 
 function render(){
 
-    renderFloorplans();
-    renderOutliers();
-}
-
-function renderFloorplans(){
     let map={};
 
     data.forEach(d=>{
@@ -132,42 +134,86 @@ function renderFloorplans(){
 
     for(let f in map){
         let jobs=map[f];
-        let avgH=avg(jobs.map(j=>j.Hours));
-        let avgB=avg(jobs.map(j=>j["Budgetted Hours"]||0));
-
         html+=`<tr class="click" onclick="openModal('${f}')">
         <td>${f}</td>
-        <td>${avgH.toFixed(2)}</td>
-        <td>${avgB.toFixed(2)}</td>
+        <td>${avg(jobs.map(j=>j.Hours)).toFixed(2)}</td>
+        <td>${avg(jobs.map(j=>j["Budgetted Hours"]||0)).toFixed(2)}</td>
         </tr>`;
     }
 
     document.getElementById("floorTable").innerHTML=html;
+
+    renderOutliers();
 }
 
 function openModal(floor){
+    currentFloor=floor;
 
-    let jobs=data.filter(d=>d.Floorplan===floor);
+    let tasks=[...new Set(data.map(d=>d.Task))];
+    let sel=document.getElementById("taskFilter");
+    sel.innerHTML='<option value="">All Tasks</option>';
+    tasks.forEach(t=> sel.innerHTML+=`<option>${t}</option>`);
 
-    let html=`<h2>${floor}</h2>`;
+    document.getElementById("modal").style.display="flex";
+    renderModal();
+}
 
-    html+="<table><tr><th>Crew</th><th>Task</th><th>Hours</th><th>Budget</th><th>Diff</th></tr>";
+function renderModal(){
+
+    let jobs=data.filter(d=>d.Floorplan===currentFloor);
+
+    let task=document.getElementById("taskFilter").value;
+    if(task) jobs=jobs.filter(j=>j.Task===task);
 
     jobs.forEach(j=>{
-        let diff=j.Hours - (j["Budgetted Hours"]||0);
+        j.diff=j.Hours-(j["Budgetted Hours"]||0);
+        j.varp=(j.diff/(j["Budgetted Hours"]||1))*100;
+    });
+
+    let sort=document.getElementById("sortFilter").value;
+
+    if(sort==="worst") jobs.sort((a,b)=>b.diff-a.diff);
+    if(sort==="best") jobs.sort((a,b)=>a.diff-b.diff);
+    if(sort==="hours") jobs.sort((a,b)=>b.Hours-a.Hours);
+
+    // stats
+    let crews={};
+    jobs.forEach(j=>{
+        if(!crews[j.Employee]) crews[j.Employee]=[];
+        crews[j.Employee].push(j.Hours);
+    });
+
+    let best=Object.entries(crews).sort((a,b)=>avg(a[1])-avg(b[1]))[0];
+    let worst=Object.entries(crews).sort((a,b)=>avg(b[1])-avg(a[1]))[0];
+
+    let avgH=avg(jobs.map(j=>j.Hours));
+    let avgB=avg(jobs.map(j=>j["Budgetted Hours"]||0));
+
+    document.getElementById("modalStats").innerHTML=`
+    <p>🏆 Best Crew: ${best[0]}</p>
+    <p>⚠️ Worst Crew: ${worst[0]}</p>
+    <p>Avg: ${avgH.toFixed(2)} | Budget: ${avgB.toFixed(2)}</p>
+    <p>Variance: ${(((avgH-avgB)/avgB)*100).toFixed(1)}%</p>
+    `;
+
+    // table
+    let html="<table><tr><th>Crew</th><th>Task</th><th>Hours</th><th>Budget</th><th>Diff</th><th>%</th></tr>";
+
+    jobs.forEach(j=>{
         html+=`<tr>
         <td>${j.Employee}</td>
         <td>${j.Task}</td>
         <td>${j.Hours}</td>
         <td>${j["Budgetted Hours"]||0}</td>
-        <td class="${diff>0?'bad':'good'}">${diff.toFixed(2)}</td>
+        <td class="${j.diff>0?'bad':'good'}">${j.diff.toFixed(2)}</td>
+        <td class="${j.varp>0?'bad':'good'}">${j.varp.toFixed(1)}%</td>
         </tr>`;
     });
 
     html+="</table>";
 
-    document.getElementById("modalData").innerHTML=html;
-    document.getElementById("modal").style.display="flex";
+    document.getElementById("modalTable").innerHTML=html;
+    document.getElementById("modalTitle").innerText=currentFloor;
 }
 
 function closeModal(){
@@ -176,19 +222,18 @@ function closeModal(){
 
 function renderOutliers(){
 
-    let avgH=avg(data.map(d=>d.Hours));
-
-    let html="<h4>Outliers</h4>";
+    let html="";
 
     data.forEach(d=>{
-        let diff=d.Hours - (d["Budgetted Hours"]||0);
+        let diff=d.Hours-(d["Budgetted Hours"]||0);
+        let pct=(diff/(d["Budgetted Hours"]||1))*100;
 
-        if(Math.abs(diff) > 2){
+        if(Math.abs(diff)>2){
             html+=`
             <div class="${diff>0?'bad':'good'}">
-            ${d.Employee} | ${d.Floorplan} | ${d.Task}  
-            → ${d.Hours}h (Budget: ${d["Budgetted Hours"]||0})  
-            Diff: ${diff.toFixed(2)}
+            ${d.Floorplan} | ${d.Employee} | ${d.Task}  
+            → ${d.Hours}h (Budget ${d["Budgetted Hours"]||0})  
+            Diff: ${diff.toFixed(2)} (${pct.toFixed(1)}%)
             </div>`;
         }
     });
