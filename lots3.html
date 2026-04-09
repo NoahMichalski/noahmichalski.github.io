@@ -13,7 +13,6 @@ body {
   color: #fff;
 }
 
-/* HEADER */
 .header {
   padding: 12px;
   background: #111;
@@ -23,7 +22,6 @@ body {
   border-bottom: 1px solid #222;
 }
 
-/* FILTERS */
 .filters {
   display: grid;
   grid-template-columns: 100px auto 1fr 140px 140px auto auto;
@@ -81,17 +79,34 @@ th {
   background: #1a1a1a;
 }
 
-/* ADDRESS CLICKABLE */
-.address-cell {
-  cursor: pointer;
+/* ADDRESS + COPY */
+.address-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.address-text {
   color: #4da3ff;
+  cursor: pointer;
 }
 
-.address-cell:hover {
-  text-decoration: underline;
+.copy-btn {
+  padding: 3px 6px;
+  font-size: 0.7rem;
+  background: #2a2a2a;
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-/* MOBILE MODE */
+.copy-btn:hover {
+  background: #444;
+}
+
+/* MOBILE */
 @media (max-width: 700px) {
 
   table, thead, tbody, th, td, tr {
@@ -130,6 +145,11 @@ th {
   }
 
   .btn { width: 100%; }
+
+  .address-wrapper {
+    flex-direction: column;
+    align-items: flex-end;
+  }
 }
 
 /* VERSION */
@@ -279,12 +299,29 @@ function renderTable(data){
       <td>${l.lotNumber}</td>
       <td>${l.subdivision}</td>
       <td>${l.builder}</td>
-      <td class="address-cell"> ${l.address}</td>
+      <td>
+        <div class="address-wrapper">
+          <span class="address-text">${l.address}</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+      </td>
       <td>${l.floorplan||''}</td>
       <td>${daysAgo(l.lastUpdated)}</td>
     `;
 
-    row.querySelector('.address-cell').addEventListener('click', (e)=>{
+    const addressText = row.querySelector('.address-text');
+    const copyBtn = row.querySelector('.copy-btn');
+
+    // COPY
+    copyBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(l.address);
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => copyBtn.textContent = "Copy", 800);
+    });
+
+    // MAP CLICK
+    addressText.addEventListener('click', (e) => {
       e.stopPropagation();
       window.open(`https://maps.google.com/?q=${encodeURIComponent(l.address)}`);
     });
