@@ -1,4 +1,188 @@
 [
+     {
+    "lotNumber": "13632",
+    "subdivision": "Parkview",
+    "builder": "DR Horton",
+    "address": "359 Park Vista Drive",
+    "floorplan": "X450",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "68",
+    "subdivision": "River Ridge",
+    "builder": "DR Horton",
+    "address": "224 Vine Grove Drive",
+    "floorplan": "X423",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "70",
+    "subdivision": "River Ridge",
+    "builder": "DR Horton",
+    "address": "236 Vine Grove Drive",
+    "floorplan": "X424",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "49",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "129 Appleseed Way",
+    "floorplan": "X421",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "50",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "133 Appleseed Way",
+    "floorplan": "X437",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "172",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "605 Madison Way",
+    "floorplan": "X431",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "27",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1215 Stratford Way",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13657",
+    "subdivision": "Parkview",
+    "builder": "DR Horton",
+    "address": "449 Garnet Ranch Drive",
+    "floorplan": "X431",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "53",
+    "subdivision": "Sugar Creek",
+    "builder": "DR Horton",
+    "address": "140 Brookside Drive",
+    "floorplan": "X423",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "14",
+    "subdivision": "Galloway East",
+    "builder": "DR Horton",
+    "address": "6212 Encosta Way",
+    "floorplan": "X421",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "5263",
+    "subdivision": "Ludlow",
+    "builder": "DR Horton",
+    "address": "1097 Sherwood Loop",
+    "floorplan": "X424",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "365",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "540 Darliene Drive",
+    "floorplan": "X422",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "260",
+    "subdivision": "Wagnalls",
+    "builder": "DR Horton",
+    "address": "1365 Hansberry Drive",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "254",
+    "subdivision": "Galloway East",
+    "builder": "DR Horton",
+    "address": "6215 Encosta Way",
+    "floorplan": "X426",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "195",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "328 Angely Drive",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "261",
+    "subdivision": "Wagnalls",
+    "builder": "DR Horton",
+    "address": "1355 Hansberry Drive",
+    "floorplan": "X431",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "255",
+    "subdivision": "Galloway East",
+    "builder": "DR Horton",
+    "address": "6221 Encosta Way",
+    "floorplan": "X431",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "113",
+    "subdivision": "Villas at Renner Park",
+    "builder": "DR Horton",
+    "address": "1385 Marinelli Drive East",
+    "floorplan": "XT04",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "114",
+    "subdivision": "Villas at Renner Park",
+    "builder": "DR Horton",
+    "address": "1387 Marinelli Drive East",
+    "floorplan": "XT03",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "115",
+    "subdivision": "Villas at Renner Park",
+    "builder": "DR Horton",
+    "address": "1389 Marinelli Drive East",
+    "floorplan": "XT03",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "116",
+    "subdivision": "Villas at Renner Park",
+    "builder": "DR Horton",
+    "address": "1391 Marinelli Drive East",
+    "floorplan": "XT03",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "117",
+    "subdivision": "Villas at Renner Park",
+    "builder": "DR Horton",
+    "address": "1393 Marinelli Drive East",
+    "floorplan": "XT03",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "118",
+    "subdivision": "Villas at Renner Park",
+    "builder": "DR Horton",
+    "address": "1395 Marinelli Drive East",
+    "floorplan": "XT04",
+    "lastUpdated": "2026-04-10"
+  },
     {
     "lotNumber": "1",
     "subdivision": "Sycamore Grove",
