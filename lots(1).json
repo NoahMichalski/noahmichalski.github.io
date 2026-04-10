@@ -1,4 +1,548 @@
 [
+    {
+    "lotNumber": "13664",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "220 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13665",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "222 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13666",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "228 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13667",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "232 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13668",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "238 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13669",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2352 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13670",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2356 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Palmer",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13671",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2360 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Barclay",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13672",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2364 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Barclay",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13673",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2368 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Claymont",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13674",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2372 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13675",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2376 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13676",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2380 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Claymont",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13677",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2384 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13678",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2388 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13679",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2392 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13680",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2394 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13681",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "306 Willow Way Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13682",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "302 Willow Way Newark, Ohio 43055",
+    "floorplan": "Wellington",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13683",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2375 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13684",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2371 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13685",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2367 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13686",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "2359 Hanna's Loop Newark, Ohio 43055",
+    "floorplan": "Hartly",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13687",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "250 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13688",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "254 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13689",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "258 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13690",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "262 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13691",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "263 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13692",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "257 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13693",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "253 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13694",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "249 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13695",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "245 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13696",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "241 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Barclay",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13697",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "239 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13698",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "235 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Wellington",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13699",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "231 Willow Bend Drive Newark, Ohio 43055",
+    "floorplan": "Barclay",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13700",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "224 Willow Way Newark, Ohio 43055",
+    "floorplan": "Wellington",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13701",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "244 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13702",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "248 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13703",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "252 Willow Way Newark, OH 43055",
+    "floorplan": "",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13704",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "256 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13705",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "260 Willow Way Newark, OH 43055",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13706",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "262 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13707",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "266 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13708",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "270 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13709",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "274 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13710",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "280 Willow Way Newark, OH 43055",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13711",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "298 Willow Way Newark, OH 43055",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13712",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "294 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13713",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "290 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13714",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "286 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13715",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "285 Willow Way Newark, OH 43055",
+    "floorplan": "Hartly",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13716",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "281 Willow Way Newark, OH 43055",
+    "floorplan": "Wellington",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13717",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "277 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13718",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "273 Willow Way Newark, OH 43055",
+    "floorplan": "Palmer",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13719",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "269 Willow Way Newark, OH 43055",
+    "floorplan": "Claymont",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13720",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "265 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13721",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "261 Willow Way Newark, OH 43055",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13722",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "259 Willow Way Newark, OH 43055",
+    "floorplan": "Palmer",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13723",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "255 Willow Way Newark, OH 43055",
+    "floorplan": "Palmer",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13724",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "251 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13725",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "247 Willow Way Newark, OH 43055",
+    "floorplan": "Claymont",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13726",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "243 Willow Way Newark, OH 43055",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13727",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "237 Willow Way Newark, OH 43055",
+    "floorplan": "Barclay",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13728",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "233 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13729",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "229 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13730",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "227 Willow Way Newark, OH 43055",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13731",
+    "subdivision": "Willowbend",
+    "builder": "Rockford",
+    "address": "223 Willow Way Newark, OH 43055",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
   {
     "lotNumber": "1",
     "subdivision": "Hazelton Crossing",
