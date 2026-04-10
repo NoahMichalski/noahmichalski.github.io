@@ -13,9 +13,15 @@ body {
     padding:20px;
 }
 
+.logo {
+    display:block;
+    margin:0 auto 15px auto;
+    max-width:200px;
+}
+
 h1 { text-align:center; }
 
-.controls { text-align:center; margin-bottom:15px; }
+.controls { text-align:center; margin-bottom:10px; }
 
 button, select {
     background:white;
@@ -24,6 +30,12 @@ button, select {
     padding:8px 14px;
     margin:5px;
     cursor:pointer;
+}
+
+.dayLabel {
+    text-align:center;
+    margin-bottom:10px;
+    font-weight:bold;
 }
 
 table {
@@ -38,26 +50,27 @@ th, td {
 }
 
 .predicted {
-    background:#ff4da6;
-    color:white;
+    background:#ff2fa3;
     font-weight:bold;
 }
 
-.normal { background:#0f2e0f; }
-.warning { background:#5a4b00; }
-.overtime { background:#5c0000; font-weight:bold; }
+.normal { background:#1f4d1f; }
+.warning { background:#7a6a00; }
+.overtime { background:#8b0000; }
 
 </style>
 </head>
 
 <body>
 
+<img src="/images/VIP-logo-white.png" class="logo">
+
 <h1>Overtime Predictor</h1>
 
 <div class="controls">
     <input type="file" id="fileInput" accept=".xlsx,.csv">
 
-    <select id="daySelect" onchange="recalcAll()">
+    <select id="daySelect" onchange="updateDayLabel(); recalcAll();">
         <option value="0">Monday</option>
         <option value="1">Tuesday</option>
         <option value="2">Wednesday</option>
@@ -65,22 +78,25 @@ th, td {
         <option value="4">Friday</option>
     </select>
 
-    <button onclick="processFile()">Load File</button>
-    <button onclick="exportExcel()">Export</button>
+    <button onclick="processFile()">Load</button>
+    <button onclick="copyStyled()">Copy for Email</button>
 </div>
+
+<div class="dayLabel" id="dayLabel"></div>
 
 <table id="table">
 <thead>
 <tr>
 <th>Name</th>
-<th>Monday</th>
-<th>Tuesday</th>
-<th>Wednesday</th>
-<th>Thursday</th>
-<th>Friday</th>
+<th>Mon</th>
+<th>Tue</th>
+<th>Wed</th>
+<th>Thu</th>
+<th>Fri</th>
 <th>Actual</th>
 <th>Projected</th>
 <th>OT</th>
+<th>Hits OT</th>
 </tr>
 </thead>
 <tbody></tbody>
@@ -90,6 +106,13 @@ th, td {
 
 let tableData = [];
 
+function updateDayLabel(){
+    let text = document.getElementById("daySelect").selectedOptions[0].text;
+    document.getElementById("dayLabel").innerText = "Current Day: " + text;
+}
+
+updateDayLabel();
+
 function processFile() {
     const file = document.getElementById('fileInput').files[0];
     const reader = new FileReader();
@@ -98,7 +121,6 @@ function processFile() {
         const wb = XLSX.read(e.target.result, {type:'binary'});
         const sheet = wb.Sheets[wb.SheetNames[0]];
         tableData = XLSX.utils.sheet_to_json(sheet);
-
         render();
     };
 
@@ -106,7 +128,6 @@ function processFile() {
 }
 
 function clean(val) {
-    if (val === " " || val === "" || val == null) return 0;
     return parseFloat(val) || 0;
 }
 
@@ -131,9 +152,10 @@ function render() {
         tr.innerHTML = `
             <td>${name}</td>
             ${days.map(d=>`<td contenteditable="true">${d}</td>`).join("")}
-            <td class="actual">0</td>
-            <td class="projected">0</td>
-            <td class="ot">0</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
         `;
 
         tbody.appendChild(tr);
@@ -149,82 +171,75 @@ function recalcAll() {
         let tds = tr.querySelectorAll("td");
 
         let days = [];
-        for (let i = 1; i <= 5; i++) {
-            let val = parseFloat(tds[i].innerText) || 0;
-            days.push(val);
+        for (let i=1;i<=5;i++){
+            days.push(parseFloat(tds[i].innerText)||0);
         }
 
         let actual = days.reduce((a,b)=>a+b,0);
 
         let projected = 0;
+        let running = 0;
+        let hitDay = "—";
 
-        for (let i = 0; i < 5; i++) {
+        for (let i=0;i<5;i++){
             tds[i+1].classList.remove("predicted");
 
-            if (i <= selectedDay) {
-                projected += days[i];
-            } else {
-                projected += 8;
+            let val = (i<=selectedDay)? days[i] : 8;
+
+            if(i>selectedDay){
                 tds[i+1].innerText = "8";
                 tds[i+1].classList.add("predicted");
             }
+
+            projected += val;
+            running += val;
+
+            if(running > 40 && hitDay==="—"){
+                hitDay = ["Mon","Tue","Wed","Thu","Fri"][i];
+            }
         }
 
-        let ot = projected > 40 ? projected - 40 : 0;
+        let ot = projected>40 ? projected-40 : 0;
 
         tds[6].innerText = actual.toFixed(2);
         tds[7].innerText = projected.toFixed(2);
         tds[8].innerText = ot.toFixed(2);
+        tds[9].innerText = hitDay;
 
         tr.classList.remove("normal","warning","overtime");
 
-        if (projected > 40) tr.classList.add("overtime");
-        else if (projected >= 36) tr.classList.add("warning");
+        if(projected>40) tr.classList.add("overtime");
+        else if(projected>=36) tr.classList.add("warning");
         else tr.classList.add("normal");
     });
 }
 
-document.addEventListener("input", function(e){
-    if (e.target.closest("table")) recalcAll();
+document.addEventListener("input", e=>{
+    if(e.target.closest("table")) recalcAll();
 });
 
-function exportExcel() {
-    let wb = XLSX.utils.book_new();
-    let ws_data = [];
+function copyStyled(){
+    let table = document.getElementById("table").cloneNode(true);
+    table.style.borderCollapse = "collapse";
 
-    document.querySelectorAll("#table tr").forEach(tr => {
-        let row = [];
-        tr.querySelectorAll("th,td").forEach(td => {
-            row.push(td.innerText);
-        });
-        ws_data.push(row);
+    table.querySelectorAll("td,th").forEach(cell=>{
+        cell.style.border="1px solid #000";
+        cell.style.padding="6px";
+
+        let bg = getComputedStyle(cell).backgroundColor;
+        cell.style.backgroundColor = bg;
+        cell.style.color = "#fff";
     });
 
-    let ws = XLSX.utils.aoa_to_sheet(ws_data);
+    let html = table.outerHTML;
 
-    // Apply styles
-    let range = XLSX.utils.decode_range(ws['!ref']);
+    navigator.clipboard.write([
+        new ClipboardItem({
+            "text/html": new Blob([html], { type: "text/html" })
+        })
+    ]);
 
-    for (let R = 1; R <= range.e.r; ++R) {
-        let tr = document.querySelectorAll("#table tbody tr")[R-1];
-
-        let style = {};
-        if (tr.classList.contains("overtime")) {
-            style = { fill: { fgColor: { rgb: "FF0000" } } };
-        } else if (tr.classList.contains("warning")) {
-            style = { fill: { fgColor: { rgb: "FFFF00" } } };
-        } else {
-            style = { fill: { fgColor: { rgb: "008000" } } };
-        }
-
-        for (let C = 0; C <= range.e.c; ++C) {
-            let cell = ws[XLSX.utils.encode_cell({r:R, c:C})];
-            if (cell) cell.s = style;
-        }
-    }
-
-    XLSX.utils.book_append_sheet(wb, ws, "OT");
-    XLSX.writeFile(wb, "overtime.xlsx");
+    alert("Copied with colors for email!");
 }
 
 </script>
