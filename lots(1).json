@@ -1,5 +1,1045 @@
 [
     {
+    "lotNumber": "98",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5432 Sutton Drive Grove City, Ohio 43123",
+    "floorplan": "Charleston",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "99",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5444 Sutton Drive Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "100",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5454 Sutton Drive Grove City, Ohio 43123",
+    "floorplan": "Sequoia",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "101",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5464 Sutton Drive Grove City, Ohio 43123",
+    "floorplan": "Redwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "102",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5474 Sutton Drive Grove City, Ohio 43123",
+    "floorplan": "Linden",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "103",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5484 Sutton Drive Grove City, Ohio 43123",
+    "floorplan": "Charleston",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "104",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5494 Sutton Drive Grove City, Ohio 43123",
+    "floorplan": "Spruce",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "105",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1768 Silverlawn Drive Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "106",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1756 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Ashland",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "107",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1746 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "108",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1736 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Cypress",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "109",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1726 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "110",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1716 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Richmond",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "111",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1713 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "112",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1723 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "113",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1733 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "114",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1743 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Ashland",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "115",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1755 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "116",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1767 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Alder",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "117",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1779 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "118",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1789 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "119",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1801 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Ceda",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "120",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1813 Silverlawn Drive Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "121",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5436 Goodwill Court Grove City, Ohio 43123",
+    "floorplan": "Cypress",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "122",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5446 Goodwill Court Grove City, Ohio 43123",
+    "floorplan": "Spruce II",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "123",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5456 Goodwill Court Grove City, Ohio 43123",
+    "floorplan": "Richmond",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "124",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5466 Goodwill Court Grove City, Ohio 43123",
+    "floorplan": "Cypress",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "125",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5476 Goodwill Court Grove City, Ohio 43123",
+    "floorplan": "Arbor",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "126",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5486 Goodwill Court Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "127",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5491 Goodwill Court Grove City, Ohio 43123",
+    "floorplan": "Linden",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "128",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5481 Goodwill Court Grove City, Ohio 43123",
+    "floorplan": "Redwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "129",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5471 Goodwill Court Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "130",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5461 Goodwill Court Grove City, Ohio 43123",
+    "floorplan": "Heather",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "131",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5451 Goodwill Court Grove City, Ohio 43123",
+    "floorplan": "Spruce",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "132",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5441 Goodwill Court Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "134",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5426 Scotch Woods Drive Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "135",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5438 Scotch Woods Drive Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "136",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5450 Scotch Woods Drive Grove City, Ohio 43123",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "137",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5462 Scotch Woods Drive Grove City, Ohio 43123",
+    "floorplan": "Richmond",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "138",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5474 Scotch Woods Drive Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "139",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5486 Scotch Woods Drive Grove City, Ohio 43123",
+    "floorplan": "Spruce",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "140",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5498 Scotch Woods Drive Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "141",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1678 Silverlawn Drive Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "142",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5511 Timber Heights Ln Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "143",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5499 Timber Heights Lane Grove City, Ohio 43123",
+    "floorplan": "Spruce",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "144",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5487 Timber Heights Lane Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "145",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5475 Timber Heights Lane Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "146",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5463 Timber Heights Lane Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "147",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5451 Timber Heights Lane Grove City, Ohio 43123",
+    "floorplan": "Ashland",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "148",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5439 Timber Heights Lane Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "149",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5427 Timber Heights Lane Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "150",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1641 Mallow Lane Grove City, OH 43123",
+    "floorplan": "Alder",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "151",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1631 Mallow Lane Grove City, Oh 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "152",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1621 Mallow Lane Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "153",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1611 Mallow Lane Grove City, OH 43123",
+    "floorplan": "Wedgewood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "154",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5431 Brighton Way Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "155",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5441 Brighton Way Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "156",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5451 Brighton Way Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "157",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5461 Brighton Way Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "158",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5471 Brighton Way Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "159",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5481 Brighton Way Grove City, Ohio 43123",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "160",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1610 Silverlawn Dr. Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "161",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1620 Silverlawn Dr. Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "162",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1630 Silverlawn Dr. Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "163",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1640 Silverlawn Dr. Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "164",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5498 Timber Heights Lane Grove City, Ohio 43123",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "165",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5486 Timber Heights Lane Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "166",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5474 Timber Heights Lane Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "167",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5462 Timber Height Lane Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "168",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5450 Timber Heights Lane Grove City, Ohio 43123",
+    "floorplan": "Redwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "169",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5438 Timber Heights Lane Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "170",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5436 Carlisle Drive Grove City, Ohio 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "171",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5446 Carlisle Drive Grove City, Ohio 43123",
+    "floorplan": "Alder",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "172",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5456 Carlisle Drive Grove City, Ohio 43123",
+    "floorplan": "Dover",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "173",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5466 Carlisle Drive Grove City, Ohio 43123",
+    "floorplan": "Spruce",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "174",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5476 Carlisle Drive Grove City, Ohio 43123",
+    "floorplan": "Ashland",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "175",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5486 Carlisle Drive Grove City, Ohio 43123",
+    "floorplan": "Spruce",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "176",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5496 Carlisle Drive Grove City, Ohio 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "177",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5506 Carlisle Drive Grove City, Ohio 43123",
+    "floorplan": "Spruc",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "178",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5516 Carlisle Drive Grove City, OH 43123",
+    "floorplan": "Rockingham",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "179",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5540 Carlisle Drive Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "180",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5550 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "181",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5560 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "182",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5570 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "183",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5580 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "184",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5590 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Ashland",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "185",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5600 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "186",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5610 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Dover",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "187",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5620 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "188",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5588 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Rockingham",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "189",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5600 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Ashland",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "190",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5610 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Ashland",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "191",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5620 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Redwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "192",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5630 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "193",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1624 Piper Court Grove City, OH 43123",
+    "floorplan": "Cypress",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "194",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1612 Piper Court Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "195",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1600 Piper Court Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "196",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1590 Piper Court Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "197",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1580 Piper Court Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "198",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1573 Piper Court Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "199",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1583 Piper Court Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "200",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1595 Piper Court Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "201",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1605 Piper Court Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "202",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1615 Piper Court Grove City, OH 43123",
+    "floorplan": "Alder",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "203",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1625 Piper Court Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "204",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5631 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Richmond",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "205",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5619 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "206",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5609 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Linden",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "207",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5599 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "208",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5589 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "209",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5579 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "210",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5569 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Richmond",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "211",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5985 Blue Star Drive Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "212",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5637 Carlisle Drive Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "213",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5625 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Ashland",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "214",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5615 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "215",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5605 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "216",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5595 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "217",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5585 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Ashland",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "218",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5565 Carlisle Dr. Grove City, OH 43123",
+    "floorplan": "Barclay",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "219",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5545 Carlisle Drive Grove City, OH 43123",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "220",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1625 Silverlawn Dr. Grove City, OH 43123",
+    "floorplan": "Redwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "221",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1635 Silverlawn Dr. Grove City, OH 43123",
+    "floorplan": "Ashland",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "222",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1645 Silverlawn Dr. Grove City, OH 43123",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "223",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1655 Silverlawn Dr. Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "224",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1665 Silverlawn Dr. Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "225",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5532 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Rockingham",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "226",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5542 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Arbor",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "227",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "5547 Scotch Woods Drive Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "228",
+    "subdivision": "Meadow Grove",
+    "builder": "Rockford",
+    "address": "1701 Silverlawn Drive Grove City, OH 43123",
+    "floorplan": "Cedar",
+    "lastUpdated": "2026-04-10"
+  },
+    {
     "lotNumber": "13664",
     "subdivision": "Willowbend",
     "builder": "Rockford",
