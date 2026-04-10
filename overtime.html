@@ -29,19 +29,12 @@ button {
 table {
     width:100%;
     border-collapse:collapse;
-    margin-top:10px;
 }
 
 th, td {
     border:1px solid #333;
     padding:6px;
     text-align:center;
-}
-
-.error {
-    color:red;
-    text-align:center;
-    margin-top:10px;
 }
 
 .normal { background:#0f2e0f; }
@@ -61,17 +54,15 @@ th, td {
     <button onclick="exportExcel()">Export</button>
 </div>
 
-<div id="error" class="error"></div>
-
 <table id="table">
 <thead>
 <tr>
-<th>Employee</th>
-<th>Mon</th>
-<th>Tue</th>
-<th>Wed</th>
-<th>Thu</th>
-<th>Fri</th>
+<th>Name</th>
+<th>Monday</th>
+<th>Tuesday</th>
+<th>Wednesday</th>
+<th>Thursday</th>
+<th>Friday</th>
 <th>Actual</th>
 <th>Projected</th>
 <th>OT</th>
@@ -81,103 +72,55 @@ th, td {
 </table>
 
 <script>
-let rawData = [];
 
 function processFile() {
-    document.getElementById("error").innerText = "";
-
     const file = document.getElementById('fileInput').files[0];
-    if (!file) {
-        showError("No file selected");
-        return;
-    }
-
     const reader = new FileReader();
 
     reader.onload = function(e) {
-        try {
-            const wb = XLSX.read(e.target.result, {type:'binary'});
-            const sheet = wb.Sheets[wb.SheetNames[0]];
-            rawData = XLSX.utils.sheet_to_json(sheet);
+        const wb = XLSX.read(e.target.result, {type:'binary'});
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(sheet);
 
-            if (!rawData.length) {
-                showError("File is empty or unreadable");
-                return;
-            }
-
-            processData();
-
-        } catch (err) {
-            showError("Error reading file: " + err.message);
-        }
+        render(data);
     };
 
     reader.readAsBinaryString(file);
 }
 
-function showError(msg) {
-    document.getElementById("error").innerText = msg;
-}
-
-function getField(row, options) {
-    for (let key of Object.keys(row)) {
-        let lower = key.toLowerCase();
-        if (options.some(opt => lower.includes(opt))) {
-            return row[key];
-        }
-    }
-    return null;
-}
-
-function processData() {
-    let employees = {};
-
-    rawData.forEach((row, i) => {
-        let name = getField(row, ["employee", "name", "worker"]);
-        let date = getField(row, ["date"]);
-        let hours = getField(row, ["hour"]);
-
-        if (!name || !date) return;
-
-        hours = parseFloat(hours) || 0;
-
-        let d = new Date(date);
-        if (isNaN(d)) return;
-
-        let day = d.getDay(); // 0=Sun
-
-        if (!employees[name]) {
-            employees[name] = {
-                days: [0,0,0,0,0] // Mon-Fri
-            };
-        }
-
-        // convert JS day to Mon-Fri index
-        let map = {1:0,2:1,3:2,4:3,5:4};
-        if (map[day] !== undefined) {
-            employees[name].days[map[day]] += hours;
-        }
-    });
-
-    render(employees);
+function clean(val) {
+    if (val === " " || val === "" || val == null) return 0;
+    return parseFloat(val) || 0;
 }
 
 function render(data) {
     const tbody = document.querySelector("#table tbody");
     tbody.innerHTML = "";
 
-    Object.keys(data).forEach(name => {
-        let days = data[name].days;
+    let today = new Date().getDay();
+    let map = {1:0,2:1,3:2,4:3,5:4};
+    let todayIndex = map[today] ?? 4;
+
+    data.forEach(row => {
+
+        let name = row["Name"];
+        if (!name) return;
+
+        let days = [
+            clean(row["Monday"]),
+            clean(row["Tuesday"]),
+            clean(row["Wednesday"]),
+            clean(row["Thursday"]),
+            clean(row["Friday"])
+        ];
 
         let actual = days.reduce((a,b)=>a+b,0);
-
-        let todayIndex = getTodayIndex();
 
         let projected = 0;
 
         days.forEach((h, i) => {
             if (i <= todayIndex) projected += h;
-            else projected += 8; // future days assume 8 hrs
+            else projected += 8;
         });
 
         let ot = projected > 40 ? projected - 40 : 0;
@@ -190,24 +133,18 @@ function render(data) {
 
         tr.innerHTML = `
             <td>${name}</td>
-            ${days.map(d=>`<td>${d.toFixed(1)}</td>`).join("")}
-            <td>${actual.toFixed(1)}</td>
-            <td>${projected.toFixed(1)}</td>
-            <td>${ot.toFixed(1)}</td>
+            ${days.map(d=>`<td>${d.toFixed(2)}</td>`).join("")}
+            <td>${actual.toFixed(2)}</td>
+            <td>${projected.toFixed(2)}</td>
+            <td>${ot.toFixed(2)}</td>
         `;
 
         tbody.appendChild(tr);
     });
 }
 
-function getTodayIndex() {
-    let d = new Date().getDay();
-    let map = {1:0,2:1,3:2,4:3,5:4};
-    return map[d] ?? 4;
-}
-
 function exportExcel() {
-    let rows = [["Employee","Mon","Tue","Wed","Thu","Fri","Actual","Projected","OT"]];
+    let rows = [["Name","Mon","Tue","Wed","Thu","Fri","Actual","Projected","OT"]];
 
     document.querySelectorAll("#table tbody tr").forEach(tr => {
         let cols = tr.querySelectorAll("td");
@@ -220,6 +157,7 @@ function exportExcel() {
 
     XLSX.writeFile(wb, "overtime.xlsx");
 }
+
 </script>
 
 </body>
