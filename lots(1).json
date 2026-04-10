@@ -1,5 +1,333 @@
 [
   {
+    "lotNumber": "1",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "200 Scotsgrove Drive Pataskala, Ohio 43062",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "2",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "202 Scotsgrove Drive Pataskala, Ohio 43062",
+    "floorplan": "Charleston",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "3",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "204 Scotsgrove Drive Pataskala, Ohio 43062",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "4",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "206 Scotsgrove Drive Pataskala, Ohio 43062",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "5",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "208 Scotsgrove Drive Pataskala, Ohio 43062",
+    "floorplan": "Richmond",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "6",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "210 Scotsgrove Drive Pataskala, Ohio 43062",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "7",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "211 Scotsgrove Drive Pataskala, Ohio 43062",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "8",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "209 Scotsgrove Drive Pataskala, Ohio 43062",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "9",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "207 Scotsgrove Drive Pataskala, Ohio 43062",
+    "floorplan": "Barclay",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "10",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "205 Scotsgrove Drive Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "11",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "203 Scotsgrive Drive Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "12",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "201 Scotsgrove Drive Pataskala, Ohio 43062",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "400 Coachman Drive Pataskala, Ohio 43062",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "14",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "402 Coachman Drive Pataskala, Ohio 43062",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "15",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "404 Coachman Drive Pataskala, Ohio 43062",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "16",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "406 Coachman Drive Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "17",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "408 Coachman Drive Pataskala, Ohio 43062",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "18",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "410 Coachman Drive Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "19",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "409 Coachman Drive Pataskala, Ohio 43062",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "20",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "407 Coachman Drive Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "21",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "405 Coachman Drive Pataskala, Ohio 43062",
+    "floorplan": "Palmer",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "22",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "403 Coachman Drive Pataskala, Ohio 43062",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "23",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "401 Coachman Drive Pataskala, Ohio 43062",
+    "floorplan": "Richmond",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "24",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "600 Hannahs Drive Pataskala, Ohio 43062",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "25",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "602 Hannahs Drive Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "26",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "604 Hannahs Drive Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "27",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "606 Hannahs Drive Pataskala, Ohio 43062",
+    "floorplan": "Bradford ",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "28",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "608 Hannahs Drive Pataskala, Ohio 43062",
+    "floorplan": "Charleston",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "29",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "611 Hannahs Drive Pataskala, Ohio 43062",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "30",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "609 Hannahs Drive Pataskala, Ohio 43062",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "31",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "607 Hannahs Drive Pataskala, Ohio 43062",
+    "floorplan": "Richmond",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "32",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "605 Hannahs Drive Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "33",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "603 Hannahs Drive Pataskala, Ohio 43062",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "34",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "601 Hannahs Drive Pataskala, Ohio 43062",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "35",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "113 Ashburn Lane Pataskala, Ohio 43062",
+    "floorplan": "Charleston",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "36",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "111 Ashburn Lane Pataskala, Ohio 43062",
+    "floorplan": "Barclay",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "37",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "109 Ashburn Lane Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "38",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "107 Ashburn Lane Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "39",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "105 Ashburn Lane Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "40",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "103 Ashburn Lane Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "41",
+    "subdivision": "Hazelton Crossing",
+    "builder": "Rockford",
+    "address": "101 Ashburn Lane Pataskala, Ohio 43062",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
     "lotNumber": "4865",
     "subdivision": "Terra Alta",
     "builder": "Ryan",
