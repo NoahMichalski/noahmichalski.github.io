@@ -2,97 +2,106 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lot Converter v1.0</title>
+<title>Lot Converter v2.0</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #111;
-        color: #fff;
-        padding: 20px;
-    }
-    h1 { margin-bottom: 5px; }
-    .box {
-        background: #1a1a1a;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 15px;
-    }
-    input, button {
-        padding: 8px;
-        margin: 5px 0;
-        border: none;
-        border-radius: 4px;
-    }
-    button {
-        background: #fff;
-        color: #000;
-        cursor: pointer;
-        font-weight: bold;
-    }
-    button:hover {
-        background: #ccc;
-    }
-    textarea {
-        width: 100%;
-        height: 300px;
-        background: #000;
-        color: #0f0;
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        font-family: monospace;
-    }
-    .error {
-        color: #ff4d4d;
-        font-size: 14px;
-    }
+body {
+    font-family: Arial;
+    background: #111;
+    color: white;
+    padding: 20px;
+}
+.box {
+    background: #1a1a1a;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+button {
+    padding: 8px 12px;
+    margin: 5px;
+    background: white;
+    color: black;
+    border: none;
+    cursor: pointer;
+}
+input, select {
+    padding: 6px;
+    margin: 3px;
+}
+textarea {
+    width: 100%;
+    height: 250px;
+    background: black;
+    color: #0f0;
+    font-family: monospace;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+td, th {
+    border: 1px solid #333;
+    padding: 5px;
+}
+.errorRow {
+    background: #3a0000;
+}
+.goodRow {
+    background: #003300;
+}
 </style>
 </head>
 
 <body>
 
 <h1>Lot Converter</h1>
-<div>Version 1.0</div>
+<div>Version 2.0</div>
 
 <div class="box">
-    <input type="file" id="fileInput" />
+    <input type="file" id="fileInput">
     <br>
-    <label>Last Updated:</label>
+    <label>Date:</label>
     <input type="date" id="dateInput">
     <br>
-    <button onclick="processFile()">Convert</button>
+    <button onclick="processFile()">Import</button>
+    <button onclick="fixErrors()">Fix Errors</button>
 </div>
 
 <div class="box">
-    <h3>Errors</h3>
-    <div id="errors" class="error"></div>
+    <h3>Editable Data</h3>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Builder</th>
+                <th>Subdivision</th>
+                <th>Lot</th>
+                <th>Floorplan</th>
+                <th>Address</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 </div>
 
 <div class="box">
-    <h3>Output</h3>
+    <h3>Output JSON</h3>
     <textarea id="output"></textarea>
     <br>
     <button onclick="copyOutput()">Copy</button>
-    <button onclick="downloadJSON()">Download JSON</button>
+    <button onclick="downloadJSON()">Download</button>
 </div>
 
 <script>
 document.getElementById("dateInput").valueAsDate = new Date();
 
-let jsonData = [];
+let tableData = [];
 
 function processFile() {
     const file = document.getElementById('fileInput').files[0];
-    const errorsDiv = document.getElementById('errors');
-    const output = document.getElementById('output');
-    errorsDiv.innerHTML = "";
-    output.value = "";
-
-    if (!file) {
-        errorsDiv.innerHTML = "No file selected.";
-        return;
-    }
+    if (!file) return alert("Select a file");
 
     const reader = new FileReader();
 
@@ -103,62 +112,97 @@ function processFile() {
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-        const selectedDate = document.getElementById('dateInput').value;
+        tableData = rows.map(row => ({
+            builder: (row["Builder"] || "").trim(),
+            subdivision: (row["Subdivision"] || "").trim(),
+            lot: (row["Lot"] || "").toString().trim(),
+            floorplan: (row["Floorplan"] || "").trim(),
+            address: (row["Address"] || "").trim(),
+            valid: false
+        }));
 
-        jsonData = [];
-        let errors = [];
-
-        rows.forEach((row, index) => {
-            let lot = row["Lot"] || row["lot"] || "";
-            let subdivision = row["Subdivision"] || "";
-            let builder = row["Builder"] || "";
-            let address = row["Address"] || "";
-            let floorplan = row["Floor Plan"] || row["Floorplan"] || "";
-
-            let rowErrors = [];
-
-            if (!subdivision) rowErrors.push("Missing subdivision");
-            if (!builder) rowErrors.push("Missing builder");
-            if (!address) rowErrors.push("Missing address");
-
-            if (rowErrors.length > 0) {
-                errors.push(`Row ${index + 2}: ${rowErrors.join(", ")}`);
-                return;
-            }
-
-            jsonData.push({
-                lotNumber: String(lot || ""),
-                subdivision: subdivision,
-                builder: builder,
-                address: address,
-                floorplan: floorplan,
-                lastUpdated: selectedDate
-            });
-        });
-
-        if (errors.length > 0) {
-            errorsDiv.innerHTML = errors.join("<br>");
-        }
-
-        output.value = JSON.stringify(jsonData, null, 2);
+        renderTable();
+        validateAndOutput();
     };
 
     reader.readAsArrayBuffer(file);
 }
 
+function renderTable() {
+    const tbody = document.querySelector("#dataTable tbody");
+    tbody.innerHTML = "";
+
+    tableData.forEach((row, index) => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td contenteditable oninput="updateCell(${index}, 'builder', this.innerText)">${row.builder}</td>
+            <td contenteditable oninput="updateCell(${index}, 'subdivision', this.innerText)">${row.subdivision}</td>
+            <td contenteditable oninput="updateCell(${index}, 'lot', this.innerText)">${row.lot}</td>
+            <td contenteditable oninput="updateCell(${index}, 'floorplan', this.innerText)">${row.floorplan}</td>
+            <td contenteditable oninput="updateCell(${index}, 'address', this.innerText)">${row.address}</td>
+            <td id="status-${index}">❌</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+
+function updateCell(index, key, value) {
+    tableData[index][key] = value.trim();
+    validateAndOutput();
+}
+
+function validateAndOutput() {
+    const date = document.getElementById("dateInput").value;
+    let output = [];
+
+    tableData.forEach((row, i) => {
+        let valid = row.builder && row.subdivision && row.address;
+
+        row.valid = valid;
+
+        const statusCell = document.getElementById(`status-${i}`);
+        const tr = document.querySelectorAll("#dataTable tbody tr")[i];
+
+        if (valid) {
+            statusCell.innerText = "✅";
+            tr.className = "goodRow";
+
+            output.push({
+                lotNumber: row.lot || "",
+                subdivision: row.subdivision,
+                builder: row.builder,
+                address: row.address,
+                floorplan: row.floorplan || "",
+                lastUpdated: date
+            });
+
+        } else {
+            statusCell.innerText = "❌";
+            tr.className = "errorRow";
+        }
+    });
+
+    document.getElementById("output").value = JSON.stringify(output, null, 2);
+}
+
+function fixErrors() {
+    validateAndOutput();
+    alert("Rechecked all rows. Fix highlighted ones.");
+}
+
 function copyOutput() {
-    const output = document.getElementById('output');
+    const output = document.getElementById("output");
     output.select();
     document.execCommand("copy");
     alert("Copied!");
 }
 
 function downloadJSON() {
-    const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
+    const blob = new Blob([document.getElementById("output").value], { type: "application/json" });
     const a = document.createElement("a");
-    a.href = url;
+    a.href = URL.createObjectURL(blob);
     a.download = "lots.json";
     a.click();
 }
