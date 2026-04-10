@@ -37,6 +37,12 @@ th, td {
     text-align:center;
 }
 
+.predicted {
+    background:#ff4da6;
+    color:white;
+    font-weight:bold;
+}
+
 .normal { background:#0f2e0f; }
 .warning { background:#5a4b00; }
 .overtime { background:#5c0000; font-weight:bold; }
@@ -50,7 +56,7 @@ th, td {
 
 <div class="controls">
     <input type="file" id="fileInput" accept=".xlsx,.csv">
-    
+
     <select id="daySelect" onchange="recalcAll()">
         <option value="0">Monday</option>
         <option value="1">Tuesday</option>
@@ -91,9 +97,8 @@ function processFile() {
     reader.onload = function(e) {
         const wb = XLSX.read(e.target.result, {type:'binary'});
         const sheet = wb.Sheets[wb.SheetNames[0]];
-        const data = XLSX.utils.sheet_to_json(sheet);
+        tableData = XLSX.utils.sheet_to_json(sheet);
 
-        tableData = data;
         render();
     };
 
@@ -145,22 +150,25 @@ function recalcAll() {
 
         let days = [];
         for (let i = 1; i <= 5; i++) {
-            days.push(parseFloat(tds[i].innerText) || 0);
+            let val = parseFloat(tds[i].innerText) || 0;
+            days.push(val);
         }
 
-        // ✅ ACTUAL = ONLY filled hours
         let actual = days.reduce((a,b)=>a+b,0);
 
-        // 🔮 PROJECTED
         let projected = 0;
 
-        days.forEach((h, i) => {
+        for (let i = 0; i < 5; i++) {
+            tds[i+1].classList.remove("predicted");
+
             if (i <= selectedDay) {
-                projected += h; // real hours
+                projected += days[i];
             } else {
-                projected += 8; // future assumption
+                projected += 8;
+                tds[i+1].innerText = "8";
+                tds[i+1].classList.add("predicted");
             }
-        });
+        }
 
         let ot = projected > 40 ? projected - 40 : 0;
 
@@ -176,23 +184,46 @@ function recalcAll() {
     });
 }
 
-// live editing support
 document.addEventListener("input", function(e){
     if (e.target.closest("table")) recalcAll();
 });
 
 function exportExcel() {
-    let rows = [["Name","Mon","Tue","Wed","Thu","Fri","Actual","Projected","OT"]];
+    let wb = XLSX.utils.book_new();
+    let ws_data = [];
 
-    document.querySelectorAll("#table tbody tr").forEach(tr => {
-        let cols = tr.querySelectorAll("td");
-        rows.push([...cols].map(td => td.innerText));
+    document.querySelectorAll("#table tr").forEach(tr => {
+        let row = [];
+        tr.querySelectorAll("th,td").forEach(td => {
+            row.push(td.innerText);
+        });
+        ws_data.push(row);
     });
 
-    let ws = XLSX.utils.aoa_to_sheet(rows);
-    let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "OT");
+    let ws = XLSX.utils.aoa_to_sheet(ws_data);
 
+    // Apply styles
+    let range = XLSX.utils.decode_range(ws['!ref']);
+
+    for (let R = 1; R <= range.e.r; ++R) {
+        let tr = document.querySelectorAll("#table tbody tr")[R-1];
+
+        let style = {};
+        if (tr.classList.contains("overtime")) {
+            style = { fill: { fgColor: { rgb: "FF0000" } } };
+        } else if (tr.classList.contains("warning")) {
+            style = { fill: { fgColor: { rgb: "FFFF00" } } };
+        } else {
+            style = { fill: { fgColor: { rgb: "008000" } } };
+        }
+
+        for (let C = 0; C <= range.e.c; ++C) {
+            let cell = ws[XLSX.utils.encode_cell({r:R, c:C})];
+            if (cell) cell.s = style;
+        }
+    }
+
+    XLSX.utils.book_append_sheet(wb, ws, "OT");
     XLSX.writeFile(wb, "overtime.xlsx");
 }
 
