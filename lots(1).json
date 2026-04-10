@@ -1,5 +1,485 @@
 [
     {
+    "lotNumber": "45",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "5959 Ayotte St. Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "46",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "5969 Ayotte St. Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "47",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "5977 Ayotte St. Powell, OH 43065",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "48",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "5987 Ayotte St. Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "49",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3177 Natal Lane Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "50",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3215 Natal Lane Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "51",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3229 Natal Lane Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "52",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3241 Natal Lane Powell, OH 43065",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "53",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3253 Natal Lane Powell, OH 43065",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "54",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3265 Natal Lane Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "55",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3277 Natal Lane Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "56",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3285 Natal Lane Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "57",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3388 Majestic Way Powell, OH 43065",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "58",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3372 Majestic Way Powell, OH 43065",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "59",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3358 Majestic Way Powell, OH 43065",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "60",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3346 Majestic Way Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "61",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3334 Majestic Way Powell, OH 43065",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "62",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3320 Majestic Way Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "63",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3270 Majestic Way Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "64",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3379 Majestic Way Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "65",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3367 Majestic Way Powell, OH 43065",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "66",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3349 Majestic Way Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "67",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3337 Majestic Way Powell, OH 43065",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "68",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6218 Gretsch Street Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "69",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6226 Gretsch Street Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "70",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6236 Gretsch Street Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "71",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6244 Gretsch Street Powell, OH 43065",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "72",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3386 Korg St. Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "73",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3398 Korg St. Powell, OH 43065",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "74",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3412 Korg St. Powell, OH 43065",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "75",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3391 Korg St. Powell, OH 43065",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "76",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3405 Korg St. Powell, OH 43065",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "77",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3413 Korg St. Powell, OH 43065",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "78",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6224 Brady Ave. Powell, OH 43065",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "79",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6216 Brady Ave. Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "80",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6204 Brady Ave. Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "81",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6194 Brady Ave, Powell, OH 43065",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "82",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6182 Brady Ave. Powell, OH 43065",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "83",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6172 Brady Ave. Powell, OH 43065",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "84",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6162 Brady Ave. Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "85",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6154 Brady Ave. Powell, OH 43065",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "86",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6148 Brady Ave. Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "87",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6120 Brady Ave. Powell, OH 43065",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "88",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6110 Brady Ave. Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "89",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6102 Brady Ave. Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "90",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6094 Brady Ave. Powell, OH 43065",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "91",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6088 Brady Ave. Powell, OH 43065",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "92",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3284 Natal Lane Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "93",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3276 Natal Lane Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "94",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3264 Natal Lane Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "95",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3252 Natal Lane Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "96",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3236 Natal Lane Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "97",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3228 Natal Lane Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "98",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3216 Natal Lane Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "99",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3016 Brady Ave. Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "100",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "3023 Brady Ave. Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "101",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6033 Brady Ave. Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "102",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6041 Brady Ave. Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "103",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6051 Brady Ave. Powell, OH 43065",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "104",
+    "subdivision": "Hyatts Village",
+    "builder": "Epcon",
+    "address": "6057 Brady Ave. Powell, OH 43065",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+    {
     "lotNumber": "98",
     "subdivision": "Meadow Grove",
     "builder": "Rockford",
