@@ -17,7 +17,7 @@ h1 { text-align:center; }
 
 .controls { text-align:center; margin-bottom:15px; }
 
-button {
+button, select {
     background:white;
     color:black;
     border:none;
@@ -50,6 +50,15 @@ th, td {
 
 <div class="controls">
     <input type="file" id="fileInput" accept=".xlsx,.csv">
+    
+    <select id="daySelect" onchange="recalcAll()">
+        <option value="0">Monday</option>
+        <option value="1">Tuesday</option>
+        <option value="2">Wednesday</option>
+        <option value="3">Thursday</option>
+        <option value="4">Friday</option>
+    </select>
+
     <button onclick="processFile()">Load File</button>
     <button onclick="exportExcel()">Export</button>
 </div>
@@ -73,6 +82,8 @@ th, td {
 
 <script>
 
+let tableData = [];
+
 function processFile() {
     const file = document.getElementById('fileInput').files[0];
     const reader = new FileReader();
@@ -82,7 +93,8 @@ function processFile() {
         const sheet = wb.Sheets[wb.SheetNames[0]];
         const data = XLSX.utils.sheet_to_json(sheet);
 
-        render(data);
+        tableData = data;
+        render();
     };
 
     reader.readAsBinaryString(file);
@@ -93,16 +105,11 @@ function clean(val) {
     return parseFloat(val) || 0;
 }
 
-function render(data) {
+function render() {
     const tbody = document.querySelector("#table tbody");
     tbody.innerHTML = "";
 
-    let today = new Date().getDay();
-    let map = {1:0,2:1,3:2,4:3,5:4};
-    let todayIndex = map[today] ?? 4;
-
-    data.forEach(row => {
-
+    tableData.forEach(row => {
         let name = row["Name"];
         if (!name) return;
 
@@ -114,34 +121,65 @@ function render(data) {
             clean(row["Friday"])
         ];
 
-        let actual = days.reduce((a,b)=>a+b,0);
-
-        let projected = 0;
-
-        days.forEach((h, i) => {
-            if (i <= todayIndex) projected += h;
-            else projected += 8;
-        });
-
-        let ot = projected > 40 ? projected - 40 : 0;
-
         let tr = document.createElement("tr");
-
-        if (projected > 40) tr.classList.add("overtime");
-        else if (projected >= 36) tr.classList.add("warning");
-        else tr.classList.add("normal");
 
         tr.innerHTML = `
             <td>${name}</td>
-            ${days.map(d=>`<td>${d.toFixed(2)}</td>`).join("")}
-            <td>${actual.toFixed(2)}</td>
-            <td>${projected.toFixed(2)}</td>
-            <td>${ot.toFixed(2)}</td>
+            ${days.map(d=>`<td contenteditable="true">${d}</td>`).join("")}
+            <td class="actual">0</td>
+            <td class="projected">0</td>
+            <td class="ot">0</td>
         `;
 
         tbody.appendChild(tr);
     });
+
+    recalcAll();
 }
+
+function recalcAll() {
+    let selectedDay = parseInt(document.getElementById("daySelect").value);
+
+    document.querySelectorAll("#table tbody tr").forEach(tr => {
+        let tds = tr.querySelectorAll("td");
+
+        let days = [];
+        for (let i = 1; i <= 5; i++) {
+            days.push(parseFloat(tds[i].innerText) || 0);
+        }
+
+        // ✅ ACTUAL = ONLY filled hours
+        let actual = days.reduce((a,b)=>a+b,0);
+
+        // 🔮 PROJECTED
+        let projected = 0;
+
+        days.forEach((h, i) => {
+            if (i <= selectedDay) {
+                projected += h; // real hours
+            } else {
+                projected += 8; // future assumption
+            }
+        });
+
+        let ot = projected > 40 ? projected - 40 : 0;
+
+        tds[6].innerText = actual.toFixed(2);
+        tds[7].innerText = projected.toFixed(2);
+        tds[8].innerText = ot.toFixed(2);
+
+        tr.classList.remove("normal","warning","overtime");
+
+        if (projected > 40) tr.classList.add("overtime");
+        else if (projected >= 36) tr.classList.add("warning");
+        else tr.classList.add("normal");
+    });
+}
+
+// live editing support
+document.addEventListener("input", function(e){
+    if (e.target.closest("table")) recalcAll();
+});
 
 function exportExcel() {
     let rows = [["Name","Mon","Tue","Wed","Thu","Fri","Actual","Projected","OT"]];
