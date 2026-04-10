@@ -1,6 +1,246 @@
 [
     {
     "lotNumber": "1",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6465 Walden Drive NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "2",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6455 Walden Drive NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "3",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6443 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "4",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6431 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "5",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6418 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "6",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6407 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Ashland",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "7",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6395 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "8",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6383 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "9",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6349 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Richmond",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "10",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6337 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "11",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6325 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "12",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "12553 Heritage Way NW Pickerington, Ohio 43147",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "13",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "12541 Heritage Way NW Pickerington, Ohio 43147",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "14",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "12529 Heritage Way NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "15",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "12517 Heritage Way NW Pickerington, Ohio 43147",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "16",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6301 Lemon Drive NW Pickerington, Ohio 43147",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "17",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6290 Lemon Drive NW Pickerington, Ohio 43147",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "18",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "12576 Heritage Way NW Pickerington, Ohio 43147",
+    "floorplan": "Manchester",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "19",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "12588 Heritage Way NW Pickerington, Ohio 43147",
+    "floorplan": "Charleston",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "20",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "12600 Heritage Way NW Pickerington, Ohio 43147",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "21",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6328 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "22",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6340 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "23",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6388 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "24",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6410 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Brentwood",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "25",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6436 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "26",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6448 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Bradford",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "27",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6460 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "28",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6484 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "29",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6496 Bemington Trail NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "30",
+    "subdivision": "Sycamore Grove",
+    "builder": "Rockford",
+    "address": "6458 Walden Drive NW Pickerington, Ohio 43147",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+    {
+    "lotNumber": "1",
     "subdivision": "Mulberry",
     "builder": "Epcon",
     "address": "2130 Darilyn Drive Grove City, OH 43123",
