@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lot Converter v1.0</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: #fff;
+        padding: 20px;
+    }
+    h1 { margin-bottom: 5px; }
+    .box {
+        background: #1a1a1a;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    input, button {
+        padding: 8px;
+        margin: 5px 0;
+        border: none;
+        border-radius: 4px;
+    }
+    button {
+        background: #fff;
+        color: #000;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    button:hover {
+        background: #ccc;
+    }
+    textarea {
+        width: 100%;
+        height: 300px;
+        background: #000;
+        color: #0f0;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        font-family: monospace;
+    }
+    .error {
+        color: #ff4d4d;
+        font-size: 14px;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Lot Converter</h1>
+<div>Version 1.0</div>
+
+<div class="box">
+    <input type="file" id="fileInput" />
+    <br>
+    <label>Last Updated:</label>
+    <input type="date" id="dateInput">
+    <br>
+    <button onclick="processFile()">Convert</button>
+</div>
+
+<div class="box">
+    <h3>Errors</h3>
+    <div id="errors" class="error"></div>
+</div>
+
+<div class="box">
+    <h3>Output</h3>
+    <textarea id="output"></textarea>
+    <br>
+    <button onclick="copyOutput()">Copy</button>
+    <button onclick="downloadJSON()">Download JSON</button>
+</div>
+
+<script>
+document.getElementById("dateInput").valueAsDate = new Date();
+
+let jsonData = [];
+
+function processFile() {
+    const file = document.getElementById('fileInput').files[0];
+    const errorsDiv = document.getElementById('errors');
+    const output = document.getElementById('output');
+    errorsDiv.innerHTML = "";
+    output.value = "";
+
+    if (!file) {
+        errorsDiv.innerHTML = "No file selected.";
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+        const selectedDate = document.getElementById('dateInput').value;
+
+        jsonData = [];
+        let errors = [];
+
+        rows.forEach((row, index) => {
+            let lot = row["Lot"] || row["lot"] || "";
+            let subdivision = row["Subdivision"] || "";
+            let builder = row["Builder"] || "";
+            let address = row["Address"] || "";
+            let floorplan = row["Floor Plan"] || row["Floorplan"] || "";
+
+            let rowErrors = [];
+
+            if (!subdivision) rowErrors.push("Missing subdivision");
+            if (!builder) rowErrors.push("Missing builder");
+            if (!address) rowErrors.push("Missing address");
+
+            if (rowErrors.length > 0) {
+                errors.push(`Row ${index + 2}: ${rowErrors.join(", ")}`);
+                return;
+            }
+
+            jsonData.push({
+                lotNumber: String(lot || ""),
+                subdivision: subdivision,
+                builder: builder,
+                address: address,
+                floorplan: floorplan,
+                lastUpdated: selectedDate
+            });
+        });
+
+        if (errors.length > 0) {
+            errorsDiv.innerHTML = errors.join("<br>");
+        }
+
+        output.value = JSON.stringify(jsonData, null, 2);
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+
+function copyOutput() {
+    const output = document.getElementById('output');
+    output.select();
+    document.execCommand("copy");
+    alert("Copied!");
+}
+
+function downloadJSON() {
+    const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "lots.json";
+    a.click();
+}
+</script>
+
+</body>
+</html>
