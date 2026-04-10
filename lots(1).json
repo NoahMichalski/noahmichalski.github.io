@@ -1,5 +1,445 @@
 [
     {
+    "lotNumber": "1",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2130 Darilyn Drive Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "2",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2124 Darilyn Drive Grove City, OH 43123",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "3",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2118 Darilyn Drive Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "4",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2112 Darilyn Drive Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "5",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2106 Darilyn Drive Grove City, OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "6",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2100 Darilyn Drive Grove City, OH 43123",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "7",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2094 Darilyn Drive Grove City, OH 43123",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "8",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2088 Darilyn Drive Grove City, OH 43123",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "9",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2082 Darilyn Drive Grove City, OH 43123",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "25",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2067 Charlyn Drive Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "26",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2073 Charlyn Drive Grove City, OH 43123",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "31",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2103 Charlyn Drive Grove City, OH 43123",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "32",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2109 Charlyn Drive Grove City, OH 43123",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "33",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2115 Charlyn Drive Grove City, OH 43123",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "34",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2121 Charlyn Drive Grove City, OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "35",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2127 Charlyn Drive Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "36",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2133 Charlyn Drive Grove City, OH 43123",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "37",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2138 Charlyn Drive Grove City, OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "38",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2132 Charlyn Drive Grove City, OH 43123",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "39",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2060 Charlyn Drive Grove City, OH 43123",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "40",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "2066 Charlyn Drive Grove City, OH 43123",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "41",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4409 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "42",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4415 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "43",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4439 Marilyn Court Grove City , OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "44",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4445 Marilyn Court Grove City , OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "45",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4451 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "46",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4457 Marilyn Court Grove City , OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "47",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4463 Marilyn Court Grove City , OH 43123",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "48",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4469 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "49",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4475 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "50",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4481 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "51",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4487 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "52",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4493 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "53",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4499 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "54",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4515 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "55",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4521 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "56",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4527 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "57",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4533 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "58",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4539 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "59",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4545 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "60",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4551 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "61",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4532 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "62",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4526 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "63",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4520 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "64",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4514 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "65",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4508 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "66",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4502 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "67",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4468 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "68",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4462 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "69",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4456 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "70",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4450 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "71",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4444 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "72",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4434 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "73",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4428 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+  {
+    "lotNumber": "74",
+    "subdivision": "Mulberry",
+    "builder": "Epcon",
+    "address": "4422 Marilyn Court Grove City, OH 43123",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-10"
+  },
+    {
     "lotNumber": "45",
     "subdivision": "Hyatts Village",
     "builder": "Epcon",
