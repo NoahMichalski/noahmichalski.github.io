@@ -13,6 +13,7 @@ body {
   color: #fff;
 }
 
+/* HEADER */
 .header {
   padding: 12px;
   background: #111;
@@ -22,10 +23,23 @@ body {
   border-bottom: 1px solid #222;
 }
 
+/* LOGO TITLE */
+.title-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  height: 26px;
+}
+
+/* FILTERS */
 .filters {
   display: grid;
   grid-template-columns: 100px auto 1fr 140px 140px auto auto;
   gap: 8px;
+  margin-top: 8px;
 }
 
 .filters input {
@@ -59,7 +73,7 @@ body {
 
 /* TABLE */
 .table-container {
-  height: calc(100vh - 150px);
+  height: calc(100vh - 160px);
   overflow: auto;
 }
 
@@ -79,7 +93,7 @@ th {
   background: #1a1a1a;
 }
 
-/* ADDRESS + COPY */
+/* ADDRESS */
 .address-wrapper {
   display: flex;
   justify-content: center;
@@ -169,7 +183,10 @@ th {
 <body>
 
 <div class="header">
-  <h3>Lot Lookup</h3>
+  <div class="title-bar">
+    <img src="/images/VIP-logo-white.png" class="logo">
+    <span>Lot Lookup</span>
+  </div>
 
   <div class="filters">
     <input id="filterLot" placeholder="Lot">
@@ -217,7 +234,7 @@ function loadData() {
     .then(data => {
       lots = data;
       buildBuilderUpdates();
-      filterLots();
+      filterLots(); // 🔥 FIXED (this was your issue)
     });
 }
 loadData();
@@ -233,7 +250,6 @@ function daysAgo(d) {
 /* BUILDER BAR */
 function buildBuilderUpdates() {
   const latest = {};
-
   lots.forEach(l => {
     if (!latest[l.builder] || new Date(l.lastUpdated) > new Date(latest[l.builder])) {
       latest[l.builder] = l.lastUpdated;
@@ -241,7 +257,6 @@ function buildBuilderUpdates() {
   });
 
   builderUpdateList.innerHTML = '';
-
   Object.entries(latest).forEach(([b,d])=>{
     const diff = Math.floor((Date.now()-new Date(d))/86400000);
     const span = document.createElement('span');
@@ -252,25 +267,34 @@ function buildBuilderUpdates() {
   });
 }
 
-/* FILTER */
+/* 🔥 FIXED FILTER (case-insensitive everything) */
 function filterLots() {
+  const lot = filterLot.value.toLowerCase();
+  const sub = filterSubdivision.value.toLowerCase();
+  const builder = filterBuilder.value.toLowerCase();
+  const floor = filterFloorplan.value.toLowerCase();
+
   let filtered = lots.filter(l =>
-    (!filterLot.value || l.lotNumber.includes(filterLot.value)) &&
-    (!filterSubdivision.value || l.subdivision.toLowerCase().includes(filterSubdivision.value.toLowerCase())) &&
-    (!filterBuilder.value || l.builder.toLowerCase().includes(filterBuilder.value.toLowerCase())) &&
-    (!filterFloorplan.value || (l.floorplan||'').toLowerCase().includes(filterFloorplan.value.toLowerCase()))
+    (!lot || l.lotNumber.toLowerCase().includes(lot)) &&
+    (!sub || l.subdivision.toLowerCase().includes(sub)) &&
+    (!builder || l.builder.toLowerCase().includes(builder)) &&
+    (!floor || (l.floorplan||'').toLowerCase().includes(floor))
   );
 
   if (currentSort.key) {
     filtered.sort((a,b)=>{
-      let A = a[currentSort.key] || '';
-      let B = b[currentSort.key] || '';
+      let A = (a[currentSort.key]||'').toString().toLowerCase();
+      let B = (b[currentSort.key]||'').toString().toLowerCase();
       return currentSort.asc ? A.localeCompare(B) : B.localeCompare(A);
     });
   }
 
   renderTable(filtered);
 }
+
+/* INPUT LISTENERS (THIS WAS MISSING) */
+document.querySelectorAll('.filters input')
+  .forEach(i => i.addEventListener('input', filterLots));
 
 /* ENTER SEARCH */
 filterLot.addEventListener('keydown', e=>{
@@ -279,7 +303,7 @@ filterLot.addEventListener('keydown', e=>{
 
 /* EXACT */
 function exactLotSearch(){
-  renderTable(lots.filter(l=>l.lotNumber===filterLot.value));
+  renderTable(lots.filter(l=>l.lotNumber.toLowerCase() === filterLot.value.toLowerCase()));
 }
 
 /* SORT */
@@ -312,7 +336,6 @@ function renderTable(data){
     const addressText = row.querySelector('.address-text');
     const copyBtn = row.querySelector('.copy-btn');
 
-    // COPY
     copyBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       navigator.clipboard.writeText(l.address);
@@ -320,7 +343,6 @@ function renderTable(data){
       setTimeout(() => copyBtn.textContent = "Copy", 800);
     });
 
-    // MAP CLICK
     addressText.addEventListener('click', (e) => {
       e.stopPropagation();
       window.open(`https://maps.google.com/?q=${encodeURIComponent(l.address)}`);
