@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Overtime Predictor v3</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<style>
+body {
+    background:#0a0a0a;
+    color:white;
+    font-family:Arial;
+    padding:20px;
+}
+h1 { text-align:center; }
+
+.controls { text-align:center; margin-bottom:15px; }
+
+button {
+    background:white;
+    color:black;
+    border:none;
+    padding:8px 14px;
+    margin:5px;
+    cursor:pointer;
+}
+
+table {
+    width:100%;
+    border-collapse:collapse;
+}
+
+th, td {
+    border:1px solid #333;
+    padding:8px;
+    text-align:center;
+}
+
+.normal { background:#0f2e0f; }
+.warning { background:#5a4b00; }
+.overtime { background:#5c0000; font-weight:bold; }
+
+</style>
+</head>
+
+<body>
+
+<h1>Overtime Predictor</h1>
+
+<div class="controls">
+    <input type="file" id="fileInput" accept=".xlsx,.csv">
+    <button onclick="processFile()">Load</button>
+    <button onclick="exportExcel()">Export</button>
+    <button onclick="copyTable()">Copy</button>
+</div>
+
+<table id="table">
+<thead>
+<tr>
+<th>Employee</th>
+<th>Hours So Far</th>
+<th>Days Worked</th>
+<th>Avg / Day</th>
+<th>Projected Total</th>
+<th>Projected OT</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+let rawData = [];
+
+function processFile() {
+    const file = document.getElementById('fileInput').files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const wb = XLSX.read(e.target.result, {type:'binary'});
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        rawData = XLSX.utils.sheet_to_json(sheet);
+
+        calculate();
+    };
+
+    reader.readAsBinaryString(file);
+}
+
+function calculate() {
+    let employees = {};
+
+    rawData.forEach(row => {
+        let name = row.Employee;
+        let date = row.Date;
+        let hours = parseFloat(row.Hours) || 0;
+
+        if (!name || !date) return;
+
+        if (!employees[name]) {
+            employees[name] = {
+                total: 0,
+                days: new Set()
+            };
+        }
+
+        employees[name].total += hours;
+        employees[name].days.add(date);
+    });
+
+    render(employees);
+}
+
+function render(data) {
+    const tbody = document.querySelector("#table tbody");
+    tbody.innerHTML = "";
+
+    Object.keys(data).forEach(name => {
+        let total = data[name].total;
+        let days = data[name].days.size;
+
+        let avg = days ? total / days : 0;
+        let projected = avg * 5;
+        let ot = projected > 40 ? projected - 40 : 0;
+
+        let tr = document.createElement("tr");
+
+        if (projected > 40) tr.classList.add("overtime");
+        else if (projected >= 36) tr.classList.add("warning");
+        else tr.classList.add("normal");
+
+        tr.innerHTML = `
+            <td>${name}</td>
+            <td>${total.toFixed(2)}</td>
+            <td>${days}</td>
+            <td>${avg.toFixed(2)}</td>
+            <td>${projected.toFixed(2)}</td>
+            <td>${ot.toFixed(2)}</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+
+function exportExcel() {
+    let rows = [["Employee","Hours","Days","Avg","Projected","OT"]];
+
+    document.querySelectorAll("#table tbody tr").forEach(tr => {
+        let cols = tr.querySelectorAll("td");
+        rows.push([...cols].map(td => td.innerText));
+    });
+
+    let ws = XLSX.utils.aoa_to_sheet(rows);
+    let wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "OT");
+
+    XLSX.writeFile(wb, "overtime_prediction.xlsx");
+}
+
+function copyTable() {
+    let text = "";
+
+    document.querySelectorAll("#table tr").forEach(tr => {
+        let row = [];
+        tr.querySelectorAll("th,td").forEach(td => {
+            row.push(td.innerText);
+        });
+        text += row.join("\t") + "\n";
+    });
+
+    navigator.clipboard.writeText(text);
+    alert("Copied");
+}
+</script>
+
+</body>
+</html>
