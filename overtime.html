@@ -122,21 +122,6 @@ th {
 <button onclick="copyEmail()">Copy Email</button>
 </div>
 
-<div class="filters">
-Min Hours <input id="minHours" type="number" style="width:60px;">
-Min OT <input id="minOT" type="number" style="width:60px;">
-
-<select id="filterType">
-<option value="all">All</option>
-<option value="ot">OT Only</option>
-<option value="risk">At Risk</option>
-<option value="safe">Safe</option>
-</select>
-
-<button onclick="applyFilters()">Apply</button>
-<button onclick="resetFilters()">Reset</button>
-</div>
-
 <div class="summary" id="summary"></div>
 
 <div class="table-container">
@@ -223,7 +208,7 @@ function render(){
     });
 
     // 🔥 ALWAYS SORT BY OT DESC
-    computed.sort((a,b)=>b.ot - a.ot);
+  computed.sort((a,b)=>b.projected - a.projected);
 
     let tbody = document.querySelector("#table tbody");
     tbody.innerHTML = "";
@@ -259,58 +244,8 @@ function render(){
         tbody.appendChild(tr);
     });
 
-    document.getElementById("summary").innerHTML = `
-        <div class="card">Current: ${totalA.toFixed(1)}</div>
-        <div class="card">Projected: ${totalP.toFixed(1)}</div>
-        <div class="card">OT Hours: ${totalOT.toFixed(1)}</div>
-        <div class="card">OT Employees: ${otCount}</div>
-        <div class="card">At Risk: ${riskCount}</div>
-    `;
 }
 
-/* FILTERS */
-function applyFilters(){
-    let minH = parseFloat(minHours.value)||0;
-    let minOT = parseFloat(minOT.value)||0;
-    let type = filterType.value;
-    let day = parseInt(daySelect.value);
-
-    currentData = rawData.map(r=>{
-        let days=[
-            clean(r["Monday"]),
-            clean(r["Tuesday"]),
-            clean(r["Wednesday"]),
-            clean(r["Thursday"]),
-            clean(r["Friday"])
-        ];
-
-        let projected=0;
-        for(let i=0;i<5;i++){
-            projected += (i<=day)?days[i]:8;
-        }
-
-        let actual=days.reduce((a,b)=>a+b,0);
-        let ot=projected>40?projected-40:0;
-
-        return {name:r["Name"],days,actual,projected,ot};
-
-    }).filter(r=>{
-        if(r.actual<minH) return false;
-        if(r.ot<minOT) return false;
-
-        if(type==="ot" && r.projected<=40) return false;
-        if(type==="risk" && !(r.projected>=36 && r.projected<=40)) return false;
-        if(type==="safe" && r.projected>=36) return false;
-
-        return true;
-    });
-
-    render();
-}
-
-function resetFilters(){
-    build();
-}
 
 /* EMAIL COPY */
 function copyEmail(){
