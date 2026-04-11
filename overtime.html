@@ -227,7 +227,7 @@ function render(){
         let tr=document.createElement("tr");
 
         if(row.projected>40) tr.classList.add("overtime");
-        else if(row.projected>=36) tr.classList.add("warning");
+        else if(row.projected>=38) tr.classList.add("warning");
         else tr.classList.add("normal");
 
         tr.innerHTML=`
