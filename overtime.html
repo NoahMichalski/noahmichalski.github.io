@@ -2,61 +2,97 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Overtime Predictor</title>
+<title>Overtime Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
 body {
-    background:#0a0a0a;
+    margin:0;
+    background:#0f1115;
+    color:#e6e6e6;
+    font-family:Segoe UI, Arial;
+}
+
+/* HEADER */
+.header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:#1a1d24;
+    padding:10px 20px;
+    border-bottom:1px solid #2a2f3a;
+}
+
+.header-left {
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.logo { height:40px; }
+.title { font-size:20px; font-weight:600; }
+
+/* CONTROLS */
+.controls, .filters {
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:10px;
+    padding:10px;
+}
+
+button, select, input {
+    background:#2a2f3a;
     color:white;
-    font-family:Arial;
-    padding:20px;
-}
-
-.logo {
-    display:block;
-    margin:0 auto 10px;
-    max-width:180px;
-}
-
-h1 { text-align:center; }
-
-.controls { text-align:center; margin-bottom:10px; }
-
-button, select {
-    background:white;
-    color:black;
     border:none;
-    padding:8px 14px;
-    margin:5px;
-    cursor:pointer;
+    padding:6px 10px;
+    border-radius:4px;
 }
 
-.dayLabel {
-    text-align:center;
-    margin-bottom:10px;
-    font-weight:bold;
+/* SUMMARY */
+.summary {
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+    padding:10px;
 }
+
+.card {
+    background:#1a1d24;
+    padding:10px 15px;
+    border-radius:6px;
+    border:1px solid #2a2f3a;
+}
+
+/* TABLE */
+.table-container { padding:10px 20px; }
 
 table {
     width:100%;
     border-collapse:collapse;
+    background:#1a1d24;
 }
 
 th, td {
-    border:1px solid #333;
-    padding:6px;
+    border:1px solid #2a2f3a;
+    padding:8px;
     text-align:center;
 }
 
-/* CLEAN COLORS */
-.normal { background:#93c47d; color:#000; }
-.warning { background:#ffd966; color:#000; font-weight:bold; }
-.overtime { background:#ff1a1a; color:#fff; font-weight:bold; }
+th {
+    background:#d9d9d9 !important;
+    color:#000000 !important;
+    font-weight:bold;
+}
+
+/* COLORS */
+.normal { background:#2e7d32; }
+.warning { background:#f9a825; color:#000; }
+.overtime { background:#c62828; }
 
 .predicted {
     background:#ff4da6 !important;
-    color:#fff !important;
     font-weight:bold;
 }
 </style>
@@ -64,27 +100,46 @@ th, td {
 
 <body>
 
-<img src="/images/VIP-logo-white.png" class="logo">
-
-<h1>Overtime Predictor</h1>
-
-<div class="controls">
-    <input type="file" id="fileInput" accept=".xlsx,.csv">
-
-    <select id="daySelect" onchange="updateDayLabel(); recalc();">
-        <option value="0">Monday</option>
-        <option value="1">Tuesday</option>
-        <option value="2">Wednesday</option>
-        <option value="3">Thursday</option>
-        <option value="4">Friday</option>
-    </select>
-
-    <button onclick="loadFile()">Load</button>
-    <button onclick="copyEmail()">Copy for Email</button>
+<div class="header">
+    <div class="header-left">
+        <img src="/images/VIP-logo-white.png" class="logo">
+        <div class="title">Overtime Dashboard</div>
+    </div>
 </div>
 
-<div class="dayLabel" id="dayLabel"></div>
+<div class="controls">
+<input type="file" id="fileInput">
 
+<select id="daySelect" onchange="recalc()">
+<option value="0">Monday</option>
+<option value="1">Tuesday</option>
+<option value="2">Wednesday</option>
+<option value="3">Thursday</option>
+<option value="4">Friday</option>
+</select>
+
+<button onclick="loadFile()">Load</button>
+<button onclick="copyEmail()">Copy Email</button>
+</div>
+
+<div class="filters">
+Min Hours <input id="minHours" type="number" style="width:60px;">
+Min OT <input id="minOT" type="number" style="width:60px;">
+
+<select id="filterType">
+<option value="all">All</option>
+<option value="ot">OT Only</option>
+<option value="risk">At Risk</option>
+<option value="safe">Safe</option>
+</select>
+
+<button onclick="applyFilters()">Apply</button>
+<button onclick="resetFilters()">Reset</button>
+</div>
+
+<div class="summary" id="summary"></div>
+
+<div class="table-container">
 <table id="table">
 <thead>
 <tr>
@@ -102,164 +157,231 @@ th, td {
 </thead>
 <tbody></tbody>
 </table>
+</div>
 
 <script>
+let rawData = [];
+let currentData = [];
 
-let data = [];
-
-function updateDayLabel(){
-    let text = document.getElementById("daySelect").selectedOptions[0].text;
-    document.getElementById("dayLabel").innerText = "Current Day: " + text;
-}
-updateDayLabel();
+function clean(v){ return parseFloat(v)||0; }
 
 function loadFile(){
     let file = document.getElementById("fileInput").files[0];
     let reader = new FileReader();
 
-    reader.onload = function(e){
+    reader.onload = e=>{
         let wb = XLSX.read(e.target.result,{type:'binary'});
         let sheet = wb.Sheets[wb.SheetNames[0]];
-        data = XLSX.utils.sheet_to_json(sheet);
-        buildTable();
+        rawData = XLSX.utils.sheet_to_json(sheet);
+        build();
     };
 
     reader.readAsBinaryString(file);
 }
 
-function clean(v){
-    return parseFloat(v) || 0;
+function build(){
+    currentData = rawData.map(r=>({
+        name:r["Name"],
+        days:[
+            clean(r["Monday"]),
+            clean(r["Tuesday"]),
+            clean(r["Wednesday"]),
+            clean(r["Thursday"]),
+            clean(r["Friday"])
+        ]
+    }));
+    render();
 }
 
-function buildTable(){
+function recalc(){ render(); }
+
+function render(){
+
+    let day = parseInt(document.getElementById("daySelect").value);
+
+    let computed = currentData.map(row=>{
+        let actual = row.days.reduce((a,b)=>a+b,0);
+
+        let projected=0,running=0,hit="—";
+        let display=[...row.days];
+
+        for(let i=0;i<5;i++){
+            let val = (i<=day)?row.days[i]:8;
+            if(i>day) display[i]=8;
+
+            projected+=val;
+            running+=val;
+
+            if(running>40 && hit==="—"){
+                hit=["Mon","Tue","Wed","Thu","Fri"][i];
+            }
+        }
+
+        let ot = projected>40?projected-40:0;
+
+        return {...row, actual, projected, ot, display, hit};
+    });
+
+    // 🔥 ALWAYS SORT BY OT DESC
+    computed.sort((a,b)=>b.ot - a.ot);
+
     let tbody = document.querySelector("#table tbody");
     tbody.innerHTML = "";
 
-    data.forEach(row=>{
-        let name = row["Name"];
-        if(!name) return;
+    let totalA=0,totalP=0,totalOT=0,otCount=0,riskCount=0;
 
-        let tr = document.createElement("tr");
+    computed.forEach(row=>{
 
-        tr.innerHTML = `
-            <td>${name}</td>
-            <td contenteditable="true">${clean(row["Monday"])}</td>
-            <td contenteditable="true">${clean(row["Tuesday"])}</td>
-            <td contenteditable="true">${clean(row["Wednesday"])}</td>
-            <td contenteditable="true">${clean(row["Thursday"])}</td>
-            <td contenteditable="true">${clean(row["Friday"])}</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+        totalA+=row.actual;
+        totalP+=row.projected;
+        totalOT+=row.ot;
+
+        if(row.projected>40) otCount++;
+        else if(row.projected>=36) riskCount++;
+
+        let tr=document.createElement("tr");
+
+        if(row.projected>40) tr.classList.add("overtime");
+        else if(row.projected>=36) tr.classList.add("warning");
+        else tr.classList.add("normal");
+
+        tr.innerHTML=`
+            <td>${row.name}</td>
+            ${row.display.map((d,i)=>`
+                <td class="${i>day?'predicted':''}" contenteditable="true">${d}</td>
+            `).join("")}
+            <td>${row.actual.toFixed(1)}</td>
+            <td>${row.projected.toFixed(1)}</td>
+            <td>${row.ot.toFixed(1)}</td>
+            <td>${row.hit}</td>
         `;
 
         tbody.appendChild(tr);
     });
 
-    recalc();
+    document.getElementById("summary").innerHTML = `
+        <div class="card">Current: ${totalA.toFixed(1)}</div>
+        <div class="card">Projected: ${totalP.toFixed(1)}</div>
+        <div class="card">OT Hours: ${totalOT.toFixed(1)}</div>
+        <div class="card">OT Employees: ${otCount}</div>
+        <div class="card">At Risk: ${riskCount}</div>
+    `;
 }
 
-function recalc(){
-    let day = parseInt(document.getElementById("daySelect").value);
+/* FILTERS */
+function applyFilters(){
+    let minH = parseFloat(minHours.value)||0;
+    let minOT = parseFloat(minOT.value)||0;
+    let type = filterType.value;
+    let day = parseInt(daySelect.value);
 
-    document.querySelectorAll("#table tbody tr").forEach(tr=>{
-        let tds = tr.querySelectorAll("td");
+    currentData = rawData.map(r=>{
+        let days=[
+            clean(r["Monday"]),
+            clean(r["Tuesday"]),
+            clean(r["Wednesday"]),
+            clean(r["Thursday"]),
+            clean(r["Friday"])
+        ];
 
-        let days = [];
-        for(let i=1;i<=5;i++){
-            days.push(parseFloat(tds[i].innerText)||0);
-        }
-
-        let actual = days.reduce((a,b)=>a+b,0);
-
-        let projected = 0;
-        let running = 0;
-        let hit = "—";
-
+        let projected=0;
         for(let i=0;i<5;i++){
-            tds[i+1].classList.remove("predicted");
-
-            let val = (i<=day)? days[i] : 8;
-
-            if(i>day){
-                tds[i+1].innerText = "8";
-                tds[i+1].classList.add("predicted");
-            }
-
-            projected += val;
-            running += val;
-
-            if(running>40 && hit==="—"){
-                hit = ["Mon","Tue","Wed","Thu","Fri"][i];
-            }
+            projected += (i<=day)?days[i]:8;
         }
 
-        let ot = projected>40 ? projected-40 : 0;
+        let actual=days.reduce((a,b)=>a+b,0);
+        let ot=projected>40?projected-40:0;
 
-        tds[6].innerText = actual.toFixed(2);
-        tds[7].innerText = projected.toFixed(2);
-        tds[8].innerText = ot.toFixed(2);
-        tds[9].innerText = hit;
+        return {name:r["Name"],days,actual,projected,ot};
 
-        tr.classList.remove("normal","warning","overtime");
+    }).filter(r=>{
+        if(r.actual<minH) return false;
+        if(r.ot<minOT) return false;
 
-        if(projected>40) tr.classList.add("overtime");
-        else if(projected>=36) tr.classList.add("warning");
-        else tr.classList.add("normal");
+        if(type==="ot" && r.projected<=40) return false;
+        if(type==="risk" && !(r.projected>=36 && r.projected<=40)) return false;
+        if(type==="safe" && r.projected>=36) return false;
+
+        return true;
     });
+
+    render();
 }
 
-document.addEventListener("input", e=>{
-    if(e.target.closest("table")) recalc();
-});
+function resetFilters(){
+    build();
+}
 
+/* EMAIL COPY */
 function copyEmail(){
 
-    let html = "<table style='border-collapse:collapse;font-family:Arial;'>";
+    let rows = document.querySelectorAll("#table tr");
 
-    document.querySelectorAll("#table tr").forEach((tr,i)=>{
+    let html = `
+    <html>
+    <body style="font-family:Arial;">
+    <h3>Overtime Report</h3>
+    <button onclick="copyNow()" style="margin-bottom:10px;padding:6px 10px;">
+        Copy Table
+    </button>
+    <table style="border-collapse:collapse;">
+    `;
+
+    rows.forEach((tr,i)=>{
 
         html += "<tr>";
 
-        tr.querySelectorAll("th,td").forEach(cell=>{
+        tr.querySelectorAll("th,td").forEach(td=>{
 
             let style = "border:1px solid #000;padding:6px;text-align:center;";
 
             if(i===0){
-                style += "background:#000;color:#fff;font-weight:bold;";
-            } else {
+    style+="background:#d9d9d9;color:#000;font-weight:bold;";
+}else {
 
                 if(tr.classList.contains("overtime")){
                     style += "background:#ff1a1a;color:#fff;font-weight:bold;";
-                } else if(tr.classList.contains("warning")){
-                    style += "background:#ffd966;color:#000;font-weight:bold;";
-                } else {
+                }
+                else if(tr.classList.contains("warning")){
+                    style += "background:#ffd966;color:#000;";
+                }
+                else{
                     style += "background:#93c47d;color:#000;";
                 }
 
-                if(cell.classList.contains("predicted")){
+                if(td.classList.contains("predicted")){
                     style = "border:1px solid #000;padding:6px;text-align:center;background:#ff4da6;color:#fff;font-weight:bold;";
                 }
             }
 
-            html += `<td style="${style}">${cell.innerText}</td>`;
+            html += `<td style="${style}">${td.innerText}</td>`;
         });
 
         html += "</tr>";
     });
 
-    html += "</table>";
+    html += `
+    </table>
 
-    navigator.clipboard.write([
-        new ClipboardItem({
-            "text/html": new Blob([html], {type:"text/html"})
-        })
-    ]);
+    <script>
+    function copyNow(){
+        let range = document.createRange();
+        range.selectNode(document.querySelector("table"));
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand("copy");
+        alert("Copied!");
+    }
+    <\/script>
 
-    alert("Copied for email ✅");
+    </body>
+    </html>
+    `;
+
+    let win = window.open("", "_blank");
+    win.document.write(html);
+    win.document.close();
 }
-
 </script>
 
 </body>
