@@ -8,12 +8,19 @@
     body { background:#111; color:#fff; font-family:Arial; padding:20px; }
 
     button, select {
-      padding:8px 12px;
+      padding:6px 10px;
       margin:5px;
       background:#444;
       color:#fff;
       border:none;
       cursor:pointer;
+    }
+
+    .delete-btn {
+      background:#aa0000;
+      margin-left:8px;
+      padding:2px 6px;
+      font-size:12px;
     }
 
     .date-box {
@@ -41,10 +48,7 @@
       border:1px solid #2a2a2a;
     }
 
-    .job {
-      padding:4px 0;
-      border-bottom:1px solid #222;
-    }
+    .job { padding:4px 0; border-bottom:1px solid #222; }
   </style>
 </head>
 
@@ -69,38 +73,23 @@ function excelDateToJS(serial) {
   return new Date((serial - 25569) * 86400 * 1000);
 }
 
-// ===== TASK LOGIC =====
-function mapTasks(tasks) {
-  let types = new Set();
-  let fallback = null;
+// ===== TASK CLASSIFIER =====
+function classifyTask(task) {
+  let t = task.toLowerCase().trim();
 
-  tasks.forEach(task => {
-    let t = task.toLowerCase().trim();
-    if (!fallback) fallback = task;
+  if (t.includes("full clean") || t.includes("first clean")) return "original";
+  if (t.includes("reclean") || t.includes("qc clean") || t.includes("buff") || t.includes("closing"))
+    return "reclean";
 
-    if (t.includes("anchor bolts")) types.add("bolts");
-    else if (t.includes("install") || t.includes("screens")) types.add("screens");
-    else if (t.includes("power wash")) types.add("p/w");
-    else if (t.includes("carpet prep")) types.add("car");
+  if (t.includes("power wash") || t.includes("powerwash") || t.includes("p/w") || t === "pressure wash")
+    return "p/w";
 
-    else if (t.includes("full clean") || t.includes("first clean")) types.add("original");
-    else if (
-      t.includes("reclean") ||
-      t.includes("qc clean") ||
-      t.includes("reclean 2") ||
-      t.includes("buff clean") ||
-      t.includes("closing clean")
-    ) types.add("reclean");
-  });
+  if (t.includes("carpet prep")) return "car";
+  if (t.includes("anchor bolts")) return "bolts";
 
-  if (types.has("original")) return "original";
-  if (types.has("reclean")) return "reclean";
-  if (types.has("bolts")) return "bolts";
-  if (types.has("screens")) return "screens";
-  if (types.has("p/w")) return "p/w";
-  if (types.has("car")) return "car";
+  if (t.includes("screen")) return null;
 
-  return fallback.toLowerCase();
+  return "unknown"; // 🔥 keep raw
 }
 
 // ===== SUBDIVISION CLEANUP =====
@@ -109,7 +98,7 @@ function cleanSubdivision(name) {
 
   let n = name.toLowerCase().trim();
 
-  // PULTE
+  // ===== HARD MAPPINGS =====
   if (n.includes("amrine meadows")) return "Amrine";
   if (n.includes("clark shaw reserve")) return "Clarkshaw";
   if (n.includes("clover run")) return "Clover";
@@ -127,7 +116,7 @@ function cleanSubdivision(name) {
   if (n.includes("nottingham trace")) return "Nottingham";
   if (n.includes("arrowhead")) return "Arrowhead";
 
-  // DR HORTON
+  // DR Horton
   if (n.includes("longview")) return "LH";
   if (n.includes("orchard lakes")) return "Orchard";
   if (n.includes("walnut mill")) return "Walnut";
@@ -135,16 +124,19 @@ function cleanSubdivision(name) {
   if (n.includes("lansdowne")) return "Lansdowne";
   if (n.includes("madison meadows")) return "MD";
 
-  // CLEANUP
-  return name
-    .replace(/\d+/g, "")
-    .replace(/hle/gi, "")
-    .replace(/ph/gi, "")
-    .replace(/'/g, "")
-    .replace(/-/g, "") // 🔥 remove trailing dashes
+  // ===== CLEANUP LOGIC =====
+  let cleaned = name
+    .replace(/-/g, " ")
+    .replace(/\d+/g, "") // remove numbers
+    .replace(/highlands/gi, "")
+    .replace(/summit/gi, "")
+    .replace(/reserve/gi, "")
+    .replace(/phase/gi, "")
+    .replace(/l\b/gi, "")
     .replace(/\s+/g, " ")
-    .trim()
-    .split(" - ")[0];
+    .trim();
+
+  return cleaned;
 }
 
 // ===== LOAD =====
@@ -162,16 +154,15 @@ function loadFile() {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-    // 🔥 BUILDER VALIDATION
-    let headerText = rows[0].join(" ").toLowerCase();
+    let header = rows[0].join(" ").toLowerCase();
 
-    if (builder === "pulte" && headerText.includes("plat")) {
-      alert("⚠️ This looks like a DR Horton file — switch builder.");
+    if (builder === "pulte" && header.includes("plat")) {
+      alert("Wrong builder selected (this is DR Horton)");
       return;
     }
 
-    if (builder === "drhorton" && headerText.includes("community")) {
-      alert("⚠️ This looks like a Pulte file — switch builder.");
+    if (builder === "drhorton" && header.includes("community")) {
+      alert("Wrong builder selected (this is Pulte)");
       return;
     }
 
@@ -182,7 +173,7 @@ function loadFile() {
   reader.readAsArrayBuffer(file);
 }
 
-// ===== PULTE =====
+// ===== PROCESS =====
 function processPulte(rows) {
   let jobs = {};
 
@@ -192,7 +183,8 @@ function processPulte(rows) {
     let task = row[8];
     let dateRaw = row[12];
 
-    if (!jobRaw || !task || !dateRaw) return;
+    if (!jobRaw || !dateRaw) return;
+    if (!task) task = "";
 
     let lot = parseInt(jobRaw.split("-")[1]?.trim(), 10);
 
@@ -202,12 +194,11 @@ function processPulte(rows) {
 
     if (isNaN(date)) return;
 
-    let dateStr = date.toLocaleDateString("en-US", { month:"2-digit", day:"2-digit" });
+    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
 
-    let subdivision = cleanSubdivision(community);
     let key = lot + "_" + dateStr;
 
-    if (!jobs[key]) jobs[key] = { lot, subdivision, dateStr, tasks: [] };
+    if (!jobs[key]) jobs[key] = { lot, subdivision: cleanSubdivision(community), dateStr, tasks: [] };
 
     jobs[key].tasks.push(task);
   });
@@ -215,58 +206,39 @@ function processPulte(rows) {
   render(jobs);
 }
 
-// ===== DR HORTON =====
 function processDRHorton(rows) {
   let jobs = {};
 
-  let headerIndex = rows.findIndex(r =>
-    r.join(" ").toLowerCase().includes("description")
-  );
+  let headerIndex = rows.findIndex(r => r.join(" ").toLowerCase().includes("description"));
+  let headers = rows[headerIndex].map(h => (h||"").toLowerCase());
 
-  if (headerIndex === -1) {
-    alert("Invalid DR Horton file");
-    return;
-  }
+  let dateCol = headers.findIndex(h=>h.includes("date"));
+  let projectCol = headers.findIndex(h=>h.includes("project"));
+  let platCol = headers.findIndex(h=>h.includes("plat"));
+  let descCol = headers.findIndex(h=>h.includes("description"));
 
-  let headers = rows[headerIndex].map(h => (h || "").toLowerCase());
-
-  let dateCol = headers.findIndex(h => h.includes("date"));
-  let projectCol = headers.findIndex(h => h.includes("project"));
-  let platCol = headers.findIndex(h => h.includes("plat"));
-  let descCol = headers.findIndex(h => h.includes("description"));
-
-  rows.slice(headerIndex + 1).forEach(row => {
-
+  rows.slice(headerIndex+1).forEach(row => {
     let dateRaw = row[dateCol];
     let project = row[projectCol];
     let plat = row[platCol];
     let task = row[descCol];
 
-    if (!plat || !task || !dateRaw) return;
+    if (!plat || !dateRaw) return;
+    if (!task) task = "";
 
-    let lot = null;
+    let match = plat.split("/")[0].match(/\d+/);
+    if (!match) return;
 
-    if (typeof plat === "string") {
-      let firstPart = plat.split("/")[0].trim();
-      let match = firstPart.match(/\d+/);
-
-      if (match) {
-        let num = parseInt(match[0], 10);
-        if (num < 100000) lot = num;
-      }
-    }
-
-    if (!lot) return;
+    let lot = parseInt(match[0],10);
+    if (lot > 100000) return;
 
     let date = new Date(dateRaw);
     if (isNaN(date)) return;
 
-    let dateStr = date.toLocaleDateString("en-US", { month:"2-digit", day:"2-digit" });
-
-    let subdivision = cleanSubdivision(project);
+    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
     let key = lot + "_" + dateStr;
 
-    if (!jobs[key]) jobs[key] = { lot, subdivision, dateStr, tasks: [] };
+    if (!jobs[key]) jobs[key] = { lot, subdivision: cleanSubdivision(project), dateStr, tasks: [] };
 
     jobs[key].tasks.push(task);
   });
@@ -277,14 +249,8 @@ function processDRHorton(rows) {
 // ===== RENDER =====
 function render(jobs) {
 
-  let cleaned = Object.values(jobs).map(j => ({
-    dateStr: j.dateStr,
-    type: mapTasks(j.tasks),
-    display: `${j.lot} ${j.subdivision}`
-  }));
-
   let grouped = {};
-  cleaned.forEach(j => {
+  Object.values(jobs).forEach(j => {
     if (!grouped[j.dateStr]) grouped[j.dateStr] = [];
     grouped[j.dateStr].push(j);
   });
@@ -301,34 +267,37 @@ function render(jobs) {
     title.className = "date-title";
     title.textContent = date;
 
-    box.appendChild(title);
-
     let columns = document.createElement("div");
     columns.className = "columns";
 
     let left = document.createElement("div");
-    left.className = "column";
-
     let right = document.createElement("div");
+
+    left.className = "column";
     right.className = "column";
-
-    let copyClean = document.createElement("button");
-    copyClean.textContent = "Copy Cleaning";
-    copyClean.onclick = () => copyList(left);
-
-    let copyLabor = document.createElement("button");
-    copyLabor.textContent = "Copy Labor";
-    copyLabor.onclick = () => copyList(right);
-
-    left.appendChild(copyClean);
-    right.appendChild(copyLabor);
 
     let cleaning = [];
     let labor = [];
 
     grouped[date].forEach(job => {
-      if (job.type === "original" || job.type === "reclean") cleaning.push(job);
-      else labor.push(job);
+
+      let hasOriginal = false;
+      let hasReclean = false;
+
+      job.tasks.forEach(t => {
+        let type = classifyTask(t);
+
+        if (type === "original") hasOriginal = true;
+        if (type === "reclean") hasReclean = true;
+
+        if (type && type !== "original" && type !== "reclean") {
+          labor.push({ lot: job.lot, subdivision: job.subdivision, type, raw: t });
+        }
+      });
+
+      if (hasOriginal) cleaning.push({ ...job, type:"original" });
+      else if (hasReclean) cleaning.push({ ...job, type:"reclean" });
+
     });
 
     cleaning.sort((a,b)=>{
@@ -337,37 +306,41 @@ function render(jobs) {
       return 0;
     });
 
+    // render cleaning
     cleaning.forEach(job=>{
       let div=document.createElement("div");
       div.className="job";
-      div.textContent=job.display;
+      div.textContent=`${job.lot} ${job.subdivision}`;
       div.style.color = job.type==="original" ? "#4CAF50" : "#FFD700";
       left.appendChild(div);
     });
 
+    // render labor
     labor.forEach(job=>{
       let div=document.createElement("div");
       div.className="job";
-      div.textContent=`${job.display}-${job.type}`;
-      div.style.color="#FFA500";
+
+      let text = job.type === "unknown"
+        ? `${job.lot} ${job.subdivision}-${job.raw}`
+        : `${job.lot} ${job.subdivision}-${job.type}`;
+
+      div.textContent = text;
+
+      let del = document.createElement("button");
+      del.textContent = "X";
+      del.className = "delete-btn";
+      del.onclick = () => div.remove();
+
+      div.appendChild(del);
       right.appendChild(div);
     });
 
     columns.appendChild(left);
     columns.appendChild(right);
+    box.appendChild(title);
     box.appendChild(columns);
-
     container.appendChild(box);
   });
-}
-
-function copyList(column) {
-  let text="";
-  column.querySelectorAll(".job").forEach(j=>{
-    text+=j.textContent+"\n";
-  });
-  navigator.clipboard.writeText(text);
-  alert("Copied!");
 }
 
 </script>
