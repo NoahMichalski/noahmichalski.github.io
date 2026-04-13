@@ -13,30 +13,20 @@ body {
     font-family:Segoe UI, Arial;
 }
 
-/* HEADER */
 .header {
     display:flex;
     align-items:center;
-    justify-content:space-between;
     background:#1a1d24;
     padding:10px 20px;
     border-bottom:1px solid #2a2f3a;
 }
 
-.header-left {
-    display:flex;
-    align-items:center;
-    gap:15px;
-}
-
-.logo { height:40px; }
+.logo { height:40px; margin-right:10px; }
 .title { font-size:20px; font-weight:600; }
 
-/* CONTROLS */
-.controls, .filters {
+.controls {
     display:flex;
     justify-content:center;
-    flex-wrap:wrap;
     gap:10px;
     padding:10px;
 }
@@ -47,25 +37,11 @@ button, select, input {
     border:none;
     padding:6px 10px;
     border-radius:4px;
+    cursor:pointer;
 }
 
-/* SUMMARY */
-.summary {
-    display:flex;
-    justify-content:center;
-    gap:20px;
-    flex-wrap:wrap;
-    padding:10px;
-}
+button:hover { background:#3a3f4a; }
 
-.card {
-    background:#1a1d24;
-    padding:10px 15px;
-    border-radius:6px;
-    border:1px solid #2a2f3a;
-}
-
-/* TABLE */
 .table-container { padding:10px 20px; }
 
 table {
@@ -76,24 +52,24 @@ table {
 
 th, td {
     border:1px solid #2a2f3a;
-    padding:8px;
+    padding:6px;
     text-align:center;
 }
 
 th {
     background:#d9d9d9 !important;
-    color:#000000 !important;
-    font-weight:bold;
+    color:#000 !important;
 }
 
-/* COLORS */
 .normal { background:#2e7d32; }
 .warning { background:#f9a825; color:#000; }
 .overtime { background:#c62828; }
 
-.predicted {
-    background:#ff4da6 !important;
-    font-weight:bold;
+.predicted { background:#ff4da6 !important; }
+
+select.day-select {
+    width:65px;
+    text-align:center;
 }
 </style>
 </head>
@@ -101,16 +77,14 @@ th {
 <body>
 
 <div class="header">
-    <div class="header-left">
-        <img src="/images/VIP-logo-white.png" class="logo">
-        <div class="title">Overtime Dashboard</div>
-    </div>
+    <img src="/images/VIP-logo-white.png" class="logo">
+    <div class="title">Overtime Dashboard</div>
 </div>
 
 <div class="controls">
 <input type="file" id="fileInput">
 
-<select id="daySelect" onchange="recalc()">
+<select id="daySelect" onchange="render()">
 <option value="0">Monday</option>
 <option value="1">Tuesday</option>
 <option value="2">Wednesday</option>
@@ -119,10 +93,10 @@ th {
 </select>
 
 <button onclick="loadFile()">Load</button>
+<button onclick="applyChanges()">Apply Changes</button>
+<button onclick="resetDraft()">Reset</button>
 <button onclick="copyEmail()">Copy Email</button>
 </div>
-
-<div class="summary" id="summary"></div>
 
 <div class="table-container">
 <table id="table">
@@ -147,6 +121,7 @@ th {
 <script>
 let rawData = [];
 let currentData = [];
+let draftSelections = [];
 
 function clean(v){ return parseFloat(v)||0; }
 
@@ -173,56 +148,57 @@ function build(){
             clean(r["Wednesday"]),
             clean(r["Thursday"]),
             clean(r["Friday"])
-        ]
+        ],
+        selections:[null,null,null,null,null]
     }));
+
+    draftSelections = currentData.map(() => [null,null,null,null,null]);
+
     render();
 }
-
-function recalc(){ render(); }
 
 function render(){
 
     let day = parseInt(document.getElementById("daySelect").value);
+    let tbody = document.querySelector("#table tbody");
+    tbody.innerHTML = "";
 
-    let computed = currentData.map(row=>{
-        let actual = row.days.reduce((a,b)=>a+b,0);
+    let computed = currentData.map((row,index)=>{
 
         let projected=0,running=0,hit="—";
-        let display=[...row.days];
 
         for(let i=0;i<5;i++){
-            let val = (i<=day)?row.days[i]:8;
-            if(i>day) display[i]=8;
 
-            projected+=val;
-            running+=val;
+            let val;
+
+            if(i <= day){
+                val = row.days[i];
+            } else {
+                let selected = draftSelections[index][i];
+                if(selected !== null){
+                    val = selected === "OFF" ? 0 : parseFloat(selected);
+                } else {
+                    val = 8;
+                }
+            }
+
+            projected += val;
+            running += val;
 
             if(running>40 && hit==="—"){
                 hit=["Mon","Tue","Wed","Thu","Fri"][i];
             }
         }
 
-        let ot = projected>40?projected-40:0;
+        let actual = row.days.reduce((a,b)=>a+b,0);
+        let ot = projected>40 ? projected-40 : 0;
 
-        return {...row, actual, projected, ot, display, hit};
+        return {...row, projected, actual, ot, hit, originalIndex:index};
     });
 
-    // 🔥 ALWAYS SORT BY OT DESC
-  computed.sort((a,b)=>b.projected - a.projected);
+    computed.sort((a,b)=>b.projected - a.projected);
 
-    let tbody = document.querySelector("#table tbody");
-    tbody.innerHTML = "";
-
-    let totalA=0,totalP=0,totalOT=0,otCount=0,riskCount=0;
-
-    computed.forEach(row=>{
-
-        totalA+=row.actual;
-        totalP+=row.projected;
-        totalOT+=row.ot;
-
-        if(row.projected>40) otCount++;
-        else if(row.projected>=36) riskCount++;
+    computed.forEach((row)=>{
 
         let tr=document.createElement("tr");
 
@@ -230,11 +206,32 @@ function render(){
         else if(row.projected>=38) tr.classList.add("warning");
         else tr.classList.add("normal");
 
+        let cells = "";
+
+        for(let i=0;i<5;i++){
+
+            if(i <= day){
+                cells += `<td>${row.days[i]}</td>`;
+            } else {
+
+                let val = draftSelections[row.originalIndex][i] ?? 8;
+
+                cells += `
+                <td class="predicted">
+                    <select class="day-select"
+                        onchange="updateCell(${row.originalIndex}, ${i}, this.value)">
+                        <option value="8" ${val==8?"selected":""}>8</option>
+                        <option value="4" ${val==4?"selected":""}>4</option>
+                        <option value="0" ${val==0?"selected":""}>0</option>
+                        <option value="OFF" ${val==="OFF"?"selected":""}>OFF</option>
+                    </select>
+                </td>`;
+            }
+        }
+
         tr.innerHTML=`
             <td>${row.name}</td>
-            ${row.display.map((d,i)=>`
-                <td class="${i>day?'predicted':''}" contenteditable="true">${d}</td>
-            `).join("")}
+            ${cells}
             <td>${row.actual.toFixed(1)}</td>
             <td>${row.projected.toFixed(1)}</td>
             <td>${row.ot.toFixed(1)}</td>
@@ -243,11 +240,25 @@ function render(){
 
         tbody.appendChild(tr);
     });
-
 }
 
+function updateCell(rowIndex, dayIndex, value){
+    draftSelections[rowIndex][dayIndex] = value;
+}
 
-/* EMAIL COPY */
+function applyChanges(){
+    currentData.forEach((row,i)=>{
+        row.selections = [...draftSelections[i]];
+    });
+    render();
+}
+
+function resetDraft(){
+    draftSelections = currentData.map(row => [...row.selections]);
+    render();
+}
+
+/* EMAIL */
 function copyEmail(){
 
     let rows = document.querySelectorAll("#table tr");
@@ -256,9 +267,7 @@ function copyEmail(){
     <html>
     <body style="font-family:Arial;">
     <h3>Overtime Report</h3>
-    <button onclick="copyNow()" style="margin-bottom:10px;padding:6px 10px;">
-        Copy Table
-    </button>
+    <button onclick="copyNow()">Copy Table</button>
     <table style="border-collapse:collapse;">
     `;
 
@@ -268,11 +277,20 @@ function copyEmail(){
 
         tr.querySelectorAll("th,td").forEach(td=>{
 
+            let text;
+            let select = td.querySelector("select");
+
+            if(select){
+                text = select.value;
+            } else {
+                text = td.innerText;
+            }
+
             let style = "border:1px solid #000;padding:6px;text-align:center;";
 
             if(i===0){
-    style+="background:#d9d9d9;color:#000;font-weight:bold;";
-}else {
+                style += "background:#d9d9d9;color:#000;font-weight:bold;";
+            } else {
 
                 if(tr.classList.contains("overtime")){
                     style += "background:#ff1a1a;color:#fff;font-weight:bold;";
@@ -289,7 +307,7 @@ function copyEmail(){
                 }
             }
 
-            html += `<td style="${style}">${td.innerText}</td>`;
+            html += `<td style="${style}">${text}</td>`;
         });
 
         html += "</tr>";
