@@ -70,7 +70,16 @@
 
 // ===== DATE =====
 function excelDateToJS(serial) {
-  return new Date((serial - 25569) * 86400 * 1000);
+  const utc_days  = Math.floor(serial - 25569);
+  const utc_value = utc_days * 86400;                                        
+  const date_info = new Date(utc_value * 1000);
+
+  // 🔥 FIX: force LOCAL date (no timezone shift)
+  return new Date(
+    date_info.getFullYear(),
+    date_info.getMonth(),
+    date_info.getDate()
+  );
 }
 
 // ===== TASK CLASSIFIER =====
