@@ -94,6 +94,8 @@ function classifyTask(task) {
     return "p/w";
 
   if (t.includes("carpet prep")) return "car";
+  if (t.includes("Remove Basement Wall Bracing")) return "remove bracing";
+  if (t.includes("Basement Wall Bracing")) return "bracing";
   if (t.includes("anchor bolts")) return "bolts";
 
   if (t.includes("screen")) return null;
