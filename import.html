@@ -182,6 +182,32 @@ function loadFile() {
   reader.readAsArrayBuffer(file);
 }
 
+function parsePulteDate(value) {
+
+  // Excel serial (most common)
+  if (typeof value === "number") {
+    let utc_days = Math.floor(value - 25569);
+    let utc_value = utc_days * 86400;
+    let date = new Date(utc_value * 1000);
+
+    return new Date(
+      date.getUTCFullYear(),
+      date.getUTCMonth(),
+      date.getUTCDate()
+    );
+  }
+
+  // String fallback (no timezone shift)
+  if (typeof value === "string") {
+    let parts = value.split(/[\/\-]/);
+    if (parts.length === 3) {
+      return new Date(parts[2], parts[0]-1, parts[1]);
+    }
+  }
+
+  return null;
+}
+
 // ===== PROCESS =====
 function processPulte(rows) {
   let jobs = {};
@@ -196,12 +222,11 @@ function processPulte(rows) {
     if (!task) task = "";
 
     let lot = parseInt(jobRaw.split("-")[1]?.trim(), 10);
+if (isNaN(lot)) return;
 
-    let date = typeof dateRaw === "number"
-      ? excelDateToJS(dateRaw)
-      : new Date(dateRaw);
+let date = parsePulteDate(dateRaw);
 
-    if (isNaN(date)) return;
+    if (!date || isNaN(date.getTime())) return;
 
     let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
 
@@ -242,7 +267,7 @@ function processDRHorton(rows) {
     if (lot > 100000) return;
 
     let date = new Date(dateRaw);
-    if (isNaN(date)) return;
+    if (!date || isNaN(date.getTime())) return;
 
     let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
     let key = lot + "_" + dateStr;
