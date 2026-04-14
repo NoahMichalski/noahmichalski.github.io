@@ -206,6 +206,10 @@ th {
   <span id="builderUpdateList"></span>
 </div>
 
+<div id="lotCount" style="padding:6px 12px; font-size:0.85rem; color:#aaa;">
+  Lots Loaded: 0
+</div>
+
 <div class="table-container">
 <table>
 <thead>
@@ -315,6 +319,9 @@ function sortTable(key){
 /* RENDER */
 function renderTable(data){
   resultsTable.innerHTML='';
+
+  // ✅ ADD THIS
+  document.getElementById('lotCount').textContent = `Lots Loaded: ${data.length}`;
 
   data.forEach(l=>{
     const row=document.createElement('tr');
