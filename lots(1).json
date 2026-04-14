@@ -1,5 +1,173 @@
 [
      {
+    "lotNumber": "364",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "544 Darliene Drive",
+    "floorplan": "F400",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "38",
+    "subdivision": "Bishop Estates",
+    "builder": "DR Horton",
+    "address": "490 Jaret Way",
+    "floorplan": "X423",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "45",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "113 Appleseed Way",
+    "floorplan": "X424",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "46",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "117 Appleseed Way",
+    "floorplan": "X426",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "41",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "105 Fippenny Place",
+    "floorplan": "F403",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "368",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "547 Darliene Drive",
+    "floorplan": "F402",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "42",
+    "subdivision": "Bishop Estates",
+    "builder": "DR Horton",
+    "address": "450 Jaret Way",
+    "floorplan": "X426",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "100",
+    "subdivision": "Walnut",
+    "builder": "DR Horton",
+    "address": "19 Mead Mill Drive",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "101",
+    "subdivision": "Walnut",
+    "builder": "DR Horton",
+    "address": "17 Mead Mill Drive",
+    "floorplan": "X424",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "13",
+    "subdivision": "Galloway East",
+    "builder": "DR Horton",
+    "address": "6218 Encosta Way",
+    "floorplan": "X422",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "173",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "609 Madison Way",
+    "floorplan": "X437",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "16",
+    "subdivision": "Sugar Creek",
+    "builder": "DR Horton",
+    "address": "131 Brookside Drive",
+    "floorplan": "X424",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "30",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1203 Stratford Way",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "253",
+    "subdivision": "Galloway East",
+    "builder": "DR Horton",
+    "address": "6209 Encosta Way",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "13633",
+    "subdivision": "Parkview",
+    "builder": "DR Horton",
+    "address": "365 Park Vista Drive",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "13752",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "132 Badger Pass",
+    "floorplan": "X421",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "51",
+    "subdivision": "Sugar Creek",
+    "builder": "DR Horton",
+    "address": "134 Brookside Drive",
+    "floorplan": "X422",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "267",
+    "subdivision": "Galloway East",
+    "builder": "DR Horton",
+    "address": "6230 Farella Way",
+    "floorplan": "X424",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "13634",
+    "subdivision": "Parkview",
+    "builder": "DR Horton",
+    "address": "371 Park Vista Drive",
+    "floorplan": "X423",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "13753",
+    "subdivision": "The Overlook",
+    "builder": "DR Horton",
+    "address": "142 Badger Pass",
+    "floorplan": "X421",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "266",
+    "subdivision": "Galloway East",
+    "builder": "DR Horton",
+    "address": "6236 Farella Way",
+    "floorplan": "X437",
+    "lastUpdated": "2026-04-14"
+  },
+     {
     "lotNumber": "1",
     "subdivision": "Carr Farms",
     "builder": "Epcon",
