@@ -1,5 +1,21 @@
 [
      {
+    "lotNumber": "210",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "429 Samantha Drive",
+    "floorplan": "X426",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "196",
+    "subdivision": "Holton Run",
+    "builder": "Schottenstein",
+    "address": "4861 Citation Court",
+    "floorplan": "Vinton",
+    "lastUpdated": "2026-04-14"
+  },
+     {
     "lotNumber": "364",
     "subdivision": "Madison Meadows",
     "builder": "DR Horton",
