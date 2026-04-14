@@ -1,5 +1,1613 @@
 [
      {
+    "lotNumber": "1",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5822 Lark Drive Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "2",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5828 Lark Drive Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "3",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5834 Lark Drive Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "4",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5840 Lark Drive Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "5",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5846 Lark Drive Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "6",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5713 Imperial Lane Hilliard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "7",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5705 Imperial Lane Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "8",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5697 Imperial Lane Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "9",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5689 Imperial Lane Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "10",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5681 Imperial Lane Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "11",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5675 Imperial Lane Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "12",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5669 Imperial Lane Hilliard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "13",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5663 Imperial Lane Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "16",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5651 Imperial Lane Hillard, OH 43026",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "17",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5645 Imperial Lane Hillard, OH 43026",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "18",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5639 Imperial Lane Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "19",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5633 Imperial Lane Hillard, OH 43026",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "20",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5627 Imperial Lane Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "21",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5621 Imperial Lane Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "22",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5615 Imperial Lane Hillard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "23",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5609 Imperial Lane Hillard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "24",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4800 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "25",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4806 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "26",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4812 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "27",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4818 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "28",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4824 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "29",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4830 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "30",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4836 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "31",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4842 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "32",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4848 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "33",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4854 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "34",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4864 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "35",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4870 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "36",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4874 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "37",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4878 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "38",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4884 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "39",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4890 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "40",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4896 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "41",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4902 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "42",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4908 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "43",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4914 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "44",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4920 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "45",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4926 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "46",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4932 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "47",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4938 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "48",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4944 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "49",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5626 Keystone Lane Hilliard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "50",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5634 Keystone Lane Hilliard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "51",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5642 Keystone Lane Hilliard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "52",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5650 Keystone Lane Hilliard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "53",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5658 Keystone Lane Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "54",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4945 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "55",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4939 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "56",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4933 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "57",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4927 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "58",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4921 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "59",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4909 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "60",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4903 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "61",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4897 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "62",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4891 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "63",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4885 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "64",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4879 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "65",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4875 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "66",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4871 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "67",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4861 Diplomat Way Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "68",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4849 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "69",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4843 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "70",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4837 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "71",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4831 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "72",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4825 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "73",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4819 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "74",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4813 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "75",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4807 Diplomat Way Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "76",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4794 Edison Street Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "77",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4802 Edison Street Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "78",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4810 Edison Street Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "79",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4818 Edison Street Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "80",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4826 Edison Street Hillard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "81",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4834 Edison Street Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "82",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4842 Edison Street Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "83",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4850 Edison Street Hillard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "84",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4860 Edison Street Hilliard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "85",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4868 Edison Street Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "86",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4876 Edison Street Hilliard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "87",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4884 Edison Street Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "88",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4892 Edison Street Hilliard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "89",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4900 Edison Street Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "90",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4908 Edison Street Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "91",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4916 Edison Street Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "92",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5628 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "93",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5638 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "94",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5648 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "95",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5658 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "96",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5668 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "97",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5678 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "98",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5688 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "99",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5729 Arcadian Avenue Hilliard, Ohio 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "100",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5719 Arcadian Avenue Hilliard, Ohio 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "101",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5709 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "102",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5699 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "103",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5689 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "104",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5679 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "105",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5669 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "106",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5659 Arcadian Avenue Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "107",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4883 Edison Street Hilliard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "108",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4875 Edison Street Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "109",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4867 Edison Street Hilliard, OH 43026",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "110",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4859 Edison Street Hilliard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "111",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4851 Edison Street Hillard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "112",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4843 Edison Street Hillard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "113",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4835 Edison Street Hillard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "114",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4827 Edison Street Hillard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "115",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4819 Edison Street Hillard, OH 43026",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "116",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4811 Edison Street Hillard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "117",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4803 Edison Street Hillard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "118",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4795 Edison Street Hillard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "119",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4784 Piedmont Drive Hilliard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "120",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4794 Piedmont Drive Hilliard, OH 43026",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "121",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4804 Piedmont Drive Hilliard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "122",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4814 Piedmont Drive Hilliard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "123",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4824 Piedmont Drive Hilliard, OH 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "124",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4834 Piedmont Drive Hilliard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "125",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4844 Piedmont Drive Hilliard, Ohio 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "126",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4854 Piedmont Drive Hilliard, Ohio 43026",
+    "floorplan": "Verona",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "127",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4864 Piedmont Drive Hilliard, Ohio 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "128",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4874 Piedmont Drive Hilliard, Ohio 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "129",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4884 Piedmont Drive Hilliard, Ohio 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "130",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4821 Piedmont Drive Hilliard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "131",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4811 Piedmont Drive Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "132",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4801 Piedmont Drive Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "133",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4791 Piedmont Drive Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "134",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5849 Lark Drive Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "135",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5839 Lark Drive Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "136",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5829 Lark Drive Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "137",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5819 Lark Drive Hilliard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "138",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5725 Lark Drive Hilliard, Ohio 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "139",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5717 Lark Drive Hilliard, Ohio 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "140",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5709 Lark Drive Hilliard, Ohio 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "141",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5701 Lark Drive Hilliard, Ohio 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "201",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5716 Embassy Drive Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "202",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5708 Embassy Drive Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "203",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5700 Embassy Drive Hilliard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "204",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5692 Embassy Drive Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "205",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5684 Embassy Drive Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "206",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5676 Embassy Drive Hilliard, OH 43026",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "207",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5668 Embassy Drive Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "208",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5656 Embassy Drive Hillard, OH 43206",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "209",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5648 Embassy Drive Hillard, OH 43026",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "210",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5640 Embassy Drive Hillard, OH 43026",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "211",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5632 Embassy Drive Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "212",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5624 Embassy Drive Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "213",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5616 Embassy Drive Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "214",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5608 Embassy Drive Hillard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "215",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4764 Champion Lane Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "216",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4754 Champion Lane Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "217",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4744 Champion Lane Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "218",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4734 Champion Lane Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "219",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4724 Champion Lane Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "220",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4714 Champion Lane Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "221",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4704 Champion Lane Hillard, OH 43026",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "222",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4694 Champion Lane Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "223",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5597 Aristocrat Drive Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "224",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5605 Aristocrat Drive Hilliard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "225",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5613 Aristocrat Drive Hilliard, Ohio 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "226",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5621 Aristocrat Drive Hilliard, Ohio 43026",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "227",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5629 Aristocrat Drive Hilliard, Ohio 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "228",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5637 Aristocrat Drive Hilliard, Ohio 43026",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "229",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5645 Aristocrat Drive Hilliard, Ohio 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "230",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5653 Aristocrat Drive Hilliard, Ohio 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "231",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5661 Aristocrat Drive Hilliard, Ohio 43026",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "232",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5669 Aristocrat Drive Hilliard, Ohio 43026",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "233",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5677 Aristocrat Drive Hilliard, Ohio 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "234",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5685 Aristocrat Drive Hilliard, Ohio 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "235",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5693 Aristocrat Drive Hilliard, Ohio 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "236",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5701 Aristocrat Drive Hilliard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "237",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5709 Aristocrat Drive Hilliard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "238",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5717 Aristocrat Drive Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "239",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5725 Aristocrat Drive Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "240",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5733 Aristocrat Drive Hilliard, OH 43026",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "241",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5632 Aristocrat Drive Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "242",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5628 Aristocrat Drive Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "243",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5620 Aristocrat Drive Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "244",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5612 Aristocrat Drive Hillard, OH 43026",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "245",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5604 Aristocrat Drive Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "246",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5615 Embassy Drive Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "247",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5623 Embassy Drive Hillard, OH 43026",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "248",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5631 Embassy Drive Hillard, OH 43026",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "249",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5639 Embassy Drive Hillard, OH 43026",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "250",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5647 Embassy Drive Hillard, OH 43026",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "251",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5655 Embassy Drive Hilliard, OH 43026",
+    "floorplan": "Cambridge",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "252",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5659 Embassy Drive Hilliard, OH 43026",
+    "floorplan": "Oxford",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "253",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5663 Embassy Drive Hilliard, OH 43026",
+    "floorplan": "Windsor",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "254",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "5667 Embassy Drive Hilliard, OH 43026",
+    "floorplan": "Cambridge",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "255",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4758 Victory Lane Hilliard, OH 43026",
+    "floorplan": "Kingston",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "256",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4750 Victory Lane Hilliard, OH 43026",
+    "floorplan": "Windsor",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "257",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4742 Victory Lane Hilliard, OH 43026",
+    "floorplan": "Oxford",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "258",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4734 Victory Lane Hilliard, OH 43026",
+    "floorplan": "Cambridge",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "259",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4726 Victory Lane Hilliard, Ohio 43026",
+    "floorplan": "Kingston",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "260",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4718 Victory Lane Hilliard, Ohio 43026",
+    "floorplan": "Windsor",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "261",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4710 Victory Lane Hilliard, Ohio 43026",
+    "floorplan": "Oxford",
+    "lastUpdated": "2026-04-14"
+  },
+  {
+    "lotNumber": "262",
+    "subdivision": "Carr Farms",
+    "builder": "Epcon",
+    "address": "4702 Victory Lane Hilliard, Ohio 43026",
+    "floorplan": "Cambridge",
+    "lastUpdated": "2026-04-14"
+  },
+     {
     "lotNumber": "13632",
     "subdivision": "Parkview",
     "builder": "DR Horton",
