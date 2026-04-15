@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>VIP Job Intake → Excel Export</title>
+<title>VIP Intake + Validator + Export</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
@@ -42,17 +42,18 @@ button {
 .good { background:#163d1c; }
 .warn { background:#4a3b00; }
 .bad { background:#4a1c1c; }
+
 </style>
 </head>
 
 <body>
 
-<h1>VIP Job Intake Tool</h1>
+<h1>VIP Job Intake System</h1>
 
 <input type="file" id="jsonFile">
 
 <button onclick="addRow()">➕ Add Row</button>
-<button onclick="validateAll()">✅ Validate</button>
+<button onclick="validateAll()">✅ Validate All</button>
 <button onclick="exportExcel()">📤 Export Excel</button>
 
 <table id="table">
@@ -61,8 +62,9 @@ button {
 <th>Lot</th>
 <th>Subdivision</th>
 <th>Builder</th>
-<th>Job Type</th>
+<th>Task</th>
 <th>Status</th>
+<th>Recheck</th>
 <th>Remove</th>
 </tr>
 </thead>
@@ -80,7 +82,7 @@ document.getElementById("jsonFile").addEventListener("change", e=>{
         lotsData = {};
 
         data.forEach(lot=>{
-            lotsData[lot.lotNumber] = lot;
+            lotsData[String(lot.lotNumber)] = lot;
         });
 
         alert("Lots loaded");
@@ -95,10 +97,11 @@ function addRow(){
 
     tr.innerHTML = `
         <td><input oninput="autoFill(this)"></td>
-        <td></td>
-        <td></td>
+        <td><input></td>
+        <td><input></td>
         <td><input placeholder="reclean / original / windows"></td>
         <td>Status</td>
+        <td><button onclick="recheck(this)">Check</button></td>
         <td><button onclick="this.closest('tr').remove()">X</button></td>
     `;
 
@@ -112,47 +115,72 @@ function autoFill(input){
     let lot = lotsData[lotNum];
 
     if(lot){
-        row.cells[1].innerText = lot.subdivision;
-        row.cells[2].innerText = lot.builder;
-        row.className = "good";
-        row.cells[4].innerText = "OK";
-    } else {
-        row.className = "bad";
-        row.cells[4].innerText = "LOT NOT FOUND";
+        row.cells[1].querySelector("input").value = lot.subdivision;
+        row.cells[2].querySelector("input").value = lot.builder;
     }
+
+    validateRow(row);
+}
+
+function validateRow(row){
+    let lotNum = row.cells[0].querySelector("input").value.trim();
+    let sub = row.cells[1].querySelector("input").value.trim();
+    let builder = row.cells[2].querySelector("input").value.trim();
+
+    let lot = lotsData[lotNum];
+
+    let status = [];
+    let className = "good";
+
+    if(!lot){
+        status.push("LOT NOT FOUND");
+        className = "bad";
+    } else {
+
+        if(sub && sub !== lot.subdivision){
+            status.push("SUBDIVISION MISMATCH");
+            className = "warn";
+        }
+
+        if(builder && builder !== lot.builder){
+            status.push("BUILDER MISMATCH");
+            className = "warn";
+        }
+    }
+
+    if(status.length === 0){
+        status.push("OK");
+    }
+
+    row.className = className;
+    row.cells[4].innerText = status.join(", ");
 }
 
 function validateAll(){
     let rows = document.querySelectorAll("#table tbody tr");
 
-    let lotCounts = {};
+    let counts = {};
 
     rows.forEach(r=>{
-        let lot = r.cells[0].innerText || r.cells[0].querySelector("input").value;
-        lotCounts[lot] = (lotCounts[lot] || 0) + 1;
+        let lot = r.cells[0].querySelector("input").value.trim();
+        counts[lot] = (counts[lot] || 0) + 1;
     });
 
     rows.forEach(r=>{
-        let lotInput = r.cells[0].querySelector("input");
-        let lotNum = lotInput.value.trim();
+        validateRow(r);
 
-        let lot = lotsData[lotNum];
+        let lot = r.cells[0].querySelector("input").value.trim();
 
-        if(!lot){
-            r.className = "bad";
-            r.cells[4].innerText = "LOT NOT FOUND";
-            return;
-        }
-
-        if(lotCounts[lotNum] > 1){
+        if(counts[lot] > 1){
             r.className = "warn";
-            r.cells[4].innerText = "DUPLICATE";
-            return;
+            r.cells[4].innerText += " | DUPLICATE";
         }
-
-        r.className = "good";
-        r.cells[4].innerText = "OK";
     });
+}
+
+function recheck(btn){
+    let row = btn.closest("tr");
+    validateRow(row);
 }
 
 function exportExcel(){
@@ -163,16 +191,11 @@ function exportExcel(){
     rows.forEach(r=>{
         if(r.className !== "good") return;
 
-        let lot = r.cells[0].querySelector("input").value;
-        let sub = r.cells[1].innerText;
-        let builder = r.cells[2].innerText;
-        let job = r.cells[3].querySelector("input").value;
-
         data.push({
-            Lot: lot,
-            Subdivision: sub,
-            Builder: builder,
-            Job: job
+            Lot: r.cells[0].querySelector("input").value,
+            Subdivision: r.cells[1].querySelector("input").value,
+            Builder: r.cells[2].querySelector("input").value,
+            Task: r.cells[3].querySelector("input").value
         });
     });
 
