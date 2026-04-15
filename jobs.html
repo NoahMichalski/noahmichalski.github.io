@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>VIP Job Validator PRO</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<style>
+body { background:#111; color:#fff; font-family:Arial; padding:20px; }
+h1 { text-align:center; }
+
+button {
+    padding:8px 14px;
+    margin:5px;
+    background:#222;
+    color:#fff;
+    border:1px solid #555;
+    cursor:pointer;
+}
+
+input, textarea {
+    background:#222;
+    color:#fff;
+    border:1px solid #555;
+    padding:6px;
+}
+
+textarea { width:100%; height:120px; }
+
+table {
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+}
+
+th, td {
+    border:1px solid #444;
+    padding:6px;
+}
+
+th { background:#333; }
+
+.good { background:#163d1c; }
+.warn { background:#4a3b00; }
+.bad { background:#4a1c1c; }
+
+#errorBox {
+    background:#300;
+    padding:10px;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>VIP Job Validator PRO</h1>
+
+<h3>Load Lots JSON</h3>
+<input type="file" id="jsonFile">
+<button onclick="loadFromGit()">Load from GitHub</button>
+
+<h3>Import Excel (Labor / Cleaning)</h3>
+<input type="file" id="excelFile">
+
+<h3>Or Paste Jobs</h3>
+<textarea id="rawInput"></textarea>
+
+<button onclick="processData()">Process & Validate</button>
+
+<div id="errorBox"></div>
+
+<table id="table">
+<thead>
+<tr>
+<th>Lot</th>
+<th>Subdivision</th>
+<th>Builder</th>
+<th>Status</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+
+let lotsData = {};
+let jobs = [];
+
+async function loadFromGit(){
+    let url = "https://raw.githubusercontent.com/YOUR_REPO/lots(1).json";
+    let res = await fetch(url);
+    let data = await res.json();
+
+    lotsData = {};
+    data.forEach(lot=>{
+        lotsData[lot.lotNumber] = lot;
+    });
+
+    alert("Loaded lots from GitHub");
+}
+
+document.getElementById("jsonFile").addEventListener("change", e=>{
+    let reader = new FileReader();
+    reader.onload = evt=>{
+        let data = JSON.parse(evt.target.result);
+
+        lotsData = {};
+        data.forEach(lot=>{
+            lotsData[lot.lotNumber] = lot;
+        });
+
+        alert("Lots loaded");
+    };
+    reader.readAsText(e.target.files[0]);
+});
+
+document.getElementById("excelFile").addEventListener("change", e=>{
+    let reader = new FileReader();
+    reader.onload = evt=>{
+        let wb = XLSX.read(evt.target.result, {type:"binary"});
+        let sheet = wb.Sheets[wb.SheetNames[0]];
+        let json = XLSX.utils.sheet_to_json(sheet);
+
+        jobs = json.map(r=>({
+            lot: String(r.Lot || "").trim(),
+            subdivision: (r.Subdivision || "").trim(),
+            builder: (r.Builder || "").trim()
+        }));
+
+        alert("Excel loaded");
+    };
+    reader.readAsBinaryString(e.target.files[0]);
+});
+
+function parseRaw(){
+    let text = document.getElementById("rawInput").value;
+    let lines = text.split("\n");
+
+    lines.forEach(line=>{
+        let match = line.match(/(\d+)/);
+        if(match){
+            jobs.push({
+                lot: match[1],
+                subdivision: "",
+                builder: ""
+            });
+        }
+    });
+}
+
+function processData(){
+    parseRaw();
+
+    let tbody = document.querySelector("#table tbody");
+    tbody.innerHTML = "";
+
+    let errors = [];
+    let lotCounts = {};
+
+    // count duplicates
+    jobs.forEach(j=>{
+        lotCounts[j.lot] = (lotCounts[j.lot] || 0) + 1;
+    });
+
+    jobs.forEach(job=>{
+        let lot = lotsData[job.lot];
+
+        let status = [];
+        let className = "good";
+
+        // ❌ lot missing
+        if(!lot){
+            status.push("LOT NOT FOUND");
+            className = "bad";
+            errors.push(`Lot ${job.lot} missing`);
+        }
+
+        // 🔁 duplicate
+        if(lotCounts[job.lot] > 1){
+            status.push("DUPLICATE");
+            className = "warn";
+            errors.push(`Lot ${job.lot} duplicated`);
+        }
+
+        if(lot){
+            // auto fill
+            job.subdivision = lot.subdivision;
+            
+            // builder mismatch
+            if(job.builder && job.builder !== lot.builder){
+                status.push("BUILDER MISMATCH");
+                className = "warn";
+                errors.push(`Lot ${job.lot} builder mismatch`);
+            }
+
+            job.builder = lot.builder;
+        }
+
+        if(status.length === 0){
+            status.push("OK");
+        }
+
+        let tr = document.createElement("tr");
+        tr.className = className;
+
+        tr.innerHTML = `
+            <td contenteditable="true">${job.lot}</td>
+            <td>${job.subdivision || ""}</td>
+            <td>${job.builder || ""}</td>
+            <td>${status.join(", ")}</td>
+            <td><button onclick="recheck(this)">Recheck</button></td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+
+    document.getElementById("errorBox").innerHTML =
+        errors.length ? "<b>Errors:</b><br>"+errors.join("<br>") : "No errors";
+}
+
+function recheck(btn){
+    let row = btn.closest("tr");
+    let lotNum = row.cells[0].innerText.trim();
+
+    let lot = lotsData[lotNum];
+
+    if(!lot){
+        row.className = "bad";
+        row.cells[3].innerText = "LOT NOT FOUND";
+        return;
+    }
+
+    row.cells[1].innerText = lot.subdivision;
+    row.cells[2].innerText = lot.builder;
+
+    row.className = "good";
+    row.cells[3].innerText = "OK";
+}
+
+</script>
+
+</body>
+</html>
