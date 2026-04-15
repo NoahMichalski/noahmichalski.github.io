@@ -7,36 +7,82 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
-body { background:#111; color:#fff; font-family:Arial; padding:20px; }
+body {
+    background:#0f1115;
+    color:#e6e6e6;
+    font-family:Arial;
+    padding:20px;
+}
 
-table { width:100%; border-collapse:collapse; margin-top:15px; }
-th, td { border:1px solid #444; padding:6px; }
-th { background:#333; }
+h1 { margin-bottom:5px; }
 
-input, select {
+#version {
+    position:absolute;
+    top:15px;
+    right:20px;
+    color:#888;
+    font-size:12px;
+}
+
+/* Buttons */
+button {
+    margin:5px;
+    padding:8px 12px;
+    background:#1f2937;
+    color:#fff;
+    border:1px solid #374151;
+    cursor:pointer;
+}
+button:hover { background:#374151; }
+
+/* Table */
+table {
     width:100%;
-    background:#222;
+    border-collapse:collapse;
+    margin-top:15px;
+}
+th, td {
+    border:1px solid #2c2f36;
+    padding:6px;
+}
+th {
+    background:#1f2937;
+}
+
+/* Inputs */
+input {
+    width:100%;
+    background:#0f172a;
     color:#fff;
     border:none;
     padding:5px;
 }
 
-button { margin:5px; padding:6px 10px; background:#222; border:1px solid #555; color:#fff; cursor:pointer; }
+/* Status Colors */
+.good { background:#132a1c; }
+.warn { background:#3a2f0c; }
+.bad  { background:#3a1212; }
 
-.good { background:#163d1c; }
-.warn { background:#4a3b00; }
-.bad { background:#4a1c1c; }
-
+/* Search */
 #searchResults div {
     padding:6px;
-    border-bottom:1px solid #333;
+    border-bottom:1px solid #2c2f36;
     cursor:pointer;
 }
-#searchResults div:hover { background:#333; }
+#searchResults div:hover {
+    background:#1f2937;
+}
+
+#lotStatus {
+    margin-bottom:10px;
+    color:#9ca3af;
+}
 </style>
 </head>
 
 <body>
+
+<div id="version">v1.0.0</div>
 
 <h1>VIP Job Intake</h1>
 <div id="lotStatus">Loading lots...</div>
@@ -46,7 +92,7 @@ button { margin:5px; padding:6px 10px; background:#222; border:1px solid #555; c
 <button onclick="exportExcel()">📤 Export Excel</button>
 
 <h3>Search Lots</h3>
-<input id="searchBox" oninput="searchLots()" placeholder="Search...">
+<input id="searchBox" oninput="searchLots()" placeholder="Search lot / subdivision / builder">
 <div id="searchResults"></div>
 
 <table>
@@ -56,6 +102,8 @@ button { margin:5px; padding:6px 10px; background:#222; border:1px solid #555; c
 <th>Subdivision</th>
 <th>Builder</th>
 <th>Task</th>
+<th>AM</th>
+<th>Notes</th>
 <th>Status</th>
 <th>Check</th>
 <th>X</th>
@@ -69,20 +117,11 @@ button { margin:5px; padding:6px 10px; background:#222; border:1px solid #555; c
 let lotsArray = [];
 let lotsData = {};
 
+// 🔄 LOAD JSON
 async function loadLots(){
     try {
-        console.log("Fetching lots JSON...");
-
-        // 🔥 THIS IS THE IMPORTANT LINE
         let res = await fetch("lots(1).json?v=" + Date.now());
-
-        if(!res.ok){
-            throw new Error("Fetch failed");
-        }
-
         let data = await res.json();
-
-        console.log("Loaded lots:", data.length);
 
         lotsArray = data;
         lotsData = {};
@@ -95,8 +134,10 @@ async function loadLots(){
         document.getElementById("lotStatus").innerText =
             "Lots Loaded: " + data.length;
 
+        console.log("Loaded:", data.length);
+
     } catch(err){
-        console.error("LOAD FAILED:", err);
+        console.error(err);
         document.getElementById("lotStatus").innerText =
             "FAILED TO LOAD lots(1).json";
     }
@@ -104,6 +145,7 @@ async function loadLots(){
 
 window.onload = loadLots;
 
+// ➕ ADD ROW
 function addRow(lotData=null){
     let tbody = document.getElementById("tbody");
 
@@ -114,6 +156,8 @@ function addRow(lotData=null){
         <td><input></td>
         <td><input></td>
         <td><input></td>
+        <td style="text-align:center;"><input type="checkbox"></td>
+        <td><input placeholder="Notes (required if Other)"></td>
         <td>Status</td>
         <td><button onclick="validateRow(this)">Check</button></td>
         <td><button onclick="this.closest('tr').remove()">X</button></td>
@@ -130,6 +174,7 @@ function addRow(lotData=null){
     }
 }
 
+// ✅ VALIDATE ROW
 function validateRow(btn){
     let row = btn.closest("tr");
 
@@ -163,36 +208,51 @@ function validateRow(btn){
     if(status.length === 0) status.push("OK");
 
     row.className = cls;
-    row.cells[4].innerText = status.join(", ");
+    row.cells[6].innerText = status.join(", ");
 }
 
+// 🔁 VALIDATE ALL
 function validateAll(){
     document.querySelectorAll("#tbody tr").forEach(r=>{
         validateRow(r.querySelector("button"));
     });
 }
 
+// 📤 EXPORT
 function exportExcel(){
     let data = [];
 
-    document.querySelectorAll("#tbody tr").forEach(r=>{
-        if(r.className !== "good") return;
+    let rows = document.querySelectorAll("#tbody tr");
+
+    for(let r of rows){
+        if(r.className !== "good") continue;
+
+        let task = r.cells[3].querySelector("input").value.trim();
+        let notes = r.cells[5].querySelector("input").value.trim();
+
+        if(task.toLowerCase() === "other" && !notes){
+            alert("Missing notes for 'Other' on lot " + r.cells[0].querySelector("input").value);
+            return;
+        }
 
         data.push({
-            Lot: r.cells[0].querySelector("input").value,
-            Subdivision: r.cells[1].querySelector("input").value,
             Builder: r.cells[2].querySelector("input").value,
-            Task: r.cells[3].querySelector("input").value
+            Subdivision: r.cells[1].querySelector("input").value,
+            Lot: r.cells[0].querySelector("input").value,
+            Task: task,
+            "AM Job": r.cells[4].querySelector("input").checked ? "YES" : "",
+            Notes: notes
         });
-    });
+    }
 
     let ws = XLSX.utils.json_to_sheet(data);
     let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Jobs");
+    XLSX.utils.book_append_sheet(wb, ws, "Cleaning");
 
-    XLSX.writeFile(wb, "jobs.xlsx");
+    XLSX.writeFile(wb, "cleaning_jobs.xlsx");
 }
 
+// 🔍 SEARCH
 function searchLots(){
     let q = document.getElementById("searchBox").value.toLowerCase();
 
