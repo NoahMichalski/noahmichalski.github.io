@@ -46,8 +46,17 @@ tr.error {
   background: #3a0000 !important;
 }
 
-#error {
+tr.duplicate {
+  background: #ff000055 !important;
+}
+
+tr.possible-duplicate {
+  background: #ffaa0055 !important;
+}
+
+#status {
   margin-top: 10px;
+  font-weight: bold;
 }
 </style>
 </head>
@@ -62,6 +71,7 @@ tr.error {
 
 <button onclick="loadDefault()">Load Repo JSON</button>
 <button onclick="loadJSON()">Upload JSON</button>
+<button onclick="checkDuplicates()">Check Duplicates</button>
 <button onclick="exportExcel()">Export Excel</button>
 <button onclick="exportJSON()">Export JSON</button>
 <button onclick="copyTable()">Copy Table</button>
@@ -73,7 +83,7 @@ tr.error {
   <option value="ALL">All</option>
 </select>
 
-<div id="error"></div>
+<div id="status"></div>
 
 <table>
 <thead>
@@ -93,29 +103,18 @@ tr.error {
 let rawData = [];
 
 async function loadDefault() {
-  const errorDiv = document.getElementById('error');
-  errorDiv.innerText = "Loading repo JSON...";
-
   try {
     const res = await fetch("lots(1).json");
     const data = await res.json();
-
     processData(data);
-    errorDiv.innerText = "Loaded from repo ✅";
-
-  } catch (err) {
-    errorDiv.innerText = "❌ Could not load lots(1).json (check filename/location)";
+  } catch {
+    document.getElementById("status").innerText = "❌ Could not load lots(1).json";
   }
 }
 
 function loadJSON() {
   const file = document.getElementById('fileInput').files[0];
-  const errorDiv = document.getElementById('error');
-
-  if (!file) {
-    errorDiv.innerText = "Select a JSON file.";
-    return;
-  }
+  if (!file) return;
 
   const reader = new FileReader();
 
@@ -123,9 +122,8 @@ function loadJSON() {
     try {
       const data = JSON.parse(e.target.result);
       processData(data);
-      errorDiv.innerText = "Loaded local file ✅";
     } catch {
-      errorDiv.innerText = "❌ Invalid JSON file";
+      document.getElementById("status").innerText = "❌ Invalid JSON";
     }
   };
 
@@ -144,6 +142,7 @@ function processData(data) {
 
   populateBuilderFilter();
   renderTable();
+  checkDuplicates();
 }
 
 function populateBuilderFilter() {
@@ -171,10 +170,6 @@ function renderTable() {
 
     const tr = document.createElement('tr');
 
-    if (!row.floorplan || !row.address) {
-      tr.classList.add('error');
-    }
-
     Object.keys(row).forEach(key => {
       const td = document.createElement('td');
       td.contentEditable = true;
@@ -183,6 +178,7 @@ function renderTable() {
       td.oninput = () => {
         rawData[index][key] = td.innerText;
         validateRow(tr, rawData[index]);
+        checkDuplicates();
       };
 
       tr.appendChild(td);
@@ -194,11 +190,69 @@ function renderTable() {
 }
 
 function validateRow(tr, row) {
+  tr.classList.remove("error");
+
   if (!row.floorplan || !row.address) {
-    tr.classList.add('error');
-  } else {
-    tr.classList.remove('error');
+    tr.classList.add("error");
   }
+}
+
+function normalizeAddress(addr) {
+  return addr.toLowerCase()
+    .replace(/street/g, "st")
+    .replace(/drive/g, "dr")
+    .replace(/road/g, "rd")
+    .replace(/lane/g, "ln")
+    .replace(/court/g, "ct")
+    .replace(/circle/g, "cir")
+    .replace(/way/g, "wy")
+    .replace(/\s+/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function checkDuplicates() {
+  const rows = document.querySelectorAll("#tableBody tr");
+
+  const seenExact = {};
+  const seenAddress = {};
+
+  let duplicates = 0;
+
+  rows.forEach(tr => {
+    tr.classList.remove("duplicate", "possible-duplicate");
+  });
+
+  rows.forEach(tr => {
+    const cells = tr.children;
+
+    const subdivision = cells[1].innerText.trim();
+    const lot = cells[2].innerText.trim();
+    const address = cells[4].innerText.trim();
+
+    const keyExact = subdivision + "|" + lot;
+    const keyAddress = normalizeAddress(address);
+
+    if (seenExact[keyExact]) {
+      tr.classList.add("duplicate");
+      seenExact[keyExact].classList.add("duplicate");
+      duplicates++;
+    } else {
+      seenExact[keyExact] = tr;
+    }
+
+    if (keyAddress && seenAddress[keyAddress]) {
+      tr.classList.add("possible-duplicate");
+      seenAddress[keyAddress].classList.add("possible-duplicate");
+      duplicates++;
+    } else if (keyAddress) {
+      seenAddress[keyAddress] = tr;
+    }
+  });
+
+  document.getElementById("status").innerText =
+    duplicates > 0
+      ? `⚠️ ${duplicates} duplicate issues found`
+      : `✅ Clean (${rawData.length} lots)`;
 }
 
 function exportExcel() {
