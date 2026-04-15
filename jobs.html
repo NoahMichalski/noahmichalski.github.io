@@ -2,24 +2,37 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>VIP Intake System</title>
+<title>VIP Job Intake</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
 body { background:#111; color:#fff; font-family:Arial; padding:20px; }
 
+.tabs button {
+    padding:10px;
+    margin-right:5px;
+    background:#222;
+    border:1px solid #555;
+    cursor:pointer;
+}
+.active { background:#444; }
+
 table { width:100%; border-collapse:collapse; margin-top:15px; }
 th, td { border:1px solid #444; padding:6px; }
 th { background:#333; }
 
-input { width:100%; background:#222; color:#fff; border:none; padding:5px; }
-
-button {
-    margin:5px;
-    padding:8px 12px;
+input, select {
+    width:100%;
     background:#222;
     color:#fff;
+    border:none;
+    padding:5px;
+}
+
+button.action {
+    padding:6px 10px;
+    background:#222;
     border:1px solid #555;
     cursor:pointer;
 }
@@ -41,18 +54,22 @@ button {
 
 <h1>VIP Job Intake</h1>
 
-<input type="file" id="jsonFile">
+<div id="lotStatus">Lots: Loading...</div>
+
+<div class="tabs">
+    <button onclick="switchTab('cleaning')" id="cleaningTab" class="active">Cleaning</button>
+    <button onclick="switchTab('labor')" id="laborTab">Labor</button>
+</div>
 
 <button onclick="addRow()">➕ Add Row</button>
-<button onclick="validateAll()">✅ Validate All</button>
+<button onclick="validateAll()">✅ Validate</button>
 <button onclick="exportExcel()">📤 Export Excel</button>
 
-<!-- 🔍 SEARCH -->
 <h3>Search Lots</h3>
-<input id="searchBox" placeholder="Search lot / subdivision / builder" oninput="searchLots()">
+<input id="searchBox" oninput="searchLots()" placeholder="Search lot / subdivision / builder">
 <div id="searchResults"></div>
 
-<table id="table">
+<table>
 <thead>
 <tr>
 <th>Lot</th>
@@ -61,37 +78,76 @@ button {
 <th>Task</th>
 <th>Status</th>
 <th>Check</th>
-<th>Remove</th>
+<th>X</th>
 </tr>
 </thead>
-<tbody></tbody>
+<tbody id="tbody"></tbody>
 </table>
 
 <script>
 
+let currentTab = "cleaning";
 let lotsData = {};
 let lotsArray = [];
 
-document.getElementById("jsonFile").addEventListener("change", e=>{
-    let reader = new FileReader();
-    reader.onload = evt=>{
-        let data = JSON.parse(evt.target.result);
+let tasks = {
+    cleaning: ["Original","Reclean","Windows","Final Clean","Touch Up"],
+    labor: [
+        "Punch Out","Insulation Prep","2nd Roll","Carpet Prep",
+        "Carpet prep/scrap house/gar/lot","Laquer Prep","Drywall Sweep",
+        "Cover Carpet","Power Wash Interior- basement/garage",
+        "Powerwash Garage","Powerwash exterior/low siding around",
+        "Relay","Cover Crawl","p/w Basement/Garage/drive/walks/porch",
+        "p/w gar/drives/walks/porch/back courtyard",
+        "p/w Basement/Garage/Porch","Bracing","Remove Bracing",
+        "Bolts","Pump","Flood",
+        "Scrap- inside house/floor coverings/garage","Other"
+    ]
+};
+
+async function loadLots() {
+    try {
+        let res = await fetch("lots(1).json");
+        let data = await res.json();
 
         lotsData = {};
         lotsArray = data;
 
         data.forEach(lot=>{
-            let key = String(lot.lotNumber).trim();
+            let key = String(lot.lotNumber).trim().toLowerCase();
             lotsData[key] = lot;
         });
 
-        alert("Lots loaded");
-    };
-    reader.readAsText(e.target.files[0]);
-});
+        document.getElementById("lotStatus").innerText =
+            "Lots Loaded: " + Object.keys(lotsData).length;
+
+    } catch (err) {
+        document.getElementById("lotStatus").innerText = "FAILED TO LOAD LOTS";
+        console.error(err);
+    }
+}
+
+window.onload = () => {
+    loadLots();
+};
+
+function switchTab(tab){
+    currentTab = tab;
+    document.getElementById("cleaningTab").classList.remove("active");
+    document.getElementById("laborTab").classList.remove("active");
+    document.getElementById(tab+"Tab").classList.add("active");
+
+    document.getElementById("tbody").innerHTML = "";
+}
 
 function addRow(lotData=null){
-    let tbody = document.querySelector("#table tbody");
+    let tbody = document.getElementById("tbody");
+
+    let select = `<select>`;
+    tasks[currentTab].forEach(t=>{
+        select += `<option>${t}</option>`;
+    });
+    select += `</select>`;
 
     let tr = document.createElement("tr");
 
@@ -99,15 +155,14 @@ function addRow(lotData=null){
         <td><input></td>
         <td><input></td>
         <td><input></td>
-        <td><input placeholder="reclean / original / windows"></td>
+        <td>${select}</td>
         <td>Status</td>
-        <td><button onclick="validateRow(this)">Check</button></td>
-        <td><button onclick="this.closest('tr').remove()">X</button></td>
+        <td><button class="action" onclick="validateRow(this)">Check</button></td>
+        <td><button class="action" onclick="this.closest('tr').remove()">X</button></td>
     `;
 
     tbody.appendChild(tr);
 
-    // autofill if coming from search
     if(lotData){
         tr.cells[0].querySelector("input").value = lotData.lotNumber;
         tr.cells[1].querySelector("input").value = lotData.subdivision;
@@ -115,47 +170,44 @@ function addRow(lotData=null){
     }
 }
 
-function normalize(val){
-    return String(val || "").trim().toLowerCase();
+function normalize(v){
+    return String(v || "").trim().toLowerCase();
 }
 
 function validateRow(btn){
     let row = btn.closest("tr");
 
-    let lotNum = normalize(row.cells[0].querySelector("input").value);
+    let lot = normalize(row.cells[0].querySelector("input").value);
     let sub = normalize(row.cells[1].querySelector("input").value);
     let builder = normalize(row.cells[2].querySelector("input").value);
 
-    let lot = lotsData[lotNum];
+    let lotObj = lotsData[lot];
 
     let status = [];
-    let className = "good";
+    let cls = "good";
 
-    if(!lot){
+    if(!lotObj){
         status.push("LOT NOT FOUND");
-        className = "bad";
+        cls = "bad";
     } else {
-
-        if(sub && normalize(lot.subdivision) !== sub){
+        if(sub && normalize(lotObj.subdivision) !== sub){
             status.push("SUBDIVISION MISMATCH");
-            className = "warn";
+            cls = "warn";
         }
-
-        if(builder && normalize(lot.builder) !== builder){
+        if(builder && normalize(lotObj.builder) !== builder){
             status.push("BUILDER MISMATCH");
-            className = "warn";
+            cls = "warn";
         }
     }
 
     if(status.length === 0) status.push("OK");
 
-    row.className = className;
+    row.className = cls;
     row.cells[4].innerText = status.join(", ");
 }
 
 function validateAll(){
-    let rows = document.querySelectorAll("#table tbody tr");
-
+    let rows = document.querySelectorAll("#tbody tr");
     let counts = {};
 
     rows.forEach(r=>{
@@ -164,8 +216,7 @@ function validateAll(){
     });
 
     rows.forEach(r=>{
-        let btn = r.cells[5].querySelector("button");
-        validateRow(btn);
+        validateRow(r.querySelector("button"));
 
         let lot = normalize(r.cells[0].querySelector("input").value);
 
@@ -177,7 +228,7 @@ function validateAll(){
 }
 
 function exportExcel(){
-    let rows = document.querySelectorAll("#table tbody tr");
+    let rows = document.querySelectorAll("#tbody tr");
 
     let data = [];
 
@@ -188,15 +239,16 @@ function exportExcel(){
             Lot: r.cells[0].querySelector("input").value,
             Subdivision: r.cells[1].querySelector("input").value,
             Builder: r.cells[2].querySelector("input").value,
-            Task: r.cells[3].querySelector("input").value
+            Task: r.cells[3].querySelector("select").value,
+            Type: currentTab
         });
     });
 
     let ws = XLSX.utils.json_to_sheet(data);
     let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Jobs");
+    XLSX.utils.book_append_sheet(wb, ws, currentTab);
 
-    XLSX.writeFile(wb, "validated_jobs.xlsx");
+    XLSX.writeFile(wb, currentTab + "_jobs.xlsx");
 }
 
 function searchLots(){
@@ -211,7 +263,7 @@ function searchLots(){
     let container = document.getElementById("searchResults");
     container.innerHTML = "";
 
-    results.slice(0, 20).forEach(lot=>{
+    results.slice(0,20).forEach(lot=>{
         let div = document.createElement("div");
         div.innerText = `${lot.lotNumber} | ${lot.subdivision} | ${lot.builder}`;
         div.onclick = ()=>addRow(lot);
