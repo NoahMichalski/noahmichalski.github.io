@@ -1,5 +1,685 @@
 [
      {
+    "lotNumber": "2232",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "6971 Aster Way",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2234",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "6991 Aster Way",
+    "floorplan": "Madison",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2239",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7041 Aster Way",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2243",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7081 Aster Way",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2244",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7091 Aster Way",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2247",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7131 Aster Way",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2248",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7141 Aster Way",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2259",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12091 Warbler Way",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2260",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12101 Warbler Way",
+    "floorplan": "Franklin",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2264",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7271 Aster Way",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2267",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7301 Aster Way",
+    "floorplan": "Madison",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2268",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7311 Aster Way",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2271",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12245 Curtis Loop",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2272",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12255 Curtis Loop",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2275",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12285 Curtis Loop",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2279",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12325 Curtis Loop",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2283",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12365 Curtis Loop",
+    "floorplan": "Erie",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2284",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12375 Curtis Loop",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2287",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12405 Curtis Loop",
+    "floorplan": "Franklin",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2291",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12445 Curtis Loop",
+    "floorplan": "Summit",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2292",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12455 Curtis Loop",
+    "floorplan": "Franklin",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2295",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12485 Curtis Loop",
+    "floorplan": "Madison",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2296",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12495 Curtis Loop",
+    "floorplan": "Franklin",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2297",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12505 Curtis Loop",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2302",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7216 Coralberry Way",
+    "floorplan": "Seneca",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2305",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7186 Coralberry Way",
+    "floorplan": "Franklin",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2323",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7034 Aster Way",
+    "floorplan": "Franklin",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2344",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7355 Coralberry Way",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2360",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7296 Coralberry Way",
+    "floorplan": "Madison",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2366",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "7356 Coralberry Way",
+    "floorplan": "Summit",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2374",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12398 Curtis Loop",
+    "floorplan": "Franklin",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2375",
+    "subdivision": "Jerome Aster",
+    "builder": "Schottenstein",
+    "address": "12408 Curtis Loop",
+    "floorplan": "Vinton II",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "15",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "8832 Eliot Drive",
+    "floorplan": "York",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "16",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "8828 Eliot Drive",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "21",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "8798 Eliot Drive",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "54",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "8920 Coe Drive",
+    "floorplan": "Chester",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "65",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "8837 Eliot Drive",
+    "floorplan": "Hanover",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "76",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "8913 Coe Drive",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "85",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "9001 Coe Drive",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "88",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "9019 Coe Drive",
+    "floorplan": "Addison",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "98",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "9087 Coe Drive",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "99",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "9093 Coe Drive",
+    "floorplan": "Knox",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "154",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "8994 Coe Drive",
+    "floorplan": "York",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "155",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "9000 Coe Drive",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "163",
+    "subdivision": "Glacier Pointe",
+    "builder": "Schottenstein",
+    "address": "9039 Eliot Drive",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "1988",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11834 Verbena Place",
+    "floorplan": "Chester",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2001",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11753 Verbena Place",
+    "floorplan": "Chester",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "1982",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11786 Verbena Place",
+    "floorplan": "York",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2005",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11797 Verbena Place",
+    "floorplan": "York",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "1994",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11914 Verbena Place",
+    "floorplan": "York",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2015",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11933 Verbena Place",
+    "floorplan": "York",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "1993",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11906 Verbena Place",
+    "floorplan": "York",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "1990",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11850 Verbena Place",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "1975",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11730 Verbena Place",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2000",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11743 Verbena Place",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2007",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11813 Verbena Place",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2013",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11917 Verbena Place",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "1995",
+    "subdivision": "Cottages at Verbena",
+    "builder": "Schottenstein",
+    "address": "11922 Verbena Place",
+    "floorplan": "Reed",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "44",
+    "subdivision": "Reserve at New California",
+    "builder": "Schottenstein",
+    "address": "9794 Mimosa Court",
+    "floorplan": "Knox",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "50",
+    "subdivision": "Reserve at New California",
+    "builder": "Schottenstein",
+    "address": "9773 Mimosa Court",
+    "floorplan": "Knox",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "60",
+    "subdivision": "Reserve at New California",
+    "builder": "Schottenstein",
+    "address": "9826 Mesquite Court",
+    "floorplan": "Knox",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "43",
+    "subdivision": "Reserve at New California",
+    "builder": "Schottenstein",
+    "address": "9804 Mimosa Court",
+    "floorplan": "Franklin",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "58",
+    "subdivision": "Reserve at New California",
+    "builder": "Schottenstein",
+    "address": "9806 Mesquite Court",
+    "floorplan": "Franklin",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "52",
+    "subdivision": "Reserve at New California",
+    "builder": "Schottenstein",
+    "address": "9797 Mesquite Court",
+    "floorplan": "Vinton",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "54",
+    "subdivision": "Reserve at New California",
+    "builder": "Schottenstein",
+    "address": "9777 Mesquite Court",
+    "floorplan": "Vinton",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "46",
+    "subdivision": "Reserve at New California",
+    "builder": "Schottenstein",
+    "address": "9774 Mimosa Court",
+    "floorplan": "Erie",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "49",
+    "subdivision": "Reserve at New California",
+    "builder": "Schottenstein",
+    "address": "9763 Mimosa Court",
+    "floorplan": "Erie",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "56",
+    "subdivision": "Reserve at New California",
+    "builder": "Schottenstein",
+    "address": "9786 Mesquite Court",
+    "floorplan": "Erie",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "136",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "1581 Crosley Lane",
+    "floorplan": "Hudson",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "24",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "1541 Forbes Avenue",
+    "floorplan": "Columbia",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "120",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "1543 Ebbets Court",
+    "floorplan": "Columbia",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "106",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "1560 Ebbets Court",
+    "floorplan": "Columbia",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "108",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "1572 Ebbets Court",
+    "floorplan": "Benton",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "117",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "1561 Ebbets Court",
+    "floorplan": "Athens",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "101",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "6324 Rickwood Trail",
+    "floorplan": "Athens",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "109",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "1578 Ebbets Court",
+    "floorplan": "Athens",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "121",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "6348 Rickwood Trail",
+    "floorplan": "Athens",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "123",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "6360 Rickwood Trail",
+    "floorplan": "Athens",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "12",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "6258 Renner Park Drive",
+    "floorplan": "Feyette",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "1",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "6180 Renner Park Drive",
+    "floorplan": "Franklin",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "2",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "6186 Renner Park Drive",
+    "floorplan": "Franklin",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "115",
+    "subdivision": "Renner Park",
+    "builder": "Schottenstein",
+    "address": "1573 Ebbets Court",
+    "floorplan": "Madison",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "164",
+    "subdivision": "Holton",
+    "builder": "Schottenstein",
+    "address": "3565 Whirla Way",
+    "floorplan": "Feyette",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "177",
+    "subdivision": "Holton",
+    "builder": "Schottenstein",
+    "address": "3570 Whirla Way",
+    "floorplan": "Hayes",
+    "lastUpdated": "2026-04-15"
+  },
+  {
+    "lotNumber": "180",
+    "subdivision": "Holton",
+    "builder": "Schottenstein",
+    "address": "3540 Whirla Way",
+    "floorplan": "Richland",
+    "lastUpdated": "2026-04-15"
+  },
+     {
     "lotNumber": "210",
     "subdivision": "Madison Meadows",
     "builder": "DR Horton",
