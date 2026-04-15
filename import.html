@@ -248,28 +248,50 @@ let date = parsePulteDate(dateRaw);
   render(jobs);
 }
 
- function processRyan(rows) {
+function processRyan(rows) {
   let jobs = {};
 
-  rows.forEach(row => {
+  // 🔍 FIND HEADER ROW
+  let headerIndex = rows.findIndex(r =>
+    r.join(" ").toLowerCase().includes("community") &&
+    r.join(" ").toLowerCase().includes("schedule")
+  );
 
-    let communityRaw = (row[0] || "").toString().trim();
-    let lotRaw = row[1];
-    let dateRaw = row[2];
-    let taskRaw = (row[3] || "").toString().toLowerCase().trim();
+  if (headerIndex === -1) {
+    alert("Ryan format not detected");
+    return;
+  }
+
+  let headers = rows[headerIndex].map(h => (h || "").toLowerCase());
+
+  let communityCol = headers.findIndex(h => h.includes("community"));
+  let lotCol = headers.findIndex(h => h.includes("lot"));
+  let dateCol = headers.findIndex(h => h.includes("schedule"));
+  let taskCol = headers.findIndex(h => h.includes("task"));
+
+  if (communityCol === -1 || lotCol === -1 || dateCol === -1 || taskCol === -1) {
+    alert("Missing required Ryan columns");
+    return;
+  }
+
+  // ===== COMMUNITY MAP =====
+  const communityMap = {
+    "RA": "Rutherford",
+    "TT": "Terra Alta",
+    "T8": "Terra Alta"
+  };
+
+  rows.slice(headerIndex + 1).forEach(row => {
+
+    let communityRaw = (row[communityCol] || "").toString().trim();
+    let lotRaw = row[lotCol];
+    let dateRaw = row[dateCol];
+    let taskRaw = (row[taskCol] || "").toString().toLowerCase().trim();
 
     if (!communityRaw || !lotRaw || !dateRaw) return;
 
-    // ===== COMMUNITY MAP =====
-    let communityMap = {
-      "RA": "Rutherford",
-      "TT": "Terra Alta",
-      "T8": "Terra Alta"
-    };
-
     let subdivision = communityMap[communityRaw] || communityRaw;
 
-    // ===== LOT =====
     let lot = parseInt(lotRaw, 10);
     if (isNaN(lot)) return;
 
@@ -288,16 +310,16 @@ let date = parsePulteDate(dateRaw);
       day: "2-digit"
     });
 
-    // ===== TASK CLEANING =====
+    // ===== TASK CLEAN =====
     let task = null;
 
-    if (taskRaw.includes("foundation poured")) return; // ignore completely
+    if (taskRaw.includes("foundation poured")) return;
 
     if (taskRaw.includes("pressure wash")) task = "p/w";
     else if (taskRaw.includes("final clean") || taskRaw.includes("qai reclean")) task = "reclean";
     else if (taskRaw.includes("full clean")) task = "original";
     else if (taskRaw.includes("carpet prep")) task = "car";
-    else task = taskRaw; // fallback (keeps weird stuff visible)
+    else task = taskRaw;
 
     let key = lot + "_" + dateStr;
 
@@ -315,7 +337,6 @@ let date = parsePulteDate(dateRaw);
 
   render(jobs);
 }
-
     // ===== TASK CLEANING =====
     let task = null;
 
