@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lot Data Manager</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<style>
+body {
+  font-family: Arial;
+  background: #111;
+  color: white;
+  padding: 20px;
+}
+
+button, select {
+  margin: 5px;
+  padding: 8px 12px;
+  background: #333;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover { background: #555; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 15px;
+}
+
+th, td {
+  border: 1px solid #444;
+  padding: 6px;
+}
+
+th { background: #222; }
+td { background: #1a1a1a; }
+
+td[contenteditable="true"] {
+  background: #222;
+}
+
+tr.error {
+  background: #3a0000 !important;
+}
+
+#error {
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Lot Data Manager</h1>
+
+<input type="file" id="fileInput" accept=".json">
+
+<br>
+
+<button onclick="loadDefault()">Load Repo JSON</button>
+<button onclick="loadJSON()">Upload JSON</button>
+<button onclick="exportExcel()">Export Excel</button>
+<button onclick="exportJSON()">Export JSON</button>
+<button onclick="copyTable()">Copy Table</button>
+
+<br>
+
+<label>Filter Builder:</label>
+<select id="builderFilter" onchange="renderTable()">
+  <option value="ALL">All</option>
+</select>
+
+<div id="error"></div>
+
+<table>
+<thead>
+<tr>
+<th>Builder</th>
+<th>Subdivision</th>
+<th>Lot</th>
+<th>Floorplan</th>
+<th>Address</th>
+<th>Last Updated</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+
+<script>
+let rawData = [];
+
+async function loadDefault() {
+  const errorDiv = document.getElementById('error');
+  errorDiv.innerText = "Loading repo JSON...";
+
+  try {
+    const res = await fetch("lots(1).json");
+    const data = await res.json();
+
+    processData(data);
+    errorDiv.innerText = "Loaded from repo ✅";
+
+  } catch (err) {
+    errorDiv.innerText = "❌ Could not load lots(1).json (check filename/location)";
+  }
+}
+
+function loadJSON() {
+  const file = document.getElementById('fileInput').files[0];
+  const errorDiv = document.getElementById('error');
+
+  if (!file) {
+    errorDiv.innerText = "Select a JSON file.";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      processData(data);
+      errorDiv.innerText = "Loaded local file ✅";
+    } catch {
+      errorDiv.innerText = "❌ Invalid JSON file";
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+function processData(data) {
+  rawData = data.map(item => ({
+    builder: item.builder || "",
+    subdivision: item.subdivision || "",
+    lot: item.lotNumber || "",
+    floorplan: item.floorplan || "",
+    address: item.address || "",
+    lastUpdated: item.lastUpdated || ""
+  }));
+
+  populateBuilderFilter();
+  renderTable();
+}
+
+function populateBuilderFilter() {
+  const select = document.getElementById('builderFilter');
+  const builders = [...new Set(rawData.map(r => r.builder).filter(b => b))];
+
+  select.innerHTML = '<option value="ALL">All</option>';
+
+  builders.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b;
+    opt.textContent = b;
+    select.appendChild(opt);
+  });
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const filter = document.getElementById('builderFilter').value;
+
+  tbody.innerHTML = "";
+
+  rawData.forEach((row, index) => {
+    if (filter !== "ALL" && row.builder !== filter) return;
+
+    const tr = document.createElement('tr');
+
+    if (!row.floorplan || !row.address) {
+      tr.classList.add('error');
+    }
+
+    Object.keys(row).forEach(key => {
+      const td = document.createElement('td');
+      td.contentEditable = true;
+      td.innerText = row[key];
+
+      td.oninput = () => {
+        rawData[index][key] = td.innerText;
+        validateRow(tr, rawData[index]);
+      };
+
+      tr.appendChild(td);
+    });
+
+    validateRow(tr, row);
+    tbody.appendChild(tr);
+  });
+}
+
+function validateRow(tr, row) {
+  if (!row.floorplan || !row.address) {
+    tr.classList.add('error');
+  } else {
+    tr.classList.remove('error');
+  }
+}
+
+function exportExcel() {
+  const ws = XLSX.utils.json_to_sheet(rawData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Lots");
+  XLSX.writeFile(wb, "lots.xlsx");
+}
+
+function exportJSON() {
+  const json = rawData.map(r => ({
+    lotNumber: r.lot,
+    subdivision: r.subdivision,
+    builder: r.builder,
+    address: r.address,
+    floorplan: r.floorplan,
+    lastUpdated: r.lastUpdated
+  }));
+
+  const blob = new Blob([JSON.stringify(json, null, 2)], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "lots.json";
+  a.click();
+}
+
+function copyTable() {
+  let text = "Builder\tSubdivision\tLot\tFloorplan\tAddress\tLast Updated\n";
+
+  rawData.forEach(r => {
+    text += `${r.builder}\t${r.subdivision}\t${r.lot}\t${r.floorplan}\t${r.address}\t${r.lastUpdated}\n`;
+  });
+
+  navigator.clipboard.writeText(text);
+  alert("Copied!");
+}
+</script>
+
+</body>
+</html>
