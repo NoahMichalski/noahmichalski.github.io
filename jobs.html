@@ -64,7 +64,7 @@ button.action {
 <button onclick="validateAll()">✅ Validate</button>
 <button onclick="exportExcel()">📤 Export Excel</button>
 
-<h3>Search Lots</h3>
+<h3>Search Lots (REQUIRED for duplicates)</h3>
 <input id="searchBox" oninput="searchLots()" placeholder="Search lot / subdivision / builder">
 <div id="searchResults"></div>
 
@@ -104,7 +104,7 @@ let tasks = {
     ]
 };
 
-async function loadLots() {
+async function loadLots(){
     let res = await fetch("lots(1).json");
     let data = await res.json();
 
@@ -156,7 +156,6 @@ function addRow(lotData=null){
         tr.cells[1].querySelector("input").value = lotData.subdivision;
         tr.cells[2].querySelector("input").value = lotData.builder;
 
-        // 🔥 AUTO VALIDATE ON CLICK
         validateRow(tr.querySelector("button"));
     }
 }
@@ -175,11 +174,10 @@ function validateRow(btn){
     let cls = "good";
 
     if(!lotObj){
-        // fallback: check duplicates
         let matches = lotsArray.filter(l=>String(l.lotNumber) === lot);
 
         if(matches.length > 1){
-            status.push("MULTIPLE MATCHES - USE SEARCH");
+            status.push("SELECT FROM SEARCH");
             cls = "warn";
         } else {
             status.push("LOT NOT FOUND");
@@ -258,7 +256,6 @@ function searchLots(){
         let div = document.createElement("div");
         div.innerText = `${lot.lotNumber} | ${lot.subdivision} | ${lot.builder}`;
 
-        // 🔥 YOU ASKED FOR THIS EXACT LINE + FIX
         div.onclick = ()=>addRow(lot);
 
         container.appendChild(div);
