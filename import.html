@@ -59,6 +59,7 @@
 <select id="builder">
   <option value="pulte">Pulte</option>
   <option value="drhorton">DR Horton</option>
+  <option value="ryan">Ryan</option>
 </select>
 
 <input type="file" id="fileInput">
@@ -181,8 +182,9 @@ function loadFile() {
       return;
     }
 
-    if (builder === "pulte") processPulte(rows);
-    if (builder === "drhorton") processDRHorton(rows);
+if (builder === "pulte") processPulte(rows);
+if (builder === "drhorton") processDRHorton(rows);
+if (builder === "ryan") processRyan(rows);
   };
 
   reader.readAsArrayBuffer(file);
@@ -241,6 +243,54 @@ let date = parsePulteDate(dateRaw);
     if (!jobs[key]) jobs[key] = { lot, subdivision: cleanSubdivision(community), dateStr, tasks: [] };
 
     jobs[key].tasks.push(task);
+  });
+
+  render(jobs);
+}
+
+  function processRyan(rows) {
+  let jobs = {};
+
+  rows.forEach(row => {
+
+    let subdivision = row[0];   // usually first col
+    let lotRaw = row[1];        // lot column
+    let task = row[2];          // task/description
+    let dateRaw = row[3];       // date column
+
+    if (!lotRaw || !dateRaw) return;
+
+    let lot = parseInt(lotRaw, 10);
+    if (isNaN(lot)) return;
+
+    let date;
+
+    // handle excel serial
+    if (typeof dateRaw === "number") {
+      date = excelDateToJS(dateRaw);
+    } else {
+      date = new Date(dateRaw);
+    }
+
+    if (!date || isNaN(date.getTime())) return;
+
+    let dateStr = date.toLocaleDateString("en-US", {
+      month: "2-digit",
+      day: "2-digit"
+    });
+
+    let key = lot + "_" + dateStr;
+
+    if (!jobs[key]) {
+      jobs[key] = {
+        lot,
+        subdivision: cleanSubdivision(subdivision),
+        dateStr,
+        tasks: []
+      };
+    }
+
+    jobs[key].tasks.push(task || "");
   });
 
   render(jobs);
