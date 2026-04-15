@@ -253,19 +253,28 @@ let date = parsePulteDate(dateRaw);
 
   rows.forEach(row => {
 
-    let subdivision = row[0];   // usually first col
-    let lotRaw = row[1];        // lot column
-    let task = row[2];          // task/description
-    let dateRaw = row[3];       // date column
+    let communityRaw = (row[0] || "").toString().trim();
+    let lotRaw = row[1];
+    let dateRaw = row[2];
+    let taskRaw = (row[3] || "").toString().toLowerCase().trim();
 
-    if (!lotRaw || !dateRaw) return;
+    if (!communityRaw || !lotRaw || !dateRaw) return;
 
+    // ===== COMMUNITY MAP =====
+    let communityMap = {
+      "RA": "Rutherford",
+      "TT": "Terra Alta",
+      "T8": "Terra Alta"
+    };
+
+    let subdivision = communityMap[communityRaw] || communityRaw;
+
+    // ===== LOT =====
     let lot = parseInt(lotRaw, 10);
     if (isNaN(lot)) return;
 
+    // ===== DATE =====
     let date;
-
-    // handle excel serial
     if (typeof dateRaw === "number") {
       date = excelDateToJS(dateRaw);
     } else {
@@ -279,6 +288,17 @@ let date = parsePulteDate(dateRaw);
       day: "2-digit"
     });
 
+    // ===== TASK CLEANING =====
+    let task = null;
+
+    if (taskRaw.includes("foundation poured")) return; // ignore completely
+
+    if (taskRaw.includes("pressure wash")) task = "p/w";
+    else if (taskRaw.includes("final clean") || taskRaw.includes("qai reclean")) task = "reclean";
+    else if (taskRaw.includes("full clean")) task = "original";
+    else if (taskRaw.includes("carpet prep")) task = "car";
+    else task = taskRaw; // fallback (keeps weird stuff visible)
+
     let key = lot + "_" + dateStr;
 
     if (!jobs[key]) {
@@ -290,12 +310,11 @@ let date = parsePulteDate(dateRaw);
       };
     }
 
-    jobs[key].tasks.push(task || "");
+    jobs[key].tasks.push(task);
   });
 
   render(jobs);
 }
-
 function processDRHorton(rows) {
   let jobs = {};
 
