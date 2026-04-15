@@ -53,8 +53,7 @@ button.action {
 <body>
 
 <h1>VIP Job Intake</h1>
-
-<div id="lotStatus">Lots: Loading...</div>
+<div id="lotStatus">Loading...</div>
 
 <div class="tabs">
     <button onclick="switchTab('cleaning')" id="cleaningTab" class="active">Cleaning</button>
@@ -87,8 +86,8 @@ button.action {
 <script>
 
 let currentTab = "cleaning";
-let lotsData = {};
 let lotsArray = [];
+let lotsData = {};
 
 let tasks = {
     cleaning: ["Original","Reclean","Windows","Final Clean","Touch Up"],
@@ -106,35 +105,28 @@ let tasks = {
 };
 
 async function loadLots() {
-    try {
-        let res = await fetch("lots(1).json");
-        let data = await res.json();
+    let res = await fetch("lots(1).json");
+    let data = await res.json();
 
-        lotsData = {};
-        lotsArray = data;
+    lotsArray = data;
+    lotsData = {};
 
-        data.forEach(lot=>{
-            let key = String(lot.lotNumber).trim(); // STRICT KEY
-            lotsData[key] = lot;
-        });
+    data.forEach(lot=>{
+        let key = `${lot.lotNumber}|${lot.subdivision}`;
+        lotsData[key] = lot;
+    });
 
-        document.getElementById("lotStatus").innerText =
-            "Lots Loaded: " + Object.keys(lotsData).length;
-
-    } catch (err) {
-        document.getElementById("lotStatus").innerText = "FAILED TO LOAD LOTS";
-        console.error(err);
-    }
+    document.getElementById("lotStatus").innerText =
+        "Lots Loaded: " + data.length;
 }
 
-window.onload = () => loadLots();
+window.onload = loadLots;
 
 function switchTab(tab){
     currentTab = tab;
     document.getElementById("cleaningTab").classList.remove("active");
     document.getElementById("laborTab").classList.remove("active");
     document.getElementById(tab+"Tab").classList.add("active");
-
     document.getElementById("tbody").innerHTML = "";
 }
 
@@ -142,9 +134,7 @@ function addRow(lotData=null){
     let tbody = document.getElementById("tbody");
 
     let select = `<select>`;
-    tasks[currentTab].forEach(t=>{
-        select += `<option>${t}</option>`;
-    });
+    tasks[currentTab].forEach(t=> select += `<option>${t}</option>`);
     select += `</select>`;
 
     let tr = document.createElement("tr");
@@ -165,30 +155,38 @@ function addRow(lotData=null){
         tr.cells[0].querySelector("input").value = lotData.lotNumber;
         tr.cells[1].querySelector("input").value = lotData.subdivision;
         tr.cells[2].querySelector("input").value = lotData.builder;
+
+        // 🔥 AUTO VALIDATE ON CLICK
+        validateRow(tr.querySelector("button"));
     }
 }
 
 function validateRow(btn){
     let row = btn.closest("tr");
 
-    let lot = String(row.cells[0].querySelector("input").value).trim();
+    let lot = row.cells[0].querySelector("input").value.trim();
     let sub = row.cells[1].querySelector("input").value.trim();
     let builder = row.cells[2].querySelector("input").value.trim();
 
-    let lotObj = lotsData[lot];
+    let key = `${lot}|${sub}`;
+    let lotObj = lotsData[key];
 
     let status = [];
     let cls = "good";
 
     if(!lotObj){
-        status.push("LOT NOT FOUND");
-        cls = "bad";
-    } else {
-        if(sub && lotObj.subdivision !== sub){
-            status.push("SUBDIVISION MISMATCH");
+        // fallback: check duplicates
+        let matches = lotsArray.filter(l=>String(l.lotNumber) === lot);
+
+        if(matches.length > 1){
+            status.push("MULTIPLE MATCHES - USE SEARCH");
             cls = "warn";
+        } else {
+            status.push("LOT NOT FOUND");
+            cls = "bad";
         }
-        if(builder && lotObj.builder !== builder){
+    } else {
+        if(lotObj.builder !== builder){
             status.push("BUILDER MISMATCH");
             cls = "warn";
         }
@@ -205,14 +203,14 @@ function validateAll(){
     let counts = {};
 
     rows.forEach(r=>{
-        let lot = String(r.cells[0].querySelector("input").value).trim();
+        let lot = r.cells[0].querySelector("input").value.trim();
         counts[lot] = (counts[lot] || 0) + 1;
     });
 
     rows.forEach(r=>{
         validateRow(r.querySelector("button"));
 
-        let lot = String(r.cells[0].querySelector("input").value).trim();
+        let lot = r.cells[0].querySelector("input").value.trim();
 
         if(counts[lot] > 1){
             r.className = "warn";
@@ -223,7 +221,6 @@ function validateAll(){
 
 function exportExcel(){
     let rows = document.querySelectorAll("#tbody tr");
-
     let data = [];
 
     rows.forEach(r=>{
@@ -260,7 +257,10 @@ function searchLots(){
     results.slice(0,20).forEach(lot=>{
         let div = document.createElement("div");
         div.innerText = `${lot.lotNumber} | ${lot.subdivision} | ${lot.builder}`;
+
+        // 🔥 YOU ASKED FOR THIS EXACT LINE + FIX
         div.onclick = ()=>addRow(lot);
+
         container.appendChild(div);
     });
 }
