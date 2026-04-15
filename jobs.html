@@ -9,15 +9,6 @@
 <style>
 body { background:#111; color:#fff; font-family:Arial; padding:20px; }
 
-.tabs button {
-    padding:10px;
-    margin-right:5px;
-    background:#222;
-    border:1px solid #555;
-    cursor:pointer;
-}
-.active { background:#444; }
-
 table { width:100%; border-collapse:collapse; margin-top:15px; }
 th, td { border:1px solid #444; padding:6px; }
 th { background:#333; }
@@ -30,12 +21,7 @@ input, select {
     padding:5px;
 }
 
-button.action {
-    padding:6px 10px;
-    background:#222;
-    border:1px solid #555;
-    cursor:pointer;
-}
+button { margin:5px; padding:6px 10px; background:#222; border:1px solid #555; color:#fff; cursor:pointer; }
 
 .good { background:#163d1c; }
 .warn { background:#4a3b00; }
@@ -53,19 +39,14 @@ button.action {
 <body>
 
 <h1>VIP Job Intake</h1>
-<div id="lotStatus">Loading...</div>
-
-<div class="tabs">
-    <button onclick="switchTab('cleaning')" id="cleaningTab" class="active">Cleaning</button>
-    <button onclick="switchTab('labor')" id="laborTab">Labor</button>
-</div>
+<div id="lotStatus">Loading lots...</div>
 
 <button onclick="addRow()">➕ Add Row</button>
 <button onclick="validateAll()">✅ Validate</button>
 <button onclick="exportExcel()">📤 Export Excel</button>
 
-<h3>Search Lots (REQUIRED for duplicates)</h3>
-<input id="searchBox" oninput="searchLots()" placeholder="Search lot / subdivision / builder">
+<h3>Search Lots</h3>
+<input id="searchBox" oninput="searchLots()" placeholder="Search...">
 <div id="searchResults"></div>
 
 <table>
@@ -85,57 +66,46 @@ button.action {
 
 <script>
 
-let currentTab = "cleaning";
 let lotsArray = [];
 let lotsData = {};
 
-let tasks = {
-    cleaning: ["Original","Reclean","Windows","Final Clean","Touch Up"],
-    labor: [
-        "Punch Out","Insulation Prep","2nd Roll","Carpet Prep",
-        "Carpet prep/scrap house/gar/lot","Laquer Prep","Drywall Sweep",
-        "Cover Carpet","Power Wash Interior- basement/garage",
-        "Powerwash Garage","Powerwash exterior/low siding around",
-        "Relay","Cover Crawl","p/w Basement/Garage/drive/walks/porch",
-        "p/w gar/drives/walks/porch/back courtyard",
-        "p/w Basement/Garage/Porch","Bracing","Remove Bracing",
-        "Bolts","Pump","Flood",
-        "Scrap- inside house/floor coverings/garage","Other"
-    ]
-};
-
 async function loadLots(){
-    let res = await fetch("lots(1).json");
-    let data = await res.json();
+    try {
+        console.log("Fetching lots JSON...");
 
-    lotsArray = data;
-    lotsData = {};
+        // 🔥 THIS IS THE IMPORTANT LINE
+        let res = await fetch("lots(1).json?v=" + Date.now());
 
-    data.forEach(lot=>{
-        let key = `${lot.lotNumber}|${lot.subdivision}`;
-        lotsData[key] = lot;
-    });
+        if(!res.ok){
+            throw new Error("Fetch failed");
+        }
 
-    document.getElementById("lotStatus").innerText =
-        "Lots Loaded: " + data.length;
+        let data = await res.json();
+
+        console.log("Loaded lots:", data.length);
+
+        lotsArray = data;
+        lotsData = {};
+
+        data.forEach(lot=>{
+            let key = `${lot.lotNumber}|${lot.subdivision}`;
+            lotsData[key] = lot;
+        });
+
+        document.getElementById("lotStatus").innerText =
+            "Lots Loaded: " + data.length;
+
+    } catch(err){
+        console.error("LOAD FAILED:", err);
+        document.getElementById("lotStatus").innerText =
+            "FAILED TO LOAD lots(1).json";
+    }
 }
 
 window.onload = loadLots;
 
-function switchTab(tab){
-    currentTab = tab;
-    document.getElementById("cleaningTab").classList.remove("active");
-    document.getElementById("laborTab").classList.remove("active");
-    document.getElementById(tab+"Tab").classList.add("active");
-    document.getElementById("tbody").innerHTML = "";
-}
-
 function addRow(lotData=null){
     let tbody = document.getElementById("tbody");
-
-    let select = `<select>`;
-    tasks[currentTab].forEach(t=> select += `<option>${t}</option>`);
-    select += `</select>`;
 
     let tr = document.createElement("tr");
 
@@ -143,10 +113,10 @@ function addRow(lotData=null){
         <td><input></td>
         <td><input></td>
         <td><input></td>
-        <td>${select}</td>
+        <td><input></td>
         <td>Status</td>
-        <td><button class="action" onclick="validateRow(this)">Check</button></td>
-        <td><button class="action" onclick="this.closest('tr').remove()">X</button></td>
+        <td><button onclick="validateRow(this)">Check</button></td>
+        <td><button onclick="this.closest('tr').remove()">X</button></td>
     `;
 
     tbody.appendChild(tr);
@@ -197,47 +167,30 @@ function validateRow(btn){
 }
 
 function validateAll(){
-    let rows = document.querySelectorAll("#tbody tr");
-    let counts = {};
-
-    rows.forEach(r=>{
-        let lot = r.cells[0].querySelector("input").value.trim();
-        counts[lot] = (counts[lot] || 0) + 1;
-    });
-
-    rows.forEach(r=>{
+    document.querySelectorAll("#tbody tr").forEach(r=>{
         validateRow(r.querySelector("button"));
-
-        let lot = r.cells[0].querySelector("input").value.trim();
-
-        if(counts[lot] > 1){
-            r.className = "warn";
-            r.cells[4].innerText += " | DUPLICATE";
-        }
     });
 }
 
 function exportExcel(){
-    let rows = document.querySelectorAll("#tbody tr");
     let data = [];
 
-    rows.forEach(r=>{
+    document.querySelectorAll("#tbody tr").forEach(r=>{
         if(r.className !== "good") return;
 
         data.push({
             Lot: r.cells[0].querySelector("input").value,
             Subdivision: r.cells[1].querySelector("input").value,
             Builder: r.cells[2].querySelector("input").value,
-            Task: r.cells[3].querySelector("select").value,
-            Type: currentTab
+            Task: r.cells[3].querySelector("input").value
         });
     });
 
     let ws = XLSX.utils.json_to_sheet(data);
     let wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, currentTab);
+    XLSX.utils.book_append_sheet(wb, ws, "Jobs");
 
-    XLSX.writeFile(wb, currentTab + "_jobs.xlsx");
+    XLSX.writeFile(wb, "jobs.xlsx");
 }
 
 function searchLots(){
