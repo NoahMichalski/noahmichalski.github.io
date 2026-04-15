@@ -114,7 +114,7 @@ async function loadLots() {
         lotsArray = data;
 
         data.forEach(lot=>{
-            let key = String(lot.lotNumber).trim().toLowerCase();
+            let key = String(lot.lotNumber).trim(); // STRICT KEY
             lotsData[key] = lot;
         });
 
@@ -127,9 +127,7 @@ async function loadLots() {
     }
 }
 
-window.onload = () => {
-    loadLots();
-};
+window.onload = () => loadLots();
 
 function switchTab(tab){
     currentTab = tab;
@@ -170,16 +168,12 @@ function addRow(lotData=null){
     }
 }
 
-function normalize(v){
-    return String(v || "").trim().toLowerCase();
-}
-
 function validateRow(btn){
     let row = btn.closest("tr");
 
-    let lot = normalize(row.cells[0].querySelector("input").value);
-    let sub = normalize(row.cells[1].querySelector("input").value);
-    let builder = normalize(row.cells[2].querySelector("input").value);
+    let lot = String(row.cells[0].querySelector("input").value).trim();
+    let sub = row.cells[1].querySelector("input").value.trim();
+    let builder = row.cells[2].querySelector("input").value.trim();
 
     let lotObj = lotsData[lot];
 
@@ -190,11 +184,11 @@ function validateRow(btn){
         status.push("LOT NOT FOUND");
         cls = "bad";
     } else {
-        if(sub && normalize(lotObj.subdivision) !== sub){
+        if(sub && lotObj.subdivision !== sub){
             status.push("SUBDIVISION MISMATCH");
             cls = "warn";
         }
-        if(builder && normalize(lotObj.builder) !== builder){
+        if(builder && lotObj.builder !== builder){
             status.push("BUILDER MISMATCH");
             cls = "warn";
         }
@@ -211,14 +205,14 @@ function validateAll(){
     let counts = {};
 
     rows.forEach(r=>{
-        let lot = normalize(r.cells[0].querySelector("input").value);
+        let lot = String(r.cells[0].querySelector("input").value).trim();
         counts[lot] = (counts[lot] || 0) + 1;
     });
 
     rows.forEach(r=>{
         validateRow(r.querySelector("button"));
 
-        let lot = normalize(r.cells[0].querySelector("input").value);
+        let lot = String(r.cells[0].querySelector("input").value).trim();
 
         if(counts[lot] > 1){
             r.className = "warn";
@@ -252,12 +246,12 @@ function exportExcel(){
 }
 
 function searchLots(){
-    let q = normalize(document.getElementById("searchBox").value);
+    let q = document.getElementById("searchBox").value.toLowerCase();
 
     let results = lotsArray.filter(lot=>{
-        return normalize(lot.lotNumber).includes(q) ||
-               normalize(lot.subdivision).includes(q) ||
-               normalize(lot.builder).includes(q);
+        return String(lot.lotNumber).includes(q) ||
+               lot.subdivision.toLowerCase().includes(q) ||
+               lot.builder.toLowerCase().includes(q);
     });
 
     let container = document.getElementById("searchResults");
