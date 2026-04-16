@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VIP Import Tool</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <style>
+    body { background:#111; color:#fff; font-family:Arial; padding:20px; }
+
+    button, select {
+      padding:6px 10px;
+      margin:5px;
+      background:#444;
+      color:#fff;
+      border:none;
+      cursor:pointer;
+    }
+
+    .delete-btn {
+      background:#aa0000;
+      margin-left:8px;
+      padding:2px 6px;
+      font-size:12px;
+    }
+
+    .date-box {
+      background:#1a1a1a;
+      border:1px solid #333;
+      border-radius:10px;
+      padding:15px;
+      margin-bottom:20px;
+    }
+
+    .date-title {
+      font-size:18px;
+      font-weight:bold;
+      margin-bottom:15px;
+      color:#0f0;
+    }
+
+    .columns { display:flex; gap:20px; }
+
+    .column {
+      flex:1;
+      background:#121212;
+      padding:10px;
+      border-radius:8px;
+      border:1px solid #2a2a2a;
+    }
+
+    .job { padding:4px 0; border-bottom:1px solid #222; }
+  </style>
+</head>
+
+<body>
+
+<h2>VIP Import Tool</h2>
+
+<select id="builder">
+  <option value="pulte">Pulte</option>
+  <option value="drhorton">DR Horton</option>
+  <option value="ryan">Ryan</option>
+</select>
+
+<input type="file" id="fileInput">
+<button onclick="loadFile()">LOAD FILE</button>
+
+<div id="output"></div>
+
+<script>
+
+let LOT_DATA = [];
+let LOT_LOOKUP = new Set();
+
+async function loadLotData() {
+  try {
+    const res = await fetch("lots(1).json");
+    LOT_DATA = await res.json();
+
+    LOT_LOOKUP.clear();
+
+    LOT_DATA.forEach(l => {
+      let key = `${cleanSubdivision(l.subdivision)}|${parseInt(l.lotNumber)}`;
+      LOT_LOOKUP.add(key);
+    });
+
+    console.log("Lot dataset loaded:", LOT_LOOKUP.size);
+  } catch (e) {
+    console.error("Failed to load lots JSON", e);
+  }
+}
+
+// ===== DATE =====
+function excelDateToJS(serial) {
+  const utc_days  = Math.floor(serial - 25569);
+  const utc_value = utc_days * 86400;                                        
+  const date_info = new Date(utc_value * 1000);
+
+  // 🔥 FIX: force LOCAL date (no timezone shift)
+  return new Date(
+    date_info.getFullYear(),
+    date_info.getMonth(),
+    date_info.getDate()
+  );
+}
+// ===== META TRACKING =====
+let META;
+
+function resetMeta() {
+  META = {
+    originals: 0,
+    recleans: 0,
+    labor: 0,
+    minDate: null,
+    maxDate: null
+  };
+}
+
+function updateMeta(date, task) {
+  if (!date) return;
+
+  if (!META.minDate || date < META.minDate) META.minDate = date;
+  if (!META.maxDate || date > META.maxDate) META.maxDate = date;
+
+  let type = classifyTask(task || "");
+
+  if (type === "original") META.originals++;
+  else if (type === "reclean") META.recleans++;
+  else if (type) META.labor++;
+}
+// ===== TASK CLASSIFIER =====
+function classifyTask(task) {
+  let t = task.toLowerCase().trim();
+
+  if (t.includes("full clean") || t.includes("first clean")) return "original";
+  if (t.includes("reclean") || t.includes("qc clean") || t.includes("buff") || t.includes("closing"))
+    return "reclean";
+
+  if (t.includes("power wash") || t.includes("powerwash") || t.includes("p/w") || t === "pressure wash")
+    return "p/w";
+
+  if (t.includes("carpet prep")) return "car";
+  if (t.includes("Remove Basement Wall Bracing")) return "remove bracing";
+  if (t.includes("Basement Wall Bracing")) return "bracing";
+  if (t.includes("anchor bolts")) return "bolts";
+
+  if (t.includes("screen")) return null;
+
+  return "unknown"; // 🔥 keep raw
+}
+
+// ===== MISSING LOT TRACKING =====
+let MISSING_LOTS;
+
+function resetMissing() {
+  MISSING_LOTS = new Set();
+}
+
+function checkMissingLot(subdivision, lot) {
+  let key = `${cleanSubdivision(subdivision)}|${parseInt(lot)}`;
+  if (!LOT_LOOKUP.has(key)) {
+    MISSING_LOTS.add(key);
+  }
+}
+
+// ===== SUBDIVISION CLEANUP =====
+function cleanSubdivision(name) {
+  if (!name) return "";
+
+  let n = name.toLowerCase().trim();
+
+  // ===== HARD MAPPINGS =====
+  if (n.includes("amrine meadows")) return "Amrine";
+  if (n.includes("clark shaw reserve")) return "Clarkshaw";
+  if (n.includes("clover run")) return "Clover";
+  if (n.includes("eagle creek")) return "Eagle";
+  if (n.includes("pioneer crossing")) return "Pioneer";
+  if (n.includes("slate ridge")) return "Slate";
+  if (n.includes("berlin bluffs")) return "Berlin";
+  if (n.includes("bloomfield hills")) return "Bloomfield";
+  if (n.includes("towns on the greenway")) return "Towns Greenway";
+  if (n.includes("towns on the parkway")) return "Towns Parkway";
+  if (n.includes("homestead at scotts farm")) return "Scotts";
+  if (n.includes("dw maygrass")) return "Maygrass";
+  if (n.includes("buckstone bend")) return "Buckstone";
+  if (n.includes("nelson farms")) return "Nelson";
+  if (n.includes("nottingham trace")) return "Nottingham";
+  if (n.includes("arrowhead")) return "Arrowhead";
+  if (n.includes("Sugar Farms")) return "Sugar Farms";
+  if (n.includes("Wagnalls Run HLE")) return "Wagnalls";
+  if (n.includes("Piatt P West")) return "Piatts";
+
+  // DR Horton
+  if (n.includes("longview")) return "LH";
+  if (n.includes("orchard lakes")) return "Orchard";
+  if (n.includes("walnut mill")) return "Walnut";
+  if (n.includes("overlook")) return "Overlook";
+  if (n.includes("lansdowne")) return "Lansdowne";
+  if (n.includes("madison meadows")) return "MD";
+
+  // ===== CLEANUP LOGIC =====
+  let cleaned = name
+    .replace(/-/g, " ")
+    .replace(/\d+/g, "") // remove numbers
+    .replace(/highlands/gi, "")
+    .replace(/summit/gi, "")
+    .replace(/reserve/gi, "")
+    .replace(/retreat/gi, "")
+    .replace(/phase/gi, "")
+    .replace(/l\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return cleaned;
+}
+
+// ===== LOAD =====
+function loadFile() {
+resetMeta();
+resetMissing();
+  const builder = document.getElementById("builder").value;
+  const file = document.getElementById("fileInput").files[0];
+  if (!file) return alert("Select file");
+
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+    let header = rows[0].join(" ").toLowerCase();
+
+    if (builder === "pulte" && header.includes("plat")) {
+      alert("Wrong builder selected (this is DR Horton)");
+      return;
+    }
+
+    if (builder === "drhorton" && header.includes("community")) {
+      alert("Wrong builder selected (this is Pulte)");
+      return;
+    }
+
+ if (builder === "pulte") processPulte(rows);
+if (builder === "drhorton") processDRHorton(rows);
+if (builder === "ryan") processRyan(rows);
+
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+function parsePulteDate(value) {
+
+  // Excel serial (most common)
+  if (typeof value === "number") {
+    let utc_days = Math.floor(value - 25569);
+    let utc_value = utc_days * 86400;
+    let date = new Date(utc_value * 1000);
+
+    return new Date(
+      date.getUTCFullYear(),
+      date.getUTCMonth(),
+      date.getUTCDate()
+    );
+  }
+
+  // String fallback (no timezone shift)
+  if (typeof value === "string") {
+    let parts = value.split(/[\/\-]/);
+    if (parts.length === 3) {
+      return new Date(parts[2], parts[0]-1, parts[1]);
+    }
+  }
+
+  return null;
+}
+
+// ===== PROCESS =====
+function processPulte(rows) {
+  let jobs = {};
+
+  rows.forEach(row => {
+    let community = row[0];
+    let jobRaw = row[1];
+    let task = row[8];
+    let dateRaw = row[12];
+
+    if (!jobRaw || !dateRaw) return;
+    if (!task) task = "";
+
+    let lot = parseInt(jobRaw.split("-")[1]?.trim(), 10);
+	checkMissingLot(community, lot);
+if (isNaN(lot)) return;
+
+let date = parsePulteDate(dateRaw);
+
+    if (!date || isNaN(date.getTime())) return;
+
+    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
+
+    let key = lot + "_" + dateStr;
+	
+	updateMeta(date, task);
+
+    if (!jobs[key]) jobs[key] = { lot, subdivision: cleanSubdivision(community), dateStr, tasks: [] };
+
+    jobs[key].tasks.push(task);
+	
+  });
+
+  render(jobs);
+}
+
+function processDRHorton(rows) {
+  let jobs = {};
+
+  let headerIndex = rows.findIndex(r => r.join(" ").toLowerCase().includes("description"));
+  let headers = rows[headerIndex].map(h => (h||"").toLowerCase());
+
+  let dateCol = headers.findIndex(h=>h.includes("date"));
+  let projectCol = headers.findIndex(h=>h.includes("project"));
+  let platCol = headers.findIndex(h=>h.includes("plat"));
+  let descCol = headers.findIndex(h=>h.includes("description"));
+
+  rows.slice(headerIndex+1).forEach(row => {
+    let dateRaw = row[dateCol];
+    let project = row[projectCol];
+    let plat = row[platCol];
+    let task = row[descCol];
+
+    if (!plat || !dateRaw) return;
+    if (!task) task = "";
+
+    let match = plat.split("/")[0].match(/\d+/);
+    if (!match) return;
+
+    let lot = parseInt(match[0],10);
+	checkMissingLot(project, lot);
+    if (lot > 100000) return;
+
+    let date = new Date(dateRaw);
+    if (!date || isNaN(date.getTime())) return;
+
+    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
+    let key = lot + "_" + dateStr;
+	updateMeta(date, task);
+
+    if (!jobs[key]) jobs[key] = { lot, subdivision: cleanSubdivision(project), dateStr, tasks: [] };
+
+    jobs[key].tasks.push(task);
+  });
+
+  render(jobs);
+}
+
+function processRyan(rows) {
+  let jobs = {};
+
+  // 🔍 find header row safely
+  let headerIndex = rows.findIndex(r => {
+    let str = r.join(" ").toLowerCase();
+    return str.includes("community") && (str.includes("schedule") || str.includes("date"));
+  });
+
+  if (headerIndex === -1) {
+    alert("Ryan format not detected");
+    return;
+  }
+
+  let headers = rows[headerIndex].map(h => (h || "").toLowerCase());
+
+  let communityCol = headers.findIndex(h => h.includes("community"));
+  let lotCol = headers.findIndex(h => h.includes("lot"));
+  let dateCol = headers.findIndex(h => h.includes("schedule") || h.includes("date"));
+  let taskCol = headers.findIndex(h => h.includes("task") || h.includes("description"));
+
+  if (communityCol === -1 || lotCol === -1 || dateCol === -1 || taskCol === -1) {
+    alert("Ryan columns not found");
+    return;
+  }
+
+  const communityMap = {
+    "RA": "Rutherford",
+    "TT": "Terra Alta",
+    "T8": "Terra Alta"
+  };
+
+  rows.slice(headerIndex + 1).forEach(row => {
+
+    let communityRaw = (row[communityCol] || "").toString().trim();
+    let lotRaw = row[lotCol];
+    let dateRaw = row[dateCol];
+    let taskRaw = (row[taskCol] || "").toString().toLowerCase().trim();
+
+    if (!communityRaw || !lotRaw || !dateRaw) return;
+
+    let subdivision = communityMap[communityRaw] || communityRaw;
+
+    let lot = parseInt(lotRaw, 10);
+	checkMissingLot(subdivision, lot);
+    if (isNaN(lot)) return;
+
+    let date = typeof dateRaw === "number"
+      ? excelDateToJS(dateRaw)
+      : new Date(dateRaw);
+
+    if (!date || isNaN(date.getTime())) return;
+
+    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
+	
+
+    // ===== TASK FILTER =====
+if (
+  taskRaw.includes("foundation") &&
+  taskRaw.includes("poured")
+) return;
+
+updateMeta(date, taskRaw);
+
+    let task;
+    if (taskRaw.includes("pressure wash")) task = "p/w";
+    else if (taskRaw.includes("final clean") || taskRaw.includes("qai reclean")) task = "reclean";
+    else if (taskRaw.includes("full clean")) task = "original";
+    else if (taskRaw.includes("carpet prep")) task = "car";
+    else task = taskRaw;
+
+    let key = lot + "_" + dateStr;
+
+    if (!jobs[key]) jobs[key] = {
+      lot,
+      subdivision: cleanSubdivision(subdivision),
+      dateStr,
+      tasks: []
+    };
+
+    jobs[key].tasks.push(task);
+  });
+
+  render(jobs);
+}
+
+// ===== RENDER =====
+function render(jobs) {
+
+  let grouped = {};
+  Object.values(jobs).forEach(j => {
+    if (!grouped[j.dateStr]) grouped[j.dateStr] = [];
+    grouped[j.dateStr].push(j);
+  });
+
+  let container = document.getElementById("output");
+  container.innerHTML = "";
+  // ===== SUMMARY =====
+let summary = document.createElement("div");
+summary.style.marginBottom = "20px";
+summary.style.fontSize = "18px";
+summary.style.fontWeight = "bold";
+
+summary.innerHTML = `
+  ${META.minDate?.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"})}
+  -
+  ${META.maxDate?.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"})}<br>
+  Originals: ${META.originals} |
+  Recleans: ${META.recleans} |
+  Labor: ${META.labor}
+`;
+
+container.appendChild(summary);
+
+  Object.keys(grouped).sort().forEach(date => {
+
+    let box = document.createElement("div");
+    box.className = "date-box";
+
+    let title = document.createElement("div");
+    title.className = "date-title";
+    title.textContent = date;
+
+    let columns = document.createElement("div");
+    columns.className = "columns";
+
+    let left = document.createElement("div");
+    let right = document.createElement("div");
+
+    left.className = "column";
+    right.className = "column";
+
+    let cleaning = [];
+    let labor = [];
+
+    grouped[date].forEach(job => {
+
+      let hasOriginal = false;
+      let hasReclean = false;
+
+      job.tasks.forEach(t => {
+        let type = classifyTask(t);
+
+        if (type === "original") hasOriginal = true;
+        if (type === "reclean") hasReclean = true;
+
+        if (type && type !== "original" && type !== "reclean") {
+          labor.push({ lot: job.lot, subdivision: job.subdivision, type, raw: t });
+        }
+      });
+
+      if (hasOriginal) cleaning.push({ ...job, type:"original" });
+      else if (hasReclean) cleaning.push({ ...job, type:"reclean" });
+
+    });
+
+    cleaning.sort((a,b)=>{
+      if (a.type==="original" && b.type==="reclean") return -1;
+      if (a.type==="reclean" && b.type==="original") return 1;
+      return 0;
+    });
+
+    // render cleaning
+    cleaning.forEach(job=>{
+      let div=document.createElement("div");
+      div.className="job";
+      div.textContent=`${job.lot} ${job.subdivision}`;
+      div.style.color = job.type==="original" ? "#4CAF50" : "#FFD700";
+      left.appendChild(div);
+    });
+
+    // render labor
+    labor.forEach(job=>{
+      let div=document.createElement("div");
+      div.className="job";
+
+      let text = job.type === "unknown"
+        ? `${job.lot} ${job.subdivision}-${job.raw}`
+        : `${job.lot} ${job.subdivision}-${job.type}`;
+
+      div.textContent = text;
+
+      let del = document.createElement("button");
+      del.textContent = "";
+      del.className = "delete-btn";
+      del.onclick = () => div.remove();
+
+      div.appendChild(del);
+      right.appendChild(div);
+    });
+
+    columns.appendChild(left);
+    columns.appendChild(right);
+    box.appendChild(title);
+    box.appendChild(columns);
+    container.appendChild(box);
+  });
+  // ===== SHOW MISSING LOTS =====
+if (MISSING_LOTS && MISSING_LOTS.size > 0) {
+  let div = document.createElement("div");
+  div.style.marginTop = "20px";
+  div.style.padding = "10px";
+  div.style.border = "1px solid red";
+
+  div.innerHTML =
+    `<b>Missing Lots (${MISSING_LOTS.size})</b><br>` +
+    Array.from(MISSING_LOTS).join("<br>");
+
+  container.appendChild(div);
+}
+
+loadLotData();
+
+</script>
+
+</body>
+</html>
