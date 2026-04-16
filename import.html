@@ -157,6 +157,7 @@ function cleanSubdivision(name) {
 
 // ===== LOAD =====
 function loadFile() {
+  console.log(rows);
   const builder = document.getElementById("builder").value;
   const file = document.getElementById("fileInput").files[0];
   if (!file) return alert("Select file");
