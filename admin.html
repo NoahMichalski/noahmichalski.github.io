@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Lot Lookup v1.3 - Floorplan Unlock</title>
+  <title>Lot Lookup v1.4</title>
+
   <style>
     body {
       font-family: Arial;
@@ -13,7 +14,6 @@
     input {
       padding: 10px;
       width: 300px;
-      margin-bottom: 10px;
     }
 
     button {
@@ -36,14 +36,22 @@
       border: 1px solid #555;
       border-radius: 6px;
     }
+
+    .debug {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
 
 <h2>Lot Lookup</h2>
 
-<input id="search" placeholder="Lot, Subdivision, Builder...">
+<input id="search" placeholder="Search lot, subdivision, builder...">
 <button onclick="unlock()">🔒 Unlock</button>
+
+<div class="debug" id="debug">Loading data...</div>
 
 <div id="results"></div>
 
@@ -52,17 +60,30 @@ let LOTS = [];
 let FLOORPLANS = {};
 let unlocked = false;
 
-// LOAD DATA
-fetch("lots.json")
+// LOAD LOTS
+fetch("lots(1).json")
   .then(res => res.json())
   .then(data => {
     LOTS = data;
+    console.log("LOTS LOADED:", data.length);
+    document.getElementById("debug").innerText = `Lots Loaded: ${data.length}`;
+    render();
+  })
+  .catch(err => {
+    console.error("LOTS FAILED:", err);
+    document.getElementById("debug").innerText = "❌ Failed to load lots(1).json";
   });
 
+// LOAD FLOORPLANS
 fetch("floorplans.json")
   .then(res => res.json())
   .then(data => {
     FLOORPLANS = data;
+    console.log("FLOORPLANS LOADED:", Object.keys(data).length);
+  })
+  .catch(err => {
+    console.error("FLOORPLANS FAILED:", err);
+    document.getElementById("debug").innerText += " | ❌ floorplans.json failed";
   });
 
 // SEARCH
@@ -71,6 +92,7 @@ document.getElementById("search").addEventListener("input", render);
 function render() {
   const val = document.getElementById("search").value.toLowerCase();
   const div = document.getElementById("results");
+
   div.innerHTML = "";
 
   const filtered = LOTS.filter(lot =>
@@ -84,12 +106,12 @@ function render() {
     el.className = "lot";
 
     el.innerHTML = `
-      <b>${lot.lotNumber} ${lot.subdivision}</b><br>
-      ${lot.builder}<br>
+      <b>${lot.lotNumber || ""} ${lot.subdivision || ""}</b><br>
+      ${lot.builder || ""}<br>
       ${lot.address || ""}
     `;
 
-    // 🔐 INTERNAL DATA
+    // 🔒 INTERNAL DATA
     if (unlocked) {
       const key = `${lot.builder}|${lot.floorplan}`;
       const fp = FLOORPLANS[key];
@@ -98,7 +120,7 @@ function render() {
         el.innerHTML += `
           <div class="internal">
             <b>Internal Data</b><br>
-            Floorplan: ${lot.floorplan}<br>
+            Floorplan: ${lot.floorplan || "N/A"}<br>
             Sqft: ${fp.sqft || "N/A"}<br>
             Original: ${fp.original || "N/A"} hrs<br>
             Reclean: ${fp.reclean || "N/A"} hrs<br>
@@ -108,7 +130,7 @@ function render() {
       } else {
         el.innerHTML += `
           <div class="internal" style="color:orange;">
-            ⚠️ No data for ${lot.builder} | ${lot.floorplan}
+            ⚠️ No match for ${lot.builder} | ${lot.floorplan}
           </div>
         `;
       }
