@@ -80,7 +80,8 @@ async function loadLotData() {
     LOT_LOOKUP.clear();
 
     LOT_DATA.forEach(l => {
-      let key = `${cleanSubdivision(l.subdivision).toLowerCase().trim()}|${parseInt(l.lotNumber)}`;
+      let sub = l.subdivision.split("*")[0]; // remove builder
+let key = `${cleanSubdivision(sub).toLowerCase().trim()}|${parseInt(l.lotNumber)}`;
       LOT_LOOKUP.add(key);
     });
 
@@ -157,7 +158,7 @@ function resetMissing() {
 }
 
 function checkMissingLot(subdivision, lot) {
-  let key = `${cleanSubdivision(subdivision).toLowerCase().trim()}|${parseInt(lot)}`;
+  let key = `${cleanSubdivision(subdivision).toLowerCase().replace(/\s+/g,"")}|${parseInt(lot)}`;
   if (!LOT_LOOKUP.has(key)) {
     MISSING_LOTS.add(key);
   }
