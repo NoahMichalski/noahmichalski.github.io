@@ -216,7 +216,7 @@ function parsePulteDate(value) {
   return null;
 }
 
-// ===== PROCESS =====
+// ===== PULTE =====
 function processPulte(rows) {
   let jobs = {};
 
@@ -227,35 +227,88 @@ function processPulte(rows) {
     let dateRaw = row[12];
 
     if (!jobRaw || !dateRaw) return;
-    if (!task) task = "";
 
     let lot = parseInt(jobRaw.split("-")[1]?.trim(), 10);
-if (isNaN(lot)) return;
+    if (isNaN(lot)) return;
 
-let date = parsePulteDate(dateRaw);
-
+    let date = parsePulteDate(dateRaw);
     if (!date || isNaN(date.getTime())) return;
 
     let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
-
     let key = lot + "_" + dateStr;
 
-    if (!jobs[key]) jobs[key] = { lot, subdivision: cleanSubdivision(community), dateStr, tasks: [] };
+    if (!jobs[key]) jobs[key] = {
+      lot,
+      subdivision: cleanSubdivision(community),
+      dateStr,
+      tasks: []
+    };
 
-    jobs[key].tasks.push(task);
+    jobs[key].tasks.push(task || "");
   });
 
   render(jobs);
 }
 
+
+// ===== DR HORTON =====
+function processDRHorton(rows) {
+  let jobs = {};
+
+  let headerIndex = rows.findIndex(r =>
+    r.join(" ").toLowerCase().includes("description")
+  );
+
+  let headers = rows[headerIndex].map(h => (h||"").toLowerCase());
+
+  let dateCol = headers.findIndex(h=>h.includes("date"));
+  let projectCol = headers.findIndex(h=>h.includes("project"));
+  let platCol = headers.findIndex(h=>h.includes("plat"));
+  let descCol = headers.findIndex(h=>h.includes("description"));
+
+  rows.slice(headerIndex+1).forEach(row => {
+
+    let dateRaw = row[dateCol];
+    let project = row[projectCol];
+    let plat = row[platCol];
+    let task = row[descCol];
+
+    if (!plat || !dateRaw) return;
+
+    let match = plat.split("/")[0].match(/\d+/);
+    if (!match) return;
+
+    let lot = parseInt(match[0],10);
+    if (lot > 100000) return;
+
+    let date = new Date(dateRaw);
+    if (!date || isNaN(date.getTime())) return;
+
+    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
+    let key = lot + "_" + dateStr;
+
+    if (!jobs[key]) jobs[key] = {
+      lot,
+      subdivision: cleanSubdivision(project),
+      dateStr,
+      tasks: []
+    };
+
+    jobs[key].tasks.push(task || "");
+  });
+
+  render(jobs);
+}
+
+
+// ===== RYAN =====
 function processRyan(rows) {
   let jobs = {};
 
-  // 🔍 FIND HEADER ROW
-  let headerIndex = rows.findIndex(r =>
-    r.join(" ").toLowerCase().includes("community") &&
-    r.join(" ").toLowerCase().includes("schedule")
-  );
+  let headerIndex = rows.findIndex(r => {
+    let str = r.join(" ").toLowerCase();
+    return str.includes("community") && (str.includes("schedule") || str.includes("date"));
+  });
 
   if (headerIndex === -1) {
     alert("Ryan format not detected");
@@ -266,15 +319,9 @@ function processRyan(rows) {
 
   let communityCol = headers.findIndex(h => h.includes("community"));
   let lotCol = headers.findIndex(h => h.includes("lot"));
-  let dateCol = headers.findIndex(h => h.includes("schedule"));
-  let taskCol = headers.findIndex(h => h.includes("task"));
+  let dateCol = headers.findIndex(h => h.includes("schedule") || h.includes("date"));
+  let taskCol = headers.findIndex(h => h.includes("task") || h.includes("description"));
 
-  if (communityCol === -1 || lotCol === -1 || dateCol === -1 || taskCol === -1) {
-    alert("Missing required Ryan columns");
-    return;
-  }
-
-  // ===== COMMUNITY MAP =====
   const communityMap = {
     "RA": "Rutherford",
     "TT": "Terra Alta",
@@ -295,25 +342,18 @@ function processRyan(rows) {
     let lot = parseInt(lotRaw, 10);
     if (isNaN(lot)) return;
 
-    // ===== DATE =====
-    let date;
-    if (typeof dateRaw === "number") {
-      date = excelDateToJS(dateRaw);
-    } else {
-      date = new Date(dateRaw);
-    }
+    let date = typeof dateRaw === "number"
+      ? excelDateToJS(dateRaw)
+      : new Date(dateRaw);
 
     if (!date || isNaN(date.getTime())) return;
 
-    let dateStr = date.toLocaleDateString("en-US", {
-      month: "2-digit",
-      day: "2-digit"
-    });
-    // ===== TASK CLEAN =====
-    let task = null;
+    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
 
+    // ===== TASK CLEAN =====
     if (taskRaw.includes("foundation poured")) return;
 
+    let task;
     if (taskRaw.includes("pressure wash")) task = "p/w";
     else if (taskRaw.includes("final clean") || taskRaw.includes("qai reclean")) task = "reclean";
     else if (taskRaw.includes("full clean")) task = "original";
@@ -322,60 +362,18 @@ function processRyan(rows) {
 
     let key = lot + "_" + dateStr;
 
-    if (!jobs[key]) {
-      jobs[key] = {
-        lot,
-        subdivision: cleanSubdivision(subdivision),
-        dateStr,
-        tasks: []
-      };
-    }
+    if (!jobs[key]) jobs[key] = {
+      lot,
+      subdivision: cleanSubdivision(subdivision),
+      dateStr,
+      tasks: []
+    };
 
     jobs[key].tasks.push(task);
   });
 
   render(jobs);
 }
-function processDRHorton(rows) {
-  let jobs = {};
-
-  let headerIndex = rows.findIndex(r => r.join(" ").toLowerCase().includes("description"));
-  let headers = rows[headerIndex].map(h => (h||"").toLowerCase());
-
-  let dateCol = headers.findIndex(h=>h.includes("date"));
-  let projectCol = headers.findIndex(h=>h.includes("project"));
-  let platCol = headers.findIndex(h=>h.includes("plat"));
-  let descCol = headers.findIndex(h=>h.includes("description"));
-
-  rows.slice(headerIndex+1).forEach(row => {
-    let dateRaw = row[dateCol];
-    let project = row[projectCol];
-    let plat = row[platCol];
-    let task = row[descCol];
-
-    if (!plat || !dateRaw) return;
-    if (!task) task = "";
-
-    let match = plat.split("/")[0].match(/\d+/);
-    if (!match) return;
-
-    let lot = parseInt(match[0],10);
-    if (lot > 100000) return;
-
-    let date = new Date(dateRaw);
-    if (!date || isNaN(date.getTime())) return;
-
-    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
-    let key = lot + "_" + dateStr;
-
-    if (!jobs[key]) jobs[key] = { lot, subdivision: cleanSubdivision(project), dateStr, tasks: [] };
-
-    jobs[key].tasks.push(task);
-  });
-
-  render(jobs);
-}
-
 // ===== RENDER =====
 function render(jobs) {
 
