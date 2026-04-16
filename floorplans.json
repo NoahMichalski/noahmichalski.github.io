@@ -1,23 +1,23 @@
 {
-  "AMH|O340/Madison": {
+  "American Homes 4 Rent |O340/Madison": {
     "sqft": 1977,
     "original": 9.0,
     "reclean": 4.0,
     "windows": 7.0
   },
-  "AMH|O500/Coolidge": {
+  "American Homes 4 Rent |O500/Coolidge": {
     "sqft": 1895,
     "original": 9.0,
     "reclean": 4.0,
     "windows": 7.0
   },
-  "AMH|O510/Eisenhower": {
+  "American Homes 4 Rent |O510/Eisenhower": {
     "sqft": 2293,
     "original": 9.0,
     "reclean": 4.0,
     "windows": 8.0
   },
-  "AMH|O520/Lincoln": {
+  "American Homes 4 Rent |O520/Lincoln": {
     "sqft": 2407,
     "original": 9.0,
     "reclean": 3.0,
@@ -1187,121 +1187,121 @@
     "reclean": 4.0,
     "windows": 8.0
   },
-  "Rockford Homes Inc|Alder": {
+  "Rockford|Alder": {
     "sqft": 3770,
     "original": 12.0,
     "reclean": 5.0,
     "windows": null
   },
-  "Rockford Homes Inc|Ashland": {
+  "Rockford|Ashland": {
     "sqft": 2520,
     "original": 10.0,
     "reclean": 3.5,
     "windows": null
   },
-  "Rockford Homes Inc|Barclay": {
+  "Rockford|Barclay": {
     "sqft": 2340,
     "original": 10.0,
     "reclean": 3.5,
     "windows": null
   },
-  "Rockford Homes Inc|Bradford": {
+  "Rockford|Bradford": {
     "sqft": 2850,
     "original": 10.0,
     "reclean": 4.0,
     "windows": null
   },
-  "Rockford Homes Inc|Brentwood": {
+  "Rockford|Brentwood": {
     "sqft": 2610,
     "original": 10.0,
     "reclean": 4.0,
     "windows": null
   },
-  "Rockford Homes Inc|Cedar": {
+  "Rockford|Cedar": {
     "sqft": 3290,
     "original": 12.0,
     "reclean": 4.0,
     "windows": null
   },
-  "Rockford Homes Inc|Charleston": {
+  "Rockford|Charleston": {
     "sqft": 1980,
     "original": 9.0,
     "reclean": 3.5,
     "windows": null
   },
-  "Rockford Homes Inc|Claymont": {
+  "Rockford|Claymont": {
     "sqft": 1645,
     "original": 7.0,
     "reclean": 2.5,
     "windows": null
   },
-  "Rockford Homes Inc|Dover": {
+  "Rockford|Dover": {
     "sqft": 3520,
     "original": 12.0,
     "reclean": 4.0,
     "windows": null
   },
-  "Rockford Homes Inc|Fillmore": {
+  "Rockford|Fillmore": {
     "sqft": 2255,
     "original": 10.0,
     "reclean": 4.0,
     "windows": null
   },
-  "Rockford Homes Inc|Hartly": {
+  "Rockford|Hartly": {
     "sqft": 1615,
     "original": 7.0,
     "reclean": 2.5,
     "windows": null
   },
-  "Rockford Homes Inc|Linden": {
+  "Rockford|Linden": {
     "sqft": 2995,
     "original": 12.0,
     "reclean": 5.0,
     "windows": null
   },
-  "Rockford Homes Inc|Madison": {
+  "Rockford|Madison": {
     "sqft": 3895,
     "original": 10.0,
     "reclean": null,
     "windows": null
   },
-  "Rockford Homes Inc|Manchester": {
+  "Rockford|Manchester": {
     "sqft": 2170,
     "original": 9.0,
     "reclean": 3.0,
     "windows": null
   },
-  "Rockford Homes Inc|Palmer": {
+  "Rockford|Palmer": {
     "sqft": 1776,
     "original": 10.0,
     "reclean": 4.0,
     "windows": null
   },
-  "Rockford Homes Inc|Redwood": {
+  "Rockford|Redwood": {
     "sqft": 3095,
     "original": 12.0,
     "reclean": 5.0,
     "windows": null
   },
-  "Rockford Homes Inc|Richmond": {
+  "Rockford|Richmond": {
     "sqft": 2800,
     "original": 10.0,
     "reclean": 4.0,
     "windows": null
   },
-  "Rockford Homes Inc|Rockingham": {
+  "Rockford|Rockingham": {
     "sqft": 3540,
     "original": 12.0,
     "reclean": 5.0,
     "windows": null
   },
-  "Rockford Homes Inc|Spruce": {
+  "Rockford|Spruce": {
     "sqft": 2230,
     "original": 10.0,
     "reclean": 4.0,
     "windows": null
   },
-  "Rockford Homes Inc|Wellington": {
+  "Rockford|Wellington": {
     "sqft": 1891,
     "original": 9.0,
     "reclean": 3.5,
