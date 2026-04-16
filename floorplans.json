@@ -1,0 +1,1550 @@
+{
+  "AMH|O340/Madison": {
+    "sqft": 1977,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": 7.0
+  },
+  "AMH|O500/Coolidge": {
+    "sqft": 1895,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": 7.0
+  },
+  "AMH|O510/Eisenhower": {
+    "sqft": 2293,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": 8.0
+  },
+  "AMH|O520/Lincoln": {
+    "sqft": 2407,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 7.0
+  },
+  "DR Horton|D540": {
+    "sqft": 1981,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 7.0
+  },
+  "DR Horton|D541": {
+    "sqft": 2278,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": 5.5
+  },
+  "DR Horton|D542": {
+    "sqft": 2546,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "DR Horton|D543": {
+    "sqft": 2829,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": 8.0
+  },
+  "DR Horton|D544": {
+    "sqft": 3062,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": 9.0
+  },
+  "DR Horton|D545": {
+    "sqft": 3388,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": 9.0
+  },
+  "DR Horton|D551": {
+    "sqft": 2774,
+    "original": null,
+    "reclean": null,
+    "windows": null
+  },
+  "DR Horton|D552": {
+    "sqft": 3175,
+    "original": null,
+    "reclean": null,
+    "windows": null
+  },
+  "DR Horton|D839": {
+    "sqft": 1839,
+    "original": null,
+    "reclean": null,
+    "windows": null
+  },
+  "DR Horton|D600": {
+    "sqft": 2569,
+    "original": null,
+    "reclean": null,
+    "windows": null
+  },
+  "DR Horton|D549": {
+    "sqft": 2851,
+    "original": null,
+    "reclean": null,
+    "windows": null
+  },
+  "DR Horton|F400": {
+    "sqft": 1664,
+    "original": 5.0,
+    "reclean": 2.5,
+    "windows": 4.0
+  },
+  "DR Horton|F401": {
+    "sqft": 1748,
+    "original": 7.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "DR Horton|F402": {
+    "sqft": 1865,
+    "original": 7.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "DR Horton|F403": {
+    "sqft": 1958,
+    "original": 7.0,
+    "reclean": 3.0,
+    "windows": 7.0
+  },
+  "DR Horton|X301": {
+    "sqft": 1657,
+    "original": 5.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "DR Horton|X302": {
+    "sqft": 1844,
+    "original": 7.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "DR Horton|X303": {
+    "sqft": 1953,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 4.0
+  },
+  "DR Horton|X304": {
+    "sqft": 2256,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "DR Horton|X305": {
+    "sqft": 2415,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 4.0
+  },
+  "DR Horton|X306": {
+    "sqft": 1166,
+    "original": 4.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "DR Horton|X311": {
+    "sqft": 1732,
+    "original": null,
+    "reclean": null,
+    "windows": null
+  },
+  "DR Horton|X421": {
+    "sqft": 1500,
+    "original": 5.0,
+    "reclean": 2.0,
+    "windows": 4.0
+  },
+  "DR Horton|X422": {
+    "sqft": 1771,
+    "original": 7.0,
+    "reclean": 2.5,
+    "windows": 4.0
+  },
+  "DR Horton|X423": {
+    "sqft": 1818,
+    "original": 7.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "DR Horton|X424": {
+    "sqft": 2053,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "DR Horton|X426": {
+    "sqft": 2156,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 9.0
+  },
+  "DR Horton|X427": {
+    "sqft": 2356,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "DR Horton|X429": {
+    "sqft": 2600,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "DR Horton|X430": {
+    "sqft": 2546,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "DR Horton|X431": {
+    "sqft": 2346,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "DR Horton|X432": {
+    "sqft": 1501,
+    "original": 6.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "DR Horton|X437": {
+    "sqft": 2904,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": 8.0
+  },
+  "DR Horton|X450": {
+    "sqft": 1635,
+    "original": 6.0,
+    "reclean": 3.0,
+    "windows": 4.0
+  },
+  "DR Horton|X475": {
+    "sqft": 1272,
+    "original": 4.0,
+    "reclean": 3.0,
+    "windows": 3.0
+  },
+  "DR Horton|X480": {
+    "sqft": 1392,
+    "original": 5.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "DR Horton|X481": {
+    "sqft": 1510,
+    "original": 5.0,
+    "reclean": 2.5,
+    "windows": 4.0
+  },
+  "DR Horton|X490": {
+    "sqft": 2618,
+    "original": null,
+    "reclean": null,
+    "windows": null
+  },
+  "DR Horton|XT03": {
+    "sqft": 1635,
+    "original": 5.0,
+    "reclean": 2.5,
+    "windows": 3.0
+  },
+  "DR Horton|XT04": {
+    "sqft": 1811,
+    "original": 7.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "DR Horton|XT05": {
+    "sqft": 1500,
+    "original": 5.0,
+    "reclean": 3.0,
+    "windows": 4.0
+  },
+  "DR Horton|XT06": {
+    "sqft": 1658,
+    "original": null,
+    "reclean": null,
+    "windows": null
+  },
+  "DR Horton|XT07": {
+    "sqft": 1498,
+    "original": null,
+    "reclean": null,
+    "windows": null
+  },
+  "Epcon|Cambridge": {
+    "sqft": 1785,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Epcon|Capri IV": {
+    "sqft": 1481,
+    "original": 7.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Epcon|Oxford": {
+    "sqft": 1853,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Epcon|Palazzo": {
+    "sqft": 1559,
+    "original": 7.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "Epcon|Portico": {
+    "sqft": 1776,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Epcon|Promenade III": {
+    "sqft": 2058,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Epcon|Provenance": {
+    "sqft": 2847,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": 8.0
+  },
+  "Epcon|Salerno II": {
+    "sqft": 1747,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Epcon|Torino II": {
+    "sqft": 1888,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Epcon|Verona": {
+    "sqft": 2114,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Epcon|Windsor": {
+    "sqft": 1812,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "MI Homes Columbus|Ainslie": {
+    "sqft": 1500,
+    "original": 5.0,
+    "reclean": 2.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Anthem": {
+    "sqft": 1924,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Ashford": {
+    "sqft": 3377,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Ashland": {
+    "sqft": 1400,
+    "original": 5.0,
+    "reclean": 2.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Athens": {
+    "sqft": 1440,
+    "original": 5.0,
+    "reclean": 2.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Augusta": {
+    "sqft": 1637,
+    "original": 6.0,
+    "reclean": 2.0,
+    "windows": 8.0
+  },
+  "MI Homes Columbus|Baldwin": {
+    "sqft": 1961,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "MI Homes Columbus|Beaufort": {
+    "sqft": 1790,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 9.0
+  },
+  "MI Homes Columbus|Bella": {
+    "sqft": 2187,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "MI Homes Columbus|Bexley": {
+    "sqft": 1711,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Braeden": {
+    "sqft": 1792,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Bucknell": {
+    "sqft": 2514,
+    "original": 9.0,
+    "reclean": 3.5,
+    "windows": null
+  },
+  "MI Homes Columbus|Campbell": {
+    "sqft": 2025,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Caymus": {
+    "sqft": 2371,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 9.0
+  },
+  "MI Homes Columbus|Charleston": {
+    "sqft": 1882,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "MI Homes Columbus|Citadel": {
+    "sqft": 2669,
+    "original": 9.0,
+    "reclean": 3.5,
+    "windows": null
+  },
+  "MI Homes Columbus|Colchester": {
+    "sqft": 2192,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Dartmouth": {
+    "sqft": 2962,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Dearborn": {
+    "sqft": 1948,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "MI Homes Columbus|Dennison": {
+    "sqft": 2025,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Dublin": {
+    "sqft": 2116,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Duckhorn": {
+    "sqft": 2524,
+    "original": 10.0,
+    "reclean": 3.0,
+    "windows": 9.0
+  },
+  "MI Homes Columbus|Durham": {
+    "sqft": 1992,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "MI Homes Columbus|Ellman": {
+    "sqft": 2841,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": 10.0
+  },
+  "MI Homes Columbus|Emory": {
+    "sqft": 3147,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Erie": {
+    "sqft": 2161,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Evanston": {
+    "sqft": 2454,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "MI Homes Columbus|Farm": {
+    "sqft": 3000,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 10.0
+  },
+  "MI Homes Columbus|Farmington": {
+    "sqft": 1523,
+    "original": 5.0,
+    "reclean": 2.0,
+    "windows": 8.0
+  },
+  "MI Homes Columbus|Findlay": {
+    "sqft": 2317,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Fordham II": {
+    "sqft": 3012,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Fremont": {
+    "sqft": 1523,
+    "original": 7.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "MI Homes Columbus|Glenview": {
+    "sqft": 1756,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Grandview": {
+    "sqft": 1756,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "MI Homes Columbus|Granville": {
+    "sqft": 2548,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Hillsdale": {
+    "sqft": 2156,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Hudson": {
+    "sqft": 2751,
+    "original": 9.0,
+    "reclean": 3.5,
+    "windows": 10.0
+  },
+  "MI Homes Columbus|Lehigh": {
+    "sqft": 3279,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Madison": {
+    "sqft": 2450,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 7.0
+  },
+  "MI Homes Columbus|Naperville": {
+    "sqft": 1520,
+    "original": 6.0,
+    "reclean": 2.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Northwestern": {
+    "sqft": 2890,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Oxford": {
+    "sqft": 1828,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Palmer": {
+    "sqft": 2100,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Petoskey": {
+    "sqft": 1908,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Preston": {
+    "sqft": 3120,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Riverside": {
+    "sqft": 1805,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "MI Homes Columbus|Riverview": {
+    "sqft": 1805,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Rochester": {
+    "sqft": 2798,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Saugatuck": {
+    "sqft": 2138,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Sheffield": {
+    "sqft": 4038,
+    "original": 14.0,
+    "reclean": 5.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Stafford": {
+    "sqft": 2091,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Temple": {
+    "sqft": 3089,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Tiverton": {
+    "sqft": 2924,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Vanderbilt": {
+    "sqft": 3248,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Wesleyan": {
+    "sqft": 1924,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Westerville": {
+    "sqft": 2297,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "MI Homes Columbus|Worthington": {
+    "sqft": 2380,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 9.0
+  },
+  "Pulte Group|Abbeyville": {
+    "sqft": 1683,
+    "original": 5.0,
+    "reclean": 2.0,
+    "windows": 9.0
+  },
+  "Pulte Group|Alcott": {
+    "sqft": 1766,
+    "original": 6.0,
+    "reclean": 3.0,
+    "windows": 9.0
+  },
+  "Pulte Group|Allison II": {
+    "sqft": 3337,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 10.0
+  },
+  "Pulte Group|Amberwood": {
+    "sqft": 2323,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Amberwood II": {
+    "sqft": 2324,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "Pulte Group|Ascend": {
+    "sqft": 1935,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Ashton": {
+    "sqft": 1888,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Aspire": {
+    "sqft": 2265,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "Pulte Group|Aspire II": {
+    "sqft": 2266,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "Pulte Group|Baldwin": {
+    "sqft": 2458,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Bedford": {
+    "sqft": 1890,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Belfort": {
+    "sqft": 2397,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 10.0
+  },
+  "Pulte Group|Blue Rock": {
+    "sqft": 1468,
+    "original": 5.0,
+    "reclean": 2.0,
+    "windows": null
+  },
+  "Pulte Group|Boardwalk": {
+    "sqft": 2662,
+    "original": 8.0,
+    "reclean": 3.5,
+    "windows": 9.0
+  },
+  "Pulte Group|Bourges": {
+    "sqft": 3415,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 10.0
+  },
+  "Pulte Group|Bowman": {
+    "sqft": 1888,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "Pulte Group|Castle Rock": {
+    "sqft": 1785,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Pulte Group|Castleton": {
+    "sqft": 3368,
+    "original": 10.0,
+    "reclean": 3.5,
+    "windows": 10.0
+  },
+  "Pulte Group|Claypool": {
+    "sqft": 2744,
+    "original": 10.0,
+    "reclean": 3.5,
+    "windows": null
+  },
+  "Pulte Group|Continental": {
+    "sqft": 2873,
+    "original": 10.0,
+    "reclean": 3.5,
+    "windows": 8.0
+  },
+  "Pulte Group|Continental II": {
+    "sqft": 3008,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 8.0
+  },
+  "Pulte Group|Countryview": {
+    "sqft": 1898,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 4.0
+  },
+  "Pulte Group|Crisfield": {
+    "sqft": 2126,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 7.0
+  },
+  "Pulte Group|Dalton": {
+    "sqft": 2056,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "Pulte Group|Deer Valley": {
+    "sqft": 3527,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 12.0
+  },
+  "Pulte Group|Deer Valley II": {
+    "sqft": 3527,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 12.0
+  },
+  "Pulte Group|Discover": {
+    "sqft": 1222,
+    "original": 4.0,
+    "reclean": 2.0,
+    "windows": null
+  },
+  "Pulte Group|Eastway": {
+    "sqft": 1936,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 7.0
+  },
+  "Pulte Group|Fairview": {
+    "sqft": 1646,
+    "original": 5.0,
+    "reclean": 2.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Fifth Avenue": {
+    "sqft": 2426,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Pulte Group|Greenfield": {
+    "sqft": 2614,
+    "original": 8.0,
+    "reclean": 3.5,
+    "windows": null
+  },
+  "Pulte Group|Greenfield II": {
+    "sqft": 2621,
+    "original": 8.0,
+    "reclean": 3.5,
+    "windows": null
+  },
+  "Pulte Group|Halston": {
+    "sqft": 2142,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 7.0
+  },
+  "Pulte Group|Hampton": {
+    "sqft": 2606,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": 7.0
+  },
+  "Pulte Group|Hampton II": {
+    "sqft": 2607,
+    "original": 9.0,
+    "reclean": 3.5,
+    "windows": 7.0
+  },
+  "Pulte Group|Highwood": {
+    "sqft": 2179,
+    "original": 8.0,
+    "reclean": 3.5,
+    "windows": 7.0
+  },
+  "Pulte Group|Hilltop": {
+    "sqft": 2881,
+    "original": 10.0,
+    "reclean": 3.5,
+    "windows": 7.0
+  },
+  "Pulte Group|Hilltop II": {
+    "sqft": 2899,
+    "original": 10.0,
+    "reclean": 3.5,
+    "windows": 7.0
+  },
+  "Pulte Group|Ivy": {
+    "sqft": 2819,
+    "original": 10.0,
+    "reclean": 3.5,
+    "windows": 8.0
+  },
+  "Pulte Group|Ivy III": {
+    "sqft": 2819,
+    "original": 10.0,
+    "reclean": 3.5,
+    "windows": 8.0
+  },
+  "Pulte Group|Linwood": {
+    "sqft": 2456,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Pulte Group|Linwood II": {
+    "sqft": 2457,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Pulte Group|Lyon": {
+    "sqft": 2422,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 10.0
+  },
+  "Pulte Group|Maple View": {
+    "sqft": 2725,
+    "original": 9.0,
+    "reclean": 3.5,
+    "windows": 10.0
+  },
+  "Pulte Group|Martin Ray": {
+    "sqft": 1953,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Meadow": {
+    "sqft": 1503,
+    "original": 6.0,
+    "reclean": 2.0,
+    "windows": null
+  },
+  "Pulte Group|Melrose": {
+    "sqft": 3539,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 10.0
+  },
+  "Pulte Group|Mercer": {
+    "sqft": 2605,
+    "original": 9.0,
+    "reclean": 3.5,
+    "windows": 10.0
+  },
+  "Pulte Group|Mercer II": {
+    "sqft": 2508,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 10.0
+  },
+  "Pulte Group|Mirage": {
+    "sqft": 1595,
+    "original": 6.0,
+    "reclean": 2.0,
+    "windows": 4.0
+  },
+  "Pulte Group|Mitchell": {
+    "sqft": 3020,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 7.0
+  },
+  "Pulte Group|Mitchell II": {
+    "sqft": 3021,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 7.0
+  },
+  "Pulte Group|Mystique": {
+    "sqft": 1841,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "Pulte Group|Mystique II": {
+    "sqft": 1841,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "Pulte Group|Newberry": {
+    "sqft": 2376,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Pulte Group|Newberry II": {
+    "sqft": 2390,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 8.0
+  },
+  "Pulte Group|Newton": {
+    "sqft": 1713,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "Pulte Group|Oakdale": {
+    "sqft": 1893,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "Pulte Group|Palmary": {
+    "sqft": 1892,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "Pulte Group|Palmary II": {
+    "sqft": 1892,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 6.0
+  },
+  "Pulte Group|Park Place": {
+    "sqft": 2756,
+    "original": 10.0,
+    "reclean": 3.5,
+    "windows": 8.0
+  },
+  "Pulte Group|Passport": {
+    "sqft": 1497,
+    "original": 4.0,
+    "reclean": 2.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Prestige": {
+    "sqft": 2026,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Prestige II": {
+    "sqft": 2026,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Prosperity": {
+    "sqft": 1647,
+    "original": 5.0,
+    "reclean": 2.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Prosperity II": {
+    "sqft": 1647,
+    "original": 5.0,
+    "reclean": 2.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Reflection": {
+    "sqft": 2271,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "Pulte Group|Riverton": {
+    "sqft": 3120,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 8.0
+  },
+  "Pulte Group|Riverton II": {
+    "sqft": 3126,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 8.0
+  },
+  "Pulte Group|Renown": {
+    "sqft": 2712,
+    "original": 11.0,
+    "reclean": 4.0,
+    "windows": 7.0
+  },
+  "Pulte Group|Senoia": {
+    "sqft": 1937,
+    "original": 8.0,
+    "reclean": 3.0,
+    "windows": 7.0
+  },
+  "Pulte Group|Serenada": {
+    "sqft": 1421,
+    "original": 4.0,
+    "reclean": 2.0,
+    "windows": 4.0
+  },
+  "Pulte Group|Strasbourg": {
+    "sqft": 3063,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Pulte Group|Sardom": {
+    "sqft": 2179,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": 5.0
+  },
+  "Pulte Group|Trailblazer": {
+    "sqft": 1336,
+    "original": 4.0,
+    "reclean": 2.0,
+    "windows": null
+  },
+  "Pulte Group|Vista": {
+    "sqft": 1502,
+    "original": 6.0,
+    "reclean": 2.0,
+    "windows": 4.0
+  },
+  "Pulte Group|Waverly": {
+    "sqft": 3291,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Pulte Group|Waverly II": {
+    "sqft": 3291,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Pulte Group|Westchester": {
+    "sqft": 3297,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 8.0
+  },
+  "Pulte Group|Westchester II": {
+    "sqft": 3300,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 8.0
+  },
+  "Pulte Group|Willwood": {
+    "sqft": 3120,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 12.0
+  },
+  "Pulte Group|Woodside": {
+    "sqft": 3277,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 12.0
+  },
+  "Pulte Group|Woodward": {
+    "sqft": 2996,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": 8.0
+  },
+  "Rockford Homes Inc|Alder": {
+    "sqft": 3770,
+    "original": 12.0,
+    "reclean": 5.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Ashland": {
+    "sqft": 2520,
+    "original": 10.0,
+    "reclean": 3.5,
+    "windows": null
+  },
+  "Rockford Homes Inc|Barclay": {
+    "sqft": 2340,
+    "original": 10.0,
+    "reclean": 3.5,
+    "windows": null
+  },
+  "Rockford Homes Inc|Bradford": {
+    "sqft": 2850,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Brentwood": {
+    "sqft": 2610,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Cedar": {
+    "sqft": 3290,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Charleston": {
+    "sqft": 1980,
+    "original": 9.0,
+    "reclean": 3.5,
+    "windows": null
+  },
+  "Rockford Homes Inc|Claymont": {
+    "sqft": 1645,
+    "original": 7.0,
+    "reclean": 2.5,
+    "windows": null
+  },
+  "Rockford Homes Inc|Dover": {
+    "sqft": 3520,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Fillmore": {
+    "sqft": 2255,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Hartly": {
+    "sqft": 1615,
+    "original": 7.0,
+    "reclean": 2.5,
+    "windows": null
+  },
+  "Rockford Homes Inc|Linden": {
+    "sqft": 2995,
+    "original": 12.0,
+    "reclean": 5.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Madison": {
+    "sqft": 3895,
+    "original": 10.0,
+    "reclean": null,
+    "windows": null
+  },
+  "Rockford Homes Inc|Manchester": {
+    "sqft": 2170,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Palmer": {
+    "sqft": 1776,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Redwood": {
+    "sqft": 3095,
+    "original": 12.0,
+    "reclean": 5.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Richmond": {
+    "sqft": 2800,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Rockingham": {
+    "sqft": 3540,
+    "original": 12.0,
+    "reclean": 5.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Spruce": {
+    "sqft": 2230,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Rockford Homes Inc|Wellington": {
+    "sqft": 1891,
+    "original": 9.0,
+    "reclean": 3.5,
+    "windows": null
+  },
+  "Ryan Homes|Allegheny": {
+    "sqft": 1823,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 7.0
+  },
+  "Ryan Homes|Ballenger": {
+    "sqft": 2114,
+    "original": 10.0,
+    "reclean": null,
+    "windows": 8.0
+  },
+  "Ryan Homes|Columbia": {
+    "sqft": 2423,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": 8.0
+  },
+  "Ryan Homes|Hudson": {
+    "sqft": 2718,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": 9.0
+  },
+  "Ryan Homes|Iris": {
+    "sqft": 1660,
+    "original": 7.0,
+    "reclean": 2.5,
+    "windows": 5.0
+  },
+  "Ryan Homes|Lehigh": {
+    "sqft": 3010,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 8.0
+  },
+  "Ryan Homes|Lily": {
+    "sqft": 1900,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 4.0
+  },
+  "Ryan Homes|Marigold": {
+    "sqft": 2134,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 5.0
+  },
+  "Ryan Homes|Mendelsohn": {
+    "sqft": 1707,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 4.0
+  },
+  "Ryan Homes|Rosecliff": {
+    "sqft": 1775,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 4.0
+  },
+  "Ryan Homes|Schubert": {
+    "sqft": 1971,
+    "original": 9.0,
+    "reclean": 3.0,
+    "windows": 4.0
+  },
+  "Ryan Homes|Seneca": {
+    "sqft": 3306,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": 10.0
+  },
+  "Ryan Homes|Wexford": {
+    "sqft": 1536,
+    "original": 7.0,
+    "reclean": 2.5,
+    "windows": 4.0
+  },
+  "Ryan Homes|York": {
+    "sqft": null,
+    "original": null,
+    "reclean": null,
+    "windows": 11.0
+  },
+  "Schottenstein Homes LLC|Athens": {
+    "sqft": 1848,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Benton": {
+    "sqft": 1825,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Carroll II": {
+    "sqft": 2402,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Chester": {
+    "sqft": 1760,
+    "original": 8.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Columbia": {
+    "sqft": 1815,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Erie II": {
+    "sqft": 2994,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Fayette": {
+    "sqft": 2110,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Franklin": {
+    "sqft": 2791,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Franklin II": {
+    "sqft": 2791,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Hanover": {
+    "sqft": 1770,
+    "original": 8.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Harmony": {
+    "sqft": 1820,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Hayes": {
+    "sqft": 2264,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Hudson": {
+    "sqft": 1500,
+    "original": 6.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Knox": {
+    "sqft": 2111,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Knox II": {
+    "sqft": 2111,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Lake": {
+    "sqft": 3559,
+    "original": 12.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Madison": {
+    "sqft": 2739,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Reed": {
+    "sqft": 2271,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Richland": {
+    "sqft": 2323,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Seneca": {
+    "sqft": 2970,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Springfield": {
+    "sqft": 1843,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Stillwater": {
+    "sqft": 2045,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Trumbull II": {
+    "sqft": 2916,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Vinton": {
+    "sqft": 2898,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|Vinton II": {
+    "sqft": 2898,
+    "original": 10.0,
+    "reclean": 4.0,
+    "windows": null
+  },
+  "Schottenstein Homes LLC|York": {
+    "sqft": 1863,
+    "original": 9.0,
+    "reclean": 4.0,
+    "windows": null
+  }
+}
