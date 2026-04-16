@@ -309,7 +309,33 @@ function processRyan(rows) {
       month: "2-digit",
       day: "2-digit"
     });
-   
+    // ===== TASK CLEAN =====
+    let task = null;
+
+    if (taskRaw.includes("foundation poured")) return;
+
+    if (taskRaw.includes("pressure wash")) task = "p/w";
+    else if (taskRaw.includes("final clean") || taskRaw.includes("qai reclean")) task = "reclean";
+    else if (taskRaw.includes("full clean")) task = "original";
+    else if (taskRaw.includes("carpet prep")) task = "car";
+    else task = taskRaw;
+
+    let key = lot + "_" + dateStr;
+
+    if (!jobs[key]) {
+      jobs[key] = {
+        lot,
+        subdivision: cleanSubdivision(subdivision),
+        dateStr,
+        tasks: []
+      };
+    }
+
+    jobs[key].tasks.push(task);
+  });
+
+  render(jobs);
+}
 function processDRHorton(rows) {
   let jobs = {};
 
