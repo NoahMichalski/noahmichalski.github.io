@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lot Lookup v1.3 - Floorplan Unlock</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #111;
+      color: white;
+      padding: 20px;
+    }
+
+    input {
+      padding: 10px;
+      width: 300px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 10px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    .lot {
+      border: 1px solid #444;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+    }
+
+    .internal {
+      margin-top: 10px;
+      padding: 10px;
+      background: #1c1c1c;
+      border: 1px solid #555;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Lot Lookup</h2>
+
+<input id="search" placeholder="Lot, Subdivision, Builder...">
+<button onclick="unlock()">🔒 Unlock</button>
+
+<div id="results"></div>
+
+<script>
+let LOTS = [];
+let FLOORPLANS = {};
+let unlocked = false;
+
+// LOAD DATA
+fetch("lots.json")
+  .then(res => res.json())
+  .then(data => {
+    LOTS = data;
+  });
+
+fetch("floorplans.json")
+  .then(res => res.json())
+  .then(data => {
+    FLOORPLANS = data;
+  });
+
+// SEARCH
+document.getElementById("search").addEventListener("input", render);
+
+function render() {
+  const val = document.getElementById("search").value.toLowerCase();
+  const div = document.getElementById("results");
+  div.innerHTML = "";
+
+  const filtered = LOTS.filter(lot =>
+    (lot.lotNumber + "").includes(val) ||
+    (lot.subdivision || "").toLowerCase().includes(val) ||
+    (lot.builder || "").toLowerCase().includes(val)
+  );
+
+  filtered.forEach(lot => {
+    const el = document.createElement("div");
+    el.className = "lot";
+
+    el.innerHTML = `
+      <b>${lot.lotNumber} ${lot.subdivision}</b><br>
+      ${lot.builder}<br>
+      ${lot.address || ""}
+    `;
+
+    // 🔐 INTERNAL DATA
+    if (unlocked) {
+      const key = `${lot.builder}|${lot.floorplan}`;
+      const fp = FLOORPLANS[key];
+
+      if (fp) {
+        el.innerHTML += `
+          <div class="internal">
+            <b>Internal Data</b><br>
+            Floorplan: ${lot.floorplan}<br>
+            Sqft: ${fp.sqft || "N/A"}<br>
+            Original: ${fp.original || "N/A"} hrs<br>
+            Reclean: ${fp.reclean || "N/A"} hrs<br>
+            Windows: ${fp.windows || "N/A"} hrs
+          </div>
+        `;
+      } else {
+        el.innerHTML += `
+          <div class="internal" style="color:orange;">
+            ⚠️ No data for ${lot.builder} | ${lot.floorplan}
+          </div>
+        `;
+      }
+    }
+
+    div.appendChild(el);
+  });
+}
+
+// 🔒 PIN
+function unlock() {
+  const pin = prompt("Enter PIN:");
+
+  if (pin === "1714") {
+    unlocked = true;
+    render();
+  } else {
+    alert("Wrong PIN");
+  }
+}
+</script>
+
+</body>
+</html>
