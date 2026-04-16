@@ -80,7 +80,7 @@ async function loadLotData() {
     LOT_LOOKUP.clear();
 
     LOT_DATA.forEach(l => {
-      let key = `${cleanSubdivision(l.subdivision)}|${parseInt(l.lotNumber)}`;
+      let key = `${cleanSubdivision(l.subdivision).toLowerCase().trim()}|${parseInt(l.lotNumber)}`;
       LOT_LOOKUP.add(key);
     });
 
@@ -157,7 +157,7 @@ function resetMissing() {
 }
 
 function checkMissingLot(subdivision, lot) {
-  let key = `${cleanSubdivision(subdivision)}|${parseInt(lot)}`;
+  let key = `${cleanSubdivision(subdivision).toLowerCase().trim()}|${parseInt(lot)}`;
   if (!LOT_LOOKUP.has(key)) {
     MISSING_LOTS.add(key);
   }
@@ -216,6 +216,10 @@ function cleanSubdivision(name) {
 
 // ===== LOAD =====
 function loadFile() {
+if (LOT_LOOKUP.size === 0) {
+  alert("Lot dataset not loaded yet");
+  return;
+}
 resetMeta();
 resetMissing();
   const builder = document.getElementById("builder").value;
@@ -566,10 +570,17 @@ if (MISSING_LOTS && MISSING_LOTS.size > 0) {
 
   container.appendChild(div);
 }
+}
 
-loadLotData();
+// ===== INIT =====
+window.onload = () => {
+  loadLotData();
+};
+
 
 </script>
+
+
 
 </body>
 </html>
