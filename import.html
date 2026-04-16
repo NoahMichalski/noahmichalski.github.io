@@ -60,6 +60,7 @@
   <option value="pulte">Pulte</option>
   <option value="drhorton">DR Horton</option>
   <option value="ryan">Ryan</option>
+  <option value="drees">Drees</option> <!-- ⭐ DREES -->
 </select>
 
 <input type="file" id="fileInput">
@@ -71,15 +72,11 @@
 
 // ===== DATE =====
 function excelDateToJS(serial) {
-  const utc_days  = Math.floor(serial - 25569);
-  const utc_value = utc_days * 86400;                                        
-  const date_info = new Date(utc_value * 1000);
-
-  // 🔥 FIX: force LOCAL date (no timezone shift)
+  let utc = new Date((serial - 25569 + 1) * 86400 * 1000);
   return new Date(
-    date_info.getFullYear(),
-    date_info.getMonth(),
-    date_info.getDate()
+    utc.getUTCFullYear(),
+    utc.getUTCMonth(),
+    utc.getUTCDate()
   );
 }
 // ===== META TRACKING =====
@@ -111,21 +108,47 @@ function updateMeta(date, task) {
 function classifyTask(task) {
   let t = task.toLowerCase().trim();
 
-  if (t.includes("full clean") || t.includes("first clean")) return "original";
-  if (t.includes("reclean") || t.includes("qc clean") || t.includes("buff") || t.includes("closing"))
-    return "reclean";
+  // ⭐ ORIGINAL (Drees + others)
+  if (
+    t.includes("full clean") ||
+    t.includes("first clean") ||
+    t.includes("pre-drywall clean") ||
+    t.includes("rough clean")
+  ) return "original";
 
-  if (t.includes("power wash") || t.includes("powerwash") || t.includes("p/w") || t === "pressure wash")
-    return "p/w";
+  // ⭐ RECLEAN (Drees + others)
+  if (
+    t.includes("reclean") ||
+    t.includes("qc clean") ||
+    t.includes("qc") ||
+    t.includes("hqi clean") ||
+    t.includes("new home presentation clean") ||
+    t.includes("final clean") ||
+    t.includes("closing") ||
+    t.includes("buff")
+  ) return "reclean";
 
-  if (t.includes("carpet prep")) return "car";
-  if (t.includes("Remove Basement Wall Bracing")) return "remove bracing";
-  if (t.includes("Basement Wall Bracing")) return "bracing";
+  // ⭐ POWER WASH
+  if (
+    t.includes("power wash") ||
+    t.includes("powerwash") ||
+    t.includes("p/w") ||
+    t.includes("pressure wash")
+  ) return "p/w";
+
+  // ⭐ CARPET
+  if (t.includes("carpet")) return "car";
+
+  // ⭐ LABOR TASKS
+  if (t.includes("dehumidifier")) return "dehu";
+  if (t.includes("remove basement wall bracing")) return "remove bracing";
+  if (t.includes("basement wall bracing")) return "bracing";
   if (t.includes("anchor bolts")) return "bolts";
 
+  // ❌ IGNORE
   if (t.includes("screen")) return null;
 
-  return "unknown"; // 🔥 keep raw
+  return "unknown"; // fallback
 }
 
 // ===== SUBDIVISION CLEANUP =====
@@ -210,6 +233,7 @@ resetMeta();
  if (builder === "pulte") processPulte(rows);
 if (builder === "drhorton") processDRHorton(rows);
 if (builder === "ryan") processRyan(rows);
+if (builder === "drees") processDrees(rows); // ⭐ DREES
 
   };
 
@@ -400,6 +424,68 @@ if (
   render(jobs);
 }
 
+function processDrees(rows) {
+  let jobs = {};
+
+  rows.slice(1).forEach(row => {
+
+    let taskRaw = (row[1] || "").toString().toLowerCase().trim();   // col 3
+    let subdivisionRaw = row[12];                                   // col 13
+    let dateRaw = row[24];                                          // col 24
+    let lotRaw = (row[13] || "").toString().trim();                 // ⭐ col 14 (N)
+
+    if (!taskRaw || !subdivisionRaw || !dateRaw || !lotRaw) return;
+
+    // ⭐ extract lot from ALPL-0063-00
+    let lotMatch = lotRaw.match(/-(\d+)-/);
+    if (!lotMatch) return;
+
+    let lot = parseInt(lotMatch[1], 10);
+    if (isNaN(lot)) return;
+
+   let date;
+
+// Excel number
+if (typeof dateRaw === "number") {
+  date = excelDateToJS(dateRaw);
+}
+// String like 3/21/2026
+else if (typeof dateRaw === "string") {
+  let parts = dateRaw.split(/[\/\-]/);
+  if (parts.length === 3) {
+    date = new Date(parts[2], parts[0]-1, parts[1]); // MM/DD/YYYY
+  } else {
+    date = new Date(dateRaw);
+  }
+}
+
+    if (!date || isNaN(date.getTime())) return;
+
+    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
+
+    updateMeta(date, taskRaw);
+
+    let task;
+    if (taskRaw.includes("pressure wash") || taskRaw.includes("p/w")) task = "p/w";
+    else if (taskRaw.includes("reclean") || taskRaw.includes("qc")) task = "reclean";
+    else if (taskRaw.includes("full clean") || taskRaw.includes("first clean")) task = "original";
+    else if (taskRaw.includes("carpet")) task = "car";
+    else task = taskRaw;
+
+    let key = lot + "_" + dateStr;
+
+    if (!jobs[key]) jobs[key] = {
+      lot,
+      subdivision: cleanSubdivision(subdivisionRaw),
+      dateStr,
+      tasks: []
+    };
+
+    jobs[key].tasks.push(task);
+  });
+
+  render(jobs);
+}
 // ===== RENDER =====
 function render(jobs) {
 
