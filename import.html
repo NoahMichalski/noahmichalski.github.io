@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>VIP Multi-Builder Tool</title>
+  <title>VIP Import Tool</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
@@ -54,7 +54,7 @@
 
 <body>
 
-<h2>VIP Multi-Builder Tool 2.0</h2>
+<h2>VIP Import Tool</h2>
 
 <select id="builder">
   <option value="pulte">Pulte</option>
@@ -82,7 +82,31 @@ function excelDateToJS(serial) {
     date_info.getDate()
   );
 }
+// ===== META TRACKING =====
+let META;
 
+function resetMeta() {
+  META = {
+    originals: 0,
+    recleans: 0,
+    labor: 0,
+    minDate: null,
+    maxDate: null
+  };
+}
+
+function updateMeta(date, task) {
+  if (!date) return;
+
+  if (!META.minDate || date < META.minDate) META.minDate = date;
+  if (!META.maxDate || date > META.maxDate) META.maxDate = date;
+
+  let type = classifyTask(task || "");
+
+  if (type === "original") META.originals++;
+  else if (type === "reclean") META.recleans++;
+  else if (type) META.labor++;
+}
 // ===== TASK CLASSIFIER =====
 function classifyTask(task) {
   let t = task.toLowerCase().trim();
@@ -157,6 +181,7 @@ function cleanSubdivision(name) {
 
 // ===== LOAD =====
 function loadFile() {
+resetMeta();
   const builder = document.getElementById("builder").value;
   const file = document.getElementById("fileInput").files[0];
   if (!file) return alert("Select file");
@@ -240,6 +265,8 @@ let date = parsePulteDate(dateRaw);
     let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
 
     let key = lot + "_" + dateStr;
+	
+	updateMeta(date, task);
 
     if (!jobs[key]) jobs[key] = { lot, subdivision: cleanSubdivision(community), dateStr, tasks: [] };
 
@@ -280,6 +307,7 @@ function processDRHorton(rows) {
 
     let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
     let key = lot + "_" + dateStr;
+	updateMeta(date, task);
 
     if (!jobs[key]) jobs[key] = { lot, subdivision: cleanSubdivision(project), dateStr, tasks: [] };
 
@@ -342,6 +370,7 @@ function processRyan(rows) {
     if (!date || isNaN(date.getTime())) return;
 
     let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
+	updateMeta(date, taskRaw);
 
     // ===== TASK FILTER =====
 if (
@@ -382,6 +411,22 @@ function render(jobs) {
 
   let container = document.getElementById("output");
   container.innerHTML = "";
+  // ===== SUMMARY =====
+let summary = document.createElement("div");
+summary.style.marginBottom = "20px";
+summary.style.fontSize = "18px";
+summary.style.fontWeight = "bold";
+
+summary.innerHTML = `
+  ${META.minDate?.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"})}
+  -
+  ${META.maxDate?.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"})}<br>
+  Originals: ${META.originals} |
+  Recleans: ${META.recleans} |
+  Labor: ${META.labor}
+`;
+
+container.appendChild(summary);
 
   Object.keys(grouped).sort().forEach(date => {
 
