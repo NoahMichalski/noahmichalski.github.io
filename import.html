@@ -59,6 +59,7 @@
 <select id="builder">
   <option value="pulte">Pulte</option>
   <option value="drhorton">DR Horton</option>
+  <option value="ryan">Ryan</option>
 </select>
 
 <input type="file" id="fileInput">
@@ -181,8 +182,10 @@ function loadFile() {
       return;
     }
 
-    if (builder === "pulte") processPulte(rows);
-    if (builder === "drhorton") processDRHorton(rows);
+ if (builder === "pulte") processPulte(rows);
+if (builder === "drhorton") processDRHorton(rows);
+if (builder === "ryan") processRyan(rows);
+
   };
 
   reader.readAsArrayBuffer(file);
@@ -279,6 +282,88 @@ function processDRHorton(rows) {
     let key = lot + "_" + dateStr;
 
     if (!jobs[key]) jobs[key] = { lot, subdivision: cleanSubdivision(project), dateStr, tasks: [] };
+
+    jobs[key].tasks.push(task);
+  });
+
+  render(jobs);
+}
+
+function processRyan(rows) {
+  let jobs = {};
+
+  // 🔍 find header row safely
+  let headerIndex = rows.findIndex(r => {
+    let str = r.join(" ").toLowerCase();
+    return str.includes("community") && (str.includes("schedule") || str.includes("date"));
+  });
+
+  if (headerIndex === -1) {
+    alert("Ryan format not detected");
+    return;
+  }
+
+  let headers = rows[headerIndex].map(h => (h || "").toLowerCase());
+
+  let communityCol = headers.findIndex(h => h.includes("community"));
+  let lotCol = headers.findIndex(h => h.includes("lot"));
+  let dateCol = headers.findIndex(h => h.includes("schedule") || h.includes("date"));
+  let taskCol = headers.findIndex(h => h.includes("task") || h.includes("description"));
+
+  if (communityCol === -1 || lotCol === -1 || dateCol === -1 || taskCol === -1) {
+    alert("Ryan columns not found");
+    return;
+  }
+
+  const communityMap = {
+    "RA": "Rutherford",
+    "TT": "Terra Alta",
+    "T8": "Terra Alta"
+  };
+
+  rows.slice(headerIndex + 1).forEach(row => {
+
+    let communityRaw = (row[communityCol] || "").toString().trim();
+    let lotRaw = row[lotCol];
+    let dateRaw = row[dateCol];
+    let taskRaw = (row[taskCol] || "").toString().toLowerCase().trim();
+
+    if (!communityRaw || !lotRaw || !dateRaw) return;
+
+    let subdivision = communityMap[communityRaw] || communityRaw;
+
+    let lot = parseInt(lotRaw, 10);
+    if (isNaN(lot)) return;
+
+    let date = typeof dateRaw === "number"
+      ? excelDateToJS(dateRaw)
+      : new Date(dateRaw);
+
+    if (!date || isNaN(date.getTime())) return;
+
+    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
+
+    // ===== TASK FILTER =====
+if (
+  taskRaw.includes("foundation") &&
+  taskRaw.includes("poured")
+) return;
+
+    let task;
+    if (taskRaw.includes("pressure wash")) task = "p/w";
+    else if (taskRaw.includes("final clean") || taskRaw.includes("qai reclean")) task = "reclean";
+    else if (taskRaw.includes("full clean")) task = "original";
+    else if (taskRaw.includes("carpet prep")) task = "car";
+    else task = taskRaw;
+
+    let key = lot + "_" + dateStr;
+
+    if (!jobs[key]) jobs[key] = {
+      lot,
+      subdivision: cleanSubdivision(subdivision),
+      dateStr,
+      tasks: []
+    };
 
     jobs[key].tasks.push(task);
   });
