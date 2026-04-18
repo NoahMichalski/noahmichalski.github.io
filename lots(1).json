@@ -1,5 +1,1085 @@
 [
      {
+    "lotNumber": "179B",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "709 Maria Drive",
+    "floorplan": "F401",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "241",
+    "subdivision": "London Landing at Brooksedge",
+    "builder": "Arbor",
+    "address": "503 Reagan's Ridge",
+    "floorplan": "Ironwood",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "192A",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "745 Maria Drive",
+    "floorplan": "F401",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "1",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "7887 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "2",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "7897 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "3",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "7907 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "4",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "7917 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "5",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "7927 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "6",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "7937 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "7",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "7947 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "8",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "7957 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "9",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "7967 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "10",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "7977 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "11",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "7987 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "12",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "7997 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "13",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8007 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "14",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8017 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "15",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8027 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "16",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8037 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "17",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8047 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "18",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8057 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "19",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8067 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "20",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8077 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "21",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8087 Grassland Drive Plain City, OH 43064",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "22",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8097 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "23",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8107 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "24",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8117 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "25",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8127 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "26",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8137 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "27",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8147 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "28",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8157 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "29",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8167 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "30",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8177 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "31",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8187 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "32",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8197 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "33",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8207 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "34",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8217 Grassland Drive Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "35",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8227 Grassland Drive Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "36",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8237 Grassland Drive Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "37",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8247 Grassland Drive Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "38",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8257 Grassland Drive Plain City, OH 43064",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "39",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8267 Grassland Drive Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "41",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12221 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "42",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12231 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "43",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12241 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "44",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12251 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "45",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12261 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "72",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12291 Savannah Crossing",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "73",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12281 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "74",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12244 Prairie Ridge Dr. Plain City, Ohio 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "75",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12254 Prairie Ridge Dr. Plain City, Ohio 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "76",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12264 Prairie Ridge Dr. Plain City, Ohio 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "77",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12274 Prairie Ridge Dr. Plain City, Ohio 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "83",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8118 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "84",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8128 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "85",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8188 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "86",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8198 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "87",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8208 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "88",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8218 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "89",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8228 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "90",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8238 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "91",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8248 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "92",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8258 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "93",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "8268 Grassland Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "94",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12161 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "95",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12162 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "96",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12172 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "97",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12182 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Capri",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "98",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12192 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "99",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12202 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "100",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12212 Savannah Crossing Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "101",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12213 Prairie Ridge Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "102",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12203 Prairie Ridge Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "103",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12193 Prairie Ridge Dr. Plain City, OH 43064",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "104",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12183 Prairie Ridge Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "105",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12173 Prairie Ridge Dr. Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "106",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12163 Prairie Ridge Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "107",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12282 Savannah Crossing Plain City, Ohio 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "108",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12292 Savannah Crossing Plain City, Ohio 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "109",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12302 Savannah Crossing Plain City, Ohio 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "110",
+    "subdivision": "Hyland Meadows",
+    "builder": "Epcon",
+    "address": "12312 Savannah Crossing Plain City, Ohio 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "1",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10525 Berry Lane Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "2",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10535 Berry Lane Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "26",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "8183 Donahey Loop Plain City, OH 43064",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "32",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "8169 Woodhull Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "33",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "8159 Woodhull Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "34",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "8149 Woodhull Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "35",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "8139 Woodhull Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "36",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "8129 Woodhull Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "37",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10613 Clare Way Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "38",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10623 Clare Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "39",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10633 Clare Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "40",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10643 Clare Way Plain City, OH 43064",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "41",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10653 Clare Way Plain City, OH 43064",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "42",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10663 Clare Way Plain City, OH 43064",
+    "floorplan": "Torino",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "43",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10673 Clare Way Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "44",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10682 Clare Way Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "45",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10672 Clare Way Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "46",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10662 Clare Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "47",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10652 Clare Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "48",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10642 Clare Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "49",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10632 Clare Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "50",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10622 Clare Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "51",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10612 Clare Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "52",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10602 Clare Way Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "53",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10592 Clare Way Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "54",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10582 Clare Way Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "55",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10572 Clare Way Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "56",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10562 Clare Way Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "57",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10552 Clare Way Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "58",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10542 Clare Way Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "59",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10532 Clare Way Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "60",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10522 Clare Way Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "61",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10512 Clare Way Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "62",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10502 Clare Way Plain City, OH 43064",
+    "floorplan": "Provenance",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "63",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10521 Clare Way Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "64",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10531 Clare Way Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "65",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10541 Clare Way Plain City, OH 43064",
+    "floorplan": "Palazzo",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "66",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10551 Clare Way Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "67",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10561 Clare Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "68",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10571 Clare Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "69",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10581 Clare Way Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "70",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10591 Clare Way Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "71",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10590 Berry Lane Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "72",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10580 Berry Lane Plain City, OH 43064",
+    "floorplan": "Portico",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "73",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10570 Berry Lane Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "74",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10560 Berry Lane Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "75",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10550 Berry Lane Plain City, OH 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "76",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10540 Berry Lane Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "77",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10530 Berry Lane Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "78",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "10520 Berry Lane Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "79",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "8117 Stowe Drive Plain City, Ohio 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "80",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "8127 Stowe Drive Plain City, Ohio 43064",
+    "floorplan": "Unknown",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "81",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "8137 Stowe Dr. Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+  {
+    "lotNumber": "94",
+    "subdivision": "White Oaks",
+    "builder": "Epcon",
+    "address": "8118 Woodhull Way Plain City, OH 43064",
+    "floorplan": "Promenade",
+    "lastUpdated": "2026-04-18"
+  },
+     {
     "lotNumber": "2232",
     "subdivision": "Jerome Aster",
     "builder": "Schottenstein",
