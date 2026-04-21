@@ -1,5 +1,165 @@
 [
      {
+    "lotNumber": "265",
+    "subdivision": "Galloway East",
+    "builder": "DR Horton",
+    "address": "6244 Farella Way",
+    "floorplan": "X450",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "270",
+    "subdivision": "Galloway East",
+    "builder": "DR Horton",
+    "address": "6208 Farella Way",
+    "floorplan": "X431",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "264",
+    "subdivision": "Galloway East",
+    "builder": "DR Horton",
+    "address": "6250 Farella Way",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "269",
+    "subdivision": "Galloway East",
+    "builder": "DR Horton",
+    "address": "6214 Farella Way",
+    "floorplan": "X421",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "48",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1202 Stratford Way",
+    "floorplan": "X450",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "2714",
+    "subdivision": "Knitner Crossing",
+    "builder": "DR Horton",
+    "address": "814 South Kintner Parkway",
+    "floorplan": "F400",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "2715",
+    "subdivision": "Knitner Crossing",
+    "builder": "DR Horton",
+    "address": "818 South Kintner Parkway",
+    "floorplan": "X421",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "2716",
+    "subdivision": "Knitner Crossing",
+    "builder": "DR Horton",
+    "address": "822 South Kintner Parkway",
+    "floorplan": "F403",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "98",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "134 Appleseed Way",
+    "floorplan": "X426",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "369",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "551 Darliene Drive",
+    "floorplan": "F401",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "175",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "606 Madison Way",
+    "floorplan": "X490",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "190",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "348 Angely Drive",
+    "floorplan": "X490",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "13639",
+    "subdivision": "Parkview",
+    "builder": "DR Horton",
+    "address": "394 Park Vista Drive",
+    "floorplan": "X431",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "13660",
+    "subdivision": "Parkview",
+    "builder": "DR Horton",
+    "address": "448 Garnet Ranch Drive",
+    "floorplan": "X424",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "134",
+    "subdivision": "Villas at Renner Park",
+    "builder": "DR Horton",
+    "address": "6305 Marinelli Drive North",
+    "floorplan": "XT04",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "135",
+    "subdivision": "Villas at Renner Park",
+    "builder": "DR Horton",
+    "address": "6307 Marinelli Drive North",
+    "floorplan": "XT03",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "136",
+    "subdivision": "Villas at Renner Park",
+    "builder": "DR Horton",
+    "address": "6309 Marinelli Drive North",
+    "floorplan": "XT03",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "137",
+    "subdivision": "Villas at Renner Park",
+    "builder": "DR Horton",
+    "address": "6311 Marinelli Drive North",
+    "floorplan": "XT03",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "138",
+    "subdivision": "Villas at Renner Park",
+    "builder": "DR Horton",
+    "address": "6313 Marinelli Drive North",
+    "floorplan": "XT03",
+    "lastUpdated": "2026-04-21"
+  },
+  {
+    "lotNumber": "139",
+    "subdivision": "Villas at Renner Park",
+    "builder": "DR Horton",
+    "address": "6315 Marinelli Drive North",
+    "floorplan": "XT04",
+    "lastUpdated": "2026-04-21"
+  },
+     {
     "lotNumber": "179B",
     "subdivision": "Madison Meadows",
     "builder": "DR Horton",
