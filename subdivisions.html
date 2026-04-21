@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Subdivision List Builder v1.0</title>
+<title>Subdivision List Builder v1.1</title>
+
 <style>
 body {
   background:#111;
@@ -13,7 +14,12 @@ body {
 }
 
 h1 {
-  margin-bottom:10px;
+  margin-bottom:5px;
+}
+
+.version {
+  color:#666;
+  margin-bottom:15px;
 }
 
 .topbar {
@@ -26,7 +32,7 @@ input {
   padding:8px;
   border-radius:5px;
   border:none;
-  width:250px;
+  width:260px;
 }
 
 button {
@@ -42,8 +48,19 @@ button:hover {
   background:#444;
 }
 
+.section {
+  margin-bottom:20px;
+}
+
+.box {
+  border:1px solid #333;
+  padding:10px;
+  border-radius:6px;
+  background:#1a1a1a;
+}
+
 .table-container {
-  max-height:70vh;
+  max-height:60vh;
   overflow:auto;
   border:1px solid #333;
 }
@@ -70,12 +87,25 @@ td {
   margin-bottom:10px;
   color:#aaa;
 }
+
+.builder-row {
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px solid #333;
+}
+
+.builder-row:last-child {
+  border-bottom:none;
+}
+
 </style>
 </head>
 
 <body>
 
 <h1>Subdivision List Builder</h1>
+<div class="version">v1.1</div>
 
 <div class="topbar">
   <input id="search" placeholder="Search builder or subdivision...">
@@ -83,23 +113,49 @@ td {
   <button onclick="exportCSV()">Export CSV</button>
 </div>
 
-<div class="count" id="count">Loading...</div>
+<!-- BUILDER COUNTS -->
+<div class="section">
+  <h3>Subdivisions Per Builder</h3>
+  <div class="box" id="builderCounts"></div>
+</div>
 
-<div class="table-container">
-  <table id="table">
-    <thead>
-      <tr>
-        <th>Builder</th>
-        <th>Subdivision</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<!-- TABLE -->
+<div class="section">
+  <div class="count" id="count">Loading...</div>
+
+  <div class="table-container">
+    <table id="table">
+      <thead>
+        <tr>
+          <th>Builder</th>
+          <th>Subdivision</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 </div>
 
 <script>
-let DATA = [];
 
+let DATA = [];
+let FULL_DATA = [];
+
+// ---------- NORMALIZE ----------
+function normalize(str){
+  return (str || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g," ");
+}
+
+function toTitleCase(str){
+  return str.replace(/\w\S*/g, w =>
+    w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+  );
+}
+
+// ---------- LOAD ----------
 async function loadData(){
   try {
     const res = await fetch("lots(1).json");
@@ -108,17 +164,20 @@ async function loadData(){
     let map = new Map();
 
     json.forEach(lot => {
-      if(!lot.builder || !lot.subdivision) return;
+      let builderRaw = normalize(lot.builder);
+      let subdivisionRaw = normalize(lot.subdivision);
 
-      let builder = lot.builder.trim();
-      let subdivision = lot.subdivision.trim();
+      if(!builderRaw || !subdivisionRaw) return;
 
-      let key = builder + "|" + subdivision;
+      let key = builderRaw + "|" + subdivisionRaw;
 
-      map.set(key, { builder, subdivision });
+      map.set(key, {
+        builder: toTitleCase(builderRaw),
+        subdivision: toTitleCase(subdivisionRaw)
+      });
     });
 
-    DATA = Array.from(map.values())
+    FULL_DATA = Array.from(map.values())
       .sort((a,b) => {
         if(a.builder === b.builder){
           return a.subdivision.localeCompare(b.subdivision);
@@ -126,7 +185,10 @@ async function loadData(){
         return a.builder.localeCompare(b.builder);
       });
 
+    DATA = [...FULL_DATA];
+
     render(DATA);
+    renderBuilderCounts(FULL_DATA);
 
   } catch(err){
     document.getElementById("count").innerText = "Error loading lots(1).json";
@@ -134,6 +196,7 @@ async function loadData(){
   }
 }
 
+// ---------- RENDER TABLE ----------
 function render(data){
   const tbody = document.querySelector("#table tbody");
   tbody.innerHTML = "";
@@ -153,17 +216,47 @@ function render(data){
     `Total Unique Subdivisions: ${data.length}`;
 }
 
+// ---------- BUILDER COUNTS ----------
+function renderBuilderCounts(data){
+  let counts = {};
+
+  data.forEach(r => {
+    counts[r.builder] = (counts[r.builder] || 0) + 1;
+  });
+
+  let container = document.getElementById("builderCounts");
+  container.innerHTML = "";
+
+  Object.keys(counts)
+    .sort((a,b)=>a.localeCompare(b))
+    .forEach(builder => {
+
+      let div = document.createElement("div");
+      div.className = "builder-row";
+
+      div.innerHTML = `
+        <div>${builder}</div>
+        <div><b>${counts[builder]}</b></div>
+      `;
+
+      container.appendChild(div);
+    });
+}
+
+// ---------- SEARCH ----------
 document.getElementById("search").addEventListener("input", e => {
   let val = e.target.value.toLowerCase();
 
-  let filtered = DATA.filter(r =>
+  let filtered = FULL_DATA.filter(r =>
     r.builder.toLowerCase().includes(val) ||
     r.subdivision.toLowerCase().includes(val)
   );
 
-  render(filtered);
+  DATA = filtered;
+  render(DATA);
 });
 
+// ---------- COPY ----------
 function copyData(){
   let text = "Builder\tSubdivision\n";
 
@@ -175,6 +268,7 @@ function copyData(){
   alert("Copied!");
 }
 
+// ---------- EXPORT ----------
 function exportCSV(){
   let csv = "Builder,Subdivision\n";
 
@@ -191,6 +285,7 @@ function exportCSV(){
 }
 
 loadData();
+
 </script>
 
 </body>
