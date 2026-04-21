@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Route Optimizer v4 FINAL</title>
+<title>Route Optimizer FINAL</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -12,22 +12,23 @@
 body { background:#111; color:#fff; font-family:Arial; padding:20px;}
 button { margin:5px; padding:8px; background:#0af; border:none; color:#fff;}
 input { padding:6px; margin:5px;}
-#map { height:400px; margin-top:15px;}
+#map { height:420px; margin-top:15px;}
 table { width:100%; margin-top:20px;}
-th { background:#333;}
+th { background:#333; padding:6px;}
 td { border-bottom:1px solid #333; padding:5px;}
 </style>
 </head>
 
 <body>
 
-<h2>Route Optimizer v4 FINAL</h2>
+<h2>Route Optimizer FINAL</h2>
 
 <input type="file" id="fileInput">
-<button onclick="loadExcel()">Import</button>
+<button onclick="loadExcel()">Import Excel</button>
 <button onclick="optimizeRoute()">Optimize Route</button>
 <button onclick="calcDriving()">Get Driving Distances</button>
-<button onclick="exportExcel()">Export</button>
+<button onclick="exportExcel()">Export Excel</button>
+<button onclick="clearData()">Clear</button>
 
 <br><br>
 
@@ -44,8 +45,9 @@ td { border-bottom:1px solid #333; padding:5px;}
 <thead>
 <tr>
 <th>#</th>
+<th>Builder</th>
 <th>Subdivision</th>
-<th>Miles to Next</th>
+<th>Miles → Next</th>
 </tr>
 </thead>
 <tbody id="table"></tbody>
@@ -63,35 +65,67 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 let polyline;
 
-function straightDist(a,b){
-    let dx=a.lat-b.lat, dy=a.lon-b.lon;
-    return Math.sqrt(dx*dx+dy*dy);
-}
-
-function save(){
-    localStorage.setItem("routeData", JSON.stringify(data));
-}
-
+// -------- IMPORT --------
 function loadExcel(){
-    let file=document.getElementById("fileInput").files[0];
-    let reader=new FileReader();
 
-    reader.onload=function(e){
-        let wb=XLSX.read(e.target.result,{type:'binary'});
-        let sheet=wb.Sheets[wb.SheetNames[0]];
-        let json=XLSX.utils.sheet_to_json(sheet);
+    let file = document.getElementById("fileInput").files[0];
+    if(!file){
+        alert("Select a file first");
+        return;
+    }
 
-        data=json.map(r=>({
-            subdivision:r.Subdivision,
-            lat:parseFloat(r.Lat),
-            lon:parseFloat(r.Lon)
-        }));
+    let reader = new FileReader();
+
+    reader.onload = function(e){
+
+        let wb = XLSX.read(e.target.result,{type:'binary'});
+        let sheet = wb.Sheets[wb.SheetNames[0]];
+        let json = XLSX.utils.sheet_to_json(sheet);
+
+        let imported = [];
+        let skipped = [];
+
+        json.forEach((r,i)=>{
+
+            let lat = parseFloat(r.Lat || r.LAT || r.lat || r.Latitude);
+            let lon = parseFloat(r.Lon || r.LON || r.lon || r.Long || r.Longitude);
+
+            let sub = r.Subdivision || r.subdivision;
+            let builder = r.Builder || "";
+            let address = r.Address || "";
+
+            if(!sub || isNaN(lat) || isNaN(lon)){
+                skipped.push(i+1);
+                return;
+            }
+
+            imported.push({
+                builder,
+                subdivision: sub.trim(),
+                address,
+                lat,
+                lon
+            });
+        });
+
+        data = imported;
 
         save();
         drawMap();
+
+        document.getElementById("info").innerHTML =
+            "Imported: " + imported.length +
+            " | Skipped: " + skipped.length +
+            (skipped.length ? " (rows: " + skipped.join(", ") + ")" : "");
     };
 
     reader.readAsBinaryString(file);
+}
+
+// -------- OPTIMIZE --------
+function straightDist(a,b){
+    let dx=a.lat-b.lat, dy=a.lon-b.lon;
+    return Math.sqrt(dx*dx+dy*dy);
 }
 
 function optimizeRoute(){
@@ -99,7 +133,7 @@ function optimizeRoute(){
     let start=data.find(x=>x.subdivision.toLowerCase().includes("jerome village applewood"));
 
     if(!start){
-        alert("Start location not found");
+        alert("Start location (Jerome Village Applewood) not found");
         return;
     }
 
@@ -124,7 +158,9 @@ function optimizeRoute(){
     drawMap();
 }
 
+// -------- DRIVING DISTANCE --------
 async function getDrive(a,b){
+
     let res=await fetch("https://api.openrouteservice.org/v2/directions/driving-car",{
         method:"POST",
         headers:{
@@ -137,6 +173,12 @@ async function getDrive(a,b){
     });
 
     let json=await res.json();
+
+    if(!json.routes){
+        console.log(json);
+        return 0;
+    }
+
     return json.routes[0].summary.distance * 0.000621371;
 }
 
@@ -157,11 +199,17 @@ async function calcDriving(){
     render();
 }
 
+// -------- ADD NEW --------
 async function addSubdivision(){
 
     let sub=document.getElementById("sub").value;
     let lat=parseFloat(document.getElementById("lat").value);
     let lon=parseFloat(document.getElementById("lon").value);
+
+    if(!sub || isNaN(lat) || isNaN(lon)){
+        alert("Enter valid subdivision + lat/lon");
+        return;
+    }
 
     let newPoint={subdivision:sub,lat,lon};
 
@@ -181,21 +229,28 @@ async function addSubdivision(){
         }
     }
 
-    document.getElementById("info").innerHTML =
-        "Inserted at position: "+(bestIndex+1);
-
     data.splice(bestIndex,0,newPoint);
     save();
     drawMap();
+
+    document.getElementById("info").innerHTML =
+        "Inserted at position: " + (bestIndex+1);
 }
 
+// -------- MAP --------
 function drawMap(){
 
     if(polyline) map.removeLayer(polyline);
 
-    let coords=data.map(p=>[p.lat,p.lon]);
-    polyline=L.polyline(coords,{color:'cyan'}).addTo(map);
+    map.eachLayer(layer=>{
+        if(layer instanceof L.Marker) map.removeLayer(layer);
+    });
 
+    if(data.length===0) return;
+
+    let coords=data.map(p=>[p.lat,p.lon]);
+
+    polyline=L.polyline(coords,{color:'cyan'}).addTo(map);
     map.fitBounds(polyline.getBounds());
 
     data.forEach(p=>{
@@ -206,6 +261,7 @@ function drawMap(){
     render();
 }
 
+// -------- TABLE --------
 function render(){
 
     let html="";
@@ -215,6 +271,7 @@ function render(){
 
         html+=`<tr>
         <td>${i+1}</td>
+        <td>${data[i].builder || ""}</td>
         <td>${data[i].subdivision}</td>
         <td>${d}</td>
         </tr>`;
@@ -223,12 +280,15 @@ function render(){
     document.getElementById("table").innerHTML=html;
 }
 
+// -------- EXPORT --------
 function exportExcel(){
 
     let exportData=data.map((d,i)=>({
         Order:i+1,
+        Builder:d.builder || "",
         Subdivision:d.subdivision,
-        MilesToNext:distances[i]||""
+        Address:d.address || "",
+        MilesToNext:distances[i] || ""
     }));
 
     let ws=XLSX.utils.json_to_sheet(exportData);
@@ -236,6 +296,19 @@ function exportExcel(){
     XLSX.utils.book_append_sheet(wb,ws,"Route");
 
     XLSX.writeFile(wb,"route.xlsx");
+}
+
+// -------- UTIL --------
+function save(){
+    localStorage.setItem("routeData", JSON.stringify(data));
+}
+
+function clearData(){
+    localStorage.removeItem("routeData");
+    data=[];
+    distances=[];
+    drawMap();
+    document.getElementById("info").innerHTML="";
 }
 
 drawMap();
