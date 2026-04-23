@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Lot Lookup v1.4</title>
+  <title>Lot Lookup v1.6</title>
 
   <style>
     body {
@@ -60,46 +60,74 @@ let LOTS = [];
 let FLOORPLANS = {};
 let unlocked = false;
 
+// normalize helper
+function norm(v) {
+  return (v || "").toString().trim().toLowerCase();
+}
+
 // LOAD LOTS
 fetch("lots(1).json")
   .then(res => res.json())
   .then(data => {
     LOTS = data;
-    console.log("LOTS LOADED:", data.length);
     document.getElementById("debug").innerText = `Lots Loaded: ${data.length}`;
     render();
   })
   .catch(err => {
-    console.error("LOTS FAILED:", err);
     document.getElementById("debug").innerText = "❌ Failed to load lots(1).json";
   });
 
-// LOAD FLOORPLANS
+// LOAD FLOORPLANS (normalize keys)
 fetch("floorplans.json")
   .then(res => res.json())
   .then(data => {
-    FLOORPLANS = data;
-    console.log("FLOORPLANS LOADED:", Object.keys(data).length);
-  })
-  .catch(err => {
-    console.error("FLOORPLANS FAILED:", err);
-    document.getElementById("debug").innerText += " | ❌ floorplans.json failed";
+    let fixed = {};
+
+    Object.keys(data).forEach(k => {
+      const parts = k.split("|");
+      if (parts.length === 2) {
+        const key = norm(parts[0]) + "|" + norm(parts[1]);
+        fixed[key] = data[k];
+      }
+    });
+
+    FLOORPLANS = fixed;
   });
 
-// SEARCH
-document.getElementById("search").addEventListener("input", render);
+// INPUT (live search)
+document.getElementById("search").addEventListener("input", () => render());
 
-function render() {
-  const val = document.getElementById("search").value.toLowerCase();
+// ENTER = exact search
+document.getElementById("search").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    render(true);
+  }
+});
+
+function render(exact = false) {
+  const val = norm(document.getElementById("search").value);
   const div = document.getElementById("results");
 
   div.innerHTML = "";
 
-  const filtered = LOTS.filter(lot =>
-    (lot.lotNumber + "").includes(val) ||
-    (lot.subdivision || "").toLowerCase().includes(val) ||
-    (lot.builder || "").toLowerCase().includes(val)
-  );
+  const isLotSearch = /^[a-z0-9]+$/i.test(val);
+
+  const filtered = LOTS.filter(lot => {
+    const lotStr = norm(lot.lotNumber);
+    const sub = norm(lot.subdivision);
+    const builder = norm(lot.builder);
+
+    // exact match for lot searches OR Enter pressed
+    if ((exact || isLotSearch) && val !== "") {
+      return lotStr === val;
+    }
+
+    return (
+      lotStr.includes(val) ||
+      sub.includes(val) ||
+      builder.includes(val)
+    );
+  });
 
   filtered.forEach(lot => {
     const el = document.createElement("div");
@@ -113,7 +141,7 @@ function render() {
 
     // 🔒 INTERNAL DATA
     if (unlocked) {
-      const key = `${lot.builder}|${lot.floorplan}`;
+      const key = norm(lot.builder) + "|" + norm(lot.floorplan);
       const fp = FLOORPLANS[key];
 
       if (fp) {
