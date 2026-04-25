@@ -1,0 +1,65 @@
+[
+  {
+    "builder": "Pulte",
+    "subdivision": "Abberley Park",
+    "address": "3384 Abberley Drive, New Albany, OH 43054",
+    "coords": { "lat": 40.052873, "lon": -82.816503 },
+    "lotMap": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=85575928-6f84-4406-9f8d-d3218f666398&noheader"
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Clarkshaw",
+    "address": "3411 Tender Avenue, Powell, OH 43065",
+    "coords": { "lat": 40.223191, "lon": -83.104699 },
+    "lotMap": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=cec414d9-3a84-47b6-8cf4-ad0e8ac23475&noheader"
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Hyatts",
+    "address": "6176 Bishop Blvd, Powell, OH 43065",
+    "coords": { "lat": 40.214810, "lon": -83.098683 },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Maplewood",
+    "address": "1159 Mueller Dr, Reynoldsburg, OH 43068",
+    "coords": { "lat": 39.969688, "lon": -82.754820 },
+    "lotMap": "https://www.drhorton.com/-/media/drhorton/productcatalog/559-columbus/55968-maplewood-north/maplewood_section_1.png"
+  },
+  {
+    "builder": "Ryan",
+    "subdivision": "Terra Alta",
+    "address": "581 Pisa Lp, Delaware, OH 43015",
+    "coords": { "lat": 40.268005, "lon": -83.051701 },
+    "lotMap": null
+  },
+  {
+    "builder": "Epcon",
+    "subdivision": "Carr Farms",
+    "address": "5755 Arcadian Ave, Hilliard, OH 43026",
+    "coords": { "lat": 40.051380, "lon": -83.170284 },
+    "lotMap": "https://epconcommunities.lotvue.com/marketing/Carr%20Farms#search"
+  },
+  {
+    "builder": "Rockford",
+    "subdivision": "Jerome Aster",
+    "address": "6981 Aster Wy, Plain City, OH 43064",
+    "coords": { "lat": 40.194037, "lon": -83.172143 },
+    "lotMap": "https://rockfordhomes.lotvue.com/marketing/Jerome%20Village%20Aster#search"
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Hill Farm",
+    "address": "6960 Gelderland Dr, Hilliard, OH 43026",
+    "coords": { "lat": 40.037428, "lon": -83.203022 },
+    "lotMap": "https://www.mihomes.com/new-homes/ohio/central-ohio/hilliard/hill-farm/Plat%20Map"
+  },
+  {
+    "builder": "Shottenstein",
+    "subdivision": "Glacier Pointe",
+    "address": "8798 Eliot Drive, Plain City, OH 43064",
+    "coords": { "lat": 40.147034, "lon": -83.205445 },
+    "lotMap": "https://schottensteinhomes.com/wp-content/uploads/2024/09/Glacier-Pointe-View-Available-Lots.png"
+  }
+]
