@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Subdivision JSON Tool v1.0</title>
+<title>Subdivision JSON Tool v2</title>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
@@ -29,7 +29,7 @@ td input{width:100%;background:#000;color:#fff;border:none}
 
 <body>
 
-<h2>Subdivision JSON Tool</h2>
+<h2>Subdivision JSON Tool v2</h2>
 
 <input type="file" id="fileInput">
 <button onclick="loadFromJSON()">Load subdivisions.json</button>
@@ -62,6 +62,15 @@ td input{width:100%;background:#000;color:#fff;border:none}
 
 let data = [];
 
+// 🔧 COLUMN MATCHER (handles slight variations)
+function getValue(row, keys){
+  for(let k of keys){
+    if(row[k] !== undefined) return row[k];
+  }
+  return "";
+}
+
+// RENDER TABLE
 function render(){
   const tbody = document.querySelector("#table tbody");
   tbody.innerHTML = "";
@@ -71,12 +80,16 @@ function render(){
   data.forEach((row,i)=>{
     const tr = document.createElement("tr");
 
-    function cell(key,value){
+    function makeCell(key, value){
       const td = document.createElement("td");
       const input = document.createElement("input");
       input.value = value || "";
 
-      input.oninput = ()=> row[key] = input.value;
+      input.oninput = () => {
+        if(key === "lat") row.coords.lat = input.value;
+        else if(key === "lon") row.coords.lon = input.value;
+        else row[key] = input.value;
+      };
 
       if(!value) td.classList.add("missing");
 
@@ -84,25 +97,27 @@ function render(){
       return td;
     }
 
-    tr.appendChild(cell("builder",row.builder));
-    tr.appendChild(cell("subdivision",row.subdivision));
-    tr.appendChild(cell("address",row.address));
-    tr.appendChild(cell("lat",row.coords?.lat));
-    tr.appendChild(cell("lon",row.coords?.lon));
-    tr.appendChild(cell("lotMap",row.lotMap));
+    tr.appendChild(makeCell("builder", row.builder));
+    tr.appendChild(makeCell("subdivision", row.subdivision));
+    tr.appendChild(makeCell("address", row.address));
+    tr.appendChild(makeCell("lat", row.coords.lat));
+    tr.appendChild(makeCell("lon", row.coords.lon));
+    tr.appendChild(makeCell("lotMap", row.lotMap));
 
     const del = document.createElement("td");
     del.innerHTML = "❌";
     del.onclick = ()=>{ data.splice(i,1); render(); };
     tr.appendChild(del);
 
-    if(!row.builder || !row.subdivision || !row.coords?.lat) missing++;
+    if(!row.builder || !row.subdivision || !row.coords.lat || !row.coords.lon){
+      missing++;
+    }
 
     tbody.appendChild(tr);
   });
 
   document.getElementById("stats").innerText =
-    `Rows: ${data.length} | Missing: ${missing}`;
+    `Rows: ${data.length} | Missing Critical: ${missing}`;
 }
 
 
@@ -130,14 +145,14 @@ document.getElementById("fileInput").addEventListener("change", e=>{
     const rows = XLSX.utils.sheet_to_json(sheet);
 
     data = rows.map(r=>({
-      builder: r.Builder || "",
-      subdivision: r.Subdivision || "",
-      address: r.Address || "",
+      builder: getValue(r, ["Builder","builder"]),
+      subdivision: getValue(r, ["Subdivision","subdivision"]),
+      address: getValue(r, ["Address","address"]),
       coords:{
-        lat: r.Lat || "",
-        lon: r.Lon || ""
+        lat: getValue(r, ["Lat","Latitude","lat"]),
+        lon: getValue(r, ["Lon","Longitude","lon"])
       },
-      lotMap: r.LotMap || ""
+      lotMap: getValue(r, ["LotMap","Map","Lot Map"]) || null
     }));
 
     render();
@@ -147,7 +162,7 @@ document.getElementById("fileInput").addEventListener("change", e=>{
 });
 
 
-// LOAD JSON (from GitHub)
+// LOAD JSON
 function loadFromJSON(){
   fetch("subdivisions.json")
   .then(r=>r.json())
@@ -158,10 +173,21 @@ function loadFromJSON(){
 }
 
 
-// EXPORT JSON
+// EXPORT JSON (CLEAN FORMAT FOR MAP)
 function exportJSON(){
+  const cleaned = data.map(d=>({
+    builder: d.builder,
+    subdivision: d.subdivision,
+    address: d.address,
+    coords:{
+      lat: parseFloat(d.coords.lat),
+      lon: parseFloat(d.coords.lon)
+    },
+    lotMap: d.lotMap || null
+  }));
+
   const blob = new Blob(
-    [JSON.stringify(data,null,2)],
+    [JSON.stringify(cleaned,null,2)],
     {type:"application/json"}
   );
 
