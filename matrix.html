@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Drive Mile Matrix Builder v1.0</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+body {
+    background:#111;
+    color:#fff;
+    font-family:Arial;
+    padding:20px;
+}
+button {
+    padding:10px 20px;
+    margin:5px;
+    background:#2a2a2a;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+}
+#log {
+    margin-top:20px;
+    white-space:pre-wrap;
+    font-size:12px;
+    background:#000;
+    padding:10px;
+    max-height:300px;
+    overflow:auto;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Drive Mile Matrix Builder v1.0</h2>
+
+<input type="file" id="fileInput">
+<br><br>
+
+<button onclick="buildMatrix()">Build Drive Matrix</button>
+<button onclick="exportExcel()">Export Excel</button>
+
+<div id="log"></div>
+
+<script>
+
+const API_KEY = "5b3ce3597851110001cf624895d5d8857d8d41b6a9508753893fbb25";
+
+let locations = [];
+let matrix = [];
+
+// ================= IMPORT =================
+document.getElementById("fileInput").addEventListener("change", function(e){
+    let file = e.target.files[0];
+    let reader = new FileReader();
+
+    reader.onload = function(evt){
+        let data = new Uint8Array(evt.target.result);
+        let workbook = XLSX.read(data, {type:'array'});
+
+        let sheet = workbook.Sheets[workbook.SheetNames[0]];
+        let json = XLSX.utils.sheet_to_json(sheet);
+
+        locations = json.map(r => ({
+            name: r.Subdivision,
+            lat: parseFloat(r.Lat),
+            lon: parseFloat(r.Lon)
+        }));
+
+        log(`Loaded ${locations.length} subdivisions`);
+    };
+
+    reader.readAsArrayBuffer(file);
+});
+
+// ================= BUILD MATRIX =================
+async function buildMatrix() {
+
+    if (locations.length === 0) {
+        alert("Load file first");
+        return;
+    }
+
+    matrix = Array(locations.length).fill().map(()=>Array(locations.length).fill(0));
+
+    let chunkSize = 20;
+
+    for (let i = 0; i < locations.length; i += chunkSize) {
+        for (let j = 0; j < locations.length; j += chunkSize) {
+
+            let sources = locations.slice(i, i + chunkSize);
+            let targets = locations.slice(j, j + chunkSize);
+
+            let coords = [...sources, ...targets].map(l => [l.lon, l.lat]);
+
+            log(`Requesting block [${i}-${i+sources.length}] vs [${j}-${j+targets.length}]`);
+
+            let res = await fetch("https://api.openrouteservice.org/v2/matrix/driving-car", {
+                method:"POST",
+                headers:{
+                    "Authorization": API_KEY,
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    locations: coords,
+                    sources: sources.map((_, idx)=>idx),
+                    destinations: targets.map((_, idx)=>idx + sources.length),
+                    metrics:["distance"]
+                })
+            });
+
+            let data = await res.json();
+
+            if (!data.distances) {
+                log("ERROR: " + JSON.stringify(data));
+                return;
+            }
+
+            for (let s = 0; s < sources.length; s++) {
+                for (let t = 0; t < targets.length; t++) {
+
+                    let miles = data.distances[s][t] * 0.000621371;
+
+                    matrix[i+s][j+t] = miles.toFixed(2);
+                }
+            }
+
+            // 🔥 THROTTLE (IMPORTANT)
+            await sleep(1200);
+        }
+    }
+
+    log("DONE building matrix");
+}
+
+// ================= EXPORT =================
+function exportExcel() {
+
+    let header = ["Subdivision", ...locations.map(l => l.name)];
+
+    let rows = locations.map((loc, i) => {
+        return [
+            loc.name,
+            ...matrix[i]
+        ];
+    });
+
+    let ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+    let wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, "Matrix");
+
+    XLSX.writeFile(wb, "Drive_Matrix.xlsx");
+}
+
+// ================= UTILS =================
+function log(msg){
+    document.getElementById("log").innerText += msg + "\n";
+}
+
+function sleep(ms){
+    return new Promise(r => setTimeout(r, ms));
+}
+
+</script>
+
+</body>
+</html>
