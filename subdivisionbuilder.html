@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Subdivision JSON Tool v1.0</title>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+<style>
+body{font-family:sans-serif;background:#111;color:#fff;padding:20px}
+button{margin:5px;padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
+input{padding:6px}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+th,td{
+  border:1px solid #444;
+  padding:6px;
+}
+th{background:#222}
+td input{width:100%;background:#000;color:#fff;border:none}
+
+.missing{background:#5a1a1a}
+</style>
+</head>
+
+<body>
+
+<h2>Subdivision JSON Tool</h2>
+
+<input type="file" id="fileInput">
+<button onclick="loadFromJSON()">Load subdivisions.json</button>
+
+<br><br>
+
+<button onclick="addRow()">+ Add Row</button>
+<button onclick="exportJSON()">Download JSON</button>
+<button onclick="exportExcel()">Download Excel</button>
+<button onclick="copyJSON()">Copy JSON</button>
+
+<div id="stats"></div>
+
+<table id="table">
+<thead>
+<tr>
+<th>Builder</th>
+<th>Subdivision</th>
+<th>Address</th>
+<th>Lat</th>
+<th>Lon</th>
+<th>Lot Map</th>
+<th>❌</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+
+let data = [];
+
+function render(){
+  const tbody = document.querySelector("#table tbody");
+  tbody.innerHTML = "";
+
+  let missing = 0;
+
+  data.forEach((row,i)=>{
+    const tr = document.createElement("tr");
+
+    function cell(key,value){
+      const td = document.createElement("td");
+      const input = document.createElement("input");
+      input.value = value || "";
+
+      input.oninput = ()=> row[key] = input.value;
+
+      if(!value) td.classList.add("missing");
+
+      td.appendChild(input);
+      return td;
+    }
+
+    tr.appendChild(cell("builder",row.builder));
+    tr.appendChild(cell("subdivision",row.subdivision));
+    tr.appendChild(cell("address",row.address));
+    tr.appendChild(cell("lat",row.coords?.lat));
+    tr.appendChild(cell("lon",row.coords?.lon));
+    tr.appendChild(cell("lotMap",row.lotMap));
+
+    const del = document.createElement("td");
+    del.innerHTML = "❌";
+    del.onclick = ()=>{ data.splice(i,1); render(); };
+    tr.appendChild(del);
+
+    if(!row.builder || !row.subdivision || !row.coords?.lat) missing++;
+
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("stats").innerText =
+    `Rows: ${data.length} | Missing: ${missing}`;
+}
+
+
+// ADD ROW
+function addRow(){
+  data.push({
+    builder:"",
+    subdivision:"",
+    address:"",
+    coords:{lat:"",lon:""},
+    lotMap:""
+  });
+  render();
+}
+
+
+// IMPORT EXCEL
+document.getElementById("fileInput").addEventListener("change", e=>{
+  const file = e.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = ev=>{
+    const wb = XLSX.read(ev.target.result,{type:"binary"});
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet);
+
+    data = rows.map(r=>({
+      builder: r.Builder || "",
+      subdivision: r.Subdivision || "",
+      address: r.Address || "",
+      coords:{
+        lat: r.Lat || "",
+        lon: r.Lon || ""
+      },
+      lotMap: r.LotMap || ""
+    }));
+
+    render();
+  };
+
+  reader.readAsBinaryString(file);
+});
+
+
+// LOAD JSON (from GitHub)
+function loadFromJSON(){
+  fetch("subdivisions.json")
+  .then(r=>r.json())
+  .then(j=>{
+    data = j;
+    render();
+  });
+}
+
+
+// EXPORT JSON
+function exportJSON(){
+  const blob = new Blob(
+    [JSON.stringify(data,null,2)],
+    {type:"application/json"}
+  );
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "subdivisions.json";
+  a.click();
+}
+
+
+// COPY JSON
+function copyJSON(){
+  navigator.clipboard.writeText(JSON.stringify(data,null,2));
+  alert("Copied!");
+}
+
+
+// EXPORT EXCEL
+function exportExcel(){
+  const flat = data.map(d=>({
+    Builder:d.builder,
+    Subdivision:d.subdivision,
+    Address:d.address,
+    Lat:d.coords.lat,
+    Lon:d.coords.lon,
+    LotMap:d.lotMap
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(flat);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Subdivisions");
+
+  XLSX.writeFile(wb,"subdivisions.xlsx");
+}
+
+</script>
+
+</body>
+</html>
