@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>VIP Builder Map v1.31</title>
+<title>VIP Builder Map v1.30</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
 
@@ -42,18 +42,18 @@ html,body{margin:0;height:100%;font-family:sans-serif;}
   bottom:10px;
   left:50%;
   transform:translateX(-50%);
-  background:rgba(255,255,255,0.85);
+  background:rgba(255,255,255,0.8);
   padding:4px 10px;
   border-radius:6px;
   z-index:1002;
 }
 
-/* CONTROLS */
+/* DESKTOP PANEL */
 #controls{
   position:absolute;
   top:60px;
   right:10px;
-  width:240px;
+  width:230px;
   max-height:70vh;
   background:white;
   border-radius:10px;
@@ -62,6 +62,7 @@ html,body{margin:0;height:100%;font-family:sans-serif;}
   z-index:1001;
 }
 
+/* MOBILE DRAWER */
 @media (max-width:700px){
   #controls{
     bottom:0;
@@ -110,11 +111,9 @@ html,body{margin:0;height:100%;font-family:sans-serif;}
   font-size:14px;
 }
 
-/* POPUP */
 .leaflet-popup-content{
   margin:8px !important;
   text-align:center;
-  min-width:200px;
 }
 </style>
 </head>
@@ -131,7 +130,7 @@ html,body{margin:0;height:100%;font-family:sans-serif;}
 <div id="controls"></div>
 <div id="legend"></div>
 
-<div id="version">v1.31</div>
+<div id="version">v1.30</div>
 <img id="vipLogo" src="/images/logo-VIP.png">
 
 <div id="map"></div>
@@ -157,46 +156,19 @@ let controlsVisible = true;
 /* NORMALIZE */
 function normalizeBuilder(name){
   if(!name) return "Unknown";
-  return name.toLowerCase().includes("shottenstein")
-    ? "Schottenstein"
-    : name;
+  const map = {
+    "shottenstein":"Schottenstein",
+    "schottenstein":"Schottenstein"
+  };
+  return map[name.toLowerCase()] || name;
 }
 
-/* 🔥 LOT MAP FIX */
-function getLotMapHTML(lotMap){
-
-  if (!lotMap) return `<i>No lot map</i>`;
-
-  const clean = String(lotMap).trim();
-
-  if (
-    clean === "" ||
-    clean.toLowerCase().includes("no") ||
-    clean === "null"
-  ){
-    return `<i>No lot map</i>`;
-  }
-
-  // image detection
-  const isImage = clean.match(/\.(jpg|jpeg|png|webp)$/i);
-
-  if(isImage){
-    return `
-      <a href="${clean}" target="_blank">Open Lot Map</a><br>
-      <img src="${clean}" style="width:100%;max-width:200px;margin-top:6px;border-radius:6px;">
-    `;
-  }
-
-  return `<a href="${clean}" target="_blank">View Lot Map</a>`;
-}
-
-/* LOAD DATA */
+/* LOAD JSON */
 fetch("subdivisions.json")
 .then(r=>r.json())
 .then(data=>{
 
   data.forEach(item=>{
-
     const b = normalizeBuilder(item.builder);
 
     const icon = L.icon({
@@ -207,7 +179,9 @@ fetch("subdivisions.json")
 
     const marker = L.marker([item.coords.lat,item.coords.lon],{icon});
 
-    const lotHTML = getLotMapHTML(item.lotMap);
+    const lotHTML = item.lotMap
+      ? `<a href="${item.lotMap}" target="_blank">View Lot Map</a>`
+      : `<i>No lot map</i>`;
 
     marker.bindPopup(`
       <b>${item.subdivision}</b><br>
@@ -223,7 +197,6 @@ fetch("subdivisions.json")
     }
 
     builderGroups[b].addLayer(marker);
-
     markers.push({...item, builder:b, marker});
   });
 
@@ -231,6 +204,7 @@ fetch("subdivisions.json")
   buildLegend();
   setupSearch();
 });
+
 
 /* SEARCH */
 function setupSearch(){
@@ -259,6 +233,7 @@ function setupSearch(){
   });
 }
 
+
 /* CONTROLS */
 function buildControls(){
   const container = document.getElementById("controls");
@@ -269,9 +244,12 @@ function buildControls(){
     counts[m.builder]=(counts[m.builder]||0)+1;
   });
 
+  const total = markers.length;
+
   const header = document.createElement("div");
   header.id="controlsHeader";
-  header.innerHTML = `<b>Total Subdivisions: ${markers.length}</b><br><br>`;
+
+  header.innerHTML = `<b>Total: ${total}</b><br><br>`;
 
   const allBtn = document.createElement("button");
   allBtn.innerText="All";
@@ -316,6 +294,7 @@ function buildControls(){
   container.appendChild(list);
 }
 
+
 /* LEGEND */
 function buildLegend(){
   const div = document.getElementById("legend");
@@ -326,6 +305,7 @@ function buildLegend(){
     div.appendChild(row);
   });
 }
+
 
 /* TOGGLE */
 document.getElementById("toggleUI").onclick=()=>{
