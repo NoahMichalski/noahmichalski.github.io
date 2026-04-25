@@ -1,65 +1,1242 @@
 [
   {
-    "builder": "Pulte",
-    "subdivision": "Abberley Park",
-    "address": "3384 Abberley Drive, New Albany, OH 43054",
-    "coords": { "lat": 40.052873, "lon": -82.816503 },
-    "lotMap": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=85575928-6f84-4406-9f8d-d3218f666398&noheader"
+    "builder": "MI Homes",
+    "subdivision": "Jerome Village Applewood",
+    "address": "10715 Pearl Creek Dr, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.169613,
+      "lon": -83.199764
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Rockford",
+    "subdivision": "Jerome Village Meadowlark",
+    "address": "8868 Meadowlark Drive Plain City, Ohio 43064",
+    "coords": {
+      "lat": 40.187822,
+      "lon": -83.20899
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "3 Pillar",
+    "subdivision": "Jerome Village",
+    "address": "11451 Winterberry Dr, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.178976,
+      "lon": -83.192238
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Epcon",
+    "subdivision": "Hyland Meadows",
+    "address": "8027 Grassland Dr, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.189891,
+      "lon": -83.191183
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Schottenstein",
+    "subdivision": "Cottages At Verbana",
+    "address": "11738 Verbena Place, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.184323,
+      "lon": -83.200862
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "3 Pillar",
+    "subdivision": "Eversole Woods",
+    "address": "11451 Winterberry Drive, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.179464,
+      "lon": -83.187045
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Epcon",
+    "subdivision": "White Oaks",
+    "address": "8400 Ryan Pkwy, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.166178,
+      "lon": -83.192868
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Glacier Pointe *MI",
+    "address": "8772 Glacier Pointe Dr, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.146403,
+      "lon": -83.203878
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Schottenstein",
+    "subdivision": "Glacier Pointe *Schott",
+    "address": "8798 Eliot Drive, Plain City, Ohio 43064 ",
+    "coords": {
+      "lat": 40.147019,
+      "lon": -83.20396
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Bob Webb",
+    "subdivision": "Indian Run",
+    "address": "8974 Whitetail Wy, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.143754,
+      "lon": -83.196779
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Hyland Glen",
+    "address": "6986 Stillhouse Ln, Dublin, OH 43016",
+    "coords": {
+      "lat": 40.114383,
+      "lon": -83.175554
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Rockford",
+    "subdivision": "Ayrshire Farms",
+    "address": "6195 Lockroy Dr, Dublin, OH 43016",
+    "coords": {
+      "lat": 40.092646,
+      "lon": -83.185798
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Rockford",
+    "subdivision": "Mitchell Highlands",
+    "address": "9511 Camberly Avenue Plain City, Ohio 43064",
+    "coords": {
+      "lat": 40.148096,
+      "lon": -83.22626
+    },
+    "lotMap": null
   },
   {
     "builder": "Pulte",
-    "subdivision": "Clarkshaw",
-    "address": "3411 Tender Avenue, Powell, OH 43065",
-    "coords": { "lat": 40.223191, "lon": -83.104699 },
-    "lotMap": "https://apps.zondavirtual.com/alphamap/index.html?OLAId=cec414d9-3a84-47b6-8cf4-ad0e8ac23475&noheader"
+    "subdivision": "Scotts",
+    "address": "9556 Burghley Dr, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.154941,
+      "lon": -83.214898
+    },
+    "lotMap": null
   },
   {
     "builder": "Pulte",
-    "subdivision": "Hyatts",
-    "address": "6176 Bishop Blvd, Powell, OH 43065",
-    "coords": { "lat": 40.214810, "lon": -83.098683 },
+    "subdivision": "Pioneer",
+    "address": "9569 Coach Line Ave, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.150438,
+      "lon": -83.237856
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Del Webb",
+    "subdivision": "Maygrass",
+    "address": "Mitchell-Dewitt Road, Plain City OH, 43064",
+    "coords": {
+      "lat": 40.140561,
+      "lon": -83.228528
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Schottenstein",
+    "subdivision": "Reserve at New California",
+    "address": "10171 Jeffrey Pine Drive, Plain City, Ohio 43064",
+    "coords": {
+      "lat": 40.159868,
+      "lon": -83.243261
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Rockford",
+    "subdivision": "HofBauer",
+    "address": "2223 Ashby Wy, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.11427,
+      "lon": -83.269355
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Darby Station",
+    "address": "537 Conductor Dr, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.107605,
+      "lon": -83.250687
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Madison Meadows",
+    "address": "403 Madison Wy, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.103927,
+      "lon": -83.287352
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Rockford",
+    "subdivision": "Tarlton Meadows",
+    "address": "5292 Tarlton Boulevard Hilliard, Ohio 43026",
+    "coords": {
+      "lat": 40.058805,
+      "lon": -83.186599
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Epcon",
+    "subdivision": "Carr",
+    "address": "5755 Arcadian Ave, Hilliard, OH 43026",
+    "coords": {
+      "lat": 40.05138,
+      "lon": -83.170284
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Tuckerman",
+    "subdivision": "Dorchester",
+    "address": "",
+    "coords": {
+      "lat": 40.018985,
+      "lon": -83.081602
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Hill Farm",
+    "address": "6960 Gelderland Dr, Hilliard, OH 43026",
+    "coords": {
+      "lat": 40.037428,
+      "lon": -83.203022
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Drees",
+    "subdivision": "Alton Place",
+    "address": "2504 Sycamore Trce, Hilliard, OH 43026",
+    "coords": {
+      "lat": 40.001406,
+      "lon": -83.190128
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Sugar Farms",
+    "address": "2040 Limone Drive, Hilliard, OH 43026",
+    "coords": {
+      "lat": 39.992456,
+      "lon": -83.174284
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Schottenstein",
+    "subdivision": "Renner Park",
+    "address": "6186 Renner Park Drive, Columbus, OH 43228",
+    "coords": {
+      "lat": 39.982893,
+      "lon": -83.173465
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Villas At Renner Park",
+    "address": "1486 Cardinez Way, Columbus, OH 43228",
+    "coords": {
+      "lat": 39.980788,
+      "lon": -83.176207
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Centex",
+    "subdivision": "Clover",
+    "address": "40 Reneau Ave, Galloway, OH 43119",
+    "coords": {
+      "lat": 39.949993,
+      "lon": -83.161864
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Chase Landings",
+    "address": "6351 Ballast Rd, Galloway, OH 43119 ",
+    "coords": {
+      "lat": 39.918362,
+      "lon": -83.163537
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Galloway East",
+    "address": "",
+    "coords": {
+      "lat": 39.919044,
+      "lon": -83.163786
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Villages at Galloway",
+    "address": "6365 Bellmouth Rd, Galloway, OH 43119 ",
+    "coords": {
+      "lat": 39.917887,
+      "lon": -83.165329
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Monarch Greene",
+    "address": "1414 Chrisman Drive, Columbus, OH 43223",
+    "coords": {
+      "lat": 39.92751,
+      "lon": -83.03278
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Beulah Park",
+    "address": "3655 Glacial Ln, Grove City, OH 43123",
+    "coords": {
+      "lat": 39.889952,
+      "lon": -83.104556
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Schottenstein",
+    "subdivision": "Holton",
+    "address": "3600 Whirla Way, Grove City, OH",
+    "coords": {
+      "lat": 39.8582,
+      "lon": -83.0983
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Browns Farm",
+    "address": "3215 Farmhouse Ln, Grove City, OH 43123",
+    "coords": {
+      "lat": 39.857121,
+      "lon": -83.089867
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Epcon",
+    "subdivision": "Mulberry",
+    "address": "4416 Marilyn Ct, Grove City, OH 43123",
+    "coords": {
+      "lat": 39.871459,
+      "lon": -83.056351
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Pinnacle",
+    "address": "899 Heimat Haus Dr, Grove City, OH 43123",
+    "coords": {
+      "lat": 39.866539,
+      "lon": -83.028943
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Rockford",
+    "subdivision": "Meadow Grove",
+    "address": "1813 Silverlawn Dr, Grove City, OH 43123",
+    "coords": {
+      "lat": 39.849346,
+      "lon": -83.052656
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Buckstone Bend",
+    "address": "4918 Ranger Dr, Lockbourne, OH 43137",
+    "coords": {
+      "lat": 39.856655,
+      "lon": -82.967935
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Rockford",
+    "subdivision": "Foxfire *Rockford",
+    "address": "440 Bethpage Blvd, Commercial Point, OH 43116",
+    "coords": {
+      "lat": 39.777874,
+      "lon": -83.029083
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Foxfire *MI",
+    "address": "444 Bethpage Blvd, Commercial Point, OH 43116",
+    "coords": {
+      "lat": 39.777897,
+      "lon": -83.028864
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Walnut Mill",
+    "address": "5 Walnut Mill Way, Ashville, OH 43103",
+    "coords": {
+      "lat": 39.734237,
+      "lon": -82.95359
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Centex",
+    "subdivision": "Bloomfield Hills",
+    "address": "5002 Roese Ave, South Bloomfield, OH 43103",
+    "coords": {
+      "lat": 39.708129,
+      "lon": -82.988884
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Wagnalls",
+    "address": "1390 Hansberry Dr, Lithopolis, OH 43136",
+    "coords": {
+      "lat": 39.811287,
+      "lon": -82.813148
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Orchard Lakes",
+    "address": "7055 Royalton Ridge Avenue, Canal Winchester, OH 43110",
+    "coords": {
+      "lat": 39.866083,
+      "lon": -82.809752
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Lansdowne",
+    "address": "4213 Sycamore Oak Avenue, Canal Winchester, OH 43110",
+    "coords": {
+      "lat": 39.89249,
+      "lon": -82.83537
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Longview Highlands",
+    "address": "102 Cedarhurst Ct, Pickerington, OH 43147",
+    "coords": {
+      "lat": 39.89768,
+      "lon": -82.789797
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Heron Crossing",
+    "address": "12146 Prairie View Dr NW, Pickerington, OH 43147",
+    "coords": {
+      "lat": 39.909728,
+      "lon": -82.716874
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "American Homes 4 Rent ",
+    "subdivision": "Eastwood",
+    "address": "9045 Lucy Drive, Reynoldsburg, OH",
+    "coords": {
+      "lat": 39.961474,
+      "lon": -82.758526
+    },
     "lotMap": null
   },
   {
     "builder": "DR Horton",
     "subdivision": "Maplewood",
     "address": "1159 Mueller Dr, Reynoldsburg, OH 43068",
-    "coords": { "lat": 39.969688, "lon": -82.754820 },
-    "lotMap": "https://www.drhorton.com/-/media/drhorton/productcatalog/559-columbus/55968-maplewood-north/maplewood_section_1.png"
+    "coords": {
+      "lat": 39.969688,
+      "lon": -82.75482
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Rockford",
+    "subdivision": "Hazelton",
+    "address": "208 Scotsgrove Drive, Pataskala, OH 43062",
+    "coords": {
+      "lat": 39.972371,
+      "lon": -82.678359
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Forest Ridge",
+    "address": "106 Ruby Rd SW, Pataskala, OH 43062",
+    "coords": {
+      "lat": 40.015704,
+      "lon": -82.668855
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Rockford",
+    "subdivision": "Willowbend",
+    "address": "228 Willow Bnd Dr, Newark, OH 43055",
+    "coords": {
+      "lat": 40.047837,
+      "lon": -82.485522
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Overlook",
+    "address": "2100 Overlook Wy, Newark, OH 43055",
+    "coords": {
+      "lat": 40.043237,
+      "lon": -82.473669
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Abberley Park",
+    "address": "3384 Abberley Drive, New Albany, OH 43054",
+    "coords": {
+      "lat": 40.052873,
+      "lon": -82.816503
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Bob Webb",
+    "subdivision": "Woodland Preserve",
+    "address": " 1961 Reserve Way, New Albany, OH 43054",
+    "coords": {
+      "lat": 40.048137,
+      "lon": -82.810941
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Bob Webb",
+    "subdivision": "Woodhaven",
+    "address": "7515 Steeplechase Ln, New Albany, OH 43054",
+    "coords": {
+      "lat": 40.108526,
+      "lon": -82.793882
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Nottingham Trace",
+    "address": "7715 Nottingham Blvd, New Albany, OH 43054",
+    "coords": {
+      "lat": 40.109482,
+      "lon": -82.81253
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Towns on the Greenway",
+    "address": "337 Hockberry Ave, Westerville, OH 43081",
+    "coords": {
+      "lat": 40.134287,
+      "lon": -82.942262
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Bob Webb",
+    "subdivision": "Nook At Highland Lakes",
+    "address": "6089 Victory Gate, Westerville, OH 43082",
+    "coords": {
+      "lat": 40.181095,
+      "lon": -82.928911
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Miller Farm",
+    "address": "2799 Sunbury Rd, Galena, OH 43021",
+    "coords": {
+      "lat": 40.212932,
+      "lon": -82.871836
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Magnolia Park",
+    "address": "582 Weatherby Drive Sunbury , OH 43074",
+    "coords": {
+      "lat": 40.245373,
+      "lon": -82.883716
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Price Ponds",
+    "address": "1026 Ping Lane, Sunbury, OH 43074",
+    "coords": {
+      "lat": 40.244527,
+      "lon": -82.885731
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Price Ponds - Summit ",
+    "address": "953 Mill Stone Dr, Sunbury, OH 43074",
+    "coords": {
+      "lat": 40.244204,
+      "lon": -82.886893
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Eagle",
+    "address": "7002 Crown Drive, Galena, OH 43021",
+    "coords": {
+      "lat": 40.249897,
+      "lon": -82.938333
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Del Webb",
+    "subdivision": "NorthStar",
+    "address": "Wilson Rd, Sunbury, OH 43074",
+    "coords": {
+      "lat": 40.281729,
+      "lon": -82.896846
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Honey Grove",
+    "address": "Coming Soon, Sunbury, Ohio 43074 ",
+    "coords": {
+      "lat": 40.280618,
+      "lon": -82.901596
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Berlin Farm",
+    "address": "2651 Cleo St, Delaware, OH 43015",
+    "coords": {
+      "lat": 40.240546,
+      "lon": -83.004182
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Berlin Bluffs *Pulte",
+    "address": "2651 Cleo St, Delaware, OH 43015",
+    "coords": {
+      "lat": 40.24485,
+      "lon": -82.997809
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Piatt Preserve",
+    "address": "2780 Aldengate Ln, Delaware, OH 43015",
+    "coords": {
+      "lat": 40.245506,
+      "lon": -83.00753
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Glenross *Pulte",
+    "address": "106 E Wind Rd, Delaware, OH 43015",
+    "coords": {
+      "lat": 40.236117,
+      "lon": -83.020358
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Winterbrooke Place",
+    "address": "43 Sienna Glenn Dr, Lewis Center, OH 43035",
+    "coords": {
+      "lat": 40.229418,
+      "lon": -83.021288
+    },
+    "lotMap": null
   },
   {
     "builder": "Ryan",
     "subdivision": "Terra Alta",
     "address": "581 Pisa Lp, Delaware, OH 43015",
-    "coords": { "lat": 40.268005, "lon": -83.051701 },
+    "coords": {
+      "lat": 40.268005,
+      "lon": -83.051701
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Ryan",
+    "subdivision": "Addison Farms",
+    "address": "50 Allenhurst Way, Delaware, OH 43015",
+    "coords": {
+      "lat": 40.322743,
+      "lon": -83.085124
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Ryan",
+    "subdivision": "Rutherford",
+    "address": "572 Rutherford Ave, Delaware, OH 43015",
+    "coords": {
+      "lat": 40.320409,
+      "lon": -83.088637
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Parkview",
+    "address": "557 Park Vista Dr, Delaware, OH 43015 ",
+    "coords": {
+      "lat": 40.317609,
+      "lon": -83.092585
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Springer Woods",
+    "address": "693 Penwell Dr, Delaware, OH 43015 ",
+    "coords": {
+      "lat": 40.310277,
+      "lon": -83.120107
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Limestone",
+    "address": "101 Franks Field Dr, Delaware, OH 43015",
+    "coords": {
+      "lat": 40.302692,
+      "lon": -83.122495
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Slate",
+    "address": "1258 Ashlar Lane Lewis Center , OH 43035",
+    "coords": {
+      "lat": 40.19303,
+      "lon": -83.013688
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Bob Webb",
+    "subdivision": "Liberty Bluff",
+    "address": "1608 Liberty Bluff Dr, Delaware, OH 43015",
+    "coords": {
+      "lat": 40.209338,
+      "lon": -83.064067
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Nelson",
+    "address": "2538 Nelson Ln, Delaware, OH 43015",
+    "coords": {
+      "lat": 40.20845,
+      "lon": -83.084053
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Hyatts Meadows *MI",
+    "address": "521 Alicia Kelton Dr, Delaware, OH 43015",
+    "coords": {
+      "lat": 40.216753,
+      "lon": -83.044456
+    },
     "lotMap": null
   },
   {
     "builder": "Epcon",
-    "subdivision": "Carr Farms",
-    "address": "5755 Arcadian Ave, Hilliard, OH 43026",
-    "coords": { "lat": 40.051380, "lon": -83.170284 },
-    "lotMap": "https://epconcommunities.lotvue.com/marketing/Carr%20Farms#search"
+    "subdivision": "Hyatts Village",
+    "address": "3372 Hyatts Rd, Powell, OH 43065",
+    "coords": {
+      "lat": 40.217428,
+      "lon": -83.100979
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Liberty Grand",
+    "address": "3777 Shoal Way, Powell, OH 43065",
+    "coords": {
+      "lat": 40.201641,
+      "lon": -83.103957
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Clarkshaw *Pulte",
+    "address": "3411 Tender Avenue, Powell, OH 43065",
+    "coords": {
+      "lat": 40.223191,
+      "lon": -83.104699
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Clarkshaw Crossing *MI",
+    "address": "5429 Valleydale Rd, Powell, OH 43065",
+    "coords": {
+      "lat": 40.226404,
+      "lon": -83.092247
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "MI Homes",
+    "subdivision": "Woodcrest Crossing",
+    "address": "6443 Bluejay Rdg Dr, Powell, OH 43065",
+    "coords": {
+      "lat": 40.222632,
+      "lon": -83.114473
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Schottenstein",
+    "subdivision": "Jerome Aster *Schott",
+    "address": "6971 Aster Way, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.194037,
+      "lon": -83.172143
+    },
+    "lotMap": null
   },
   {
     "builder": "Rockford",
     "subdivision": "Jerome Aster",
     "address": "6981 Aster Wy, Plain City, OH 43064",
-    "coords": { "lat": 40.194037, "lon": -83.172143 },
-    "lotMap": "https://rockfordhomes.lotvue.com/marketing/Jerome%20Village%20Aster#search"
+    "coords": {
+      "lat": 40.194037,
+      "lon": -83.172143
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "WPLand Company",
+    "subdivision": "Foundry Park",
+    "address": "2908 Robertson Ave, Oakley, OH 45209",
+    "coords": {
+      "lat": 39.156184,
+      "lon": -84.434851
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "WPLand Company",
+    "subdivision": "Arabella",
+    "address": "4291 Parkview Dr, Blue Ash, OH 45242",
+    "coords": {
+      "lat": 39.24633,
+      "lon": -84.390224
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Fischer Homes",
+    "subdivision": "Trailhead",
+    "address": "1322 Trailhead Pl, Harrison, OH 45030",
+    "coords": {
+      "lat": 39.286196,
+      "lon": -84.759673
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Fischer Homes",
+    "subdivision": "Silverstone",
+    "address": "4081 Silverstone Ln, Batavia, OH 45103",
+    "coords": {
+      "lat": 39.071042,
+      "lon": -84.241813
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Hyatts",
+    "address": "6176 Bishop Blvd, Powell, OH 43065",
+    "coords": {
+      "lat": 40.21481,
+      "lon": -83.098683
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Jefferson Manor",
+    "address": "8488 Ben Hale Ct, Blacklick, OH 43004",
+    "coords": {
+      "lat": 40.036095,
+      "lon": -82.787034
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Liberty Crossing",
+    "address": "8040 Newark Rd, Mt Vernon, OH 43050 ",
+    "coords": {
+      "lat": 40.350467,
+      "lon": -82.473826
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Ryan",
+    "subdivision": "Hyatts",
+    "address": "250 Alicia Kelton Dr, Delaware, OH 43015",
+    "coords": {
+      "lat": 40.215079,
+      "lon": -83.04102
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Epcon",
+    "subdivision": "Courtyards on Hyatts",
+    "address": "3200 Korg St, Powell, OH 43065",
+    "coords": {
+      "lat": 40.217012,
+      "lon": -83.099814
+    },
+    "lotMap": null
   },
   {
     "builder": "MI Homes",
-    "subdivision": "Hill Farm",
-    "address": "6960 Gelderland Dr, Hilliard, OH 43026",
-    "coords": { "lat": 40.037428, "lon": -83.203022 },
-    "lotMap": "https://www.mihomes.com/new-homes/ohio/central-ohio/hilliard/hill-farm/Plat%20Map"
+    "subdivision": "Spring Hill Farm",
+    "address": "7820 Oldham Dr., Reynoldsburg, OH 43068",
+    "coords": {
+      "lat": 39.97291,
+      "lon": -82.792604
+    },
+    "lotMap": null
   },
   {
     "builder": "Shottenstein",
-    "subdivision": "Glacier Pointe",
-    "address": "8798 Eliot Drive, Plain City, OH 43064",
-    "coords": { "lat": 40.147034, "lon": -83.205445 },
-    "lotMap": "https://schottensteinhomes.com/wp-content/uploads/2024/09/Glacier-Pointe-View-Available-Lots.png"
+    "subdivision": "Wellington Park",
+    "address": "598 Courtright Dr, Pickerington, OH 43147",
+    "coords": {
+      "lat": 39.895545,
+      "lon": -82.751744
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Towns On The Parkway",
+    "address": "4128 John Shields Pkwy, Dublin, OH 43017",
+    "coords": {
+      "lat": 40.106649,
+      "lon": -83.100162
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Amrine",
+    "address": "334 Amrine Wy, Marysville, OH 43040",
+    "coords": {
+      "lat": 40.270238,
+      "lon": -83.371765
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Johnson's Creek",
+    "address": "1128 Stratford Way, London, OH 43140",
+    "coords": {
+      "lat": 39.913494,
+      "lon": -83.437509
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "River Ridge",
+    "address": "1797 Jacko Lane, Circleville, OH 43113",
+    "coords": {
+      "lat": 39.63585,
+      "lon": -82.94865
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Ludlow Ridge",
+    "address": "819 Sherwood Loop, Bellefontaine, OH 43311 ",
+    "coords": {
+      "lat": 40.339108,
+      "lon": -83.745493
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Bishop Estates",
+    "address": "1105 Dayton Ave NW, Washington Court House, OH 43160 ",
+    "coords": {
+      "lat": 39.537536,
+      "lon": -83.455934
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Sugar Creek",
+    "address": "27 Darbyshire Dr, Jeffersonville, OH 43128 ",
+    "coords": {
+      "lat": 39.653289,
+      "lon": -83.576828
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Leasure Farms",
+    "address": "3870 Frazeysburg Rd, Zanesville, OH 43701 ",
+    "coords": {
+      "lat": 39.99765,
+      "lon": -82.035303
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Bob Webb",
+    "subdivision": "Harpers Pointe",
+    "address": "188 Chedworth Row, Powell, OH 43065",
+    "coords": {
+      "lat": 40.160454,
+      "lon": -83.071413
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "VIP",
+    "subdivision": "Home Office",
+    "address": "1110 Claycraft Rd, Gahanna, OH 43230",
+    "coords": {
+      "lat": 39.99286,
+      "lon": -82.843525
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Arbor Homes",
+    "subdivision": "London Landing",
+    "address": "347 Jacob Ln, London, OH 43140",
+    "coords": {
+      "lat": 39.900397,
+      "lon": -83.458767
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Park View",
+    "address": "557 Park Vista Dr, Delaware, OH 43015",
+    "coords": {
+      "lat": 40.317987,
+      "lon": -83.09263
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Arbor Homes",
+    "subdivision": "Edgewood Farms",
+    "address": "5586 Washington St, Canal Winchester, OH 43110",
+    "coords": {
+      "lat": 39.819593,
+      "lon": -82.819663
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Pulte",
+    "subdivision": "Arrowhead",
+    "address": "Coming Soon, Lewis Center, Ohio 43035",
+    "coords": {
+      "lat": 40.219469,
+      "lon": -83.00693
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "DR Horton",
+    "subdivision": "Kintner Crossing",
+    "address": "Kintner Pkwy.Sunbury, OH 43074 ",
+    "coords": {
+      "lat": 40.253075,
+      "lon": -82.878609
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Tuckerman",
+    "subdivision": "Eastcleft",
+    "address": "2520 Eastcleft, Columbus",
+    "coords": {
+      "lat": 40.021396,
+      "lon": -83.080911
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Manor",
+    "subdivision": "Jerome Village *Manor",
+    "address": "7871 Sparrow Run, Plain City, OH 43064",
+    "coords": {
+      "lat": 40.179033,
+      "lon": -83.187736
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Tuckerman",
+    "subdivision": "Derby",
+    "address": "3051 Derby Rd, Columbus, OH 43221",
+    "coords": {
+      "lat": 40.016958,
+      "lon": -83.077961
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Tuckerman",
+    "subdivision": "Hoxton",
+    "address": "2300 Hoxton Ct, Upper Arlington, OH 43220",
+    "coords": {
+      "lat": 40.0331,
+      "lon": -83.078144
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Bob Webb",
+    "subdivision": "Evens Farm",
+    "address": "5129 Maple Dr, Lewis Center, OH 43035",
+    "coords": {
+      "lat": 40.206054,
+      "lon": -83.003999
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Fischer Homes",
+    "subdivision": "Glacier Pointe *Fischer",
+    "address": "6261 Wright Rd, Canal Winchester, OH 43110",
+    "coords": {
+      "lat": 39.887655,
+      "lon": -82.820301
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "Bob Webb",
+    "subdivision": "Liberty Trails",
+    "address": "Clark-Shaw Rd, Powell, OH 43065",
+    "coords": {
+      "lat": 40.227948,
+      "lon": -83.083279
+    },
+    "lotMap": null
+  },
+  {
+    "builder": "3 Pillar",
+    "subdivision": "Scioto Bluffs",
+    "address": "Concord Township, OH 43065",
+    "coords": {
+      "lat": 40.214965,
+      "lon": -83.136494
+    },
+    "lotMap": null
   }
 ]
