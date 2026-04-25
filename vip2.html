@@ -2,42 +2,80 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>VIP Builder Map v2</title>
+<title>VIP Builder Map v1.30</title>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
 
 <style>
-html,body{margin:0;height:100%;}
+html,body{margin:0;height:100%;font-family:sans-serif;}
 #map{height:100%}
 
-/* UI */
+/* SEARCH */
 .search-box{
   position:absolute;top:10px;left:50%;transform:translateX(-50%);
-  z-index:1001;width:300px;
+  z-index:1001;width:320px;
 }
 #searchInput{
   width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;
 }
+.search-results{
+  background:white;border-radius:6px;margin-top:4px;
+  max-height:200px;overflow:auto;
+}
+.search-results div{
+  padding:8px;cursor:pointer;border-bottom:1px solid #eee;
+}
+.search-results div:hover{background:#f0f0f0}
 
-#builderToggles{
-  position:absolute;top:60px;right:10px;z-index:1001;
+/* CONTROLS */
+#controls{
+  position:absolute;top:60px;right:10px;
   background:white;padding:10px;border-radius:8px;
+  z-index:1001;max-height:60vh;overflow:auto;
 }
 
-#company-logo{
-  position:absolute;bottom:10px;left:10px;width:100px;z-index:1002;
+/* LEGEND */
+#legend{
+  position:absolute;bottom:10px;right:10px;
+  background:white;padding:10px;border-radius:8px;
+  z-index:1001;font-size:14px;
+}
+
+/* VERSION */
+#version{
+  position:absolute;bottom:10px;left:50%;
+  transform:translateX(-50%);
+  background:rgba(255,255,255,0.8);
+  padding:4px 10px;border-radius:6px;
+  z-index:1001;
+}
+
+/* BUTTON */
+#toggleUI{
+  position:absolute;top:10px;right:10px;
+  z-index:1002;padding:8px;
+}
+
+/* POPUP */
+.leaflet-popup-content{
+  margin:8px !important;
+  text-align:center;
 }
 </style>
 </head>
 
 <body>
 
+<button id="toggleUI">Hide Controls</button>
+
 <div class="search-box">
   <input id="searchInput" placeholder="Search subdivision...">
+  <div id="results" class="search-results"></div>
 </div>
 
-<div id="builderToggles"></div>
-<img id="company-logo" src="/images/logo-VIP.png">
+<div id="controls"></div>
+<div id="legend"></div>
+<div id="version">v1.30</div>
 
 <div id="map"></div>
 
@@ -47,9 +85,7 @@ html,body{margin:0;height:100%;}
 
 const map = L.map('map').setView([40.1,-83.1],10);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  attribution:'© OpenStreetMap'
-}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
 const colorMap = {
   "Pulte":"green","Ryan":"violet","DR Horton":"black",
@@ -57,11 +93,12 @@ const colorMap = {
   "MI Homes":"grey"
 };
 
-const builderGroups = {};
+let builderGroups = {};
 let markers = [];
+let controlsVisible = true;
 
-// LOAD JSON
-fetch('subdivisions.json')
+// LOAD DATA
+fetch("subdivisions.json")
 .then(r=>r.json())
 .then(data=>{
 
@@ -74,75 +111,134 @@ fetch('subdivisions.json')
       iconSize:[25,41],iconAnchor:[12,41]
     });
 
-    const marker = L.marker([coords.lat,coords.lon],{icon}).addTo(map);
+    const marker = L.marker([coords.lat,coords.lon],{icon});
 
-    const lotHtml = lotMap
+    const lotHTML = lotMap
       ? `<a href="${lotMap}" target="_blank">View Lot Map</a>`
       : `<i>No lot map</i>`;
 
     marker.bindPopup(`
       <b>${subdivision}</b><br>
       ${builder}<br><br>
-      ${lotHtml}<br><br>
+      ${lotHTML}<br><br>
       <a target="_blank"
-       href="https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lon}">
-       ${address}
+        href="https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lon}">
+        ${address}
       </a>
     `);
 
-    // grouping
     if(!builderGroups[builder]){
       builderGroups[builder]=L.layerGroup().addTo(map);
     }
+
     builderGroups[builder].addLayer(marker);
 
-    markers.push({marker,...item});
+    markers.push({...item, marker});
   });
 
-  buildToggles();
+  buildControls();
+  buildLegend();
   setupSearch();
-
 });
 
 
-// SEARCH
+// 🔍 SEARCH WITH DROPDOWN
 function setupSearch(){
-  const input = document.getElementById('searchInput');
+  const input = document.getElementById("searchInput");
+  const results = document.getElementById("results");
 
-  input.addEventListener('input',()=>{
+  input.addEventListener("input",()=>{
     const val = input.value.toLowerCase();
+    results.innerHTML = "";
 
-    markers.forEach(m=>{
-      if(m.subdivision.toLowerCase().includes(val)){
-        map.setView([m.coords.lat,m.coords.lon],14);
-        m.marker.openPopup();
-      }
-    });
+    if(!val) return;
+
+    markers
+      .filter(m=>m.subdivision.toLowerCase().includes(val))
+      .forEach(m=>{
+        const div = document.createElement("div");
+        div.innerHTML = `<b>${m.builder}</b> - ${m.subdivision}`;
+
+        div.onclick = ()=>{
+          map.setView([m.coords.lat,m.coords.lon],14);
+          m.marker.addTo(map).openPopup();
+          results.innerHTML="";
+          input.value = m.subdivision;
+        };
+
+        results.appendChild(div);
+      });
   });
 }
 
 
-// BUILDER TOGGLES
-function buildToggles(){
-  const div = document.getElementById('builderToggles');
+// 🧱 CONTROLS
+function buildControls(){
+  const div = document.getElementById("controls");
+
+  const allBtn = document.createElement("button");
+  allBtn.innerText = "Select All";
+  allBtn.onclick = ()=>{
+    Object.values(builderGroups).forEach(g=>g.addTo(map));
+    document.querySelectorAll("#controls input").forEach(cb=>cb.checked=true);
+  };
+
+  const noneBtn = document.createElement("button");
+  noneBtn.innerText = "Select None";
+  noneBtn.onclick = ()=>{
+    Object.values(builderGroups).forEach(g=>map.removeLayer(g));
+    document.querySelectorAll("#controls input").forEach(cb=>cb.checked=false);
+  };
+
+  div.appendChild(allBtn);
+  div.appendChild(noneBtn);
+  div.appendChild(document.createElement("hr"));
 
   Object.entries(builderGroups).forEach(([b,g])=>{
-    const cb = document.createElement('input');
-    cb.type='checkbox'; cb.checked=true;
+    const cb = document.createElement("input");
+    cb.type="checkbox"; cb.checked=true;
 
     cb.onchange=()=>{
       cb.checked ? g.addTo(map) : map.removeLayer(g);
     };
 
-    const label=document.createElement('label');
+    const label = document.createElement("label");
     label.appendChild(cb);
     label.append(" "+b);
 
     div.appendChild(label);
-    div.appendChild(document.createElement('br'));
+    div.appendChild(document.createElement("br"));
   });
 }
 
+
+// 🎨 LEGEND
+function buildLegend(){
+  const div = document.getElementById("legend");
+
+  Object.entries(colorMap).forEach(([b,c])=>{
+    const row = document.createElement("div");
+    row.innerHTML = `<span style="color:${c}">●</span> ${b}`;
+    div.appendChild(row);
+  });
+}
+
+
+// 👁 HIDE CONTROLS
+document.getElementById("toggleUI").onclick = ()=>{
+  controlsVisible = !controlsVisible;
+
+  document.getElementById("controls").style.display =
+    controlsVisible ? "block" : "none";
+
+  document.getElementById("legend").style.display =
+    controlsVisible ? "block" : "none";
+
+  document.querySelector(".search-box").style.display =
+    controlsVisible ? "block" : "none";
+};
+
 </script>
+
 </body>
 </html>
