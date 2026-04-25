@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Drive Mile Matrix Builder v2.0</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+body {
+    background:#111;
+    color:#fff;
+    font-family:Arial;
+    padding:20px;
+}
+
+button {
+    padding:10px 15px;
+    margin:5px;
+    background:#2a2a2a;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+}
+
+#log {
+    margin-top:10px;
+    white-space:pre-wrap;
+    font-size:12px;
+    background:#000;
+    padding:10px;
+    max-height:200px;
+    overflow:auto;
+}
+
+#matrixContainer {
+    max-height:500px;
+    overflow:auto;
+    border:1px solid #333;
+    margin-top:10px;
+}
+
+table {
+    border-collapse:collapse;
+    font-size:11px;
+}
+
+td, th {
+    border:1px solid #333;
+    padding:4px 6px;
+    text-align:center;
+}
+
+th {
+    background:#222;
+    position:sticky;
+    top:0;
+    z-index:2;
+}
+
+td:first-child, th:first-child {
+    position:sticky;
+    left:0;
+    background:#222;
+    z-index:3;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Drive Mile Matrix Builder v2.0</h2>
+
+<input type="file" id="fileInput">
+<br>
+
+<button onclick="buildMatrix()">Build Matrix</button>
+<button onclick="exportExcel()">Export Excel</button>
+<button onclick="clearProgress()">Reset</button>
+
+<div id="log"></div>
+
+<h3>Matrix Preview</h3>
+<div id="matrixContainer"></div>
+
+<script>
+
+const API_KEY = "5b3ce3597851110001cf624895d5d8857d8d41b6a9508753893fbb25";
+
+let locations = [];
+let matrix = [];
+
+// ================= IMPORT =================
+document.getElementById("fileInput").addEventListener("change", function(e){
+    let file = e.target.files[0];
+    let reader = new FileReader();
+
+    reader.onload = function(evt){
+        let data = new Uint8Array(evt.target.result);
+        let workbook = XLSX.read(data, {type:'array'});
+        let sheet = workbook.Sheets[workbook.SheetNames[0]];
+        let json = XLSX.utils.sheet_to_json(sheet);
+
+        locations = json.map(r => ({
+            name: r.Subdivision,
+            lat: parseFloat(r.Lat),
+            lon: parseFloat(r.Lon)
+        })).filter(l => !isNaN(l.lat) && !isNaN(l.lon));
+
+        matrix = Array(locations.length).fill().map(()=>Array(locations.length).fill(0));
+
+        log(`Loaded ${locations.length} subdivisions`);
+        renderMatrixPreview();
+    };
+
+    reader.readAsArrayBuffer(file);
+});
+
+// ================= MATRIX BUILDER =================
+async function buildMatrix() {
+
+    if (!locations.length) {
+        alert("Load file first");
+        return;
+    }
+
+    let chunkSize = 15;
+
+    let progress = loadProgress();
+
+    for (let i = progress.i; i < locations.length; i += chunkSize) {
+        for (let j = (i === progress.i ? progress.j : 0); j < locations.length; j += chunkSize) {
+
+            let sources = locations.slice(i, i + chunkSize);
+            let targets = locations.slice(j, j + chunkSize);
+
+            let coordMap = new Map();
+            let coords = [];
+
+            function addCoord(loc) {
+                let key = loc.lon + "," + loc.lat;
+                if (!coordMap.has(key)) {
+                    coordMap.set(key, coords.length);
+                    coords.push([loc.lon, loc.lat]);
+                }
+                return coordMap.get(key);
+            }
+
+            let sourceIdx = sources.map(addCoord);
+            let targetIdx = targets.map(addCoord);
+
+            log(`Block [${i}-${i+sources.length}] vs [${j}-${j+targets.length}]`);
+
+            try {
+                let res = await fetch("https://api.openrouteservice.org/v2/matrix/driving-car", {
+                    method:"POST",
+                    headers:{
+                        "Authorization": API_KEY,
+                        "Content-Type":"application/json"
+                    },
+                    body: JSON.stringify({
+                        locations: coords,
+                        sources: sourceIdx,
+                        destinations: targetIdx,
+                        metrics:["distance"]
+                    })
+                });
+
+                let data = await res.json();
+
+                if (!data.distances) {
+                    log("ERROR:");
+                    log(JSON.stringify(data, null, 2));
+                    return;
+                }
+
+                for (let s = 0; s < sources.length; s++) {
+                    for (let t = 0; t < targets.length; t++) {
+
+                        let meters = data.distances[s][t];
+
+                        if (meters === null) {
+                            matrix[i+s][j+t] = "ERR";
+                        } else {
+                            let miles = meters * 0.000621371;
+                            matrix[i+s][j+t] = miles.toFixed(2);
+                        }
+                    }
+                }
+
+                renderMatrixPreview();
+                saveProgress(i, j);
+
+            } catch (err) {
+                log("FETCH ERROR: " + err);
+                return;
+            }
+
+            await sleep(1500);
+        }
+    }
+
+    log("DONE");
+}
+
+// ================= PREVIEW =================
+function renderMatrixPreview() {
+
+    if (!locations.length || !matrix.length) return;
+
+    let html = "<table>";
+
+    html += "<tr><th>Subdivision</th>";
+    locations.forEach(l => html += `<th>${l.name}</th>`);
+    html += "</tr>";
+
+    locations.forEach((loc, i) => {
+        html += `<tr><th>${loc.name}</th>`;
+
+        matrix[i].forEach(val => {
+
+            let display = val === 0 ? "-" : val;
+            let color = "";
+
+            if (val > 0 && val < 5) color = "#1f6f3d";
+            else if (val < 15) color = "#7a5c00";
+            else if (val >= 15) color = "#6f1f1f";
+
+            html += `<td style="background:${color}">${display}</td>`;
+        });
+
+        html += "</tr>";
+    });
+
+    html += "</table>";
+
+    document.getElementById("matrixContainer").innerHTML = html;
+}
+
+// ================= EXPORT =================
+function exportExcel() {
+
+    let header = ["Subdivision", ...locations.map(l => l.name)];
+
+    let rows = locations.map((loc, i) => [
+        loc.name,
+        ...matrix[i]
+    ]);
+
+    let ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
+    let wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, "Matrix");
+    XLSX.writeFile(wb, "Drive_Matrix.xlsx");
+}
+
+// ================= STORAGE =================
+function saveProgress(i, j) {
+    localStorage.setItem("matrixData", JSON.stringify(matrix));
+    localStorage.setItem("matrixProgress", JSON.stringify({i, j}));
+}
+
+function loadProgress() {
+    let savedMatrix = localStorage.getItem("matrixData");
+    let savedProgress = localStorage.getItem("matrixProgress");
+
+    if (savedMatrix && savedProgress) {
+        matrix = JSON.parse(savedMatrix);
+        let prog = JSON.parse(savedProgress);
+        log(`Resuming from i=${prog.i}, j=${prog.j}`);
+        renderMatrixPreview();
+        return prog;
+    }
+    return {i:0, j:0};
+}
+
+function clearProgress() {
+    localStorage.clear();
+    log("Progress cleared");
+}
+
+// ================= UTILS =================
+function log(msg){
+    document.getElementById("log").innerText += msg + "\n";
+}
+
+function sleep(ms){
+    return new Promise(r => setTimeout(r, ms));
+}
+
+</script>
+
+</body>
+</html>
