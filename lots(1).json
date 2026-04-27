@@ -1,5 +1,181 @@
 [
      {
+    "lotNumber": "5",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "116 Fippenny Place",
+    "floorplan": "F402",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "97",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "130 Appleseed Way",
+    "floorplan": "X490",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "37",
+    "subdivision": "Liberty Crossing",
+    "builder": "DR Horton",
+    "address": "121 Fippenny Place",
+    "floorplan": "F400",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "2717",
+    "subdivision": "Kintner Crossing",
+    "builder": "DR Horton",
+    "address": "826 South Kintner Parkway",
+    "floorplan": "X422",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "2744",
+    "subdivision": "Kintner Crossing",
+    "builder": "DR Horton",
+    "address": "833 South Kintner Parkway",
+    "floorplan": "X422",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "2745",
+    "subdivision": "Kintner Crossing",
+    "builder": "DR Horton",
+    "address": "829 South Kintner Parkway",
+    "floorplan": "F400",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "2746",
+    "subdivision": "Kintner Crossing",
+    "builder": "DR Horton",
+    "address": "825 South Kintner Parkway",
+    "floorplan": "X421",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "171",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "601 Madison Way",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "191",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "344 Angely Drive",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "361",
+    "subdivision": "Madison Meadows",
+    "builder": "DR Horton",
+    "address": "581 Winnie Way",
+    "floorplan": "F401",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "39",
+    "subdivision": "Bishop Estates",
+    "builder": "DR Horton",
+    "address": "486 Jaret Way",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "11",
+    "subdivision": "Bishop Estates",
+    "builder": "DR Horton",
+    "address": "473 Jaret Way",
+    "floorplan": "X424",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "31",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5646 Orchard Lakes Trail Drive",
+    "floorplan": "X431",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "98",
+    "subdivision": "Walnut",
+    "builder": "DR Horton",
+    "address": "23 Mead Mill Drive",
+    "floorplan": "X422",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "99",
+    "subdivision": "Walnut",
+    "builder": "DR Horton",
+    "address": "21 Mead Mill Drive",
+    "floorplan": "X431",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "30",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5640 Orchard Lakes Trail Drive",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "32",
+    "subdivision": "Orchard Lakes",
+    "builder": "DR Horton",
+    "address": "5652 Orchard Lakes Trail Drive",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "7",
+    "subdivision": "Leasure Farms",
+    "builder": "DR Horton",
+    "address": "3846 Leasure Farms Drive",
+    "floorplan": "X423",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "13637",
+    "subdivision": "Parkview",
+    "builder": "DR Horton",
+    "address": "389 Park Vista Drive",
+    "floorplan": "X429",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "13628",
+    "subdivision": "Parkview",
+    "builder": "DR Horton",
+    "address": "335 Park Vista Drive",
+    "floorplan": "X450",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "5273",
+    "subdivision": "Ludlow Ridge",
+    "builder": "DR Horton",
+    "address": "1076 Sherwood Loop",
+    "floorplan": "X431",
+    "lastUpdated": "2026-04-27"
+  },
+  {
+    "lotNumber": "32",
+    "subdivision": "Johnson's Creek",
+    "builder": "DR Horton",
+    "address": "1195 Stratford Way",
+    "floorplan": "X424",
+    "lastUpdated": "2026-04-27"
+  },
+     {
     "lotNumber": "265",
     "subdivision": "Galloway East",
     "builder": "DR Horton",
