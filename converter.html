@@ -2,54 +2,134 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lot Converter v2.0</title>
+<title>Lot Converter v2.2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
+:root {
+    --bg: #0f1115;
+    --panel: #181b22;
+    --panel2: #20242d;
+    --text: #f3f4f6;
+    --muted: #a7adba;
+    --line: #303644;
+    --good: #123d22;
+    --bad: #4a1414;
+    --warn: #4a3a14;
+    --accent: #ffffff;
+}
+* { box-sizing: border-box; }
 body {
-    font-family: Arial;
-    background: #111;
-    color: white;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
     padding: 20px;
 }
+h1 { margin: 0 0 4px; }
+.small { color: var(--muted); font-size: 13px; }
 .box {
-    background: #1a1a1a;
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 8px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 16px;
+    margin: 16px 0;
+    border-radius: 12px;
+}
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
 }
 button {
-    padding: 8px 12px;
-    margin: 5px;
-    background: white;
-    color: black;
+    padding: 9px 13px;
+    background: var(--accent);
+    color: #111;
     border: none;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: 700;
+}
+button.secondary {
+    background: var(--panel2);
+    color: var(--text);
+    border: 1px solid var(--line);
 }
 input, select {
-    padding: 6px;
+    padding: 8px;
     margin: 3px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: #0b0d11;
+    color: var(--text);
 }
 textarea {
     width: 100%;
-    height: 250px;
-    background: black;
-    color: #0f0;
-    font-family: monospace;
+    min-height: 300px;
+    background: #050607;
+    color: #3cff78;
+    font-family: Consolas, Monaco, monospace;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+}
+.tableWrap {
+    overflow: auto;
+    max-height: 58vh;
+    border: 1px solid var(--line);
+    border-radius: 10px;
 }
 table {
     width: 100%;
+    min-width: 1100px;
     border-collapse: collapse;
 }
 td, th {
-    border: 1px solid #333;
-    padding: 5px;
+    border-bottom: 1px solid var(--line);
+    padding: 7px;
+    vertical-align: top;
 }
-.errorRow {
-    background: #3a0000;
+th {
+    position: sticky;
+    top: 0;
+    background: #252a35;
+    z-index: 2;
+    text-align: left;
 }
-.goodRow {
-    background: #003300;
+td[contenteditable="true"] {
+    background: rgba(255,255,255,.035);
+    outline: none;
+}
+td[contenteditable="true"]:focus {
+    background: rgba(255,255,255,.09);
+}
+.errorRow { background: var(--bad); }
+.goodRow { background: var(--good); }
+.warnRow { background: var(--warn); }
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+}
+.stat {
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+}
+.stat strong {
+    display: block;
+    font-size: 24px;
+}
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
 }
 </style>
 </head>
@@ -57,33 +137,55 @@ td, th {
 <body>
 
 <h1>Lot Converter</h1>
-<div>Version 2.0</div>
+<div class="small">Version 2.2 — reads Builder, Subdivision, Lot, Floorplan, Original, Reclean, Windows, Address, and lastUpdated.</div>
 
 <div class="box">
-    <input type="file" id="fileInput">
-    <br>
-    <label>Date:</label>
-    <input type="date" id="dateInput">
-    <br>
-    <button onclick="processFile()">Import</button>
-    <button onclick="fixErrors()">Fix Errors</button>
+    <div class="row">
+        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+        <label>Date fallback:</label>
+        <input type="date" id="dateInput">
+        <button onclick="processFile()">Import</button>
+        <button class="secondary" onclick="fixErrors()">Fix Errors</button>
+        <button class="secondary" onclick="clearAll()">Clear</button>
+    </div>
+    <p class="small">
+        If your spreadsheet already has a <b>lastUpdated</b> column, that date will be used per row. If it is blank, the fallback date above is used.
+        Original / Reclean / Windows can be blank and will still export.
+    </p>
+</div>
+
+<div class="box">
+    <div class="stats">
+        <div class="stat"><span class="small">Imported rows</span><strong id="statRows">0</strong></div>
+        <div class="stat"><span class="small">Valid rows</span><strong id="statValid">0</strong></div>
+        <div class="stat"><span class="small">Rows needing fix</span><strong id="statBad">0</strong></div>
+        <div class="stat"><span class="small">JSON records</span><strong id="statJson">0</strong></div>
+    </div>
 </div>
 
 <div class="box">
     <h3>Editable Data</h3>
-    <table id="dataTable">
-        <thead>
-            <tr>
-                <th>Builder</th>
-                <th>Subdivision</th>
-                <th>Lot</th>
-                <th>Floorplan</th>
-                <th>Address</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div class="small" id="detectedHeaders">No file loaded.</div>
+    <br>
+    <div class="tableWrap">
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>Builder</th>
+                    <th>Subdivision</th>
+                    <th>Lot</th>
+                    <th>Floorplan</th>
+                    <th>Original</th>
+                    <th>Reclean</th>
+                    <th>Windows</th>
+                    <th>Address</th>
+                    <th>lastUpdated</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>
 
 <div class="box">
@@ -91,7 +193,7 @@ td, th {
     <textarea id="output"></textarea>
     <br>
     <button onclick="copyOutput()">Copy</button>
-    <button onclick="downloadJSON()">Download</button>
+    <button onclick="downloadJSON()">Download lots.json</button>
 </div>
 
 <script>
@@ -99,27 +201,115 @@ document.getElementById("dateInput").valueAsDate = new Date();
 
 let tableData = [];
 
+const HEADER_ALIASES = {
+    builder: ["builder", "builders"],
+    subdivision: ["subdivision", "community", "neighborhood", "project"],
+    lot: ["lot", "lotnumber", "lot number", "lot #", "lot#", "job number"],
+    floorplan: ["floorplan", "floor plan", "plan"],
+    address: ["address", "street address", "job address"],
+    original: ["original", "original hours", "original clean", "original/reclean/window columns"],
+    reclean: ["reclean", "reclean hours", "re-clean", "re clean"],
+    windows: ["windows", "window", "window hours", "windows hours"],
+    lastUpdated: ["lastupdated", "last updated", "date", "updated", "last update"]
+};
+
+function normalizeHeader(value) {
+    return String(value || "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .replace(/[_-]/g, " ")
+        .trim();
+}
+
+function findKey(row, aliases) {
+    const keys = Object.keys(row || {});
+    const normalized = keys.map(k => ({ raw: k, clean: normalizeHeader(k) }));
+
+    for (const alias of aliases) {
+        const cleanAlias = normalizeHeader(alias);
+        const exact = normalized.find(k => k.clean === cleanAlias);
+        if (exact) return exact.raw;
+    }
+
+    for (const alias of aliases) {
+        const cleanAlias = normalizeHeader(alias);
+        const loose = normalized.find(k => k.clean.replace(/[^a-z0-9]/g, "") === cleanAlias.replace(/[^a-z0-9]/g, ""));
+        if (loose) return loose.raw;
+    }
+
+    return null;
+}
+
+function getValue(row, field) {
+    const key = findKey(row, HEADER_ALIASES[field] || [field]);
+    return key ? row[key] : "";
+}
+
+function cleanText(value) {
+    return String(value ?? "").replace(/\s+/g, " ").trim();
+}
+
+function cleanNumberText(value) {
+    const text = cleanText(value);
+    if (!text) return "";
+    const n = Number(text);
+    return Number.isFinite(n) ? String(n) : text;
+}
+
+function excelDateToISO(value) {
+    if (value instanceof Date && !isNaN(value)) {
+        return value.toISOString().slice(0, 10);
+    }
+
+    if (typeof value === "number" && Number.isFinite(value)) {
+        const utcDays = Math.floor(value - 25569);
+        const utcValue = utcDays * 86400;
+        const dateInfo = new Date(utcValue * 1000);
+        return dateInfo.toISOString().slice(0, 10);
+    }
+
+    const text = cleanText(value);
+    if (!text) return "";
+
+    const parsed = new Date(text);
+    if (!isNaN(parsed)) {
+        return parsed.toISOString().slice(0, 10);
+    }
+
+    return text;
+}
+
 function processFile() {
-    const file = document.getElementById('fileInput').files[0];
+    const file = document.getElementById("fileInput").files[0];
     if (!file) return alert("Select a file");
 
     const reader = new FileReader();
 
     reader.onload = function(e) {
         const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
+        const workbook = XLSX.read(data, { type: "array", cellDates: true });
 
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: "", raw: false });
 
-        tableData = rows.map(row => ({
-            builder: (row["Builder"] || "").trim(),
-            subdivision: (row["Subdivision"] || "").trim(),
-            lot: (row["Lot"] || "").toString().trim(),
-            floorplan: (row["Floorplan"] || "").trim(),
-            address: (row["Address"] || "").trim(),
-            valid: false
-        }));
+        tableData = rows
+            .filter(row => Object.values(row).some(v => cleanText(v)))
+            .map(row => ({
+                builder: cleanText(getValue(row, "builder")),
+                subdivision: cleanText(getValue(row, "subdivision")),
+                lot: cleanText(getValue(row, "lot")),
+                floorplan: cleanText(getValue(row, "floorplan")),
+                original: cleanNumberText(getValue(row, "original")),
+                reclean: cleanNumberText(getValue(row, "reclean")),
+                windows: cleanNumberText(getValue(row, "windows")),
+                address: cleanText(getValue(row, "address")),
+                lastUpdated: excelDateToISO(getValue(row, "lastUpdated")),
+                valid: false
+            }));
+
+        const firstRow = rows[0] || {};
+        document.getElementById("detectedHeaders").innerHTML =
+            `Detected headers: <span class="badge">${Object.keys(firstRow).join("</span> <span class='badge'>") || "none"}</span>`;
 
         renderTable();
         validateAndOutput();
@@ -136,11 +326,15 @@ function renderTable() {
         const tr = document.createElement("tr");
 
         tr.innerHTML = `
-            <td contenteditable oninput="updateCell(${index}, 'builder', this.innerText)">${row.builder}</td>
-            <td contenteditable oninput="updateCell(${index}, 'subdivision', this.innerText)">${row.subdivision}</td>
-            <td contenteditable oninput="updateCell(${index}, 'lot', this.innerText)">${row.lot}</td>
-            <td contenteditable oninput="updateCell(${index}, 'floorplan', this.innerText)">${row.floorplan}</td>
-            <td contenteditable oninput="updateCell(${index}, 'address', this.innerText)">${row.address}</td>
+            <td contenteditable="true" oninput="updateCell(${index}, 'builder', this.innerText)">${escapeHtml(row.builder)}</td>
+            <td contenteditable="true" oninput="updateCell(${index}, 'subdivision', this.innerText)">${escapeHtml(row.subdivision)}</td>
+            <td contenteditable="true" oninput="updateCell(${index}, 'lot', this.innerText)">${escapeHtml(row.lot)}</td>
+            <td contenteditable="true" oninput="updateCell(${index}, 'floorplan', this.innerText)">${escapeHtml(row.floorplan)}</td>
+            <td contenteditable="true" oninput="updateCell(${index}, 'original', this.innerText)">${escapeHtml(row.original)}</td>
+            <td contenteditable="true" oninput="updateCell(${index}, 'reclean', this.innerText)">${escapeHtml(row.reclean)}</td>
+            <td contenteditable="true" oninput="updateCell(${index}, 'windows', this.innerText)">${escapeHtml(row.windows)}</td>
+            <td contenteditable="true" oninput="updateCell(${index}, 'address', this.innerText)">${escapeHtml(row.address)}</td>
+            <td contenteditable="true" oninput="updateCell(${index}, 'lastUpdated', this.innerText)">${escapeHtml(row.lastUpdated)}</td>
             <td id="status-${index}">❌</td>
         `;
 
@@ -149,23 +343,27 @@ function renderTable() {
 }
 
 function updateCell(index, key, value) {
-    tableData[index][key] = value.trim();
+    tableData[index][key] = key === "lastUpdated" ? excelDateToISO(value) : cleanText(value);
     validateAndOutput();
 }
 
 function validateAndOutput() {
-    const date = document.getElementById("dateInput").value;
+    const fallbackDate = document.getElementById("dateInput").value;
     let output = [];
+    let validCount = 0;
+    let badCount = 0;
 
     tableData.forEach((row, i) => {
-        let valid = row.builder && row.subdivision && row.address;
-
+        let valid = !!(row.builder && row.subdivision && row.lot && row.address);
         row.valid = valid;
 
         const statusCell = document.getElementById(`status-${i}`);
         const tr = document.querySelectorAll("#dataTable tbody tr")[i];
 
+        if (!statusCell || !tr) return;
+
         if (valid) {
+            validCount++;
             statusCell.innerText = "✅";
             tr.className = "goodRow";
 
@@ -173,23 +371,30 @@ function validateAndOutput() {
                 lotNumber: row.lot || "",
                 subdivision: row.subdivision,
                 builder: row.builder,
-                address: row.address,
                 floorplan: row.floorplan || "",
-                lastUpdated: date
+                original: row.original || "",
+                reclean: row.reclean || "",
+                windows: row.windows || "",
+                address: row.address,
+                lastUpdated: row.lastUpdated || fallbackDate
             });
-
         } else {
-            statusCell.innerText = "❌";
+            badCount++;
+            statusCell.innerText = "❌ Missing required field";
             tr.className = "errorRow";
         }
     });
 
     document.getElementById("output").value = JSON.stringify(output, null, 2);
+    document.getElementById("statRows").innerText = tableData.length;
+    document.getElementById("statValid").innerText = validCount;
+    document.getElementById("statBad").innerText = badCount;
+    document.getElementById("statJson").innerText = output.length;
 }
 
 function fixErrors() {
     validateAndOutput();
-    alert("Rechecked all rows. Fix highlighted ones.");
+    alert("Rechecked all rows. Fix any highlighted rows.");
 }
 
 function copyOutput() {
@@ -205,6 +410,23 @@ function downloadJSON() {
     a.href = URL.createObjectURL(blob);
     a.download = "lots.json";
     a.click();
+}
+
+function clearAll() {
+    tableData = [];
+    renderTable();
+    validateAndOutput();
+    document.getElementById("output").value = "";
+    document.getElementById("detectedHeaders").innerText = "No file loaded.";
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 </script>
 
