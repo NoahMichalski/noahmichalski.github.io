@@ -13,8 +13,9 @@ body {
   color: #fff;
 }
 
+/* HEADER */
 .header {
-  padding: 15px;
+  padding: 12px;
   background: #111;
   position: sticky;
   top: 0;
@@ -22,15 +23,56 @@ body {
   border-bottom: 1px solid #222;
 }
 
-.filters {
-  display: grid;
-  grid-template-columns: 120px auto 1fr 180px 180px auto auto;
+/* LOGO TITLE */
+.title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
 }
 
+.title-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  height: 26px;
+}
+
+/* LOCK */
+.lock-btn {
+  background: #1f1f1f;
+  border: 1px solid #333;
+  color: #fff;
+  border-radius: 999px;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.lock-btn.unlocked {
+  background: #143d25;
+  border-color: #28a745;
+  color: #b8ffd0;
+}
+
+.lock-btn:hover {
+  background: #2a2a2a;
+}
+
+/* FILTERS */
+.filters {
+  display: grid;
+  grid-template-columns: 100px auto 1fr 140px 140px auto auto;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 .filters input {
-  padding: 10px;
-  border-radius: 8px;
+  padding: 8px;
+  border-radius: 6px;
   border: none;
   background: #1e1e1e;
   color: #fff;
@@ -40,75 +82,269 @@ body {
   background: #222;
   border: none;
   color: #fff;
-  border-radius: 8px;
-  padding: 10px;
+  border-radius: 6px;
+  padding: 8px;
   cursor: pointer;
 }
 
+.btn:hover {
+  background: #333;
+}
+
+/* BUILDER BAR */
 #builderUpdates {
-  padding: 8px 15px;
-  background: #0d0d0d;
+  padding: 6px 12px;
+  font-size: 0.8rem;
   border-bottom: 1px solid #222;
-  font-size: 0.85rem;
 }
 
 .builder-pill {
-  margin-right: 12px;
+  margin-right: 10px;
   color: #aaa;
 }
 
+/* TABLE */
 .table-container {
-  height: calc(100vh - 180px);
+  height: calc(100vh - 170px);
   overflow: auto;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
 }
 
 th, td {
-  padding: 10px;
+  padding: 8px;
   border-bottom: 1px solid #222;
   text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  position: relative;
 }
 
 th {
   cursor: pointer;
-}
-
-thead th {
+  background: #1a1a1a;
   position: sticky;
   top: 0;
-  background: #1a1a1a;
-  z-index: 5;
+  z-index: 2;
 }
 
-/* COLUMN WIDTHS */
-th:nth-child(1), td:nth-child(1) { width: 80px; }
-th:nth-child(2), td:nth-child(2) { width: 220px; }
-th:nth-child(3), td:nth-child(3) { width: 160px; }
-th:nth-child(4), td:nth-child(4) { width: auto; }
-th:nth-child(5), td:nth-child(5) { width: 140px; }
-th:nth-child(6), td:nth-child(6) { width: 120px; }
-
-/* RESIZER */
-.resizer {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 6px;
-  height: 100%;
-  cursor: col-resize;
+tr:hover {
+  background: #141414;
 }
 
-.resizer:hover {
-  background: #4da3ff;
+/* ADDRESS */
+.address-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.address-text {
+  color: #4da3ff;
+  cursor: pointer;
+}
+
+.copy-btn {
+  padding: 3px 6px;
+  font-size: 0.7rem;
+  background: #2a2a2a;
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  background: #444;
+}
+
+/* BUDGET */
+.budget-btn {
+  padding: 5px 9px;
+  font-size: 0.75rem;
+  background: #263245;
+  border: 1px solid #3d4e6b;
+  color: #d8e7ff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.budget-btn:hover {
+  background: #344766;
+}
+
+.budget-btn.locked {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #aaa;
+}
+
+.budget-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.budget-box {
+  background: #181818;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+
+.budget-label {
+  color: #aaa;
+  font-size: 0.78rem;
+  margin-bottom: 5px;
+}
+
+.budget-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+/* MODALS */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.modal {
+  width: min(440px, 100%);
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  padding: 18px;
+}
+
+.modal h2 {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+}
+
+.modal p {
+  margin: 6px 0;
+  color: #bbb;
+  font-size: 0.9rem;
+}
+
+.modal input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 12px;
+  padding: 10px;
+  background: #1f1f1f;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.modal-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  cursor: pointer;
+  color: #fff;
+  background: #2a2a2a;
+}
+
+.modal-btn.primary {
+  background: #246bfe;
+}
+
+.modal-btn.danger {
+  background: #7a2222;
+}
+
+.error-text {
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  margin-top: 8px;
+  min-height: 18px;
+}
+
+/* MOBILE */
+@media (max-width: 700px) {
+
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead { display: none; }
+
+  tr {
+    background: #141414;
+    margin: 10px;
+    border-radius: 8px;
+    padding: 10px;
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    text-align: right;
+  }
+
+  td::before {
+    font-weight: 600;
+    color: #888;
+    text-align: left;
+  }
+
+  td:nth-child(1)::before { content: "Lot"; }
+  td:nth-child(2)::before { content: "Subdivision"; }
+  td:nth-child(3)::before { content: "Builder"; }
+  td:nth-child(4)::before { content: "Address"; }
+  td:nth-child(5)::before { content: "Floorplan"; }
+  td:nth-child(6)::before { content: "Budget"; }
+  td:nth-child(7)::before { content: "Updated"; }
+
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .btn { width: 100%; }
+
+  .address-wrapper {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .budget-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* VERSION */
+#versionTag {
+  position: fixed;
+  bottom: 8px;
+  right: 12px;
+  font-size: 0.75rem;
+  color: #666;
+  background: rgba(0,0,0,0.4);
+  padding: 4px 8px;
+  border-radius: 6px;
 }
 </style>
 </head>
@@ -116,7 +352,14 @@ th:nth-child(6), td:nth-child(6) { width: 120px; }
 <body>
 
 <div class="header">
-  <h2>Lot Lookup</h2>
+  <div class="title-bar">
+    <div class="title-left">
+      <img src="/images/VIP-logo-white.png" class="logo">
+      <span>Lot Lookup</span>
+    </div>
+
+    <button id="lockButton" class="lock-btn" onclick="handleLockClick()">🔒 Locked</button>
+  </div>
 
   <div class="filters">
     <input id="filterLot" placeholder="Lot">
@@ -136,6 +379,10 @@ th:nth-child(6), td:nth-child(6) { width: 120px; }
   <span id="builderUpdateList"></span>
 </div>
 
+<div id="lotCount" style="padding:6px 12px; font-size:0.85rem; color:#aaa;">
+  Lots Loaded: 0
+</div>
+
 <div class="table-container">
 <table>
 <thead>
@@ -145,6 +392,7 @@ th:nth-child(6), td:nth-child(6) { width: 120px; }
 <th onclick="sortTable('builder')">Builder</th>
 <th onclick="sortTable('address')">Address</th>
 <th onclick="sortTable('floorplan')">Floorplan</th>
+<th>Budget</th>
 <th onclick="sortTable('lastUpdated')">Updated</th>
 </tr>
 </thead>
@@ -152,56 +400,145 @@ th:nth-child(6), td:nth-child(6) { width: 120px; }
 </table>
 </div>
 
+<div id="versionTag">v1.22</div>
+
+<!-- UNLOCK MODAL -->
+<div id="unlockModal" class="modal-backdrop">
+  <div class="modal">
+    <h2>Unlock Budget Data</h2>
+    <p>Enter the PIN to view floorplan budget hours.</p>
+
+    <input id="pinInput" type="password" inputmode="numeric" placeholder="PIN">
+
+    <div id="pinError" class="error-text"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeUnlockModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="unlockBudget()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- BUDGET MODAL -->
+<div id="budgetModal" class="modal-backdrop">
+  <div class="modal">
+    <h2 id="budgetTitle">Budget</h2>
+    <p id="budgetSub"></p>
+    <p id="budgetAddress"></p>
+
+    <div class="budget-card">
+      <div class="budget-box">
+        <div class="budget-label">Original</div>
+        <div id="budgetOriginal" class="budget-value">—</div>
+      </div>
+
+      <div class="budget-box">
+        <div class="budget-label">Reclean</div>
+        <div id="budgetReclean" class="budget-value">—</div>
+      </div>
+
+      <div class="budget-box">
+        <div class="budget-label">Windows</div>
+        <div id="budgetWindows" class="budget-value">—</div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeBudgetModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
 let lots = [];
 let currentSort = { key: null, asc: true };
+let budgetUnlocked = false;
 
+const BUDGET_PIN = "1714";
+
+/* LOAD DATA */
 function loadData() {
-  fetch('lots(1).json?t=' + Date.now())
-    .then(r => r.json())
+  fetch('lots2.json?t=' + Date.now())
+    .then(r => {
+      if (!r.ok) throw new Error("Could not load lots(1).json");
+      return r.json();
+    })
     .then(data => {
-      lots = data;
+      lots = Array.isArray(data) ? data : [];
       buildBuilderUpdates();
       filterLots();
+    })
+    .catch(err => {
+      console.error(err);
+      resultsTable.innerHTML = `
+        <tr>
+          <td colspan="7" style="color:#ff6b6b; padding:20px;">
+            Error loading lots(1).json
+          </td>
+        </tr>
+      `;
     });
 }
+
 loadData();
+
+/* SAFE TEXT */
+function safeText(value) {
+  return (value ?? '').toString();
+}
+
+function escapeHTML(value) {
+  return safeText(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
 
 /* DAYS AGO */
 function daysAgo(d) {
   if (!d) return '';
-  const [y,m,day] = d.split('-');
-  const date = new Date(y,m-1,day);
-  const diff = Math.floor((Date.now()-date)/86400000);
+  const date = new Date(d);
+  if (isNaN(date)) return d;
+
+  const diff = Math.floor((Date.now() - date) / 86400000);
+  if (diff < 0) return d;
   if (diff === 0) return 'Today';
   if (diff === 1) return '1d ago';
   return diff + 'd ago';
 }
 
-/* BUILDER UPDATES */
+/* BUILDER BAR */
 function buildBuilderUpdates() {
   const latest = {};
 
   lots.forEach(l => {
-    if (!l.lastUpdated) return;
+    const builder = safeText(l.builder) || "Unknown";
+    const updated = safeText(l.lastUpdated);
 
-    const date = new Date(l.lastUpdated);
+    if (!updated) return;
 
-    if (!latest[l.builder] || date > latest[l.builder]) {
-      latest[l.builder] = date;
+    if (!latest[builder] || new Date(updated) > new Date(latest[builder])) {
+      latest[builder] = updated;
     }
   });
 
   builderUpdateList.innerHTML = '';
 
-  Object.entries(latest).forEach(([builder, date]) => {
-    const diff = Math.floor((Date.now() - date.getTime()) / 86400000);
+  Object.entries(latest).forEach(([b,d]) => {
+    const parsed = new Date(d);
+    const diff = isNaN(parsed) ? null : Math.floor((Date.now() - parsed) / 86400000);
 
     const span = document.createElement('span');
     span.className = 'builder-pill';
-    span.textContent = `${builder} – ${diff === 0 ? 'Today' : diff + 'd ago'}`;
 
-    if (diff > 30) span.style.color = '#ff6b6b';
+    if (diff === null) {
+      span.textContent = `${b} – ${d}`;
+    } else {
+      span.textContent = `${b} – ${diff}d`;
+      if (diff > 30) span.style.color = '#ff6b6b';
+    }
 
     builderUpdateList.appendChild(span);
   });
@@ -209,107 +546,258 @@ function buildBuilderUpdates() {
 
 /* FILTER */
 function filterLots() {
-  const lot = filterLot.value.toLowerCase();
-  const sub = filterSubdivision.value.toLowerCase();
-  const builder = filterBuilder.value.toLowerCase();
-  const floor = filterFloorplan.value.toLowerCase();
+  const lot = filterLot.value.trim().toLowerCase();
+  const sub = filterSubdivision.value.trim().toLowerCase();
+  const builder = filterBuilder.value.trim().toLowerCase();
+  const floor = filterFloorplan.value.trim().toLowerCase();
 
-  let filtered = lots.filter(l =>
-    (!lot || l.lotNumber.toLowerCase().includes(lot)) &&
-    (!sub || l.subdivision.toLowerCase().includes(sub)) &&
-    (!builder || l.builder.toLowerCase().includes(builder)) &&
-    (!floor || (l.floorplan||'').toLowerCase().includes(floor))
-  );
+  let filtered = lots.filter(l => {
+    const lotNumber = safeText(l.lotNumber).toLowerCase();
+    const subdivision = safeText(l.subdivision).toLowerCase();
+    const builderName = safeText(l.builder).toLowerCase();
+    const floorplan = safeText(l.floorplan).toLowerCase();
+
+    return (
+      (!lot || lotNumber.includes(lot)) &&
+      (!sub || subdivision.includes(sub)) &&
+      (!builder || builderName.includes(builder)) &&
+      (!floor || floorplan.includes(floor))
+    );
+  });
 
   if (currentSort.key) {
-    filtered = sortData(filtered, currentSort.key, currentSort.asc);
+    filtered.sort((a,b) => {
+      let A = safeText(a[currentSort.key]).toLowerCase();
+      let B = safeText(b[currentSort.key]).toLowerCase();
+
+      if (currentSort.key === "lotNumber") {
+        const numA = parseFloat(A);
+        const numB = parseFloat(B);
+
+        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
+          return currentSort.asc ? numA - numB : numB - numA;
+        }
+      }
+
+      return currentSort.asc ? A.localeCompare(B) : B.localeCompare(A);
+    });
   }
 
   renderTable(filtered);
-}
-
-/* SORT LOGIC */
-function sortTable(key) {
-  if (currentSort.key === key) {
-    currentSort.asc = !currentSort.asc;
-  } else {
-    currentSort = { key, asc: true };
-  }
-  filterLots();
-}
-
-function sortData(data, key, asc) {
-  return [...data].sort((a, b) => {
-
-    if (key === 'lotNumber') {
-      return asc ? smartLotSort(a, b) : smartLotSort(b, a);
-    }
-
-    if (key === 'lastUpdated') {
-      return asc
-        ? new Date(a.lastUpdated) - new Date(b.lastUpdated)
-        : new Date(b.lastUpdated) - new Date(a.lastUpdated);
-    }
-
-    let A = (a[key] || '').toString().toLowerCase();
-    let B = (b[key] || '').toString().toLowerCase();
-
-    if (A < B) return asc ? -1 : 1;
-    if (A > B) return asc ? 1 : -1;
-    return 0;
-  });
-}
-
-/* SMART LOT SORT */
-function smartLotSort(a,b){
-  const parse=x=>{
-    const m=x.toString().match(/^(\d+)([A-Za-z]*)$/);
-    return {num:m?parseInt(m[1]):0,suffix:m?m[2]:''};
-  };
-  const A=parse(a.lotNumber),B=parse(b.lotNumber);
-  return A.num!==B.num?A.num-B.num:A.suffix.localeCompare(B.suffix);
 }
 
 /* INPUT LISTENERS */
 document.querySelectorAll('.filters input')
   .forEach(i => i.addEventListener('input', filterLots));
 
+/* ENTER SEARCH */
 filterLot.addEventListener('keydown', e => {
   if (e.key === 'Enter') exactLotSearch();
 });
 
-/* EXACT */
+pinInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') unlockBudget();
+});
+
+/* EXACT LOT SEARCH */
 function exactLotSearch() {
-  const v = filterLot.value.toLowerCase();
-  renderTable(lots.filter(l => l.lotNumber.toLowerCase() === v));
+  const value = filterLot.value.trim().toLowerCase();
+
+  if (!value) {
+    filterLots();
+    return;
+  }
+
+  const filtered = lots.filter(l =>
+    safeText(l.lotNumber).toLowerCase() === value
+  );
+
+  renderTable(filtered);
+}
+
+/* SORT */
+function sortTable(key) {
+  currentSort.key === key
+    ? currentSort.asc = !currentSort.asc
+    : currentSort = { key, asc: true };
+
+  filterLots();
 }
 
 /* RENDER */
 function renderTable(data) {
   resultsTable.innerHTML = '';
 
+  document.getElementById('lotCount').textContent =
+    `Lots Showing: ${data.length} / ${lots.length}`;
+
+  if (!data.length) {
+    resultsTable.innerHTML = `
+      <tr>
+        <td colspan="7" style="color:#aaa; padding:20px;">
+          No lots found
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
   data.forEach(l => {
     const row = document.createElement('tr');
 
+    const lotNumber = escapeHTML(l.lotNumber);
+    const subdivision = escapeHTML(l.subdivision);
+    const builder = escapeHTML(l.builder);
+    const address = escapeHTML(l.address);
+    const floorplan = escapeHTML(l.floorplan);
+    const updated = escapeHTML(daysAgo(l.lastUpdated));
+
     row.innerHTML = `
-      <td>${l.lotNumber}</td>
-      <td>${l.subdivision}</td>
-      <td>${l.builder}</td>
-      <td>${l.address}</td>
-      <td>${l.floorplan || ''}</td>
-      <td>${daysAgo(l.lastUpdated)}</td>
+      <td>${lotNumber}</td>
+      <td>${subdivision}</td>
+      <td>${builder}</td>
+      <td>
+        <div class="address-wrapper">
+          <span class="address-text">${address}</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+      </td>
+      <td>${floorplan}</td>
+      <td>
+        <button class="budget-btn ${budgetUnlocked ? '' : 'locked'}">
+          ${budgetUnlocked ? 'View Budget' : '🔒 View Budget'}
+        </button>
+      </td>
+      <td>${updated}</td>
     `;
+
+    const addressText = row.querySelector('.address-text');
+    const copyBtn = row.querySelector('.copy-btn');
+    const budgetBtn = row.querySelector('.budget-btn');
+
+    copyBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(safeText(l.address));
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => copyBtn.textContent = "Copy", 800);
+    });
+
+    addressText.addEventListener('click', e => {
+      e.stopPropagation();
+      window.open(`https://maps.google.com/?q=${encodeURIComponent(safeText(l.address))}`);
+    });
+
+    budgetBtn.addEventListener('click', e => {
+      e.stopPropagation();
+
+      if (!budgetUnlocked) {
+        openUnlockModal();
+        return;
+      }
+
+      openBudgetModal(l);
+    });
 
     resultsTable.appendChild(row);
   });
 }
 
+/* LOCK / UNLOCK */
+function handleLockClick() {
+  if (budgetUnlocked) {
+    budgetUnlocked = false;
+    updateLockButton();
+    filterLots();
+    return;
+  }
+
+  openUnlockModal();
+}
+
+function openUnlockModal() {
+  pinInput.value = '';
+  pinError.textContent = '';
+  unlockModal.style.display = 'flex';
+
+  setTimeout(() => {
+    pinInput.focus();
+  }, 50);
+}
+
+function closeUnlockModal() {
+  unlockModal.style.display = 'none';
+  pinInput.value = '';
+  pinError.textContent = '';
+}
+
+function unlockBudget() {
+  const pin = pinInput.value.trim();
+
+  if (pin === BUDGET_PIN) {
+    budgetUnlocked = true;
+    updateLockButton();
+    closeUnlockModal();
+    filterLots();
+    return;
+  }
+
+  pinError.textContent = 'Incorrect PIN';
+}
+
+function updateLockButton() {
+  if (budgetUnlocked) {
+    lockButton.textContent = '🔓 Budget Unlocked';
+    lockButton.classList.add('unlocked');
+  } else {
+    lockButton.textContent = '🔒 Locked';
+    lockButton.classList.remove('unlocked');
+  }
+}
+
+/* BUDGET MODAL */
+function openBudgetModal(lot) {
+  budgetTitle.textContent =
+    `${safeText(lot.lotNumber)} ${safeText(lot.subdivision)}`;
+
+  budgetSub.textContent =
+    `${safeText(lot.builder)} • ${safeText(lot.floorplan) || 'No floorplan'}`;
+
+  budgetAddress.textContent =
+    safeText(lot.address);
+
+  budgetOriginal.textContent =
+    safeText(lot.original) || '—';
+
+  budgetReclean.textContent =
+    safeText(lot.reclean) || '—';
+
+  budgetWindows.textContent =
+    safeText(lot.windows) || '—';
+
+  budgetModal.style.display = 'flex';
+}
+
+function closeBudgetModal() {
+  budgetModal.style.display = 'none';
+}
+
+/* CLICK OUTSIDE MODALS TO CLOSE */
+unlockModal.addEventListener('click', e => {
+  if (e.target === unlockModal) closeUnlockModal();
+});
+
+budgetModal.addEventListener('click', e => {
+  if (e.target === budgetModal) closeBudgetModal();
+});
+
 /* REFRESH */
-function refreshData(){ loadData(); }
+function refreshData() {
+  loadData();
+}
 
 /* CLEAR */
-function clearFilters(){
-  document.querySelectorAll('.filters input').forEach(i=>i.value='');
+function clearFilters() {
+  document.querySelectorAll('.filters input').forEach(i => i.value = '');
   filterLots();
 }
 </script>
