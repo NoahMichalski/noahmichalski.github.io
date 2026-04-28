@@ -2,9 +2,16 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Drive Mile Matrix Builder v3.2</title>
+<title>Drive Mile Matrix Builder v3.3</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
 body {
@@ -63,6 +70,15 @@ button.route:hover {
     border:1px solid #333;
     margin-top:10px;
     border-radius:8px;
+}
+
+#map {
+    height:520px;
+    width:100%;
+    border-radius:10px;
+    border:1px solid #333;
+    margin-top:10px;
+    background:#000;
 }
 
 table {
@@ -125,14 +141,37 @@ th:first-child {
 .bad {
     color:#f87171;
 }
+
+.marker-number {
+    background:#2563eb;
+    color:white;
+    border:2px solid white;
+    border-radius:50%;
+    width:26px;
+    height:26px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    font-weight:bold;
+    box-shadow:0 0 6px rgba(0,0,0,.8);
+}
+
+.marker-start {
+    background:#16a34a;
+}
+
+.marker-end {
+    background:#dc2626;
+}
 </style>
 </head>
 
 <body>
 
-<h2>Drive Mile Matrix Builder v3.2</h2>
+<h2>Drive Mile Matrix Builder v3.3</h2>
 <div class="small">
-    Builds drive mile matrix, optimizes a circle route, and exports the original imported format in optimized order.
+    Builds drive mile matrix, optimizes a circle route, maps the stop order, and exports both original format + route details.
 </div>
 
 <br>
@@ -142,10 +181,18 @@ th:first-child {
 <button class="primary" onclick="buildMatrix()">Build Matrix</button>
 <button onclick="exportExcel()">Export Matrix Excel</button>
 <button class="route" onclick="optimizeRoute()">Optimize Route</button>
-<button onclick="exportRouteExcel()">Export Optimized Import Format</button>
+<button onclick="exportRouteExcel()">Export Optimized Route Excel</button>
 <button onclick="clearProgress()">Reset</button>
 
 <div id="log"></div>
+
+<div class="panel">
+    <h3>Route Map</h3>
+    <div class="small">
+        Markers show optimized stop order. The map line connects the subdivisions in order. Drive mileage still comes from the matrix.
+    </div>
+    <div id="map"></div>
+</div>
 
 <div class="panel">
     <h3>Route Optimizer</h3>
@@ -167,9 +214,114 @@ let matrix = [];
 let optimizedRoute = [];
 let optimizedRouteRows = [];
 
-// These preserve the exact imported Excel format.
+// Preserve imported Excel format.
 let importHeaders = [];
 let importedRows = [];
+
+// Map globals.
+let map = null;
+let routeLayer = null;
+let markerLayer = null;
+
+// ================= PAGE INIT =================
+window.addEventListener("load", function() {
+    initMap();
+    loadStoredState();
+});
+
+// ================= MAP =================
+function initMap() {
+    map = L.map("map").setView([40.05, -83.05], 9);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom:19,
+        attribution:"&copy; OpenStreetMap"
+    }).addTo(map);
+
+    routeLayer = L.layerGroup().addTo(map);
+    markerLayer = L.layerGroup().addTo(map);
+}
+
+function renderRouteMap() {
+    if (!map || !optimizedRouteRows.length) return;
+
+    routeLayer.clearLayers();
+    markerLayer.clearLayers();
+
+    let latLngs = optimizedRouteRows.map(r => [r.lat, r.lon]);
+
+    // Close the circle visually by returning to first stop.
+    if (latLngs.length > 1) {
+        latLngs.push(latLngs[0]);
+    }
+
+    L.polyline(latLngs, {
+        weight:4,
+        opacity:0.85
+    }).addTo(routeLayer);
+
+    optimizedRouteRows.forEach((r, index) => {
+        let className = "marker-number";
+
+        if (index === 0) className += " marker-start";
+        else if (index === optimizedRouteRows.length - 1) className += " marker-end";
+
+        let icon = L.divIcon({
+            className:"",
+            html:`<div class="${className}">${r.step}</div>`,
+            iconSize:[26,26],
+            iconAnchor:[13,13]
+        });
+
+        L.marker([r.lat, r.lon], { icon })
+            .bindPopup(`
+                <b>Stop ${r.step}</b><br>
+                ${escapeHtml(r.subdivision)}<br><br>
+                <b>Next:</b> ${escapeHtml(r.nextSubdivision)}<br>
+                <b>Miles to next:</b> ${r.milesToNext.toFixed(2)}<br>
+                <b>Running total:</b> ${r.runningTotal.toFixed(2)}
+            `)
+            .addTo(markerLayer);
+    });
+
+    let bounds = L.latLngBounds(latLngs);
+
+    if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding:[30,30] });
+    }
+}
+
+function renderLoadedPointsMap() {
+    if (!map || !locations.length) return;
+
+    routeLayer.clearLayers();
+    markerLayer.clearLayers();
+
+    let latLngs = locations.map(l => [l.lat, l.lon]);
+
+    locations.forEach((l, index) => {
+        let icon = L.divIcon({
+            className:"",
+            html:`<div class="marker-number">${index + 1}</div>`,
+            iconSize:[26,26],
+            iconAnchor:[13,13]
+        });
+
+        L.marker([l.lat, l.lon], { icon })
+            .bindPopup(`
+                <b>${escapeHtml(l.name)}</b><br>
+                Lat: ${l.lat}<br>
+                Lon: ${l.lon}
+            `)
+            .addTo(markerLayer);
+    });
+
+    let bounds = L.latLngBounds(latLngs);
+
+    if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding:[30,30] });
+    }
+}
 
 // ================= IMPORT =================
 document.getElementById("fileInput").addEventListener("change", function(e){
@@ -185,7 +337,6 @@ document.getElementById("fileInput").addEventListener("change", function(e){
         let workbook = XLSX.read(data, {type:'array'});
         let sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-        // Read as array-of-arrays so we can preserve original header order.
         let aoa = XLSX.utils.sheet_to_json(sheet, {
             header: 1,
             defval: ""
@@ -257,7 +408,9 @@ Lon → ${lonKey}`);
         saveImportedData();
 
         log(`Loaded ${locations.length} subdivisions`);
+
         renderMatrixPreview();
+        renderLoadedPointsMap();
     };
 
     reader.readAsArrayBuffer(file);
@@ -372,7 +525,7 @@ function optimizeRoute() {
     let bestRoute = null;
     let bestDistance = Infinity;
 
-    // Try nearest-neighbor from every possible starting point.
+    // Try every possible start point.
     for (let start = 0; start < locations.length; start++) {
         let route = nearestNeighborRoute(start);
         let distance = routeDistance(route);
@@ -383,7 +536,7 @@ function optimizeRoute() {
         }
     }
 
-    // Improve with 2-opt.
+    // Improve route.
     bestRoute = twoOpt(bestRoute);
     bestDistance = routeDistance(bestRoute);
 
@@ -391,6 +544,7 @@ function optimizeRoute() {
     buildRouteRows();
 
     renderRoutePreview();
+    renderRouteMap();
 
     localStorage.setItem("optimizedRoute", JSON.stringify(optimizedRoute));
 
@@ -550,7 +704,8 @@ function renderRoutePreview() {
     document.getElementById("routeStats").innerHTML = `
         <span class="stat good">Stops: ${optimizedRouteRows.length}</span>
         <span class="stat good">Total Circle Miles: ${total.toFixed(2)}</span>
-        <span class="stat warn">Export Format: Same as Import</span>
+        <span class="stat warn">Sheet 1: Original Format</span>
+        <span class="stat warn">Sheet 2: Route Details</span>
         <span class="stat warn">Returns to Start: Yes</span>
     `;
 
@@ -597,6 +752,9 @@ function clearRoutePreview(showText = true) {
     document.getElementById("routeContainer").innerHTML = showText
         ? `<div style="padding:10px;" class="small">No route yet.</div>`
         : "";
+
+    if (routeLayer) routeLayer.clearLayers();
+    if (markerLayer) markerLayer.clearLayers();
 }
 
 // ================= MATRIX PREVIEW =================
@@ -657,10 +815,10 @@ function exportExcel() {
     XLSX.writeFile(wb, "Drive_Matrix.xlsx");
 }
 
-// ================= EXPORT ROUTE — SAME FORMAT AS IMPORT =================
+// ================= EXPORT ROUTE =================
 function exportRouteExcel() {
 
-    if (!optimizedRoute.length) {
+    if (!optimizedRoute.length || !optimizedRouteRows.length) {
         alert("Optimize the route first.");
         return;
     }
@@ -670,6 +828,7 @@ function exportRouteExcel() {
         return;
     }
 
+    // Sheet 1: Exact original imported format, just reordered.
     let orderedRows = optimizedRoute.map(locationIndex => {
         let loc = locations[locationIndex];
         let original = loc.originalRow || {};
@@ -677,17 +836,44 @@ function exportRouteExcel() {
         return importHeaders.map(header => original[header] ?? "");
     });
 
-    let ws = XLSX.utils.aoa_to_sheet([
+    let wsOriginalFormat = XLSX.utils.aoa_to_sheet([
         importHeaders,
         ...orderedRows
     ]);
 
+    // Sheet 2: Route details so the export actually makes sense.
+    let routeDetailRows = optimizedRouteRows.map(r => ({
+        Stop: r.step,
+        Subdivision: r.subdivision,
+        "Next Stop": r.nextSubdivision,
+        "Miles To Next": Number(r.milesToNext.toFixed(2)),
+        "Running Total Miles": Number(r.runningTotal.toFixed(2)),
+        Lat: r.lat,
+        Lon: r.lon
+    }));
+
+    let total = optimizedRouteRows[optimizedRouteRows.length - 1].runningTotal;
+
+    routeDetailRows.push({
+        Stop: "",
+        Subdivision: "TOTAL CIRCLE MILES",
+        "Next Stop": "",
+        "Miles To Next": "",
+        "Running Total Miles": Number(total.toFixed(2)),
+        Lat: "",
+        Lon: ""
+    });
+
+    let wsRouteDetails = XLSX.utils.json_to_sheet(routeDetailRows);
+
     let wb = XLSX.utils.book_new();
 
-    XLSX.utils.book_append_sheet(wb, ws, "Optimized Order");
-    XLSX.writeFile(wb, "Optimized_Subdivisions.xlsx");
+    XLSX.utils.book_append_sheet(wb, wsOriginalFormat, "Optimized Order");
+    XLSX.utils.book_append_sheet(wb, wsRouteDetails, "Route Details");
 
-    log("Exported optimized route in the same format as imported.");
+    XLSX.writeFile(wb, "Optimized_Subdivision_Route.xlsx");
+
+    log("Exported optimized route with original-format sheet and route-details sheet.");
 }
 
 // ================= STORAGE =================
@@ -709,7 +895,6 @@ function loadProgress() {
     let savedProgress = localStorage.getItem("matrixProgress");
     let savedImportHeaders = localStorage.getItem("importHeaders");
     let savedImportedRows = localStorage.getItem("importedRows");
-    let savedOptimizedRoute = localStorage.getItem("optimizedRoute");
 
     if (savedImportHeaders) {
         importHeaders = JSON.parse(savedImportHeaders);
@@ -730,16 +915,45 @@ function loadProgress() {
         log(`Resuming from i=${prog.i}, j=${prog.j}`);
         renderMatrixPreview();
 
-        if (savedOptimizedRoute) {
-            optimizedRoute = JSON.parse(savedOptimizedRoute);
-            buildRouteRows();
-            renderRoutePreview();
-        }
-
         return prog;
     }
 
     return {i:0, j:0};
+}
+
+function loadStoredState() {
+    let savedLocations = localStorage.getItem("matrixLocations");
+    let savedMatrix = localStorage.getItem("matrixData");
+    let savedProgress = localStorage.getItem("matrixProgress");
+    let savedImportHeaders = localStorage.getItem("importHeaders");
+    let savedImportedRows = localStorage.getItem("importedRows");
+    let savedOptimizedRoute = localStorage.getItem("optimizedRoute");
+
+    if (savedImportHeaders) importHeaders = JSON.parse(savedImportHeaders);
+    if (savedImportedRows) importedRows = JSON.parse(savedImportedRows);
+    if (savedLocations) locations = JSON.parse(savedLocations);
+    if (savedMatrix) matrix = JSON.parse(savedMatrix);
+
+    if (locations.length) {
+        renderLoadedPointsMap();
+    }
+
+    if (locations.length && matrix.length) {
+        renderMatrixPreview();
+    }
+
+    if (savedProgress) {
+        let prog = JSON.parse(savedProgress);
+        log(`Loaded saved progress: i=${prog.i}, j=${prog.j}`);
+    }
+
+    if (savedOptimizedRoute && locations.length && matrix.length) {
+        optimizedRoute = JSON.parse(savedOptimizedRoute);
+        buildRouteRows();
+        renderRoutePreview();
+        renderRouteMap();
+        log("Loaded saved optimized route.");
+    }
 }
 
 function clearProgress() {
