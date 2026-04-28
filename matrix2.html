@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Drive Mile Matrix Builder v3.6</title>
+<title>Drive Mile Matrix Builder v3.7</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -35,13 +35,14 @@ button.primary:hover { background:#166534; }
 button.route { background:#1d4ed8; }
 button.route:hover { background:#2563eb; }
 
-button.fullscreenBtn {
-    background:#7c3aed;
-}
+button.fullscreenBtn { background:#7c3aed; }
+button.fullscreenBtn:hover { background:#8b5cf6; }
 
-button.fullscreenBtn:hover {
-    background:#8b5cf6;
-}
+button.sequenceBtn { background:#be7c00; }
+button.sequenceBtn:hover { background:#d99100; }
+
+button.danger { background:#991b1b; }
+button.danger:hover { background:#b91c1c; }
 
 button.smallBtn {
     padding:4px 8px;
@@ -180,6 +181,25 @@ th:first-child {
     font-size:11px;
 }
 
+.marker-unselected {
+    background:#555;
+}
+
+.marker-selected {
+    background:#16a34a;
+}
+
+.marker-next {
+    background:#f59e0b;
+    animation:pulseMarker 1s infinite;
+}
+
+@keyframes pulseMarker {
+    0% { transform:scale(1); }
+    50% { transform:scale(1.16); }
+    100% { transform:scale(1); }
+}
+
 .drag-row {
     cursor:grab;
 }
@@ -189,7 +209,7 @@ th:first-child {
 }
 
 .dragging {
-    opacity:.45;
+    opacity:.35;
     background:#334155 !important;
 }
 
@@ -232,13 +252,13 @@ th:first-child {
 }
 
 .fsTopBar {
-    height:58px;
+    min-height:64px;
     background:#111827;
     border-bottom:1px solid #333;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 14px;
+    padding:8px 14px;
     gap:10px;
 }
 
@@ -257,7 +277,7 @@ th:first-child {
 .fsBody {
     flex:1;
     display:grid;
-    grid-template-columns:430px 1fr;
+    grid-template-columns:440px 1fr;
     min-height:0;
 }
 
@@ -291,6 +311,11 @@ th:first-child {
     padding:8px;
     margin-bottom:7px;
     cursor:grab;
+    transition:
+        transform .16s ease,
+        background .16s ease,
+        border-color .16s ease,
+        opacity .16s ease;
 }
 
 .fsRouteItem:hover {
@@ -298,7 +323,24 @@ th:first-child {
 }
 
 .fsRouteItem.dragging {
-    opacity:.45;
+    opacity:.25;
+    transform:scale(.98);
+}
+
+.fsRouteItem.drop-target {
+    border-color:#60a5fa;
+    background:#1e3a5f;
+    transform:translateY(4px);
+}
+
+.fsRouteItem.sequence-picked {
+    background:#064e3b;
+    border-color:#22c55e;
+}
+
+.fsRouteItem.sequence-next {
+    background:#4a2e05;
+    border-color:#f59e0b;
 }
 
 .fsStopNum {
@@ -356,6 +398,20 @@ th:first-child {
     background:#b91c1c;
 }
 
+.sequenceBanner {
+    display:none;
+    background:#4a2e05;
+    border:1px solid #f59e0b;
+    padding:8px 10px;
+    border-radius:8px;
+    margin-top:8px;
+    font-size:13px;
+}
+
+.sequenceBanner.active {
+    display:block;
+}
+
 @media (max-width:900px) {
     .fsBody {
         grid-template-columns:1fr;
@@ -372,9 +428,9 @@ th:first-child {
 
 <body>
 
-<h2>Drive Mile Matrix Builder v3.6</h2>
+<h2>Drive Mile Matrix Builder v3.7</h2>
 <div class="small">
-    Upload subdivisions, build or upload the drive matrix, optimize a Home Office circle route, then fullscreen drag/edit before export.
+    Upload subdivisions, build/upload the drive matrix, optimize from Home Office, then fullscreen edit with smooth drag or map-click sequencing.
 </div>
 
 <br>
@@ -445,7 +501,7 @@ th:first-child {
 <div class="panel">
     <h3>Route Map</h3>
     <div class="small">
-        Regular map preview. Use the fullscreen editor for the big drag-and-map layout.
+        Regular map preview. Use the fullscreen editor for drag editing or map-click sequencing.
     </div>
     <div id="map"></div>
 </div>
@@ -458,9 +514,8 @@ th:first-child {
     </div>
 
     <div class="route-tools">
-        <span class="badge">Drag rows to reorder</span>
-        <span class="badge">Use ↑ / ↓ buttons</span>
-        <span class="badge">Fullscreen editor available</span>
+        <span class="badge">Smooth drag reorder</span>
+        <span class="badge">Fullscreen map-click sequence</span>
         <span class="badge">Export uses edited order</span>
     </div>
 
@@ -475,7 +530,7 @@ th:first-child {
     <div class="fsTopBar">
         <div>
             <div class="fsTitle">Fullscreen Route Editor</div>
-            <div class="small">Drag subdivisions on the left. Map and total miles update instantly.</div>
+            <div class="small">Drag subdivisions on the left, or click markers on the map in the exact order you want.</div>
         </div>
 
         <div class="fsStats" id="fsStats">
@@ -483,7 +538,9 @@ th:first-child {
         </div>
 
         <div>
-            <button onclick="recalculateManualRoute()">Refresh</button>
+            <button class="sequenceBtn" onclick="startMapSequenceMode()">Start Map Sequence</button>
+            <button onclick="finishMapSequenceMode()">Finish Sequence</button>
+            <button class="danger" onclick="cancelMapSequenceMode()">Cancel Sequence</button>
             <button onclick="exportRouteExcel()">Export</button>
             <button class="fsCloseBtn" onclick="closeFullscreenEditor()">Close</button>
         </div>
@@ -493,7 +550,13 @@ th:first-child {
         <div class="fsLeft">
             <div class="fsLeftHeader">
                 <strong>Subdivision Order</strong>
-                <div class="small">Start and return are Home Office. Drag the subdivisions only.</div>
+                <div class="small">
+                    Drag cards, use arrows, or use map-click sequence mode. Start/return is Home Office.
+                </div>
+
+                <div id="sequenceBanner" class="sequenceBanner">
+                    Map Sequence Mode is active. Click markers on the map in the order you want them visited.
+                </div>
             </div>
             <div class="fsList" id="fsRouteList"></div>
         </div>
@@ -530,6 +593,11 @@ let fsMarkerLayer = null;
 
 let draggedRouteIndex = null;
 let draggedFsIndex = null;
+let currentDropTarget = null;
+
+let sequenceMode = false;
+let sequenceRoute = [];
+let sequenceRemaining = new Set();
 
 // ================= PAGE INIT =================
 window.addEventListener("load", function() {
@@ -552,7 +620,6 @@ function saveHomeOffice() {
 
     localStorage.setItem("homeOffice", JSON.stringify(homeOffice));
 
-    // Home changed, so old office distance cache may not apply.
     officeToLocationMiles = [];
     locationToOfficeMiles = [];
     localStorage.removeItem("officeToLocationMiles");
@@ -665,15 +732,15 @@ function initFullscreenMap() {
 }
 
 function renderRouteMap() {
-    renderMapToLayers(map, routeLayer, markerLayer);
+    renderMapToLayers(map, routeLayer, markerLayer, false);
 }
 
 function renderFullscreenRouteMap() {
     if (!fsMap) return;
-    renderMapToLayers(fsMap, fsRouteLayer, fsMarkerLayer);
+    renderMapToLayers(fsMap, fsRouteLayer, fsMarkerLayer, true);
 }
 
-function renderMapToLayers(targetMap, targetRouteLayer, targetMarkerLayer) {
+function renderMapToLayers(targetMap, targetRouteLayer, targetMarkerLayer, clickable) {
     if (!targetMap || !optimizedRouteRows.length) return;
 
     targetRouteLayer.clearLayers();
@@ -693,10 +760,29 @@ function renderMapToLayers(targetMap, targetRouteLayer, targetMarkerLayer) {
         latLngs.push([homeOffice.lat, homeOffice.lon]);
     }
 
-    if (latLngs.length > 1) {
+    if (latLngs.length > 1 && !sequenceMode) {
         L.polyline(latLngs, {
             weight:4,
             opacity:0.85
+        }).addTo(targetRouteLayer);
+    }
+
+    if (sequenceMode && sequenceRoute.length > 0) {
+        let seqLatLngs = [];
+
+        if (homeOffice) {
+            seqLatLngs.push([homeOffice.lat, homeOffice.lon]);
+        }
+
+        sequenceRoute.forEach(idx => {
+            let loc = locations[idx];
+            seqLatLngs.push([loc.lat, loc.lon]);
+        });
+
+        L.polyline(seqLatLngs, {
+            weight:5,
+            opacity:0.95,
+            dashArray:"8,8"
         }).addTo(targetRouteLayer);
     }
 
@@ -713,27 +799,52 @@ function renderMapToLayers(targetMap, targetRouteLayer, targetMarkerLayer) {
             .addTo(targetMarkerLayer);
     }
 
-    optimizedRouteRows
-        .filter(r => !r.isHome)
-        .forEach((r) => {
-            let icon = L.divIcon({
-                className:"",
-                html:`<div class="marker-number">${r.step}</div>`,
-                iconSize:[26,26],
-                iconAnchor:[13,13]
-            });
+    let routePosition = new Map();
+    optimizedRoute.forEach((locIndex, i) => {
+        routePosition.set(locIndex, i + 1);
+    });
 
-            L.marker([r.lat, r.lon], { icon })
-                .bindPopup(`
-                    <b>Stop ${r.step}</b><br>
-                    ${escapeHtml(r.subdivision)}<br><br>
-                    <b>Previous miles:</b> ${formatMiles(r.milesFromPrevious)}<br>
-                    <b>Next:</b> ${escapeHtml(r.nextSubdivision)}<br>
-                    <b>Miles to next:</b> ${formatMiles(r.milesToNext)}<br>
-                    <b>Running total:</b> ${formatMiles(r.runningTotal)}
-                `)
-                .addTo(targetMarkerLayer);
+    locations.forEach((loc, locIndex) => {
+        if (!isFinite(loc.lat) || !isFinite(loc.lon)) return;
+
+        let displayNumber = routePosition.has(locIndex)
+            ? routePosition.get(locIndex)
+            : "?";
+
+        let markerClass = "marker-number";
+
+        if (sequenceMode) {
+            if (sequenceRoute.includes(locIndex)) {
+                markerClass += " marker-selected";
+                displayNumber = sequenceRoute.indexOf(locIndex) + 1;
+            } else {
+                markerClass += " marker-unselected";
+                displayNumber = "+";
+            }
+        }
+
+        let icon = L.divIcon({
+            className:"",
+            html:`<div class="${markerClass}">${displayNumber}</div>`,
+            iconSize:[26,26],
+            iconAnchor:[13,13]
         });
+
+        let marker = L.marker([loc.lat, loc.lon], { icon })
+            .bindPopup(`
+                <b>${escapeHtml(loc.name)}</b><br>
+                ${sequenceMode ? "Click to add as next stop." : "Stop " + displayNumber}
+            `)
+            .addTo(targetMarkerLayer);
+
+        if (clickable) {
+            marker.on("click", function() {
+                if (sequenceMode) {
+                    addLocationToSequence(locIndex);
+                }
+            });
+        }
+    });
 
     if (latLngs.length) {
         let bounds = L.latLngBounds(latLngs);
@@ -794,6 +905,90 @@ function renderLoadedPointsMap() {
             map.fitBounds(bounds, { padding:[30,30] });
         }
     }
+}
+
+// ================= MAP SEQUENCE MODE =================
+function startMapSequenceMode() {
+    if (!optimizedRoute.length) {
+        alert("Optimize a route first.");
+        return;
+    }
+
+    sequenceMode = true;
+    sequenceRoute = [];
+    sequenceRemaining = new Set(locations.map((_, i) => i));
+
+    document.getElementById("sequenceBanner").classList.add("active");
+
+    renderFullscreenRouteList();
+    renderFullscreenRouteMap();
+    updateFullscreenStats();
+
+    log("Map Sequence Mode started. Click markers in the order you want.");
+}
+
+function addLocationToSequence(locationIndex) {
+    if (!sequenceMode) return;
+
+    if (!sequenceRemaining.has(locationIndex)) {
+        return;
+    }
+
+    sequenceRoute.push(locationIndex);
+    sequenceRemaining.delete(locationIndex);
+
+    renderFullscreenRouteList();
+    renderFullscreenRouteMap();
+    updateSequenceStats();
+
+    if (sequenceRemaining.size === 0) {
+        finishMapSequenceMode();
+    }
+}
+
+function finishMapSequenceMode() {
+    if (!sequenceMode) return;
+
+    if (sequenceRoute.length === 0) {
+        alert("No markers were selected.");
+        return;
+    }
+
+    let remaining = optimizedRoute.filter(idx => !sequenceRoute.includes(idx));
+
+    optimizedRoute = sequenceRoute.concat(remaining);
+
+    sequenceMode = false;
+    sequenceRoute = [];
+    sequenceRemaining = new Set();
+
+    document.getElementById("sequenceBanner").classList.remove("active");
+
+    recalculateManualRoute();
+
+    log("Map Sequence Mode finished. Route updated.");
+}
+
+function cancelMapSequenceMode() {
+    sequenceMode = false;
+    sequenceRoute = [];
+    sequenceRemaining = new Set();
+
+    document.getElementById("sequenceBanner").classList.remove("active");
+
+    renderFullscreenRouteList();
+    renderFullscreenRouteMap();
+    updateFullscreenStats();
+
+    log("Map Sequence Mode cancelled.");
+}
+
+function updateSequenceStats() {
+    document.getElementById("fsStats").innerHTML = `
+        <span class="stat warn">Sequence Mode Active</span>
+        <span class="stat good">Picked: ${sequenceRoute.length}</span>
+        <span class="stat">Remaining: ${sequenceRemaining.size}</span>
+    `;
 }
 
 // ================= IMPORT ORIGINAL FILE =================
@@ -929,8 +1124,6 @@ document.getElementById("matrixFileInput").addEventListener("change", function(e
             return;
         }
 
-        // If no original subdivision file is loaded, build basic location names only.
-        // Map needs original file with Lat/Lon.
         if (!locations.length) {
             locations = rowNames.map((name, index) => ({
                 name,
@@ -1170,7 +1363,7 @@ async function optimizeRoute() {
 
     recalculateManualRoute();
 
-    log(`Circle route complete. Open fullscreen editor to drag/edit before export.`);
+    log(`Circle route complete. Open fullscreen editor to drag/edit or map-click sequence.`);
 }
 
 function buildAngularRoute(reverse = false) {
@@ -1267,6 +1460,7 @@ function openFullscreenEditor() {
 }
 
 function closeFullscreenEditor() {
+    cancelMapSequenceMode();
     document.getElementById("fullscreenEditor").classList.remove("active");
 }
 
@@ -1295,12 +1489,25 @@ function renderFullscreenRouteList() {
     optimizedRouteRows.forEach(r => {
         if (r.isHome) return;
 
+        let seqClass = "";
+
+        if (sequenceMode) {
+            if (sequenceRoute.includes(r.locationIndex)) {
+                seqClass = " sequence-picked";
+            } else if (sequenceRoute.length === r.routeIndex) {
+                seqClass = " sequence-next";
+            }
+        }
+
         html += `
             <div
-                class="fsRouteItem"
-                draggable="true"
+                class="fsRouteItem${seqClass}"
+                draggable="${sequenceMode ? "false" : "true"}"
+                data-route-index="${r.routeIndex}"
                 ondragstart="handleFsDragStart(event, ${r.routeIndex})"
+                ondragenter="handleFsDragEnter(event, ${r.routeIndex})"
                 ondragover="handleFsDragOver(event)"
+                ondragleave="handleFsDragLeave(event, ${r.routeIndex})"
                 ondrop="handleFsDrop(event, ${r.routeIndex})"
                 ondragend="handleFsDragEnd(event)"
             >
@@ -1327,19 +1534,47 @@ function renderFullscreenRouteList() {
 }
 
 function handleFsDragStart(event, routeIndex) {
+    if (sequenceMode) return;
+
     draggedFsIndex = routeIndex;
     event.currentTarget.classList.add("dragging");
     event.dataTransfer.effectAllowed = "move";
     event.dataTransfer.setData("text/plain", routeIndex);
 }
 
+function handleFsDragEnter(event, routeIndex) {
+    if (sequenceMode) return;
+
+    event.preventDefault();
+
+    clearCurrentDropTarget();
+
+    currentDropTarget = event.currentTarget;
+    currentDropTarget.classList.add("drop-target");
+}
+
 function handleFsDragOver(event) {
+    if (sequenceMode) return;
+
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
 }
 
+function handleFsDragLeave(event, routeIndex) {
+    if (sequenceMode) return;
+
+    if (event.currentTarget === currentDropTarget) {
+        event.currentTarget.classList.remove("drop-target");
+        currentDropTarget = null;
+    }
+}
+
 function handleFsDrop(event, targetIndex) {
+    if (sequenceMode) return;
+
     event.preventDefault();
+
+    clearCurrentDropTarget();
 
     let fromIndex = draggedFsIndex;
 
@@ -1359,7 +1594,15 @@ function handleFsDrop(event, targetIndex) {
 
 function handleFsDragEnd(event) {
     event.currentTarget.classList.remove("dragging");
+    clearCurrentDropTarget();
     draggedFsIndex = null;
+}
+
+function clearCurrentDropTarget() {
+    if (currentDropTarget) {
+        currentDropTarget.classList.remove("drop-target");
+        currentDropTarget = null;
+    }
 }
 
 // ================= MANUAL ROUTE EDITOR =================
@@ -1392,6 +1635,8 @@ function recalculateManualRoute() {
 }
 
 function moveRouteItem(fromIndex, toIndex) {
+    if (sequenceMode) return;
+
     if (toIndex < 0 || toIndex >= optimizedRoute.length) return;
 
     let item = optimizedRoute.splice(fromIndex, 1)[0];
@@ -1401,6 +1646,8 @@ function moveRouteItem(fromIndex, toIndex) {
 }
 
 function handleDragStart(event, routeIndex) {
+    if (sequenceMode) return;
+
     draggedRouteIndex = routeIndex;
     event.currentTarget.classList.add("dragging");
     event.dataTransfer.effectAllowed = "move";
@@ -1408,11 +1655,15 @@ function handleDragStart(event, routeIndex) {
 }
 
 function handleDragOver(event) {
+    if (sequenceMode) return;
+
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
 }
 
 function handleDrop(event, targetIndex) {
+    if (sequenceMode) return;
+
     event.preventDefault();
 
     let fromIndex = draggedRouteIndex;
@@ -1664,7 +1915,7 @@ function renderRoutePreview() {
         <span class="stat good">Stops: ${locations.length}</span>
         <span class="stat good">Edited Total Drive Miles: ${formatMiles(total)}</span>
         <span class="stat warn">Start: ${escapeHtml(homeOffice.name)}</span>
-        <span class="stat warn">Fullscreen Drag/Edit Ready</span>
+        <span class="stat warn">Map Sequence Available</span>
         <span class="stat warn">Export Uses Current Order</span>
     `;
 
@@ -1721,7 +1972,7 @@ function renderRoutePreview() {
         html += `
             <tr
                 class="drag-row"
-                draggable="true"
+                draggable="${sequenceMode ? "false" : "true"}"
                 ondragstart="handleDragStart(event, ${r.routeIndex})"
                 ondragover="handleDragOver(event)"
                 ondrop="handleDrop(event, ${r.routeIndex})"
@@ -1766,7 +2017,8 @@ function clearRoutePreview(showText = true) {
     if (fsRouteLayer) fsRouteLayer.clearLayers();
     if (fsMarkerLayer) fsMarkerLayer.clearLayers();
 
-    document.getElementById("fsRouteList").innerHTML = "";
+    let fsList = document.getElementById("fsRouteList");
+    if (fsList) fsList.innerHTML = "";
 }
 
 // ================= MATRIX PREVIEW =================
@@ -2069,6 +2321,9 @@ function clearProgress() {
     officeToLocationMiles = [];
     locationToOfficeMiles = [];
     homeOffice = null;
+    sequenceMode = false;
+    sequenceRoute = [];
+    sequenceRemaining = new Set();
 
     document.getElementById("homeName").value = "Home Office";
     document.getElementById("homeAddress").value = "";
@@ -2076,6 +2331,8 @@ function clearProgress() {
     document.getElementById("homeLon").value = "";
 
     document.getElementById("matrixContainer").innerHTML = "";
+    document.getElementById("sequenceBanner").classList.remove("active");
+
     clearRoutePreview(false);
 
     log("Progress cleared");
