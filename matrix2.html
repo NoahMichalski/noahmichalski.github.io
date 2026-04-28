@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Drive Mile Matrix Builder v3.3</title>
+<title>Drive Mile Matrix Builder v3.4</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -51,6 +51,21 @@ button.route:hover {
     background:#2563eb;
 }
 
+input[type="text"],
+input[type="number"] {
+    background:#050505;
+    color:#fff;
+    border:1px solid #444;
+    border-radius:6px;
+    padding:8px;
+    margin:4px;
+}
+
+label {
+    font-size:13px;
+    color:#ddd;
+}
+
 #log {
     margin-top:10px;
     white-space:pre-wrap;
@@ -73,7 +88,7 @@ button.route:hover {
 }
 
 #map {
-    height:520px;
+    height:560px;
     width:100%;
     border-radius:10px;
     border:1px solid #333;
@@ -142,6 +157,13 @@ th:first-child {
     color:#f87171;
 }
 
+.grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:8px;
+    align-items:end;
+}
+
 .marker-number {
     background:#2563eb;
     color:white;
@@ -157,8 +179,11 @@ th:first-child {
     box-shadow:0 0 6px rgba(0,0,0,.8);
 }
 
-.marker-start {
+.marker-home {
     background:#16a34a;
+    width:34px;
+    height:34px;
+    font-size:11px;
 }
 
 .marker-end {
@@ -169,9 +194,9 @@ th:first-child {
 
 <body>
 
-<h2>Drive Mile Matrix Builder v3.3</h2>
+<h2>Drive Mile Matrix Builder v3.4</h2>
 <div class="small">
-    Builds drive mile matrix, optimizes a circle route, maps the stop order, and exports both original format + route details.
+    Builds a drive mile matrix, then creates a circle-style route starting and ending at Home Office.
 </div>
 
 <br>
@@ -180,16 +205,55 @@ th:first-child {
 
 <button class="primary" onclick="buildMatrix()">Build Matrix</button>
 <button onclick="exportExcel()">Export Matrix Excel</button>
-<button class="route" onclick="optimizeRoute()">Optimize Route</button>
+<button class="route" onclick="optimizeRoute()">Optimize Circle Route</button>
 <button onclick="exportRouteExcel()">Export Optimized Route Excel</button>
 <button onclick="clearProgress()">Reset</button>
+
+<div class="panel">
+    <h3>Home Office Start / End</h3>
+
+    <div class="small">
+        Enter the Home Office coordinates. The optimized route will start here, circle the subdivisions, then return here.
+    </div>
+
+    <div class="grid">
+        <div>
+            <label>Home Office Name</label><br>
+            <input type="text" id="homeName" value="Home Office">
+        </div>
+
+        <div>
+            <label>Home Office Address</label><br>
+            <input type="text" id="homeAddress" placeholder="Optional, for geocoding">
+            <button onclick="geocodeHomeOffice()">Geocode</button>
+        </div>
+
+        <div>
+            <label>Home Office Lat</label><br>
+            <input type="number" step="any" id="homeLat" placeholder="40.000000">
+        </div>
+
+        <div>
+            <label>Home Office Lon</label><br>
+            <input type="number" step="any" id="homeLon" placeholder="-83.000000">
+        </div>
+
+        <div>
+            <button onclick="saveHomeOffice()">Save Home Office</button>
+        </div>
+    </div>
+
+    <div class="small warn">
+        The map line is a visual route line. The miles still come from the OpenRouteService drive-mile matrix.
+    </div>
+</div>
 
 <div id="log"></div>
 
 <div class="panel">
     <h3>Route Map</h3>
     <div class="small">
-        Markers show optimized stop order. The map line connects the subdivisions in order. Drive mileage still comes from the matrix.
+        This version forces a circle-style order around Home Office instead of allowing a shortest-distance route to zig-zag.
     </div>
     <div id="map"></div>
 </div>
@@ -214,11 +278,13 @@ let matrix = [];
 let optimizedRoute = [];
 let optimizedRouteRows = [];
 
-// Preserve imported Excel format.
 let importHeaders = [];
 let importedRows = [];
 
-// Map globals.
+let homeOffice = null;
+let officeToLocationMiles = [];
+let locationToOfficeMiles = [];
+
 let map = null;
 let routeLayer = null;
 let markerLayer = null;
@@ -228,6 +294,96 @@ window.addEventListener("load", function() {
     initMap();
     loadStoredState();
 });
+
+// ================= HOME OFFICE =================
+function saveHomeOffice() {
+    let name = document.getElementById("homeName").value.trim() || "Home Office";
+    let lat = parseFloat(document.getElementById("homeLat").value);
+    let lon = parseFloat(document.getElementById("homeLon").value);
+
+    if (isNaN(lat) || isNaN(lon)) {
+        alert("Enter a valid Home Office Lat and Lon.");
+        return;
+    }
+
+    homeOffice = { name, lat, lon };
+
+    localStorage.setItem("homeOffice", JSON.stringify(homeOffice));
+
+    log(`Saved Home Office: ${name} (${lat}, ${lon})`);
+
+    if (locations.length) {
+        renderLoadedPointsMap();
+    }
+}
+
+async function geocodeHomeOffice() {
+    let address = document.getElementById("homeAddress").value.trim();
+
+    if (!address) {
+        alert("Enter a Home Office address first.");
+        return;
+    }
+
+    log("Geocoding Home Office address...");
+
+    try {
+        let url =
+            "https://api.openrouteservice.org/geocode/search" +
+            "?api_key=" + encodeURIComponent(API_KEY) +
+            "&text=" + encodeURIComponent(address) +
+            "&size=1";
+
+        let res = await fetch(url);
+        let data = await res.json();
+
+        if (!data.features || !data.features.length) {
+            alert("Could not geocode that address.");
+            log("Geocode failed.");
+            return;
+        }
+
+        let coords = data.features[0].geometry.coordinates;
+        let lon = coords[0];
+        let lat = coords[1];
+
+        document.getElementById("homeLat").value = lat;
+        document.getElementById("homeLon").value = lon;
+
+        saveHomeOffice();
+
+    } catch (err) {
+        log("GEOCODE ERROR: " + err);
+    }
+}
+
+function loadHomeOfficeToInputs() {
+    if (!homeOffice) return;
+
+    document.getElementById("homeName").value = homeOffice.name || "Home Office";
+    document.getElementById("homeLat").value = homeOffice.lat;
+    document.getElementById("homeLon").value = homeOffice.lon;
+}
+
+function requireHomeOffice() {
+    if (!homeOffice) {
+        let lat = parseFloat(document.getElementById("homeLat").value);
+        let lon = parseFloat(document.getElementById("homeLon").value);
+        let name = document.getElementById("homeName").value.trim() || "Home Office";
+
+        if (!isNaN(lat) && !isNaN(lon)) {
+            homeOffice = { name, lat, lon };
+            localStorage.setItem("homeOffice", JSON.stringify(homeOffice));
+        }
+    }
+
+    if (!homeOffice || isNaN(homeOffice.lat) || isNaN(homeOffice.lon)) {
+        alert("Enter and save Home Office coordinates first.");
+        return false;
+    }
+
+    return true;
+}
 
 // ================= MAP =================
 function initMap() {
@@ -248,10 +404,19 @@ function renderRouteMap() {
     routeLayer.clearLayers();
     markerLayer.clearLayers();
 
-    let latLngs = optimizedRouteRows.map(r => [r.lat, r.lon]);
+    let latLngs = [];
 
-    // Close the circle visually by returning to first stop.
-    if (latLngs.length > 1) {
+    if (homeOffice) {
+        latLngs.push([homeOffice.lat, homeOffice.lon]);
+    }
+
+    optimizedRouteRows
+        .filter(r => !r.isHome)
+        .forEach(r => latLngs.push([r.lat, r.lon]));
+
+    if (homeOffice) {
+        latLngs.push([homeOffice.lat, homeOffice.lon]);
+    } else if (latLngs.length > 1) {
         latLngs.push(latLngs[0]);
     }
 
@@ -260,29 +425,39 @@ function renderRouteMap() {
         opacity:0.85
     }).addTo(routeLayer);
 
-    optimizedRouteRows.forEach((r, index) => {
-        let className = "marker-number";
-
-        if (index === 0) className += " marker-start";
-        else if (index === optimizedRouteRows.length - 1) className += " marker-end";
-
-        let icon = L.divIcon({
+    if (homeOffice) {
+        let homeIcon = L.divIcon({
             className:"",
-            html:`<div class="${className}">${r.step}</div>`,
-            iconSize:[26,26],
-            iconAnchor:[13,13]
+            html:`<div class="marker-number marker-home">HOME</div>`,
+            iconSize:[34,34],
+            iconAnchor:[17,17]
         });
 
-        L.marker([r.lat, r.lon], { icon })
-            .bindPopup(`
-                <b>Stop ${r.step}</b><br>
-                ${escapeHtml(r.subdivision)}<br><br>
-                <b>Next:</b> ${escapeHtml(r.nextSubdivision)}<br>
-                <b>Miles to next:</b> ${r.milesToNext.toFixed(2)}<br>
-                <b>Running total:</b> ${r.runningTotal.toFixed(2)}
-            `)
+        L.marker([homeOffice.lat, homeOffice.lon], { icon: homeIcon })
+            .bindPopup(`<b>${escapeHtml(homeOffice.name)}</b><br>Start / End`)
             .addTo(markerLayer);
-    });
+    }
+
+    optimizedRouteRows
+        .filter(r => !r.isHome)
+        .forEach((r) => {
+            let icon = L.divIcon({
+                className:"",
+                html:`<div class="marker-number">${r.step}</div>`,
+                iconSize:[26,26],
+                iconAnchor:[13,13]
+            });
+
+            L.marker([r.lat, r.lon], { icon })
+                .bindPopup(`
+                    <b>Stop ${r.step}</b><br>
+                    ${escapeHtml(r.subdivision)}<br><br>
+                    <b>Next:</b> ${escapeHtml(r.nextSubdivision)}<br>
+                    <b>Miles to next:</b> ${formatMiles(r.milesToNext)}<br>
+                    <b>Running total:</b> ${formatMiles(r.runningTotal)}
+                `)
+                .addTo(markerLayer);
+        });
 
     let bounds = L.latLngBounds(latLngs);
 
@@ -292,14 +467,31 @@ function renderRouteMap() {
 }
 
 function renderLoadedPointsMap() {
-    if (!map || !locations.length) return;
+    if (!map) return;
 
     routeLayer.clearLayers();
     markerLayer.clearLayers();
 
-    let latLngs = locations.map(l => [l.lat, l.lon]);
+    let latLngs = [];
+
+    if (homeOffice) {
+        latLngs.push([homeOffice.lat, homeOffice.lon]);
+
+        let homeIcon = L.divIcon({
+            className:"",
+            html:`<div class="marker-number marker-home">HOME</div>`,
+            iconSize:[34,34],
+            iconAnchor:[17,17]
+        });
+
+        L.marker([homeOffice.lat, homeOffice.lon], { icon: homeIcon })
+            .bindPopup(`<b>${escapeHtml(homeOffice.name)}</b><br>Home Office`)
+            .addTo(markerLayer);
+    }
 
     locations.forEach((l, index) => {
+        latLngs.push([l.lat, l.lon]);
+
         let icon = L.divIcon({
             className:"",
             html:`<div class="marker-number">${index + 1}</div>`,
@@ -316,10 +508,12 @@ function renderLoadedPointsMap() {
             .addTo(markerLayer);
     });
 
-    let bounds = L.latLngBounds(latLngs);
+    if (latLngs.length) {
+        let bounds = L.latLngBounds(latLngs);
 
-    if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding:[30,30] });
+        if (bounds.isValid()) {
+            map.fitBounds(bounds, { padding:[30,30] });
+        }
     }
 }
 
@@ -403,8 +597,10 @@ Lon → ${lonKey}`);
 
         optimizedRoute = [];
         optimizedRouteRows = [];
-        clearRoutePreview(false);
+        officeToLocationMiles = [];
+        locationToOfficeMiles = [];
 
+        clearRoutePreview(false);
         saveImportedData();
 
         log(`Loaded ${locations.length} subdivisions`);
@@ -432,6 +628,19 @@ async function buildMatrix() {
 
             let sources = locations.slice(i, i + chunkSize);
             let targets = locations.slice(j, j + chunkSize);
+
+            // Fixes OpenRouteService error 6003 on final single self-block.
+            if (
+                sources.length === 1 &&
+                targets.length === 1 &&
+                i === j
+            ) {
+                matrix[i][j] = 0;
+                saveProgress(i, j);
+                renderMatrixPreview();
+                log(`Skipped single self-block [${i}-${i + 1}]`);
+                continue;
+            }
 
             let coordMap = new Map();
             let coords = [];
@@ -503,16 +712,18 @@ async function buildMatrix() {
     saveProgress(0, 0);
     localStorage.setItem("matrixComplete", "true");
 
-    log("DONE - Matrix complete. You can now click Optimize Route.");
+    log("DONE - Matrix complete. You can now click Optimize Circle Route.");
 }
 
-// ================= ROUTE OPTIMIZER =================
-function optimizeRoute() {
+// ================= CIRCLE ROUTE OPTIMIZER =================
+async function optimizeRoute() {
 
     if (!locations.length || !matrix.length) {
         alert("Build or load the matrix first.");
         return;
     }
+
+    if (!requireHomeOffice()) return;
 
     if (!isMatrixReady()) {
         alert("Matrix is not fully complete yet. Finish building the matrix first.");
@@ -520,175 +731,334 @@ function optimizeRoute() {
         return;
     }
 
-    log("Optimizing route...");
+    log("Building circle-style route around Home Office...");
 
-    let bestRoute = null;
-    let bestDistance = Infinity;
+    await ensureHomeOfficeDistances();
 
-    // Try every possible start point.
-    for (let start = 0; start < locations.length; start++) {
-        let route = nearestNeighborRoute(start);
-        let distance = routeDistance(route);
+    let clockwise = buildAngularRoute(false);
+    let counterClockwise = buildAngularRoute(true);
 
-        if (distance < bestDistance) {
-            bestDistance = distance;
-            bestRoute = route;
-        }
+    let clockwiseDistance = routeDistanceWithOffice(clockwise);
+    let counterClockwiseDistance = routeDistanceWithOffice(counterClockwise);
+
+    if (counterClockwiseDistance < clockwiseDistance) {
+        optimizedRoute = counterClockwise;
+        log("Selected counter-clockwise circle route.");
+    } else {
+        optimizedRoute = clockwise;
+        log("Selected clockwise circle route.");
     }
 
-    // Improve route.
-    bestRoute = twoOpt(bestRoute);
-    bestDistance = routeDistance(bestRoute);
-
-    optimizedRoute = bestRoute;
     buildRouteRows();
 
     renderRoutePreview();
     renderRouteMap();
 
     localStorage.setItem("optimizedRoute", JSON.stringify(optimizedRoute));
+    localStorage.setItem("officeToLocationMiles", JSON.stringify(officeToLocationMiles));
+    localStorage.setItem("locationToOfficeMiles", JSON.stringify(locationToOfficeMiles));
 
-    log(`Route optimized. Total circle miles: ${bestDistance.toFixed(2)}`);
+    let total = optimizedRouteRows.length
+        ? optimizedRouteRows[optimizedRouteRows.length - 1].runningTotal
+        : 0;
+
+    log(`Circle route complete. Total drive miles: ${formatMiles(total)}`);
 }
 
-function nearestNeighborRoute(start) {
-    let unvisited = new Set();
+function buildAngularRoute(reverse = false) {
+    let center = homeOffice || getCentroid();
 
-    for (let i = 0; i < locations.length; i++) {
-        if (i !== start) unvisited.add(i);
+    let withAngles = locations.map((loc, index) => {
+        let angle = Math.atan2(
+            loc.lat - center.lat,
+            loc.lon - center.lon
+        );
+
+        return {
+            index,
+            angle
+        };
+    });
+
+    withAngles.sort((a, b) => a.angle - b.angle);
+
+    if (reverse) {
+        withAngles.reverse();
     }
 
-    let route = [start];
-    let current = start;
+    let baseRoute = withAngles.map(x => x.index);
 
-    while (unvisited.size > 0) {
-        let nearest = null;
-        let nearestDist = Infinity;
+    // Rotate the circle so the first/last split works best with Home Office.
+    let bestRoute = baseRoute.slice();
+    let bestScore = Infinity;
 
-        for (let candidate of unvisited) {
-            let d = getDistance(current, candidate);
-            if (d < nearestDist) {
-                nearestDist = d;
-                nearest = candidate;
-            }
-        }
+    for (let cut = 0; cut < baseRoute.length; cut++) {
+        let rotated = baseRoute.slice(cut).concat(baseRoute.slice(0, cut));
+        let first = rotated[0];
+        let last = rotated[rotated.length - 1];
 
-        route.push(nearest);
-        unvisited.delete(nearest);
-        current = nearest;
-    }
+        let score = getOfficeToLocationDistance(first) + getLocationToOfficeDistance(last);
 
-    return route;
-}
-
-function twoOpt(route) {
-    let improved = true;
-    let best = route.slice();
-    let bestDistance = routeDistance(best);
-    let safety = 0;
-
-    while (improved && safety < 100) {
-        improved = false;
-        safety++;
-
-        for (let i = 1; i < best.length - 2; i++) {
-            for (let k = i + 1; k < best.length - 1; k++) {
-
-                let candidate = twoOptSwap(best, i, k);
-                let candidateDistance = routeDistance(candidate);
-
-                if (candidateDistance + 0.001 < bestDistance) {
-                    best = candidate;
-                    bestDistance = candidateDistance;
-                    improved = true;
-                }
-            }
+        if (score < bestScore) {
+            bestScore = score;
+            bestRoute = rotated;
         }
     }
 
-    return best;
+    return bestRoute;
 }
 
-function twoOptSwap(route, i, k) {
-    let part1 = route.slice(0, i);
-    let part2 = route.slice(i, k + 1).reverse();
-    let part3 = route.slice(k + 1);
-    return part1.concat(part2, part3);
-}
+function routeDistanceWithOffice(route) {
+    if (!route.length) return 0;
 
-function routeDistance(route) {
     let total = 0;
 
-    for (let i = 0; i < route.length; i++) {
-        let from = route[i];
-        let to = route[(i + 1) % route.length];
-        total += getDistance(from, to);
+    total += getOfficeToLocationDistance(route[0]);
+
+    for (let i = 0; i < route.length - 1; i++) {
+        total += getDistance(route[i], route[i + 1]);
     }
+
+    total += getLocationToOfficeDistance(route[route.length - 1]);
 
     return total;
 }
 
-function getDistance(fromIndex, toIndex) {
-    if (fromIndex === toIndex) return 0;
+function getCentroid() {
+    let lat = 0;
+    let lon = 0;
 
-    let value = matrix[fromIndex]?.[toIndex];
+    locations.forEach(l => {
+        lat += l.lat;
+        lon += l.lon;
+    });
 
-    if (value === "ERR" || value === undefined || value === null || value === "") {
-        return Infinity;
-    }
-
-    let num = parseFloat(value);
-
-    if (isNaN(num)) return Infinity;
-
-    return num;
+    return {
+        lat: lat / locations.length,
+        lon: lon / locations.length
+    };
 }
 
-function isMatrixReady() {
-    if (!locations.length || !matrix.length) return false;
+// ================= HOME OFFICE DISTANCES =================
+async function ensureHomeOfficeDistances() {
 
-    for (let i = 0; i < locations.length; i++) {
-        for (let j = 0; j < locations.length; j++) {
-            if (i === j) continue;
+    if (!homeOffice) return;
 
-            let d = getDistance(i, j);
+    let alreadyHas =
+        officeToLocationMiles.length === locations.length &&
+        locationToOfficeMiles.length === locations.length &&
+        officeToLocationMiles.every(v => isFinite(v)) &&
+        locationToOfficeMiles.every(v => isFinite(v));
 
-            if (!isFinite(d)) {
-                log(`Missing distance: ${locations[i].name} → ${locations[j].name}`);
-                return false;
+    if (alreadyHas) {
+        log("Using saved Home Office drive distances.");
+        return;
+    }
+
+    officeToLocationMiles = Array(locations.length).fill(Infinity);
+    locationToOfficeMiles = Array(locations.length).fill(Infinity);
+
+    log("Fetching Home Office drive distances...");
+
+    let chunkSize = 15;
+
+    // Home Office -> subdivisions
+    for (let start = 0; start < locations.length; start += chunkSize) {
+        let chunk = locations.slice(start, start + chunkSize);
+
+        let coords = [
+            [homeOffice.lon, homeOffice.lat],
+            ...chunk.map(l => [l.lon, l.lat])
+        ];
+
+        try {
+            let res = await fetch("https://api.openrouteservice.org/v2/matrix/driving-car", {
+                method:"POST",
+                headers:{
+                    "Authorization": API_KEY,
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    locations: coords,
+                    sources: [0],
+                    destinations: chunk.map((_, i) => i + 1),
+                    metrics:["distance"]
+                })
+            });
+
+            let data = await res.json();
+
+            if (!data.distances) {
+                log("Home Office -> subdivisions error:");
+                log(JSON.stringify(data, null, 2));
+            } else {
+                data.distances[0].forEach((meters, idx) => {
+                    officeToLocationMiles[start + idx] =
+                        meters === null ? Infinity : meters * 0.000621371;
+                });
             }
+
+        } catch (err) {
+            log("Office distance fetch error: " + err);
+        }
+
+        await sleep(1000);
+    }
+
+    // subdivisions -> Home Office
+    for (let start = 0; start < locations.length; start += chunkSize) {
+        let chunk = locations.slice(start, start + chunkSize);
+
+        let coords = [
+            [homeOffice.lon, homeOffice.lat],
+            ...chunk.map(l => [l.lon, l.lat])
+        ];
+
+        try {
+            let res = await fetch("https://api.openrouteservice.org/v2/matrix/driving-car", {
+                method:"POST",
+                headers:{
+                    "Authorization": API_KEY,
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    locations: coords,
+                    sources: chunk.map((_, i) => i + 1),
+                    destinations: [0],
+                    metrics:["distance"]
+                })
+            });
+
+            let data = await res.json();
+
+            if (!data.distances) {
+                log("Subdivisions -> Home Office error:");
+                log(JSON.stringify(data, null, 2));
+            } else {
+                data.distances.forEach((row, idx) => {
+                    let meters = row[0];
+                    locationToOfficeMiles[start + idx] =
+                        meters === null ? Infinity : meters * 0.000621371;
+                });
+            }
+
+        } catch (err) {
+            log("Return office distance fetch error: " + err);
+        }
+
+        await sleep(1000);
+    }
+
+    // Fallback for anything ORS could not return.
+    for (let i = 0; i < locations.length; i++) {
+        if (!isFinite(officeToLocationMiles[i])) {
+            officeToLocationMiles[i] = haversineMiles(homeOffice, locations[i]);
+            log(`Fallback straight-line miles used: Home Office -> ${locations[i].name}`);
+        }
+
+        if (!isFinite(locationToOfficeMiles[i])) {
+            locationToOfficeMiles[i] = haversineMiles(locations[i], homeOffice);
+            log(`Fallback straight-line miles used: ${locations[i].name} -> Home Office`);
         }
     }
 
-    return true;
+    localStorage.setItem("officeToLocationMiles", JSON.stringify(officeToLocationMiles));
+    localStorage.setItem("locationToOfficeMiles", JSON.stringify(locationToOfficeMiles));
+
+    log("Home Office drive distances complete.");
 }
 
+function getOfficeToLocationDistance(locationIndex) {
+    let d = officeToLocationMiles[locationIndex];
+
+    if (isFinite(d)) return d;
+
+    return haversineMiles(homeOffice, locations[locationIndex]);
+}
+
+function getLocationToOfficeDistance(locationIndex) {
+    let d = locationToOfficeMiles[locationIndex];
+
+    if (isFinite(d)) return d;
+
+    return haversineMiles(locations[locationIndex], homeOffice);
+}
+
+// ================= ROUTE ROWS =================
 function buildRouteRows() {
     optimizedRouteRows = [];
 
     let running = 0;
 
-    for (let i = 0; i < optimizedRoute.length; i++) {
-        let fromIndex = optimizedRoute[i];
-        let toIndex = optimizedRoute[(i + 1) % optimizedRoute.length];
+    if (!optimizedRoute.length) return;
 
-        let from = locations[fromIndex];
-        let to = locations[toIndex];
+    let firstIndex = optimizedRoute[0];
+    let firstLoc = locations[firstIndex];
 
-        let miles = getDistance(fromIndex, toIndex);
-        running += miles;
+    let firstMiles = getOfficeToLocationDistance(firstIndex);
+    running += firstMiles;
+
+    optimizedRouteRows.push({
+        step: 1,
+        subdivision: firstLoc.name,
+        lat: firstLoc.lat,
+        lon: firstLoc.lon,
+        nextSubdivision: optimizedRoute.length > 1
+            ? locations[optimizedRoute[1]].name
+            : homeOffice.name,
+        milesToNext: optimizedRoute.length > 1
+            ? getDistance(firstIndex, optimizedRoute[1])
+            : getLocationToOfficeDistance(firstIndex),
+        milesFromPrevious: firstMiles,
+        runningTotal: running,
+        originalRow: firstLoc.originalRow,
+        isHome: false
+    });
+
+    for (let i = 1; i < optimizedRoute.length; i++) {
+        let fromIndex = optimizedRoute[i - 1];
+        let currentIndex = optimizedRoute[i];
+        let nextIndex = optimizedRoute[i + 1];
+
+        let current = locations[currentIndex];
+
+        let milesFromPrevious = getDistance(fromIndex, currentIndex);
+        running += milesFromPrevious;
 
         optimizedRouteRows.push({
             step: i + 1,
-            subdivision: from.name,
-            lat: from.lat,
-            lon: from.lon,
-            nextSubdivision: to.name,
-            milesToNext: miles,
+            subdivision: current.name,
+            lat: current.lat,
+            lon: current.lon,
+            nextSubdivision: nextIndex !== undefined
+                ? locations[nextIndex].name
+                : homeOffice.name,
+            milesToNext: nextIndex !== undefined
+                ? getDistance(currentIndex, nextIndex)
+                : getLocationToOfficeDistance(currentIndex),
+            milesFromPrevious,
             runningTotal: running,
-            originalRow: from.originalRow
+            originalRow: current.originalRow,
+            isHome: false
         });
     }
+
+    let lastIndex = optimizedRoute[optimizedRoute.length - 1];
+    let returnMiles = getLocationToOfficeDistance(lastIndex);
+    running += returnMiles;
+
+    optimizedRouteRows.push({
+        step: "Return",
+        subdivision: homeOffice.name,
+        lat: homeOffice.lat,
+        lon: homeOffice.lon,
+        nextSubdivision: "",
+        milesToNext: 0,
+        milesFromPrevious: returnMiles,
+        runningTotal: running,
+        originalRow: null,
+        isHome: true
+    });
 }
 
 // ================= ROUTE PREVIEW =================
@@ -702,11 +1072,11 @@ function renderRoutePreview() {
     let total = optimizedRouteRows[optimizedRouteRows.length - 1].runningTotal;
 
     document.getElementById("routeStats").innerHTML = `
-        <span class="stat good">Stops: ${optimizedRouteRows.length}</span>
-        <span class="stat good">Total Circle Miles: ${total.toFixed(2)}</span>
-        <span class="stat warn">Sheet 1: Original Format</span>
-        <span class="stat warn">Sheet 2: Route Details</span>
-        <span class="stat warn">Returns to Start: Yes</span>
+        <span class="stat good">Stops: ${locations.length}</span>
+        <span class="stat good">Total Drive Miles: ${formatMiles(total)}</span>
+        <span class="stat warn">Start: ${escapeHtml(homeOffice.name)}</span>
+        <span class="stat warn">Route Type: Circle</span>
+        <span class="stat warn">Returns to Office: Yes</span>
     `;
 
     let html = "<table>";
@@ -714,11 +1084,25 @@ function renderRoutePreview() {
         <tr>
             <th>Stop</th>
             <th>Subdivision</th>
+            <th>Miles From Previous</th>
             <th>Next Stop</th>
-            <th>Miles to Next</th>
+            <th>Miles To Next</th>
             <th>Running Total</th>
             <th>Lat</th>
             <th>Lon</th>
+        </tr>
+    `;
+
+    html += `
+        <tr>
+            <td>Start</td>
+            <td>${escapeHtml(homeOffice.name)}</td>
+            <td>-</td>
+            <td>${escapeHtml(optimizedRouteRows[0].subdivision)}</td>
+            <td>${formatMiles(getOfficeToLocationDistance(optimizedRoute[0]))}</td>
+            <td>0.00</td>
+            <td>${homeOffice.lat}</td>
+            <td>${homeOffice.lon}</td>
         </tr>
     `;
 
@@ -727,9 +1111,10 @@ function renderRoutePreview() {
             <tr>
                 <td>${r.step}</td>
                 <td>${escapeHtml(r.subdivision)}</td>
+                <td>${formatMiles(r.milesFromPrevious)}</td>
                 <td>${escapeHtml(r.nextSubdivision)}</td>
-                <td>${r.milesToNext.toFixed(2)}</td>
-                <td>${r.runningTotal.toFixed(2)}</td>
+                <td>${formatMiles(r.milesToNext)}</td>
+                <td>${formatMiles(r.runningTotal)}</td>
                 <td>${r.lat}</td>
                 <td>${r.lon}</td>
             </tr>
@@ -828,7 +1213,7 @@ function exportRouteExcel() {
         return;
     }
 
-    // Sheet 1: Exact original imported format, just reordered.
+    // Sheet 1: exact original imported format, reordered by optimized circle route.
     let orderedRows = optimizedRoute.map(locationIndex => {
         let loc = locations[locationIndex];
         let original = loc.originalRow || {};
@@ -841,22 +1226,45 @@ function exportRouteExcel() {
         ...orderedRows
     ]);
 
-    // Sheet 2: Route details so the export actually makes sense.
-    let routeDetailRows = optimizedRouteRows.map(r => ({
-        Stop: r.step,
-        Subdivision: r.subdivision,
-        "Next Stop": r.nextSubdivision,
-        "Miles To Next": Number(r.milesToNext.toFixed(2)),
-        "Running Total Miles": Number(r.runningTotal.toFixed(2)),
-        Lat: r.lat,
-        Lon: r.lon
-    }));
+    // Sheet 2: route details.
+    let routeDetailRows = [];
+
+    routeDetailRows.push({
+        Stop: "Start",
+        Subdivision: homeOffice.name,
+        "Miles From Previous": "",
+        "Next Stop": locations[optimizedRoute[0]].name,
+        "Miles To Next": Number(getOfficeToLocationDistance(optimizedRoute[0]).toFixed(2)),
+        "Running Total Miles": 0,
+        Lat: homeOffice.lat,
+        Lon: homeOffice.lon
+    });
+
+    optimizedRouteRows.forEach(r => {
+        routeDetailRows.push({
+            Stop: r.step,
+            Subdivision: r.subdivision,
+            "Miles From Previous": isFinite(r.milesFromPrevious)
+                ? Number(r.milesFromPrevious.toFixed(2))
+                : "",
+            "Next Stop": r.nextSubdivision,
+            "Miles To Next": isFinite(r.milesToNext)
+                ? Number(r.milesToNext.toFixed(2))
+                : "",
+            "Running Total Miles": isFinite(r.runningTotal)
+                ? Number(r.runningTotal.toFixed(2))
+                : "",
+            Lat: r.lat,
+            Lon: r.lon
+        });
+    });
 
     let total = optimizedRouteRows[optimizedRouteRows.length - 1].runningTotal;
 
     routeDetailRows.push({
         Stop: "",
-        Subdivision: "TOTAL CIRCLE MILES",
+        Subdivision: "TOTAL DRIVE MILES",
+        "Miles From Previous": "",
         "Next Stop": "",
         "Miles To Next": "",
         "Running Total Miles": Number(total.toFixed(2)),
@@ -871,9 +1279,67 @@ function exportRouteExcel() {
     XLSX.utils.book_append_sheet(wb, wsOriginalFormat, "Optimized Order");
     XLSX.utils.book_append_sheet(wb, wsRouteDetails, "Route Details");
 
-    XLSX.writeFile(wb, "Optimized_Subdivision_Route.xlsx");
+    XLSX.writeFile(wb, "Optimized_Circle_Route.xlsx");
 
-    log("Exported optimized route with original-format sheet and route-details sheet.");
+    log("Exported optimized circle route.");
+}
+
+// ================= DISTANCE HELPERS =================
+function getDistance(fromIndex, toIndex) {
+    if (fromIndex === toIndex) return 0;
+
+    let value = matrix[fromIndex]?.[toIndex];
+
+    if (value === "ERR" || value === undefined || value === null || value === "") {
+        return Infinity;
+    }
+
+    let num = parseFloat(value);
+
+    if (isNaN(num)) return Infinity;
+
+    return num;
+}
+
+function isMatrixReady() {
+    if (!locations.length || !matrix.length) return false;
+
+    for (let i = 0; i < locations.length; i++) {
+        for (let j = 0; j < locations.length; j++) {
+            if (i === j) continue;
+
+            let d = getDistance(i, j);
+
+            if (!isFinite(d)) {
+                log(`Missing distance: ${locations[i].name} → ${locations[j].name}`);
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+function haversineMiles(a, b) {
+    let R = 3958.8;
+    let dLat = toRad(b.lat - a.lat);
+    let dLon = toRad(b.lon - a.lon);
+
+    let lat1 = toRad(a.lat);
+    let lat2 = toRad(b.lat);
+
+    let x =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1) * Math.cos(lat2) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    let c = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+
+    return R * c;
+}
+
+function toRad(deg) {
+    return deg * Math.PI / 180;
 }
 
 // ================= STORAGE =================
@@ -922,17 +1388,27 @@ function loadProgress() {
 }
 
 function loadStoredState() {
+    let savedHomeOffice = localStorage.getItem("homeOffice");
     let savedLocations = localStorage.getItem("matrixLocations");
     let savedMatrix = localStorage.getItem("matrixData");
     let savedProgress = localStorage.getItem("matrixProgress");
     let savedImportHeaders = localStorage.getItem("importHeaders");
     let savedImportedRows = localStorage.getItem("importedRows");
     let savedOptimizedRoute = localStorage.getItem("optimizedRoute");
+    let savedOfficeToLocationMiles = localStorage.getItem("officeToLocationMiles");
+    let savedLocationToOfficeMiles = localStorage.getItem("locationToOfficeMiles");
+
+    if (savedHomeOffice) {
+        homeOffice = JSON.parse(savedHomeOffice);
+        loadHomeOfficeToInputs();
+    }
 
     if (savedImportHeaders) importHeaders = JSON.parse(savedImportHeaders);
     if (savedImportedRows) importedRows = JSON.parse(savedImportedRows);
     if (savedLocations) locations = JSON.parse(savedLocations);
     if (savedMatrix) matrix = JSON.parse(savedMatrix);
+    if (savedOfficeToLocationMiles) officeToLocationMiles = JSON.parse(savedOfficeToLocationMiles);
+    if (savedLocationToOfficeMiles) locationToOfficeMiles = JSON.parse(savedLocationToOfficeMiles);
 
     if (locations.length) {
         renderLoadedPointsMap();
@@ -947,12 +1423,12 @@ function loadStoredState() {
         log(`Loaded saved progress: i=${prog.i}, j=${prog.j}`);
     }
 
-    if (savedOptimizedRoute && locations.length && matrix.length) {
+    if (savedOptimizedRoute && locations.length && matrix.length && homeOffice) {
         optimizedRoute = JSON.parse(savedOptimizedRoute);
         buildRouteRows();
         renderRoutePreview();
         renderRouteMap();
-        log("Loaded saved optimized route.");
+        log("Loaded saved optimized circle route.");
     }
 }
 
@@ -965,6 +1441,14 @@ function clearProgress() {
     optimizedRouteRows = [];
     importHeaders = [];
     importedRows = [];
+    officeToLocationMiles = [];
+    locationToOfficeMiles = [];
+    homeOffice = null;
+
+    document.getElementById("homeName").value = "Home Office";
+    document.getElementById("homeAddress").value = "";
+    document.getElementById("homeLat").value = "";
+    document.getElementById("homeLon").value = "";
 
     document.getElementById("matrixContainer").innerHTML = "";
     clearRoutePreview(false);
@@ -989,6 +1473,11 @@ function escapeHtml(value) {
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+}
+
+function formatMiles(value) {
+    if (!isFinite(value)) return "-";
+    return Number(value).toFixed(2);
 }
 
 </script>
