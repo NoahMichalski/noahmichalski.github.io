@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Drive Mile Matrix Builder v2.0</title>
+<title>Drive Mile Matrix Builder v3.1</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -21,6 +21,27 @@ button {
     color:#fff;
     border:none;
     cursor:pointer;
+    border-radius:6px;
+}
+
+button:hover {
+    background:#3a3a3a;
+}
+
+button.primary {
+    background:#14532d;
+}
+
+button.primary:hover {
+    background:#166534;
+}
+
+button.route {
+    background:#1d4ed8;
+}
+
+button.route:hover {
+    background:#2563eb;
 }
 
 #log {
@@ -31,18 +52,23 @@ button {
     padding:10px;
     max-height:200px;
     overflow:auto;
+    border:1px solid #333;
+    border-radius:8px;
 }
 
-#matrixContainer {
+#matrixContainer,
+#routeContainer {
     max-height:500px;
     overflow:auto;
     border:1px solid #333;
     margin-top:10px;
+    border-radius:8px;
 }
 
 table {
     border-collapse:collapse;
     font-size:11px;
+    width:max-content;
 }
 
 td, th {
@@ -58,27 +84,74 @@ th {
     z-index:2;
 }
 
-td:first-child, th:first-child {
+td:first-child,
+th:first-child {
     position:sticky;
     left:0;
     background:#222;
     z-index:3;
+}
+
+.panel {
+    background:#181818;
+    border:1px solid #333;
+    padding:14px;
+    border-radius:10px;
+    margin-top:15px;
+}
+
+.stat {
+    display:inline-block;
+    background:#222;
+    border:1px solid #333;
+    padding:8px 12px;
+    border-radius:8px;
+    margin:4px;
+}
+
+.small {
+    font-size:12px;
+    color:#bbb;
+}
+
+.good {
+    color:#4ade80;
+}
+
+.warn {
+    color:#facc15;
+}
+
+.bad {
+    color:#f87171;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Drive Mile Matrix Builder v2.0</h2>
+<h2>Drive Mile Matrix Builder v3.1</h2>
+<div class="small">Builds drive mile matrix, then optimizes a circle route that touches every subdivision once.</div>
 
-<input type="file" id="fileInput">
 <br>
 
-<button onclick="buildMatrix()">Build Matrix</button>
-<button onclick="exportExcel()">Export Excel</button>
+<input type="file" id="fileInput"><br><br>
+
+<button class="primary" onclick="buildMatrix()">Build Matrix</button>
+<button onclick="exportExcel()">Export Matrix Excel</button>
+<button class="route" onclick="optimizeRoute()">Optimize Route</button>
+<button onclick="exportRouteExcel()">Export Route Excel</button>
 <button onclick="clearProgress()">Reset</button>
 
 <div id="log"></div>
+
+<div class="panel">
+    <h3>Route Optimizer</h3>
+    <div id="routeStats">
+        <span class="stat">Route: Not optimized yet</span>
+    </div>
+    <div id="routeContainer"></div>
+</div>
 
 <h3>Matrix Preview</h3>
 <div id="matrixContainer"></div>
@@ -89,25 +162,69 @@ const API_KEY = "5b3ce3597851110001cf624895d5d8857d8d41b6a9508753893fbb25";
 
 let locations = [];
 let matrix = [];
+let optimizedRoute = [];
+let optimizedRouteRows = [];
 
 // ================= IMPORT =================
 document.getElementById("fileInput").addEventListener("change", function(e){
+
     let file = e.target.files[0];
+    if (!file) return;
+
     let reader = new FileReader();
 
     reader.onload = function(evt){
+
         let data = new Uint8Array(evt.target.result);
         let workbook = XLSX.read(data, {type:'array'});
         let sheet = workbook.Sheets[workbook.SheetNames[0]];
         let json = XLSX.utils.sheet_to_json(sheet);
 
-        locations = json.map(r => ({
-            name: r.Subdivision,
-            lat: parseFloat(r.Lat),
-            lon: parseFloat(r.Lon)
-        })).filter(l => !isNaN(l.lat) && !isNaN(l.lon));
+        if (!json.length) {
+            alert("Empty file");
+            return;
+        }
 
-        matrix = Array(locations.length).fill().map(()=>Array(locations.length).fill(0));
+        let sample = json[0];
+
+        let latKey = Object.keys(sample).find(k => k.toLowerCase().includes("lat"));
+        let lonKey = Object.keys(sample).find(k => {
+            let x = k.toLowerCase();
+            return x.includes("lon") || x.includes("lng");
+        });
+        let subKey = Object.keys(sample).find(k => k.toLowerCase().includes("sub"));
+
+        log(`Detected:
+Subdivision → ${subKey}
+Lat → ${latKey}
+Lon → ${lonKey}`);
+
+        if (!latKey || !lonKey || !subKey) {
+            alert("Missing required columns. Need Subdivision, Lat, and Lon.");
+            return;
+        }
+
+        locations = json.map(r => ({
+            name: String(r[subKey] ?? "").trim(),
+            lat: parseFloat(r[latKey]),
+            lon: parseFloat(r[lonKey])
+        })).filter(l => {
+            if (!l.name || isNaN(l.lat) || isNaN(l.lon)) {
+                log(`Skipped bad row: ${JSON.stringify(l)}`);
+                return false;
+            }
+            return true;
+        });
+
+        matrix = Array(locations.length)
+            .fill()
+            .map(() => Array(locations.length).fill(0));
+
+        optimizedRoute = [];
+        optimizedRouteRows = [];
+        clearRoutePreview(false);
+
+        localStorage.setItem("matrixLocations", JSON.stringify(locations));
 
         log(`Loaded ${locations.length} subdivisions`);
         renderMatrixPreview();
@@ -125,7 +242,6 @@ async function buildMatrix() {
     }
 
     let chunkSize = 15;
-
     let progress = loadProgress();
 
     for (let i = progress.i; i < locations.length; i += chunkSize) {
@@ -149,9 +265,10 @@ async function buildMatrix() {
             let sourceIdx = sources.map(addCoord);
             let targetIdx = targets.map(addCoord);
 
-            log(`Block [${i}-${i+sources.length}] vs [${j}-${j+targets.length}]`);
+            log(`Block [${i}-${i + sources.length}] vs [${j}-${j + targets.length}]`);
 
             try {
+
                 let res = await fetch("https://api.openrouteservice.org/v2/matrix/driving-car", {
                     method:"POST",
                     headers:{
@@ -180,10 +297,10 @@ async function buildMatrix() {
                         let meters = data.distances[s][t];
 
                         if (meters === null) {
-                            matrix[i+s][j+t] = "ERR";
+                            matrix[i + s][j + t] = "ERR";
                         } else {
                             let miles = meters * 0.000621371;
-                            matrix[i+s][j+t] = miles.toFixed(2);
+                            matrix[i + s][j + t] = miles.toFixed(2);
                         }
                     }
                 }
@@ -200,10 +317,255 @@ async function buildMatrix() {
         }
     }
 
-    log("DONE");
+    saveProgress(0, 0);
+    localStorage.setItem("matrixComplete", "true");
+
+    log("DONE - Matrix complete. You can now click Optimize Route.");
 }
 
-// ================= PREVIEW =================
+// ================= ROUTE OPTIMIZER =================
+function optimizeRoute() {
+
+    if (!locations.length || !matrix.length) {
+        alert("Build or load the matrix first.");
+        return;
+    }
+
+    if (!isMatrixReady()) {
+        alert("Matrix is not fully complete yet. Finish building the matrix first.");
+        log("Route optimizer stopped: matrix has missing or invalid distances.");
+        return;
+    }
+
+    log("Optimizing route...");
+
+    let bestRoute = null;
+    let bestDistance = Infinity;
+
+    // Try nearest-neighbor from every possible starting point.
+    for (let start = 0; start < locations.length; start++) {
+        let route = nearestNeighborRoute(start);
+        let distance = routeDistance(route);
+
+        if (distance < bestDistance) {
+            bestDistance = distance;
+            bestRoute = route;
+        }
+    }
+
+    // Improve with 2-opt.
+    bestRoute = twoOpt(bestRoute);
+    bestDistance = routeDistance(bestRoute);
+
+    optimizedRoute = bestRoute;
+    buildRouteRows();
+
+    renderRoutePreview();
+
+    log(`Route optimized. Total circle miles: ${bestDistance.toFixed(2)}`);
+}
+
+function nearestNeighborRoute(start) {
+    let unvisited = new Set();
+
+    for (let i = 0; i < locations.length; i++) {
+        if (i !== start) unvisited.add(i);
+    }
+
+    let route = [start];
+    let current = start;
+
+    while (unvisited.size > 0) {
+        let nearest = null;
+        let nearestDist = Infinity;
+
+        for (let candidate of unvisited) {
+            let d = getDistance(current, candidate);
+            if (d < nearestDist) {
+                nearestDist = d;
+                nearest = candidate;
+            }
+        }
+
+        route.push(nearest);
+        unvisited.delete(nearest);
+        current = nearest;
+    }
+
+    return route;
+}
+
+function twoOpt(route) {
+    let improved = true;
+    let best = route.slice();
+    let bestDistance = routeDistance(best);
+    let safety = 0;
+
+    while (improved && safety < 100) {
+        improved = false;
+        safety++;
+
+        for (let i = 1; i < best.length - 2; i++) {
+            for (let k = i + 1; k < best.length - 1; k++) {
+
+                let candidate = twoOptSwap(best, i, k);
+                let candidateDistance = routeDistance(candidate);
+
+                if (candidateDistance + 0.001 < bestDistance) {
+                    best = candidate;
+                    bestDistance = candidateDistance;
+                    improved = true;
+                }
+            }
+        }
+    }
+
+    return best;
+}
+
+function twoOptSwap(route, i, k) {
+    let part1 = route.slice(0, i);
+    let part2 = route.slice(i, k + 1).reverse();
+    let part3 = route.slice(k + 1);
+    return part1.concat(part2, part3);
+}
+
+function routeDistance(route) {
+    let total = 0;
+
+    for (let i = 0; i < route.length; i++) {
+        let from = route[i];
+        let to = route[(i + 1) % route.length];
+        total += getDistance(from, to);
+    }
+
+    return total;
+}
+
+function getDistance(fromIndex, toIndex) {
+    if (fromIndex === toIndex) return 0;
+
+    let value = matrix[fromIndex]?.[toIndex];
+
+    if (value === "ERR" || value === undefined || value === null || value === "") {
+        return Infinity;
+    }
+
+    let num = parseFloat(value);
+
+    if (isNaN(num)) return Infinity;
+
+    return num;
+}
+
+function isMatrixReady() {
+    if (!locations.length || !matrix.length) return false;
+
+    for (let i = 0; i < locations.length; i++) {
+        for (let j = 0; j < locations.length; j++) {
+            if (i === j) continue;
+
+            let d = getDistance(i, j);
+
+            if (!isFinite(d)) {
+                log(`Missing distance: ${locations[i].name} → ${locations[j].name}`);
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+function buildRouteRows() {
+    optimizedRouteRows = [];
+
+    let running = 0;
+
+    for (let i = 0; i < optimizedRoute.length; i++) {
+        let fromIndex = optimizedRoute[i];
+        let toIndex = optimizedRoute[(i + 1) % optimizedRoute.length];
+
+        let from = locations[fromIndex];
+        let to = locations[toIndex];
+
+        let miles = getDistance(fromIndex, toIndex);
+        running += miles;
+
+        optimizedRouteRows.push({
+            step: i + 1,
+            subdivision: from.name,
+            lat: from.lat,
+            lon: from.lon,
+            nextSubdivision: to.name,
+            milesToNext: miles,
+            runningTotal: running
+        });
+    }
+}
+
+// ================= ROUTE PREVIEW =================
+function renderRoutePreview() {
+
+    if (!optimizedRouteRows.length) {
+        clearRoutePreview(false);
+        return;
+    }
+
+    let total = optimizedRouteRows[optimizedRouteRows.length - 1].runningTotal;
+
+    document.getElementById("routeStats").innerHTML = `
+        <span class="stat good">Stops: ${optimizedRouteRows.length}</span>
+        <span class="stat good">Total Circle Miles: ${total.toFixed(2)}</span>
+        <span class="stat warn">Returns to Start: Yes</span>
+    `;
+
+    let html = "<table>";
+    html += `
+        <tr>
+            <th>Stop</th>
+            <th>Subdivision</th>
+            <th>Next Stop</th>
+            <th>Miles to Next</th>
+            <th>Running Total</th>
+            <th>Lat</th>
+            <th>Lon</th>
+        </tr>
+    `;
+
+    optimizedRouteRows.forEach(r => {
+        html += `
+            <tr>
+                <td>${r.step}</td>
+                <td>${escapeHtml(r.subdivision)}</td>
+                <td>${escapeHtml(r.nextSubdivision)}</td>
+                <td>${r.milesToNext.toFixed(2)}</td>
+                <td>${r.runningTotal.toFixed(2)}</td>
+                <td>${r.lat}</td>
+                <td>${r.lon}</td>
+            </tr>
+        `;
+    });
+
+    html += "</table>";
+
+    document.getElementById("routeContainer").innerHTML = html;
+}
+
+function clearRoutePreview(showText = true) {
+    optimizedRoute = [];
+    optimizedRouteRows = [];
+
+    document.getElementById("routeStats").innerHTML = `
+        <span class="stat">Route: Not optimized yet</span>
+    `;
+
+    document.getElementById("routeContainer").innerHTML = showText
+        ? `<div style="padding:10px;" class="small">No route yet.</div>`
+        : "";
+}
+
+// ================= MATRIX PREVIEW =================
 function renderMatrixPreview() {
 
     if (!locations.length || !matrix.length) return;
@@ -211,20 +573,22 @@ function renderMatrixPreview() {
     let html = "<table>";
 
     html += "<tr><th>Subdivision</th>";
-    locations.forEach(l => html += `<th>${l.name}</th>`);
+    locations.forEach(l => html += `<th>${escapeHtml(l.name)}</th>`);
     html += "</tr>";
 
     locations.forEach((loc, i) => {
-        html += `<tr><th>${loc.name}</th>`;
+        html += `<tr><th>${escapeHtml(loc.name)}</th>`;
 
-        matrix[i].forEach(val => {
+        (matrix[i] || []).forEach(val => {
 
             let display = val === 0 ? "-" : val;
             let color = "";
 
-            if (val > 0 && val < 5) color = "#1f6f3d";
-            else if (val < 15) color = "#7a5c00";
-            else if (val >= 15) color = "#6f1f1f";
+            let num = parseFloat(val);
+
+            if (!isNaN(num) && num > 0 && num < 5) color = "#1f6f3d";
+            else if (!isNaN(num) && num < 15) color = "#7a5c00";
+            else if (!isNaN(num) && num >= 15) color = "#6f1f1f";
 
             html += `<td style="background:${color}">${display}</td>`;
         });
@@ -237,14 +601,19 @@ function renderMatrixPreview() {
     document.getElementById("matrixContainer").innerHTML = html;
 }
 
-// ================= EXPORT =================
+// ================= EXPORT MATRIX =================
 function exportExcel() {
+
+    if (!locations.length || !matrix.length) {
+        alert("Nothing to export yet.");
+        return;
+    }
 
     let header = ["Subdivision", ...locations.map(l => l.name)];
 
     let rows = locations.map((loc, i) => [
         loc.name,
-        ...matrix[i]
+        ...(matrix[i] || [])
     ]);
 
     let ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
@@ -254,15 +623,58 @@ function exportExcel() {
     XLSX.writeFile(wb, "Drive_Matrix.xlsx");
 }
 
+// ================= EXPORT ROUTE =================
+function exportRouteExcel() {
+
+    if (!optimizedRouteRows.length) {
+        alert("Optimize the route first.");
+        return;
+    }
+
+    let rows = optimizedRouteRows.map(r => ({
+        Stop: r.step,
+        Subdivision: r.subdivision,
+        "Next Stop": r.nextSubdivision,
+        "Miles To Next": Number(r.milesToNext.toFixed(2)),
+        "Running Total Miles": Number(r.runningTotal.toFixed(2)),
+        Lat: r.lat,
+        Lon: r.lon
+    }));
+
+    let total = optimizedRouteRows[optimizedRouteRows.length - 1].runningTotal;
+
+    rows.push({
+        Stop: "",
+        Subdivision: "TOTAL CIRCLE MILES",
+        "Next Stop": "",
+        "Miles To Next": "",
+        "Running Total Miles": Number(total.toFixed(2)),
+        Lat: "",
+        Lon: ""
+    });
+
+    let ws = XLSX.utils.json_to_sheet(rows);
+    let wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, "Optimized Route");
+    XLSX.writeFile(wb, "Optimized_Subdivision_Route.xlsx");
+}
+
 // ================= STORAGE =================
 function saveProgress(i, j) {
     localStorage.setItem("matrixData", JSON.stringify(matrix));
     localStorage.setItem("matrixProgress", JSON.stringify({i, j}));
+    localStorage.setItem("matrixLocations", JSON.stringify(locations));
 }
 
 function loadProgress() {
+    let savedLocations = localStorage.getItem("matrixLocations");
     let savedMatrix = localStorage.getItem("matrixData");
     let savedProgress = localStorage.getItem("matrixProgress");
+
+    if (savedLocations && !locations.length) {
+        locations = JSON.parse(savedLocations);
+    }
 
     if (savedMatrix && savedProgress) {
         matrix = JSON.parse(savedMatrix);
@@ -271,21 +683,41 @@ function loadProgress() {
         renderMatrixPreview();
         return prog;
     }
+
     return {i:0, j:0};
 }
 
 function clearProgress() {
     localStorage.clear();
+
+    locations = [];
+    matrix = [];
+    optimizedRoute = [];
+    optimizedRouteRows = [];
+
+    document.getElementById("matrixContainer").innerHTML = "";
+    clearRoutePreview(false);
+
     log("Progress cleared");
 }
 
 // ================= UTILS =================
-function log(msg){
+function log(msg) {
     document.getElementById("log").innerText += msg + "\n";
+    document.getElementById("log").scrollTop = document.getElementById("log").scrollHeight;
 }
 
-function sleep(ms){
+function sleep(ms) {
     return new Promise(r => setTimeout(r, ms));
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
 </script>
