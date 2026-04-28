@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Drive Mile Matrix Builder v3.5</title>
+<title>Drive Mile Matrix Builder v3.6</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -35,6 +35,14 @@ button.primary:hover { background:#166534; }
 button.route { background:#1d4ed8; }
 button.route:hover { background:#2563eb; }
 
+button.fullscreenBtn {
+    background:#7c3aed;
+}
+
+button.fullscreenBtn:hover {
+    background:#8b5cf6;
+}
+
 button.smallBtn {
     padding:4px 8px;
     font-size:11px;
@@ -49,6 +57,10 @@ input[type="number"] {
     border-radius:6px;
     padding:8px;
     margin:4px;
+}
+
+input[type="file"] {
+    margin:6px 0;
 }
 
 label {
@@ -203,24 +215,193 @@ th:first-child {
     border:1px solid #444;
     font-size:12px;
 }
+
+/* ================= FULLSCREEN EDITOR ================= */
+#fullscreenEditor {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:#090909;
+    z-index:99999;
+    color:#fff;
+}
+
+#fullscreenEditor.active {
+    display:flex;
+    flex-direction:column;
+}
+
+.fsTopBar {
+    height:58px;
+    background:#111827;
+    border-bottom:1px solid #333;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 14px;
+    gap:10px;
+}
+
+.fsTitle {
+    font-weight:bold;
+    font-size:16px;
+}
+
+.fsStats {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+}
+
+.fsBody {
+    flex:1;
+    display:grid;
+    grid-template-columns:430px 1fr;
+    min-height:0;
+}
+
+.fsLeft {
+    border-right:1px solid #333;
+    background:#111;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+}
+
+.fsLeftHeader {
+    padding:12px;
+    border-bottom:1px solid #333;
+    background:#181818;
+}
+
+.fsList {
+    overflow:auto;
+    padding:10px;
+}
+
+.fsRouteItem {
+    display:grid;
+    grid-template-columns:34px 1fr 74px;
+    gap:8px;
+    align-items:center;
+    background:#1a1a1a;
+    border:1px solid #333;
+    border-radius:8px;
+    padding:8px;
+    margin-bottom:7px;
+    cursor:grab;
+}
+
+.fsRouteItem:hover {
+    background:#243044;
+}
+
+.fsRouteItem.dragging {
+    opacity:.45;
+}
+
+.fsStopNum {
+    background:#2563eb;
+    border:2px solid #fff;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.fsSubName {
+    font-size:13px;
+    font-weight:bold;
+    line-height:1.2;
+}
+
+.fsMiles {
+    font-size:11px;
+    color:#bbb;
+    margin-top:3px;
+}
+
+.fsMoveBtns {
+    display:flex;
+    gap:3px;
+}
+
+.fsMoveBtns button {
+    padding:5px 7px;
+    font-size:12px;
+    margin:0;
+}
+
+.fsRight {
+    position:relative;
+    min-width:0;
+}
+
+#fullscreenMap {
+    width:100%;
+    height:100%;
+    background:#000;
+}
+
+.fsCloseBtn {
+    background:#991b1b;
+}
+
+.fsCloseBtn:hover {
+    background:#b91c1c;
+}
+
+@media (max-width:900px) {
+    .fsBody {
+        grid-template-columns:1fr;
+        grid-template-rows:42% 58%;
+    }
+
+    .fsLeft {
+        border-right:none;
+        border-bottom:1px solid #333;
+    }
+}
 </style>
 </head>
 
 <body>
 
-<h2>Drive Mile Matrix Builder v3.5</h2>
+<h2>Drive Mile Matrix Builder v3.6</h2>
 <div class="small">
-    Builds a drive mile matrix, creates a circle route from Home Office, then lets you manually drag/edit the route before export.
+    Upload subdivisions, build or upload the drive matrix, optimize a Home Office circle route, then fullscreen drag/edit before export.
 </div>
 
 <br>
 
-<input type="file" id="fileInput"><br><br>
+<div class="panel">
+    <h3>Files</h3>
+
+    <div class="grid">
+        <div>
+            <label>1. Upload Original Subdivision Excel</label><br>
+            <input type="file" id="fileInput">
+            <div class="small">Needs Subdivision, Lat, and Lon columns. This keeps your original import format for export.</div>
+        </div>
+
+        <div>
+            <label>2. Upload Existing Matrix Excel</label><br>
+            <input type="file" id="matrixFileInput">
+            <div class="small">Use a previously exported Drive_Matrix.xlsx so you do not have to rebuild every time.</div>
+        </div>
+    </div>
+</div>
 
 <button class="primary" onclick="buildMatrix()">Build Matrix</button>
 <button onclick="exportExcel()">Export Matrix Excel</button>
 <button class="route" onclick="optimizeRoute()">Optimize Circle Route</button>
 <button onclick="recalculateManualRoute()">Refresh Edited Route</button>
+<button class="fullscreenBtn" onclick="openFullscreenEditor()">Open Fullscreen Route Editor</button>
 <button onclick="exportRouteExcel()">Export Edited Route Excel</button>
 <button onclick="clearProgress()">Reset</button>
 
@@ -264,7 +445,7 @@ th:first-child {
 <div class="panel">
     <h3>Route Map</h3>
     <div class="small">
-        Drag rows in the route table below. The map updates immediately after each change.
+        Regular map preview. Use the fullscreen editor for the big drag-and-map layout.
     </div>
     <div id="map"></div>
 </div>
@@ -278,7 +459,8 @@ th:first-child {
 
     <div class="route-tools">
         <span class="badge">Drag rows to reorder</span>
-        <span class="badge">Use ↑ / ↓ buttons for small changes</span>
+        <span class="badge">Use ↑ / ↓ buttons</span>
+        <span class="badge">Fullscreen editor available</span>
         <span class="badge">Export uses edited order</span>
     </div>
 
@@ -287,6 +469,40 @@ th:first-child {
 
 <h3>Matrix Preview</h3>
 <div id="matrixContainer"></div>
+
+<!-- ================= FULLSCREEN EDITOR ================= -->
+<div id="fullscreenEditor">
+    <div class="fsTopBar">
+        <div>
+            <div class="fsTitle">Fullscreen Route Editor</div>
+            <div class="small">Drag subdivisions on the left. Map and total miles update instantly.</div>
+        </div>
+
+        <div class="fsStats" id="fsStats">
+            <span class="stat">No route loaded</span>
+        </div>
+
+        <div>
+            <button onclick="recalculateManualRoute()">Refresh</button>
+            <button onclick="exportRouteExcel()">Export</button>
+            <button class="fsCloseBtn" onclick="closeFullscreenEditor()">Close</button>
+        </div>
+    </div>
+
+    <div class="fsBody">
+        <div class="fsLeft">
+            <div class="fsLeftHeader">
+                <strong>Subdivision Order</strong>
+                <div class="small">Start and return are Home Office. Drag the subdivisions only.</div>
+            </div>
+            <div class="fsList" id="fsRouteList"></div>
+        </div>
+
+        <div class="fsRight">
+            <div id="fullscreenMap"></div>
+        </div>
+    </div>
+</div>
 
 <script>
 
@@ -308,7 +524,12 @@ let map = null;
 let routeLayer = null;
 let markerLayer = null;
 
+let fsMap = null;
+let fsRouteLayer = null;
+let fsMarkerLayer = null;
+
 let draggedRouteIndex = null;
+let draggedFsIndex = null;
 
 // ================= PAGE INIT =================
 window.addEventListener("load", function() {
@@ -331,15 +552,16 @@ function saveHomeOffice() {
 
     localStorage.setItem("homeOffice", JSON.stringify(homeOffice));
 
+    // Home changed, so old office distance cache may not apply.
+    officeToLocationMiles = [];
+    locationToOfficeMiles = [];
+    localStorage.removeItem("officeToLocationMiles");
+    localStorage.removeItem("locationToOfficeMiles");
+
     log(`Saved Home Office: ${name} (${lat}, ${lon})`);
 
-    if (locations.length) {
-        renderLoadedPointsMap();
-    }
-
-    if (optimizedRoute.length) {
-        recalculateManualRoute();
-    }
+    if (locations.length) renderLoadedPointsMap();
+    if (optimizedRoute.length) recalculateManualRoute();
 }
 
 async function geocodeHomeOffice() {
@@ -423,11 +645,39 @@ function initMap() {
     markerLayer = L.layerGroup().addTo(map);
 }
 
-function renderRouteMap() {
-    if (!map || !optimizedRouteRows.length) return;
+function initFullscreenMap() {
+    if (fsMap) {
+        setTimeout(() => fsMap.invalidateSize(), 150);
+        return;
+    }
 
-    routeLayer.clearLayers();
-    markerLayer.clearLayers();
+    fsMap = L.map("fullscreenMap").setView([40.05, -83.05], 9);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom:19,
+        attribution:"&copy; OpenStreetMap"
+    }).addTo(fsMap);
+
+    fsRouteLayer = L.layerGroup().addTo(fsMap);
+    fsMarkerLayer = L.layerGroup().addTo(fsMap);
+
+    setTimeout(() => fsMap.invalidateSize(), 150);
+}
+
+function renderRouteMap() {
+    renderMapToLayers(map, routeLayer, markerLayer);
+}
+
+function renderFullscreenRouteMap() {
+    if (!fsMap) return;
+    renderMapToLayers(fsMap, fsRouteLayer, fsMarkerLayer);
+}
+
+function renderMapToLayers(targetMap, targetRouteLayer, targetMarkerLayer) {
+    if (!targetMap || !optimizedRouteRows.length) return;
+
+    targetRouteLayer.clearLayers();
+    targetMarkerLayer.clearLayers();
 
     let latLngs = [];
 
@@ -443,10 +693,12 @@ function renderRouteMap() {
         latLngs.push([homeOffice.lat, homeOffice.lon]);
     }
 
-    L.polyline(latLngs, {
-        weight:4,
-        opacity:0.85
-    }).addTo(routeLayer);
+    if (latLngs.length > 1) {
+        L.polyline(latLngs, {
+            weight:4,
+            opacity:0.85
+        }).addTo(targetRouteLayer);
+    }
 
     if (homeOffice) {
         let homeIcon = L.divIcon({
@@ -458,7 +710,7 @@ function renderRouteMap() {
 
         L.marker([homeOffice.lat, homeOffice.lon], { icon: homeIcon })
             .bindPopup(`<b>${escapeHtml(homeOffice.name)}</b><br>Start / End`)
-            .addTo(markerLayer);
+            .addTo(targetMarkerLayer);
     }
 
     optimizedRouteRows
@@ -480,13 +732,15 @@ function renderRouteMap() {
                     <b>Miles to next:</b> ${formatMiles(r.milesToNext)}<br>
                     <b>Running total:</b> ${formatMiles(r.runningTotal)}
                 `)
-                .addTo(markerLayer);
+                .addTo(targetMarkerLayer);
         });
 
-    let bounds = L.latLngBounds(latLngs);
+    if (latLngs.length) {
+        let bounds = L.latLngBounds(latLngs);
 
-    if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding:[30,30] });
+        if (bounds.isValid()) {
+            targetMap.fitBounds(bounds, { padding:[30,30] });
+        }
     }
 }
 
@@ -514,6 +768,8 @@ function renderLoadedPointsMap() {
     }
 
     locations.forEach((l, index) => {
+        if (!isFinite(l.lat) || !isFinite(l.lon)) return;
+
         latLngs.push([l.lat, l.lon]);
 
         let icon = L.divIcon({
@@ -540,7 +796,7 @@ function renderLoadedPointsMap() {
     }
 }
 
-// ================= IMPORT =================
+// ================= IMPORT ORIGINAL FILE =================
 document.getElementById("fileInput").addEventListener("change", function(e){
 
     let file = e.target.files[0];
@@ -635,11 +891,147 @@ Lon → ${lonKey}`);
     reader.readAsArrayBuffer(file);
 });
 
+// ================= IMPORT MATRIX FILE =================
+document.getElementById("matrixFileInput").addEventListener("change", function(e){
+
+    let file = e.target.files[0];
+    if (!file) return;
+
+    let reader = new FileReader();
+
+    reader.onload = function(evt) {
+        let data = new Uint8Array(evt.target.result);
+        let workbook = XLSX.read(data, { type:"array" });
+        let sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+        let aoa = XLSX.utils.sheet_to_json(sheet, {
+            header:1,
+            defval:""
+        });
+
+        if (!aoa.length || aoa.length < 2) {
+            alert("Matrix file appears empty.");
+            return;
+        }
+
+        let header = aoa[0].map(x => String(x ?? "").trim());
+        let matrixNames = header.slice(1);
+
+        if (!matrixNames.length) {
+            alert("Matrix file does not look like Drive_Matrix.xlsx.");
+            return;
+        }
+
+        let rowNames = aoa.slice(1).map(r => String(r[0] ?? "").trim()).filter(Boolean);
+
+        if (!rowNames.length) {
+            alert("Matrix file has no subdivision rows.");
+            return;
+        }
+
+        // If no original subdivision file is loaded, build basic location names only.
+        // Map needs original file with Lat/Lon.
+        if (!locations.length) {
+            locations = rowNames.map((name, index) => ({
+                name,
+                lat: NaN,
+                lon: NaN,
+                originalIndex:index,
+                originalRow:{ Subdivision:name }
+            }));
+
+            importHeaders = ["Subdivision"];
+            importedRows = locations.map(l => ({ Subdivision:l.name }));
+
+            log("Matrix uploaded without original subdivision file. Route miles can load, but map needs original Lat/Lon file.");
+        }
+
+        let nameToMatrixRow = new Map();
+
+        aoa.slice(1).forEach(row => {
+            let rowName = cleanName(row[0]);
+            nameToMatrixRow.set(rowName, row);
+        });
+
+        let nameToMatrixCol = new Map();
+
+        matrixNames.forEach((name, index) => {
+            nameToMatrixCol.set(cleanName(name), index + 1);
+        });
+
+        let loadedMatrix = Array(locations.length)
+            .fill()
+            .map(() => Array(locations.length).fill(0));
+
+        let missing = [];
+
+        for (let i = 0; i < locations.length; i++) {
+            let fromName = cleanName(locations[i].name);
+            let sourceRow = nameToMatrixRow.get(fromName);
+
+            if (!sourceRow) {
+                missing.push(locations[i].name);
+                continue;
+            }
+
+            for (let j = 0; j < locations.length; j++) {
+                if (i === j) {
+                    loadedMatrix[i][j] = 0;
+                    continue;
+                }
+
+                let toName = cleanName(locations[j].name);
+                let colIndex = nameToMatrixCol.get(toName);
+
+                if (colIndex === undefined) {
+                    loadedMatrix[i][j] = "ERR";
+                    continue;
+                }
+
+                let val = sourceRow[colIndex];
+
+                if (val === "" || val === null || val === undefined) {
+                    loadedMatrix[i][j] = "ERR";
+                } else {
+                    let num = parseFloat(val);
+                    loadedMatrix[i][j] = isNaN(num) ? val : num.toFixed(2);
+                }
+            }
+        }
+
+        matrix = loadedMatrix;
+
+        localStorage.setItem("matrixData", JSON.stringify(matrix));
+        localStorage.setItem("matrixComplete", "true");
+        saveImportedData();
+
+        renderMatrixPreview();
+
+        if (locations.some(l => isFinite(l.lat) && isFinite(l.lon))) {
+            renderLoadedPointsMap();
+        }
+
+        if (missing.length) {
+            log(`Matrix loaded with missing rows for ${missing.length} subdivisions:`);
+            log(missing.join(", "));
+        } else {
+            log(`Matrix uploaded successfully for ${locations.length} subdivisions.`);
+        }
+    };
+
+    reader.readAsArrayBuffer(file);
+});
+
 // ================= MATRIX BUILDER =================
 async function buildMatrix() {
 
     if (!locations.length) {
-        alert("Load file first");
+        alert("Load the original subdivision file first.");
+        return;
+    }
+
+    if (!locations.every(l => isFinite(l.lat) && isFinite(l.lon))) {
+        alert("Your original subdivision file needs valid Lat/Lon before building matrix.");
         return;
     }
 
@@ -741,14 +1133,19 @@ async function buildMatrix() {
 async function optimizeRoute() {
 
     if (!locations.length || !matrix.length) {
-        alert("Build or load the matrix first.");
+        alert("Load subdivisions and build/upload the matrix first.");
         return;
     }
 
     if (!requireHomeOffice()) return;
 
+    if (!locations.every(l => isFinite(l.lat) && isFinite(l.lon))) {
+        alert("Map/route editor needs the original subdivision file with Lat/Lon loaded.");
+        return;
+    }
+
     if (!isMatrixReady()) {
-        alert("Matrix is not fully complete yet. Finish building the matrix first.");
+        alert("Matrix is not fully complete yet. Build or upload a complete matrix.");
         log("Route optimizer stopped: matrix has missing or invalid distances.");
         return;
     }
@@ -773,7 +1170,7 @@ async function optimizeRoute() {
 
     recalculateManualRoute();
 
-    log(`Circle route complete. You can now drag/edit the route before export.`);
+    log(`Circle route complete. Open fullscreen editor to drag/edit before export.`);
 }
 
 function buildAngularRoute(reverse = false) {
@@ -846,6 +1243,125 @@ function getCentroid() {
     };
 }
 
+// ================= FULLSCREEN EDITOR =================
+function openFullscreenEditor() {
+    if (!optimizedRoute.length) {
+        alert("Optimize a route first.");
+        return;
+    }
+
+    document.getElementById("fullscreenEditor").classList.add("active");
+
+    initFullscreenMap();
+
+    renderFullscreenRouteList();
+    renderFullscreenRouteMap();
+    updateFullscreenStats();
+
+    setTimeout(() => {
+        if (fsMap) {
+            fsMap.invalidateSize();
+            renderFullscreenRouteMap();
+        }
+    }, 250);
+}
+
+function closeFullscreenEditor() {
+    document.getElementById("fullscreenEditor").classList.remove("active");
+}
+
+function updateFullscreenStats() {
+    let total = optimizedRouteRows.length
+        ? optimizedRouteRows[optimizedRouteRows.length - 1].runningTotal
+        : 0;
+
+    document.getElementById("fsStats").innerHTML = `
+        <span class="stat good">Total Miles: ${formatMiles(total)}</span>
+        <span class="stat good">Stops: ${optimizedRoute.length}</span>
+        <span class="stat warn">Start/End: ${escapeHtml(homeOffice?.name || "Home Office")}</span>
+    `;
+}
+
+function renderFullscreenRouteList() {
+    let box = document.getElementById("fsRouteList");
+
+    if (!optimizedRouteRows.length) {
+        box.innerHTML = `<div class="small">No route loaded.</div>`;
+        return;
+    }
+
+    let html = "";
+
+    optimizedRouteRows.forEach(r => {
+        if (r.isHome) return;
+
+        html += `
+            <div
+                class="fsRouteItem"
+                draggable="true"
+                ondragstart="handleFsDragStart(event, ${r.routeIndex})"
+                ondragover="handleFsDragOver(event)"
+                ondrop="handleFsDrop(event, ${r.routeIndex})"
+                ondragend="handleFsDragEnd(event)"
+            >
+                <div class="fsStopNum">${r.step}</div>
+
+                <div>
+                    <div class="fsSubName">${escapeHtml(r.subdivision)}</div>
+                    <div class="fsMiles">
+                        From prev: ${formatMiles(r.milesFromPrevious)}
+                        · To next: ${formatMiles(r.milesToNext)}
+                        · Total: ${formatMiles(r.runningTotal)}
+                    </div>
+                </div>
+
+                <div class="fsMoveBtns">
+                    <button onclick="moveRouteItem(${r.routeIndex}, ${r.routeIndex - 1})">↑</button>
+                    <button onclick="moveRouteItem(${r.routeIndex}, ${r.routeIndex + 1})">↓</button>
+                </div>
+            </div>
+        `;
+    });
+
+    box.innerHTML = html;
+}
+
+function handleFsDragStart(event, routeIndex) {
+    draggedFsIndex = routeIndex;
+    event.currentTarget.classList.add("dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", routeIndex);
+}
+
+function handleFsDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+}
+
+function handleFsDrop(event, targetIndex) {
+    event.preventDefault();
+
+    let fromIndex = draggedFsIndex;
+
+    if (fromIndex === null || fromIndex === undefined) {
+        fromIndex = parseInt(event.dataTransfer.getData("text/plain"), 10);
+    }
+
+    if (isNaN(fromIndex) || fromIndex === targetIndex) return;
+
+    let item = optimizedRoute.splice(fromIndex, 1)[0];
+    optimizedRoute.splice(targetIndex, 0, item);
+
+    draggedFsIndex = null;
+
+    recalculateManualRoute();
+}
+
+function handleFsDragEnd(event) {
+    event.currentTarget.classList.remove("dragging");
+    draggedFsIndex = null;
+}
+
 // ================= MANUAL ROUTE EDITOR =================
 function recalculateManualRoute() {
     if (!optimizedRoute.length) {
@@ -856,8 +1372,15 @@ function recalculateManualRoute() {
     if (!requireHomeOffice()) return;
 
     buildRouteRows();
+
     renderRoutePreview();
     renderRouteMap();
+
+    if (document.getElementById("fullscreenEditor").classList.contains("active")) {
+        renderFullscreenRouteList();
+        renderFullscreenRouteMap();
+        updateFullscreenStats();
+    }
 
     localStorage.setItem("optimizedRoute", JSON.stringify(optimizedRoute));
 
@@ -1141,7 +1664,7 @@ function renderRoutePreview() {
         <span class="stat good">Stops: ${locations.length}</span>
         <span class="stat good">Edited Total Drive Miles: ${formatMiles(total)}</span>
         <span class="stat warn">Start: ${escapeHtml(homeOffice.name)}</span>
-        <span class="stat warn">Drag/Edit Enabled</span>
+        <span class="stat warn">Fullscreen Drag/Edit Ready</span>
         <span class="stat warn">Export Uses Current Order</span>
     `;
 
@@ -1240,6 +1763,10 @@ function clearRoutePreview(showText = true) {
 
     if (routeLayer) routeLayer.clearLayers();
     if (markerLayer) markerLayer.clearLayers();
+    if (fsRouteLayer) fsRouteLayer.clearLayers();
+    if (fsMarkerLayer) fsMarkerLayer.clearLayers();
+
+    document.getElementById("fsRouteList").innerHTML = "";
 }
 
 // ================= MATRIX PREVIEW =================
@@ -1576,6 +2103,13 @@ function escapeHtml(value) {
 function formatMiles(value) {
     if (!isFinite(value)) return "-";
     return Number(value).toFixed(2);
+}
+
+function cleanName(value) {
+    return String(value ?? "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
 }
 
 </script>
