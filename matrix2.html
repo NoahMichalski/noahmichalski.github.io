@@ -2,15 +2,11 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Drive Mile Matrix Builder v3.4</title>
+<title>Drive Mile Matrix Builder v3.5</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-<link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
@@ -31,24 +27,18 @@ button {
     border-radius:6px;
 }
 
-button:hover {
-    background:#3a3a3a;
-}
+button:hover { background:#3a3a3a; }
 
-button.primary {
-    background:#14532d;
-}
+button.primary { background:#14532d; }
+button.primary:hover { background:#166534; }
 
-button.primary:hover {
-    background:#166534;
-}
+button.route { background:#1d4ed8; }
+button.route:hover { background:#2563eb; }
 
-button.route {
-    background:#1d4ed8;
-}
-
-button.route:hover {
-    background:#2563eb;
+button.smallBtn {
+    padding:4px 8px;
+    font-size:11px;
+    margin:1px;
 }
 
 input[type="text"],
@@ -80,7 +70,7 @@ label {
 
 #matrixContainer,
 #routeContainer {
-    max-height:500px;
+    max-height:520px;
     overflow:auto;
     border:1px solid #333;
     margin-top:10px;
@@ -145,17 +135,9 @@ th:first-child {
     color:#bbb;
 }
 
-.good {
-    color:#4ade80;
-}
-
-.warn {
-    color:#facc15;
-}
-
-.bad {
-    color:#f87171;
-}
+.good { color:#4ade80; }
+.warn { color:#facc15; }
+.bad { color:#f87171; }
 
 .grid {
     display:grid;
@@ -186,17 +168,49 @@ th:first-child {
     font-size:11px;
 }
 
-.marker-end {
-    background:#dc2626;
+.drag-row {
+    cursor:grab;
+}
+
+.drag-row:hover {
+    background:#1f2937;
+}
+
+.dragging {
+    opacity:.45;
+    background:#334155 !important;
+}
+
+.drag-handle {
+    font-size:16px;
+    cursor:grab;
+    color:#93c5fd;
+}
+
+.route-tools {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-top:8px;
+}
+
+.badge {
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:999px;
+    background:#222;
+    border:1px solid #444;
+    font-size:12px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Drive Mile Matrix Builder v3.4</h2>
+<h2>Drive Mile Matrix Builder v3.5</h2>
 <div class="small">
-    Builds a drive mile matrix, then creates a circle-style route starting and ending at Home Office.
+    Builds a drive mile matrix, creates a circle route from Home Office, then lets you manually drag/edit the route before export.
 </div>
 
 <br>
@@ -206,14 +220,15 @@ th:first-child {
 <button class="primary" onclick="buildMatrix()">Build Matrix</button>
 <button onclick="exportExcel()">Export Matrix Excel</button>
 <button class="route" onclick="optimizeRoute()">Optimize Circle Route</button>
-<button onclick="exportRouteExcel()">Export Optimized Route Excel</button>
+<button onclick="recalculateManualRoute()">Refresh Edited Route</button>
+<button onclick="exportRouteExcel()">Export Edited Route Excel</button>
 <button onclick="clearProgress()">Reset</button>
 
 <div class="panel">
     <h3>Home Office Start / End</h3>
 
     <div class="small">
-        Enter the Home Office coordinates. The optimized route will start here, circle the subdivisions, then return here.
+        Enter the Home Office coordinates. The route starts here, circles the subdivisions, then returns here.
     </div>
 
     <div class="grid">
@@ -242,10 +257,6 @@ th:first-child {
             <button onclick="saveHomeOffice()">Save Home Office</button>
         </div>
     </div>
-
-    <div class="small warn">
-        The map line is a visual route line. The miles still come from the OpenRouteService drive-mile matrix.
-    </div>
 </div>
 
 <div id="log"></div>
@@ -253,16 +264,24 @@ th:first-child {
 <div class="panel">
     <h3>Route Map</h3>
     <div class="small">
-        This version forces a circle-style order around Home Office instead of allowing a shortest-distance route to zig-zag.
+        Drag rows in the route table below. The map updates immediately after each change.
     </div>
     <div id="map"></div>
 </div>
 
 <div class="panel">
-    <h3>Route Optimizer</h3>
+    <h3>Route Editor</h3>
+
     <div id="routeStats">
         <span class="stat">Route: Not optimized yet</span>
     </div>
+
+    <div class="route-tools">
+        <span class="badge">Drag rows to reorder</span>
+        <span class="badge">Use ↑ / ↓ buttons for small changes</span>
+        <span class="badge">Export uses edited order</span>
+    </div>
+
     <div id="routeContainer"></div>
 </div>
 
@@ -289,6 +308,8 @@ let map = null;
 let routeLayer = null;
 let markerLayer = null;
 
+let draggedRouteIndex = null;
+
 // ================= PAGE INIT =================
 window.addEventListener("load", function() {
     initMap();
@@ -314,6 +335,10 @@ function saveHomeOffice() {
 
     if (locations.length) {
         renderLoadedPointsMap();
+    }
+
+    if (optimizedRoute.length) {
+        recalculateManualRoute();
     }
 }
 
@@ -416,8 +441,6 @@ function renderRouteMap() {
 
     if (homeOffice) {
         latLngs.push([homeOffice.lat, homeOffice.lon]);
-    } else if (latLngs.length > 1) {
-        latLngs.push(latLngs[0]);
     }
 
     L.polyline(latLngs, {
@@ -452,6 +475,7 @@ function renderRouteMap() {
                 .bindPopup(`
                     <b>Stop ${r.step}</b><br>
                     ${escapeHtml(r.subdivision)}<br><br>
+                    <b>Previous miles:</b> ${formatMiles(r.milesFromPrevious)}<br>
                     <b>Next:</b> ${escapeHtml(r.nextSubdivision)}<br>
                     <b>Miles to next:</b> ${formatMiles(r.milesToNext)}<br>
                     <b>Running total:</b> ${formatMiles(r.runningTotal)}
@@ -510,7 +534,6 @@ function renderLoadedPointsMap() {
 
     if (latLngs.length) {
         let bounds = L.latLngBounds(latLngs);
-
         if (bounds.isValid()) {
             map.fitBounds(bounds, { padding:[30,30] });
         }
@@ -629,7 +652,6 @@ async function buildMatrix() {
             let sources = locations.slice(i, i + chunkSize);
             let targets = locations.slice(j, j + chunkSize);
 
-            // Fixes OpenRouteService error 6003 on final single self-block.
             if (
                 sources.length === 1 &&
                 targets.length === 1 &&
@@ -749,20 +771,9 @@ async function optimizeRoute() {
         log("Selected clockwise circle route.");
     }
 
-    buildRouteRows();
+    recalculateManualRoute();
 
-    renderRoutePreview();
-    renderRouteMap();
-
-    localStorage.setItem("optimizedRoute", JSON.stringify(optimizedRoute));
-    localStorage.setItem("officeToLocationMiles", JSON.stringify(officeToLocationMiles));
-    localStorage.setItem("locationToOfficeMiles", JSON.stringify(locationToOfficeMiles));
-
-    let total = optimizedRouteRows.length
-        ? optimizedRouteRows[optimizedRouteRows.length - 1].runningTotal
-        : 0;
-
-    log(`Circle route complete. Total drive miles: ${formatMiles(total)}`);
+    log(`Circle route complete. You can now drag/edit the route before export.`);
 }
 
 function buildAngularRoute(reverse = false) {
@@ -774,10 +785,7 @@ function buildAngularRoute(reverse = false) {
             loc.lon - center.lon
         );
 
-        return {
-            index,
-            angle
-        };
+        return { index, angle };
     });
 
     withAngles.sort((a, b) => a.angle - b.angle);
@@ -788,7 +796,6 @@ function buildAngularRoute(reverse = false) {
 
     let baseRoute = withAngles.map(x => x.index);
 
-    // Rotate the circle so the first/last split works best with Home Office.
     let bestRoute = baseRoute.slice();
     let bestScore = Infinity;
 
@@ -839,6 +846,73 @@ function getCentroid() {
     };
 }
 
+// ================= MANUAL ROUTE EDITOR =================
+function recalculateManualRoute() {
+    if (!optimizedRoute.length) {
+        alert("Optimize a route first.");
+        return;
+    }
+
+    if (!requireHomeOffice()) return;
+
+    buildRouteRows();
+    renderRoutePreview();
+    renderRouteMap();
+
+    localStorage.setItem("optimizedRoute", JSON.stringify(optimizedRoute));
+
+    let total = optimizedRouteRows.length
+        ? optimizedRouteRows[optimizedRouteRows.length - 1].runningTotal
+        : 0;
+
+    log(`Route refreshed. Edited total drive miles: ${formatMiles(total)}`);
+}
+
+function moveRouteItem(fromIndex, toIndex) {
+    if (toIndex < 0 || toIndex >= optimizedRoute.length) return;
+
+    let item = optimizedRoute.splice(fromIndex, 1)[0];
+    optimizedRoute.splice(toIndex, 0, item);
+
+    recalculateManualRoute();
+}
+
+function handleDragStart(event, routeIndex) {
+    draggedRouteIndex = routeIndex;
+    event.currentTarget.classList.add("dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", routeIndex);
+}
+
+function handleDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+}
+
+function handleDrop(event, targetIndex) {
+    event.preventDefault();
+
+    let fromIndex = draggedRouteIndex;
+
+    if (fromIndex === null || fromIndex === undefined) {
+        fromIndex = parseInt(event.dataTransfer.getData("text/plain"), 10);
+    }
+
+    if (isNaN(fromIndex) || fromIndex === targetIndex) return;
+
+    let item = optimizedRoute.splice(fromIndex, 1)[0];
+    optimizedRoute.splice(targetIndex, 0, item);
+
+    draggedRouteIndex = null;
+
+    recalculateManualRoute();
+}
+
+function handleDragEnd(event) {
+    event.currentTarget.classList.remove("dragging");
+    draggedRouteIndex = null;
+}
+
 // ================= HOME OFFICE DISTANCES =================
 async function ensureHomeOfficeDistances() {
 
@@ -862,7 +936,6 @@ async function ensureHomeOfficeDistances() {
 
     let chunkSize = 15;
 
-    // Home Office -> subdivisions
     for (let start = 0; start < locations.length; start += chunkSize) {
         let chunk = locations.slice(start, start + chunkSize);
 
@@ -905,7 +978,6 @@ async function ensureHomeOfficeDistances() {
         await sleep(1000);
     }
 
-    // subdivisions -> Home Office
     for (let start = 0; start < locations.length; start += chunkSize) {
         let chunk = locations.slice(start, start + chunkSize);
 
@@ -949,7 +1021,6 @@ async function ensureHomeOfficeDistances() {
         await sleep(1000);
     }
 
-    // Fallback for anything ORS could not return.
     for (let i = 0; i < locations.length; i++) {
         if (!isFinite(officeToLocationMiles[i])) {
             officeToLocationMiles[i] = haversineMiles(homeOffice, locations[i]);
@@ -988,54 +1059,47 @@ function getLocationToOfficeDistance(locationIndex) {
 function buildRouteRows() {
     optimizedRouteRows = [];
 
-    let running = 0;
-
     if (!optimizedRoute.length) return;
 
-    let firstIndex = optimizedRoute[0];
-    let firstLoc = locations[firstIndex];
+    let running = 0;
 
-    let firstMiles = getOfficeToLocationDistance(firstIndex);
-    running += firstMiles;
-
-    optimizedRouteRows.push({
-        step: 1,
-        subdivision: firstLoc.name,
-        lat: firstLoc.lat,
-        lon: firstLoc.lon,
-        nextSubdivision: optimizedRoute.length > 1
-            ? locations[optimizedRoute[1]].name
-            : homeOffice.name,
-        milesToNext: optimizedRoute.length > 1
-            ? getDistance(firstIndex, optimizedRoute[1])
-            : getLocationToOfficeDistance(firstIndex),
-        milesFromPrevious: firstMiles,
-        runningTotal: running,
-        originalRow: firstLoc.originalRow,
-        isHome: false
-    });
-
-    for (let i = 1; i < optimizedRoute.length; i++) {
-        let fromIndex = optimizedRoute[i - 1];
+    for (let i = 0; i < optimizedRoute.length; i++) {
         let currentIndex = optimizedRoute[i];
+        let previousIndex = optimizedRoute[i - 1];
         let nextIndex = optimizedRoute[i + 1];
 
         let current = locations[currentIndex];
 
-        let milesFromPrevious = getDistance(fromIndex, currentIndex);
+        let milesFromPrevious = 0;
+
+        if (i === 0) {
+            milesFromPrevious = getOfficeToLocationDistance(currentIndex);
+        } else {
+            milesFromPrevious = getDistance(previousIndex, currentIndex);
+        }
+
         running += milesFromPrevious;
+
+        let nextSubdivision = "";
+        let milesToNext = 0;
+
+        if (nextIndex !== undefined) {
+            nextSubdivision = locations[nextIndex].name;
+            milesToNext = getDistance(currentIndex, nextIndex);
+        } else {
+            nextSubdivision = homeOffice.name;
+            milesToNext = getLocationToOfficeDistance(currentIndex);
+        }
 
         optimizedRouteRows.push({
             step: i + 1,
+            routeIndex: i,
+            locationIndex: currentIndex,
             subdivision: current.name,
             lat: current.lat,
             lon: current.lon,
-            nextSubdivision: nextIndex !== undefined
-                ? locations[nextIndex].name
-                : homeOffice.name,
-            milesToNext: nextIndex !== undefined
-                ? getDistance(currentIndex, nextIndex)
-                : getLocationToOfficeDistance(currentIndex),
+            nextSubdivision,
+            milesToNext,
             milesFromPrevious,
             runningTotal: running,
             originalRow: current.originalRow,
@@ -1049,6 +1113,8 @@ function buildRouteRows() {
 
     optimizedRouteRows.push({
         step: "Return",
+        routeIndex: null,
+        locationIndex: null,
         subdivision: homeOffice.name,
         lat: homeOffice.lat,
         lon: homeOffice.lon,
@@ -1073,15 +1139,17 @@ function renderRoutePreview() {
 
     document.getElementById("routeStats").innerHTML = `
         <span class="stat good">Stops: ${locations.length}</span>
-        <span class="stat good">Total Drive Miles: ${formatMiles(total)}</span>
+        <span class="stat good">Edited Total Drive Miles: ${formatMiles(total)}</span>
         <span class="stat warn">Start: ${escapeHtml(homeOffice.name)}</span>
-        <span class="stat warn">Route Type: Circle</span>
-        <span class="stat warn">Returns to Office: Yes</span>
+        <span class="stat warn">Drag/Edit Enabled</span>
+        <span class="stat warn">Export Uses Current Order</span>
     `;
 
     let html = "<table>";
     html += `
         <tr>
+            <th>Drag</th>
+            <th>Move</th>
             <th>Stop</th>
             <th>Subdivision</th>
             <th>Miles From Previous</th>
@@ -1095,6 +1163,8 @@ function renderRoutePreview() {
 
     html += `
         <tr>
+            <td>-</td>
+            <td>-</td>
             <td>Start</td>
             <td>${escapeHtml(homeOffice.name)}</td>
             <td>-</td>
@@ -1107,8 +1177,38 @@ function renderRoutePreview() {
     `;
 
     optimizedRouteRows.forEach(r => {
+        if (r.isHome) {
+            html += `
+                <tr>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>Return</td>
+                    <td>${escapeHtml(r.subdivision)}</td>
+                    <td>${formatMiles(r.milesFromPrevious)}</td>
+                    <td>-</td>
+                    <td>0.00</td>
+                    <td>${formatMiles(r.runningTotal)}</td>
+                    <td>${r.lat}</td>
+                    <td>${r.lon}</td>
+                </tr>
+            `;
+            return;
+        }
+
         html += `
-            <tr>
+            <tr
+                class="drag-row"
+                draggable="true"
+                ondragstart="handleDragStart(event, ${r.routeIndex})"
+                ondragover="handleDragOver(event)"
+                ondrop="handleDrop(event, ${r.routeIndex})"
+                ondragend="handleDragEnd(event)"
+            >
+                <td><span class="drag-handle">☰</span></td>
+                <td>
+                    <button class="smallBtn" onclick="moveRouteItem(${r.routeIndex}, ${r.routeIndex - 1})">↑</button>
+                    <button class="smallBtn" onclick="moveRouteItem(${r.routeIndex}, ${r.routeIndex + 1})">↓</button>
+                </td>
                 <td>${r.step}</td>
                 <td>${escapeHtml(r.subdivision)}</td>
                 <td>${formatMiles(r.milesFromPrevious)}</td>
@@ -1200,11 +1300,11 @@ function exportExcel() {
     XLSX.writeFile(wb, "Drive_Matrix.xlsx");
 }
 
-// ================= EXPORT ROUTE =================
+// ================= EXPORT EDITED ROUTE =================
 function exportRouteExcel() {
 
     if (!optimizedRoute.length || !optimizedRouteRows.length) {
-        alert("Optimize the route first.");
+        alert("Optimize or edit the route first.");
         return;
     }
 
@@ -1213,7 +1313,6 @@ function exportRouteExcel() {
         return;
     }
 
-    // Sheet 1: exact original imported format, reordered by optimized circle route.
     let orderedRows = optimizedRoute.map(locationIndex => {
         let loc = locations[locationIndex];
         let original = loc.originalRow || {};
@@ -1226,7 +1325,6 @@ function exportRouteExcel() {
         ...orderedRows
     ]);
 
-    // Sheet 2: route details.
     let routeDetailRows = [];
 
     routeDetailRows.push({
@@ -1276,12 +1374,12 @@ function exportRouteExcel() {
 
     let wb = XLSX.utils.book_new();
 
-    XLSX.utils.book_append_sheet(wb, wsOriginalFormat, "Optimized Order");
+    XLSX.utils.book_append_sheet(wb, wsOriginalFormat, "Edited Optimized Order");
     XLSX.utils.book_append_sheet(wb, wsRouteDetails, "Route Details");
 
-    XLSX.writeFile(wb, "Optimized_Circle_Route.xlsx");
+    XLSX.writeFile(wb, "Edited_Optimized_Circle_Route.xlsx");
 
-    log("Exported optimized circle route.");
+    log("Exported edited optimized circle route.");
 }
 
 // ================= DISTANCE HELPERS =================
@@ -1428,7 +1526,7 @@ function loadStoredState() {
         buildRouteRows();
         renderRoutePreview();
         renderRouteMap();
-        log("Loaded saved optimized circle route.");
+        log("Loaded saved edited route.");
     }
 }
 
