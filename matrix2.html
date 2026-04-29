@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Drive Mile Matrix Builder v3.9</title>
+<title>Drive Mile Matrix Builder v4.0</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -43,6 +43,22 @@ button.sequenceBtn:hover { background:#d99100; }
 
 button.danger { background:#991b1b; }
 button.danger:hover { background:#b91c1c; }
+
+button.forceLastBtn {
+    background:#9a3412;
+}
+
+button.forceLastBtn:hover {
+    background:#c2410c;
+}
+
+button.forceLastActive {
+    background:#dc2626;
+}
+
+button.forceLastActive:hover {
+    background:#ef4444;
+}
 
 button.smallBtn {
     padding:4px 8px;
@@ -193,6 +209,10 @@ th:first-child {
     background:#dc2626;
 }
 
+.marker-force-last {
+    background:#ea580c;
+}
+
 .drag-row {
     cursor:grab;
 }
@@ -270,7 +290,7 @@ th:first-child {
 .fsBody {
     flex:1;
     display:grid;
-    grid-template-columns:440px 1fr;
+    grid-template-columns:470px 1fr;
     min-height:0;
 }
 
@@ -295,7 +315,7 @@ th:first-child {
 
 .fsRouteItem {
     display:grid;
-    grid-template-columns:34px 1fr 74px;
+    grid-template-columns:34px 1fr 128px;
     gap:8px;
     align-items:center;
     background:#1a1a1a;
@@ -336,6 +356,11 @@ th:first-child {
     background:#2a1111;
 }
 
+.fsRouteItem.force-last-card {
+    border-color:#f97316;
+    background:#2c1608;
+}
+
 .fsStopNum {
     background:#2563eb;
     border:2px solid #fff;
@@ -353,6 +378,10 @@ th:first-child {
     background:#dc2626;
 }
 
+.fsStopNum.force-last-num {
+    background:#ea580c;
+}
+
 .fsSubName {
     font-size:13px;
     font-weight:bold;
@@ -368,6 +397,8 @@ th:first-child {
 .fsMoveBtns {
     display:flex;
     gap:3px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
 }
 
 .fsMoveBtns button {
@@ -425,9 +456,9 @@ th:first-child {
 
 <body>
 
-<h2>Drive Mile Matrix Builder v3.9</h2>
+<h2>Drive Mile Matrix Builder v4.0</h2>
 <div class="small">
-    Upload subdivisions, build/upload the drive matrix, optimize a low-mile city loop around the area, then fullscreen edit before export.
+    Upload subdivisions, build/upload the drive matrix, optimize a low-mile city loop, manually force outskirt stops last, then fullscreen edit before export.
 </div>
 
 <br>
@@ -500,7 +531,7 @@ th:first-child {
         <div>
             <label>Soft outlier threshold</label><br>
             <input type="number" step="1" id="outlierThreshold" value="25">
-            <div class="small">Marks subdivisions that are this many miles from their nearest subdivision. They are allowed in the loop, but discouraged from being buried in the middle.</div>
+            <div class="small">Marks subdivisions that are this many miles from their nearest subdivision. You can also manually mark any stop as Force Last.</div>
         </div>
 
         <div>
@@ -516,7 +547,7 @@ th:first-child {
 <div class="panel">
     <h3>Route Map</h3>
     <div class="small">
-        Regular map preview. Use fullscreen editor for drag editing or map-click sequencing.
+        Regular map preview. Use fullscreen editor for Force Last, drag editing, or map-click sequencing.
     </div>
     <div id="map"></div>
 </div>
@@ -531,7 +562,7 @@ th:first-child {
     <div class="route-tools">
         <span class="badge">City-loop optimizer</span>
         <span class="badge">Drive-mile scoring</span>
-        <span class="badge">Fullscreen map-click sequence</span>
+        <span class="badge">Manual Force Last</span>
         <span class="badge">Export uses edited order</span>
     </div>
 
@@ -546,7 +577,7 @@ th:first-child {
     <div class="fsTopBar">
         <div>
             <div class="fsTitle">Fullscreen Route Editor</div>
-            <div class="small">Drag subdivisions on the left, or click markers on the map in the exact order you want.</div>
+            <div class="small">Drag subdivisions, mark outskirt jobs as Force Last, or click markers in sequence.</div>
         </div>
 
         <div class="fsStats" id="fsStats">
@@ -567,7 +598,7 @@ th:first-child {
             <div class="fsLeftHeader">
                 <strong>Subdivision Order</strong>
                 <div class="small">
-                    Drag cards, use arrows, or use map-click sequence mode. Start/return is Home Office.
+                    Click <b>Force Last</b> for far outskirt subdivisions. They will stay at the bottom/end before returning home.
                 </div>
 
                 <div id="sequenceBanner" class="sequenceBanner">
@@ -600,6 +631,7 @@ let officeToLocationMiles = [];
 let locationToOfficeMiles = [];
 
 let outlierSet = new Set();
+let forceLastSet = new Set();
 
 let map = null;
 let routeLayer = null;
@@ -832,7 +864,9 @@ function renderMapToLayers(targetMap, targetRouteLayer, targetMarkerLayer, click
 
         let markerClass = "marker-number";
 
-        if (outlierSet.has(locIndex)) {
+        if (forceLastSet.has(locIndex)) {
+            markerClass += " marker-force-last";
+        } else if (outlierSet.has(locIndex)) {
             markerClass += " marker-outlier";
         }
 
@@ -856,6 +890,7 @@ function renderMapToLayers(targetMap, targetRouteLayer, targetMarkerLayer, click
         let marker = L.marker([loc.lat, loc.lon], { icon })
             .bindPopup(`
                 <b>${escapeHtml(loc.name)}</b><br>
+                ${forceLastSet.has(locIndex) ? "<b>Force Last</b><br>" : ""}
                 ${outlierSet.has(locIndex) ? "<b>Soft Outlier</b><br>" : ""}
                 ${sequenceMode ? "Click to add as next stop." : "Stop " + displayNumber}
             `)
@@ -1102,9 +1137,13 @@ Lon → ${lonKey}`);
         officeToLocationMiles = [];
         locationToOfficeMiles = [];
         outlierSet = new Set();
+        forceLastSet = new Set();
 
         clearRoutePreview(false);
         saveImportedData();
+
+        localStorage.removeItem("forceLastSet");
+        localStorage.removeItem("outlierSet");
 
         log(`Loaded ${locations.length} subdivisions`);
 
@@ -1385,9 +1424,12 @@ async function optimizeRoute() {
 
     optimizedRoute = removeDuplicateRouteItems(optimizedRoute);
 
+    applyForceLastOrdering();
+
     recalculateManualRoute(true);
 
     localStorage.setItem("outlierSet", JSON.stringify([...outlierSet]));
+    localStorage.setItem("forceLastSet", JSON.stringify([...forceLastSet]));
 
     let total = optimizedRouteRows.length
         ? optimizedRouteRows[optimizedRouteRows.length - 1].runningTotal
@@ -1395,6 +1437,7 @@ async function optimizeRoute() {
 
     log(`City-loop route complete. Total drive miles: ${formatMiles(total)}`);
     log(`Soft outliers marked: ${outlierSet.size}`);
+    log(`Force Last stops: ${forceLastSet.size}`);
 }
 
 function buildBestCityLoopRoute() {
@@ -1433,12 +1476,14 @@ function buildBestCityLoopRoute() {
         let shapePenalty = loopShapePenalty(route);
         let outlierPenalty = outlierPlacementPenalty(route);
         let homePenalty = homeEntryPenalty(route);
+        let forceLastPenalty = forceLastPlacementPenalty(route);
 
         let score =
             driveMiles +
             shapePenalty * 0.35 +
             outlierPenalty * 0.5 +
-            homePenalty * 0.25;
+            homePenalty * 0.25 +
+            forceLastPenalty * 4;
 
         if (score < bestScore) {
             bestScore = score;
@@ -1492,12 +1537,10 @@ function loopShapePenalty(route) {
 
         let distFromCenter = haversineMiles(center, mid);
 
-        // Discourage long cuts through the middle of the city cloud.
         if (segmentMiles > 12 && distFromCenter < 8) {
             penalty += segmentMiles * 1.5;
         }
 
-        // Discourage giant jumps unless they are truly unavoidable.
         if (segmentMiles > 25) {
             penalty += (segmentMiles - 25) * 0.8;
         }
@@ -1518,8 +1561,23 @@ function outlierPlacementPenalty(route) {
         let normalized = position / Math.max(1, n - 1);
         let distanceFromEdge = Math.min(normalized, 1 - normalized);
 
-        // Outliers are allowed, but better near the beginning/end of the loop.
         penalty += distanceFromEdge * 30;
+    });
+
+    return penalty;
+}
+
+function forceLastPlacementPenalty(route) {
+    if (!forceLastSet.size) return 0;
+
+    let penalty = 0;
+    let n = route.length;
+
+    route.forEach((idx, position) => {
+        if (!forceLastSet.has(idx)) return;
+
+        let fromEnd = (n - 1) - position;
+        penalty += fromEnd * 50;
     });
 
     return penalty;
@@ -1603,6 +1661,66 @@ function removeDuplicateRouteItems(route) {
     return cleaned;
 }
 
+// ================= FORCE LAST =================
+function toggleForceLast(locationIndex) {
+    if (forceLastSet.has(locationIndex)) {
+        forceLastSet.delete(locationIndex);
+        log(`Removed Force Last: ${locations[locationIndex]?.name || locationIndex}`);
+    } else {
+        forceLastSet.add(locationIndex);
+        log(`Marked Force Last: ${locations[locationIndex]?.name || locationIndex}`);
+    }
+
+    localStorage.setItem("forceLastSet", JSON.stringify([...forceLastSet]));
+
+    applyForceLastOrdering();
+    recalculateManualRoute(false);
+}
+
+function applyForceLastOrdering() {
+    if (!optimizedRoute.length) return;
+
+    let normal = optimizedRoute.filter(idx => !forceLastSet.has(idx));
+    let forced = optimizedRoute.filter(idx => forceLastSet.has(idx));
+
+    if (!forced.length) {
+        optimizedRoute = normal;
+        return;
+    }
+
+    let orderedForced = [];
+
+    let current = normal.length
+        ? normal[normal.length - 1]
+        : null;
+
+    let remaining = new Set(forced);
+
+    while (remaining.size) {
+        let best = null;
+        let bestScore = Infinity;
+
+        remaining.forEach(candidate => {
+            let score = current === null
+                ? getOfficeToLocationDistance(candidate)
+                : getDistance(current, candidate);
+
+            score += getLocationToOfficeDistance(candidate) * 0.25;
+
+            if (score < bestScore) {
+                bestScore = score;
+                best = candidate;
+            }
+        });
+
+        orderedForced.push(best);
+        remaining.delete(best);
+        current = best;
+    }
+
+    optimizedRoute = normal.concat(orderedForced);
+}
+
 // ================= FULLSCREEN EDITOR =================
 function openFullscreenEditor() {
     if (!optimizedRoute.length) {
@@ -1641,6 +1759,7 @@ function updateFullscreenStats() {
     document.getElementById("fsStats").innerHTML = `
         <span class="stat good">Total Miles: ${formatMiles(total)}</span>
         <span class="stat good">Stops: ${optimizedRoute.length}</span>
+        <span class="stat warn">Force Last: ${forceLastSet.size}</span>
         <span class="stat warn">Soft Outliers: ${outlierSet.size}</span>
         <span class="stat warn">Start/End: ${escapeHtml(homeOffice?.name || "Home Office")}</span>
     `;
@@ -1660,6 +1779,7 @@ function renderFullscreenRouteList() {
         if (r.isHome) return;
 
         let isOutlier = outlierSet.has(r.locationIndex);
+        let isForceLast = forceLastSet.has(r.locationIndex);
 
         let seqClass = "";
 
@@ -1669,7 +1789,7 @@ function renderFullscreenRouteList() {
 
         html += `
             <div
-                class="fsRouteItem${seqClass}${isOutlier ? " outlier-card" : ""}"
+                class="fsRouteItem${seqClass}${isOutlier ? " outlier-card" : ""}${isForceLast ? " force-last-card" : ""}"
                 draggable="${sequenceMode ? "false" : "true"}"
                 data-route-index="${r.routeIndex}"
                 ondragstart="handleFsDragStart(event, ${r.routeIndex})"
@@ -1679,21 +1799,32 @@ function renderFullscreenRouteList() {
                 ondrop="handleFsDrop(event, ${r.routeIndex})"
                 ondragend="handleFsDragEnd(event)"
             >
-                <div class="fsStopNum${isOutlier ? " outlier-num" : ""}">${r.step}</div>
+                <div class="fsStopNum${isOutlier ? " outlier-num" : ""}${isForceLast ? " force-last-num" : ""}">${r.step}</div>
 
                 <div>
-                    <div class="fsSubName">${escapeHtml(r.subdivision)} ${isOutlier ? "⚠️" : ""}</div>
+                    <div class="fsSubName">
+                        ${escapeHtml(r.subdivision)}
+                        ${isForceLast ? " 🔥 LAST" : ""}
+                        ${!isForceLast && isOutlier ? " ⚠️" : ""}
+                    </div>
                     <div class="fsMiles">
                         From prev: ${formatMiles(r.milesFromPrevious)}
                         · To next: ${formatMiles(r.milesToNext)}
                         · Total: ${formatMiles(r.runningTotal)}
                     </div>
-                    ${isOutlier ? `<div class="fsMiles bad">Soft outlier: nearest subdivision ${formatMiles(locations[r.locationIndex].nearestSubdivisionMiles)} mi</div>` : ""}
+                    ${isForceLast ? `<div class="fsMiles bad">Forced to bottom/end of route</div>` : ""}
+                    ${!isForceLast && isOutlier ? `<div class="fsMiles bad">Soft outlier: nearest subdivision ${formatMiles(locations[r.locationIndex].nearestSubdivisionMiles)} mi</div>` : ""}
                 </div>
 
                 <div class="fsMoveBtns">
                     <button onclick="moveRouteItem(${r.routeIndex}, ${r.routeIndex - 1})">↑</button>
                     <button onclick="moveRouteItem(${r.routeIndex}, ${r.routeIndex + 1})">↓</button>
+                    <button
+                        class="forceLastBtn ${isForceLast ? "forceLastActive" : ""}"
+                        onclick="toggleForceLast(${r.locationIndex})"
+                    >
+                        ${isForceLast ? "Unlast" : "Last"}
+                    </button>
                 </div>
             </div>
         `;
@@ -1758,6 +1889,7 @@ function handleFsDrop(event, targetIndex) {
 
     draggedFsIndex = null;
 
+    applyForceLastOrdering();
     recalculateManualRoute(false);
 }
 
@@ -1783,6 +1915,8 @@ function recalculateManualRoute(fitFullscreenMap = false) {
 
     if (!requireHomeOffice()) return;
 
+    applyForceLastOrdering();
+
     buildRouteRows();
 
     renderRoutePreview();
@@ -1796,6 +1930,7 @@ function recalculateManualRoute(fitFullscreenMap = false) {
 
     localStorage.setItem("optimizedRoute", JSON.stringify(optimizedRoute));
     localStorage.setItem("outlierSet", JSON.stringify([...outlierSet]));
+    localStorage.setItem("forceLastSet", JSON.stringify([...forceLastSet]));
 
     let total = optimizedRouteRows.length
         ? optimizedRouteRows[optimizedRouteRows.length - 1].runningTotal
@@ -1812,6 +1947,7 @@ function moveRouteItem(fromIndex, toIndex) {
     let item = optimizedRoute.splice(fromIndex, 1)[0];
     optimizedRoute.splice(toIndex, 0, item);
 
+    applyForceLastOrdering();
     recalculateManualRoute(false);
 }
 
@@ -1849,6 +1985,7 @@ function handleDrop(event, targetIndex) {
 
     draggedRouteIndex = null;
 
+    applyForceLastOrdering();
     recalculateManualRoute(false);
 }
 
@@ -2085,6 +2222,7 @@ function renderRoutePreview() {
         <span class="stat good">Stops: ${locations.length}</span>
         <span class="stat good">Total Drive Miles: ${formatMiles(total)}</span>
         <span class="stat warn">City Loop</span>
+        <span class="stat warn">Force Last: ${forceLastSet.size}</span>
         <span class="stat warn">Soft Outliers: ${outlierSet.size}</span>
         <span class="stat warn">Start: ${escapeHtml(homeOffice.name)}</span>
         <span class="stat warn">Export Uses Current Order</span>
@@ -2095,6 +2233,7 @@ function renderRoutePreview() {
         <tr>
             <th>Drag</th>
             <th>Move</th>
+            <th>Last</th>
             <th>Stop</th>
             <th>Subdivision</th>
             <th>Miles From Previous</th>
@@ -2108,6 +2247,7 @@ function renderRoutePreview() {
 
     html += `
         <tr>
+            <td>-</td>
             <td>-</td>
             <td>-</td>
             <td>Start</td>
@@ -2127,6 +2267,7 @@ function renderRoutePreview() {
                 <tr>
                     <td>-</td>
                     <td>-</td>
+                    <td>-</td>
                     <td>Return</td>
                     <td>${escapeHtml(r.subdivision)}</td>
                     <td>${formatMiles(r.milesFromPrevious)}</td>
@@ -2141,6 +2282,7 @@ function renderRoutePreview() {
         }
 
         let isOutlier = outlierSet.has(r.locationIndex);
+        let isForceLast = forceLastSet.has(r.locationIndex);
 
         html += `
             <tr
@@ -2150,15 +2292,20 @@ function renderRoutePreview() {
                 ondragover="handleDragOver(event)"
                 ondrop="handleDrop(event, ${r.routeIndex})"
                 ondragend="handleDragEnd(event)"
-                style="${isOutlier ? "background:#2a1111;" : ""}"
+                style="${isForceLast ? "background:#2c1608;" : isOutlier ? "background:#2a1111;" : ""}"
             >
                 <td><span class="drag-handle">☰</span></td>
                 <td>
                     <button class="smallBtn" onclick="moveRouteItem(${r.routeIndex}, ${r.routeIndex - 1})">↑</button>
                     <button class="smallBtn" onclick="moveRouteItem(${r.routeIndex}, ${r.routeIndex + 1})">↓</button>
                 </td>
+                <td>
+                    <button class="smallBtn forceLastBtn ${isForceLast ? "forceLastActive" : ""}" onclick="toggleForceLast(${r.locationIndex})">
+                        ${isForceLast ? "Unlast" : "Last"}
+                    </button>
+                </td>
                 <td>${r.step}</td>
-                <td>${escapeHtml(r.subdivision)} ${isOutlier ? "⚠️" : ""}</td>
+                <td>${escapeHtml(r.subdivision)} ${isForceLast ? "🔥 LAST" : isOutlier ? "⚠️" : ""}</td>
                 <td>${formatMiles(r.milesFromPrevious)}</td>
                 <td>${escapeHtml(r.nextSubdivision)}</td>
                 <td>${formatMiles(r.milesToNext)}</td>
@@ -2289,7 +2436,8 @@ function exportRouteExcel() {
         "Running Total Miles": 0,
         Lat: homeOffice.lat,
         Lon: homeOffice.lon,
-        "Soft Outlier": ""
+        "Soft Outlier": "",
+        "Force Last": ""
     });
 
     optimizedRouteRows.forEach(r => {
@@ -2308,7 +2456,8 @@ function exportRouteExcel() {
                 : "",
             Lat: r.lat,
             Lon: r.lon,
-            "Soft Outlier": outlierSet.has(r.locationIndex) ? "YES" : ""
+            "Soft Outlier": outlierSet.has(r.locationIndex) ? "YES" : "",
+            "Force Last": forceLastSet.has(r.locationIndex) ? "YES" : ""
         });
     });
 
@@ -2323,7 +2472,8 @@ function exportRouteExcel() {
         "Running Total Miles": Number(total.toFixed(2)),
         Lat: "",
         Lon: "",
-        "Soft Outlier": ""
+        "Soft Outlier": "",
+        "Force Last": ""
     });
 
     let wsRouteDetails = XLSX.utils.json_to_sheet(routeDetailRows);
@@ -2452,6 +2602,7 @@ function loadStoredState() {
     let savedOfficeToLocationMiles = localStorage.getItem("officeToLocationMiles");
     let savedLocationToOfficeMiles = localStorage.getItem("locationToOfficeMiles");
     let savedOutlierSet = localStorage.getItem("outlierSet");
+    let savedForceLastSet = localStorage.getItem("forceLastSet");
 
     if (savedHomeOffice) {
         homeOffice = JSON.parse(savedHomeOffice);
@@ -2465,6 +2616,7 @@ function loadStoredState() {
     if (savedOfficeToLocationMiles) officeToLocationMiles = JSON.parse(savedOfficeToLocationMiles);
     if (savedLocationToOfficeMiles) locationToOfficeMiles = JSON.parse(savedLocationToOfficeMiles);
     if (savedOutlierSet) outlierSet = new Set(JSON.parse(savedOutlierSet));
+    if (savedForceLastSet) forceLastSet = new Set(JSON.parse(savedForceLastSet));
 
     if (locations.length) {
         renderLoadedPointsMap();
@@ -2481,6 +2633,7 @@ function loadStoredState() {
 
     if (savedOptimizedRoute && locations.length && matrix.length && homeOffice) {
         optimizedRoute = JSON.parse(savedOptimizedRoute);
+        applyForceLastOrdering();
         buildRouteRows();
         renderRoutePreview();
         renderRouteMap();
@@ -2501,6 +2654,7 @@ function clearProgress() {
     locationToOfficeMiles = [];
     homeOffice = null;
     outlierSet = new Set();
+    forceLastSet = new Set();
     sequenceMode = false;
     sequenceRoute = [];
     sequenceRemaining = new Set();
