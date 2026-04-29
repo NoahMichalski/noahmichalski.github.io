@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Drive Mile Matrix Builder v3.8</title>
+<title>Drive Mile Matrix Builder v3.9</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -425,9 +425,9 @@ th:first-child {
 
 <body>
 
-<h2>Drive Mile Matrix Builder v3.8</h2>
+<h2>Drive Mile Matrix Builder v3.9</h2>
 <div class="small">
-    Upload subdivisions, build/upload the drive matrix, optimize for least miles from Home Office, then fullscreen edit before export.
+    Upload subdivisions, build/upload the drive matrix, optimize a low-mile city loop around the area, then fullscreen edit before export.
 </div>
 
 <br>
@@ -452,7 +452,7 @@ th:first-child {
 
 <button class="primary" onclick="buildMatrix()">Build Matrix</button>
 <button onclick="exportExcel()">Export Matrix Excel</button>
-<button class="route" onclick="optimizeRoute()">Optimize Least Miles</button>
+<button class="route" onclick="optimizeRoute()">Optimize City Loop</button>
 <button onclick="recalculateManualRoute()">Refresh Edited Route</button>
 <button class="fullscreenBtn" onclick="openFullscreenEditor()">Open Fullscreen Route Editor</button>
 <button onclick="exportRouteExcel()">Export Edited Route Excel</button>
@@ -462,7 +462,7 @@ th:first-child {
     <h3>Home Office Start / End</h3>
 
     <div class="small">
-        Enter the Home Office coordinates. The route starts here, visits every subdivision once, then returns here.
+        Enter the Home Office coordinates. The route starts here, loops around the city/area, visits every subdivision once, then returns here.
     </div>
 
     <div class="grid">
@@ -498,15 +498,15 @@ th:first-child {
 
     <div class="grid">
         <div>
-            <label>Outlier threshold</label><br>
+            <label>Soft outlier threshold</label><br>
             <input type="number" step="1" id="outlierThreshold" value="25">
-            <div class="small">If a subdivision is this many miles from its nearest subdivision, it gets pushed toward the bottom/end.</div>
+            <div class="small">Marks subdivisions that are this many miles from their nearest subdivision. They are allowed in the loop, but discouraged from being buried in the middle.</div>
         </div>
 
         <div>
-            <label>Optimization style</label><br>
-            <button class="route" onclick="optimizeRoute()">Optimize Least Miles</button>
-            <div class="small">Uses drive matrix + improvement pass. Outliers still go last.</div>
+            <label>Optimization Style</label><br>
+            <button class="route" onclick="optimizeRoute()">Optimize City Loop</button>
+            <div class="small">Creates a circular route around the city, then chooses the lowest-mile rotation/direction using the drive matrix.</div>
         </div>
     </div>
 </div>
@@ -529,8 +529,8 @@ th:first-child {
     </div>
 
     <div class="route-tools">
-        <span class="badge">Least-mile optimizer</span>
-        <span class="badge">Outliers pushed to bottom</span>
+        <span class="badge">City-loop optimizer</span>
+        <span class="badge">Drive-mile scoring</span>
         <span class="badge">Fullscreen map-click sequence</span>
         <span class="badge">Export uses edited order</span>
     </div>
@@ -646,7 +646,7 @@ function saveHomeOffice() {
     log(`Saved Home Office: ${name} (${lat}, ${lon})`);
 
     if (locations.length) renderLoadedPointsMap();
-    if (optimizedRoute.length) recalculateManualRoute();
+    if (optimizedRoute.length) recalculateManualRoute(false);
 }
 
 async function geocodeHomeOffice() {
@@ -818,6 +818,7 @@ function renderMapToLayers(targetMap, targetRouteLayer, targetMarkerLayer, click
     }
 
     let routePosition = new Map();
+
     optimizedRoute.forEach((locIndex, i) => {
         routePosition.set(locIndex, i + 1);
     });
@@ -855,7 +856,7 @@ function renderMapToLayers(targetMap, targetRouteLayer, targetMarkerLayer, click
         let marker = L.marker([loc.lat, loc.lon], { icon })
             .bindPopup(`
                 <b>${escapeHtml(loc.name)}</b><br>
-                ${outlierSet.has(locIndex) ? "<b>Outlier</b><br>" : ""}
+                ${outlierSet.has(locIndex) ? "<b>Soft Outlier</b><br>" : ""}
                 ${sequenceMode ? "Click to add as next stop." : "Stop " + displayNumber}
             `)
             .addTo(targetMarkerLayer);
@@ -869,8 +870,6 @@ function renderMapToLayers(targetMap, targetRouteLayer, targetMarkerLayer, click
         }
     });
 
-    // IMPORTANT: do not fitBounds on every sequence click.
-    // That was the zoom-out problem.
     if (fitMap && latLngs.length) {
         let bounds = L.latLngBounds(latLngs);
 
@@ -947,7 +946,7 @@ function startMapSequenceMode() {
 
     renderFullscreenRouteList();
     renderFullscreenRouteMap(false);
-    updateFullscreenStats();
+    updateSequenceStats();
 
     log("Map Sequence Mode started. Click markers in the order you want.");
 }
@@ -964,7 +963,7 @@ function addLocationToSequence(locationIndex) {
 
     renderFullscreenRouteList();
 
-    // Do not fit map here. This fixes the zoom-out issue.
+    // Do not fit map here. This fixes zooming out every click.
     renderFullscreenRouteMap(false);
 
     updateSequenceStats();
@@ -992,7 +991,7 @@ function finishMapSequenceMode() {
 
     document.getElementById("sequenceBanner").classList.remove("active");
 
-    recalculateManualRoute();
+    recalculateManualRoute(false);
 
     log("Map Sequence Mode finished. Route updated.");
 }
@@ -1002,7 +1001,8 @@ function cancelMapSequenceMode() {
     sequenceRoute = [];
     sequenceRemaining = new Set();
 
-    document.getElementById("sequenceBanner").classList.remove("active");
+    let banner = document.getElementById("sequenceBanner");
+    if (banner) banner.classList.remove("active");
 
     renderFullscreenRouteList();
     renderFullscreenRouteMap(false);
@@ -1348,10 +1348,10 @@ async function buildMatrix() {
     saveProgress(0, 0);
     localStorage.setItem("matrixComplete", "true");
 
-    log("DONE - Matrix complete. You can now click Optimize Least Miles.");
+    log("DONE - Matrix complete. You can now click Optimize City Loop.");
 }
 
-// ================= LEAST-MILE OPTIMIZER =================
+// ================= CITY LOOP OPTIMIZER =================
 async function optimizeRoute() {
 
     if (!locations.length || !matrix.length) {
@@ -1372,44 +1372,173 @@ async function optimizeRoute() {
         return;
     }
 
-    log("Optimizing for least drive miles...");
+    log("Optimizing city-loop route using drive miles...");
 
     await ensureHomeOfficeDistances();
 
     let threshold = parseFloat(document.getElementById("outlierThreshold").value);
     if (isNaN(threshold) || threshold <= 0) threshold = 25;
 
-    let classified = classifyOutliers(threshold);
-    outlierSet = new Set(classified.outliers);
+    outlierSet = classifySoftOutliers(threshold);
 
-    let normalRoute = [];
-
-    if (classified.normal.length) {
-        normalRoute = optimizeSubsetRoute(classified.normal);
-    }
-
-    let outlierRoute = [];
-
-    if (classified.outliers.length) {
-        outlierRoute = orderOutliersLast(classified.outliers, normalRoute);
-    }
-
-    optimizedRoute = normalRoute.concat(outlierRoute);
+    optimizedRoute = buildBestCityLoopRoute();
 
     optimizedRoute = removeDuplicateRouteItems(optimizedRoute);
 
-    recalculateManualRoute();
+    recalculateManualRoute(true);
 
     localStorage.setItem("outlierSet", JSON.stringify([...outlierSet]));
 
-    log(`Least-mile route complete.`);
-    log(`Normal stops: ${classified.normal.length}`);
-    log(`Outliers pushed to bottom: ${classified.outliers.length}`);
+    let total = optimizedRouteRows.length
+        ? optimizedRouteRows[optimizedRouteRows.length - 1].runningTotal
+        : 0;
+
+    log(`City-loop route complete. Total drive miles: ${formatMiles(total)}`);
+    log(`Soft outliers marked: ${outlierSet.size}`);
 }
 
-function classifyOutliers(threshold) {
-    let normal = [];
-    let outliers = [];
+function buildBestCityLoopRoute() {
+    let center = getRouteCenter();
+
+    let angled = locations.map((loc, index) => {
+        let angle = Math.atan2(
+            loc.lat - center.lat,
+            loc.lon - center.lon
+        );
+
+        let radius = haversineMiles(center, loc);
+
+        return {
+            index,
+            angle,
+            radius
+        };
+    });
+
+    angled.sort((a, b) => a.angle - b.angle);
+
+    let clockwise = angled.map(x => x.index);
+    let counterClockwise = clockwise.slice().reverse();
+
+    let candidates = [];
+
+    candidates.push(...generateLoopCandidates(clockwise));
+    candidates.push(...generateLoopCandidates(counterClockwise));
+
+    let best = null;
+    let bestScore = Infinity;
+
+    candidates.forEach(route => {
+        let driveMiles = routeDistanceWithOffice(route);
+        let shapePenalty = loopShapePenalty(route);
+        let outlierPenalty = outlierPlacementPenalty(route);
+        let homePenalty = homeEntryPenalty(route);
+
+        let score =
+            driveMiles +
+            shapePenalty * 0.35 +
+            outlierPenalty * 0.5 +
+            homePenalty * 0.25;
+
+        if (score < bestScore) {
+            bestScore = score;
+            best = route;
+        }
+    });
+
+    return best || clockwise;
+}
+
+function generateLoopCandidates(baseRoute) {
+    let candidates = [];
+
+    for (let cut = 0; cut < baseRoute.length; cut++) {
+        let rotated = baseRoute.slice(cut).concat(baseRoute.slice(0, cut));
+        candidates.push(rotated);
+    }
+
+    return candidates;
+}
+
+function getRouteCenter() {
+    let lat = 0;
+    let lon = 0;
+
+    locations.forEach(l => {
+        lat += l.lat;
+        lon += l.lon;
+    });
+
+    return {
+        lat: lat / locations.length,
+        lon: lon / locations.length
+    };
+}
+
+function loopShapePenalty(route) {
+    let penalty = 0;
+    let center = getRouteCenter();
+
+    for (let i = 0; i < route.length - 1; i++) {
+        let a = locations[route[i]];
+        let b = locations[route[i + 1]];
+
+        let segmentMiles = getDistance(route[i], route[i + 1]);
+
+        let mid = {
+            lat: (a.lat + b.lat) / 2,
+            lon: (a.lon + b.lon) / 2
+        };
+
+        let distFromCenter = haversineMiles(center, mid);
+
+        // Discourage long cuts through the middle of the city cloud.
+        if (segmentMiles > 12 && distFromCenter < 8) {
+            penalty += segmentMiles * 1.5;
+        }
+
+        // Discourage giant jumps unless they are truly unavoidable.
+        if (segmentMiles > 25) {
+            penalty += (segmentMiles - 25) * 0.8;
+        }
+    }
+
+    return penalty;
+}
+
+function outlierPlacementPenalty(route) {
+    if (!outlierSet.size) return 0;
+
+    let penalty = 0;
+    let n = route.length;
+
+    route.forEach((idx, position) => {
+        if (!outlierSet.has(idx)) return;
+
+        let normalized = position / Math.max(1, n - 1);
+        let distanceFromEdge = Math.min(normalized, 1 - normalized);
+
+        // Outliers are allowed, but better near the beginning/end of the loop.
+        penalty += distanceFromEdge * 30;
+    });
+
+    return penalty;
+}
+
+function homeEntryPenalty(route) {
+    if (!route.length) return 0;
+
+    let first = route[0];
+    let last = route[route.length - 1];
+
+    let startMiles = getOfficeToLocationDistance(first);
+    let endMiles = getLocationToOfficeDistance(last);
+
+    return startMiles + endMiles;
+}
+
+function classifySoftOutliers(threshold) {
+    let set = new Set();
 
     for (let i = 0; i < locations.length; i++) {
         let nearest = nearestSubdivisionMiles(i);
@@ -1417,21 +1546,11 @@ function classifyOutliers(threshold) {
         locations[i].nearestSubdivisionMiles = nearest;
 
         if (nearest >= threshold) {
-            outliers.push(i);
-        } else {
-            normal.push(i);
+            set.add(i);
         }
     }
 
-    // If almost everything gets marked as an outlier, do not split.
-    if (normal.length < 2 && outliers.length > 2) {
-        return {
-            normal: locations.map((_, i) => i),
-            outliers: []
-        };
-    }
-
-    return { normal, outliers };
+    return set;
 }
 
 function nearestSubdivisionMiles(index) {
@@ -1448,134 +1567,6 @@ function nearestSubdivisionMiles(index) {
     }
 
     return best;
-}
-
-function optimizeSubsetRoute(indices) {
-    if (!indices.length) return [];
-    if (indices.length === 1) return indices.slice();
-
-    let bestRoute = null;
-    let bestDistance = Infinity;
-
-    // Try every start point so it does not get stuck with a bad first subdivision.
-    indices.forEach(start => {
-        let route = nearestNeighborSubsetRoute(indices, start);
-        route = twoOptWithOffice(route);
-
-        let distance = routeDistanceWithOffice(route);
-
-        if (distance < bestDistance) {
-            bestDistance = distance;
-            bestRoute = route;
-        }
-    });
-
-    // A second 2-opt pass helps clean up crossings/backtracking.
-    bestRoute = twoOptWithOffice(bestRoute);
-
-    return bestRoute;
-}
-
-function nearestNeighborSubsetRoute(indices, start) {
-    let unvisited = new Set(indices);
-    unvisited.delete(start);
-
-    let route = [start];
-    let current = start;
-
-    while (unvisited.size) {
-        let nearest = null;
-        let nearestScore = Infinity;
-
-        unvisited.forEach(candidate => {
-            let d = getDistance(current, candidate);
-
-            if (d < nearestScore) {
-                nearestScore = d;
-                nearest = candidate;
-            }
-        });
-
-        route.push(nearest);
-        unvisited.delete(nearest);
-        current = nearest;
-    }
-
-    return route;
-}
-
-function twoOptWithOffice(route) {
-    if (!route || route.length < 4) return route;
-
-    let best = route.slice();
-    let bestDistance = routeDistanceWithOffice(best);
-    let improved = true;
-    let safety = 0;
-
-    while (improved && safety < 75) {
-        improved = false;
-        safety++;
-
-        for (let i = 0; i < best.length - 2; i++) {
-            for (let k = i + 1; k < best.length - 1; k++) {
-                let candidate = twoOptSwap(best, i, k);
-                let candidateDistance = routeDistanceWithOffice(candidate);
-
-                if (candidateDistance + 0.001 < bestDistance) {
-                    best = candidate;
-                    bestDistance = candidateDistance;
-                    improved = true;
-                }
-            }
-        }
-    }
-
-    return best;
-}
-
-function twoOptSwap(route, i, k) {
-    let part1 = route.slice(0, i);
-    let part2 = route.slice(i, k + 1).reverse();
-    let part3 = route.slice(k + 1);
-    return part1.concat(part2, part3);
-}
-
-function orderOutliersLast(outliers, normalRoute) {
-    if (!outliers.length) return [];
-
-    let remaining = new Set(outliers);
-    let ordered = [];
-
-    let current = normalRoute.length
-        ? normalRoute[normalRoute.length - 1]
-        : null;
-
-    while (remaining.size) {
-        let best = null;
-        let bestScore = Infinity;
-
-        remaining.forEach(candidate => {
-            let fromCurrent = current === null
-                ? getOfficeToLocationDistance(candidate)
-                : getDistance(current, candidate);
-
-            let returnHome = getLocationToOfficeDistance(candidate);
-
-            // Balance getting there and eventually coming home.
-            let score = fromCurrent + returnHome * 0.35;
-
-            if (score < bestScore) {
-                bestScore = score;
-                best = candidate;
-            }
-        });
-
-        ordered.push(best);
-        remaining.delete(best);
-        current = best;
-    }
-
-    return ordered;
 }
 
 function routeDistanceWithOffice(route) {
@@ -1625,7 +1616,6 @@ function openFullscreenEditor() {
 
     renderFullscreenRouteList();
 
-    // Fit once when opening. After that, sequence clicks will not zoom out.
     renderFullscreenRouteMap(true);
 
     updateFullscreenStats();
@@ -1651,7 +1641,7 @@ function updateFullscreenStats() {
     document.getElementById("fsStats").innerHTML = `
         <span class="stat good">Total Miles: ${formatMiles(total)}</span>
         <span class="stat good">Stops: ${optimizedRoute.length}</span>
-        <span class="stat warn">Outliers: ${outlierSet.size}</span>
+        <span class="stat warn">Soft Outliers: ${outlierSet.size}</span>
         <span class="stat warn">Start/End: ${escapeHtml(homeOffice?.name || "Home Office")}</span>
     `;
 }
@@ -1698,7 +1688,7 @@ function renderFullscreenRouteList() {
                         · To next: ${formatMiles(r.milesToNext)}
                         · Total: ${formatMiles(r.runningTotal)}
                     </div>
-                    ${isOutlier ? `<div class="fsMiles bad">Outlier: nearest subdivision ${formatMiles(locations[r.locationIndex].nearestSubdivisionMiles)} mi</div>` : ""}
+                    ${isOutlier ? `<div class="fsMiles bad">Soft outlier: nearest subdivision ${formatMiles(locations[r.locationIndex].nearestSubdivisionMiles)} mi</div>` : ""}
                 </div>
 
                 <div class="fsMoveBtns">
@@ -2094,7 +2084,8 @@ function renderRoutePreview() {
     document.getElementById("routeStats").innerHTML = `
         <span class="stat good">Stops: ${locations.length}</span>
         <span class="stat good">Total Drive Miles: ${formatMiles(total)}</span>
-        <span class="stat warn">Outliers Last: ${outlierSet.size}</span>
+        <span class="stat warn">City Loop</span>
+        <span class="stat warn">Soft Outliers: ${outlierSet.size}</span>
         <span class="stat warn">Start: ${escapeHtml(homeOffice.name)}</span>
         <span class="stat warn">Export Uses Current Order</span>
     `;
@@ -2298,7 +2289,7 @@ function exportRouteExcel() {
         "Running Total Miles": 0,
         Lat: homeOffice.lat,
         Lon: homeOffice.lon,
-        Outlier: ""
+        "Soft Outlier": ""
     });
 
     optimizedRouteRows.forEach(r => {
@@ -2317,7 +2308,7 @@ function exportRouteExcel() {
                 : "",
             Lat: r.lat,
             Lon: r.lon,
-            Outlier: outlierSet.has(r.locationIndex) ? "YES" : ""
+            "Soft Outlier": outlierSet.has(r.locationIndex) ? "YES" : ""
         });
     });
 
@@ -2332,7 +2323,7 @@ function exportRouteExcel() {
         "Running Total Miles": Number(total.toFixed(2)),
         Lat: "",
         Lon: "",
-        Outlier: ""
+        "Soft Outlier": ""
     });
 
     let wsRouteDetails = XLSX.utils.json_to_sheet(routeDetailRows);
@@ -2342,9 +2333,9 @@ function exportRouteExcel() {
     XLSX.utils.book_append_sheet(wb, wsOriginalFormat, "Edited Optimized Order");
     XLSX.utils.book_append_sheet(wb, wsRouteDetails, "Route Details");
 
-    XLSX.writeFile(wb, "Edited_Optimized_Least_Miles_Route.xlsx");
+    XLSX.writeFile(wb, "Edited_Optimized_City_Loop_Route.xlsx");
 
-    log("Exported edited optimized least-mile route.");
+    log("Exported edited optimized city-loop route.");
 }
 
 // ================= DISTANCE HELPERS =================
@@ -2520,7 +2511,9 @@ function clearProgress() {
     document.getElementById("homeLon").value = "";
 
     document.getElementById("matrixContainer").innerHTML = "";
-    document.getElementById("sequenceBanner").classList.remove("active");
+
+    let banner = document.getElementById("sequenceBanner");
+    if (banner) banner.classList.remove("active");
 
     clearRoutePreview(false);
 
