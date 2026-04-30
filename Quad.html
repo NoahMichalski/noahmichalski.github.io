@@ -125,6 +125,10 @@
     .quadMarker{display:grid;place-items:center;width:30px;height:30px;border-radius:999px;border:2px solid rgba(255,255,255,.88);box-shadow:0 8px 22px rgba(0,0,0,.38);color:#06101d;font-weight:950;font-size:12px}
     .quadNW{background:var(--nw)}.quadNE{background:var(--ne)}.quadSW{background:var(--sw)}.quadSE{background:var(--se)}.quadUnmatched{background:#8892a6}
     .centerCross{width:18px;height:18px;border-radius:50%;border:3px solid #fff;background:#111827;box-shadow:0 0 0 3px rgba(55,189,248,.45)}
+    .quadLabel{min-width:116px;text-align:center;color:#eaf2ff;background:rgba(7,17,31,.88);border:1px solid rgba(200,216,239,.45);border-radius:14px;padding:8px 10px;box-shadow:0 10px 28px rgba(0,0,0,.38);backdrop-filter:blur(10px);line-height:1.15}
+    .quadLabel .big{font-size:19px;font-weight:950;letter-spacing:-.03em}
+    .quadLabel .hrs{font-size:13px;font-weight:900;margin-top:2px}
+    .quadLabel .jobs{font-size:11px;color:#92a5bf;margin-top:2px}
     .mapNote{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.45}
   </style>
 </head>
@@ -135,7 +139,7 @@
         <h1>Quadrant Man-Hour Dashboard</h1>
         <div class="sub">Upload today’s jobs + subdivisions + task hours. Totals man-hours by Columbus quadrant and recommends 2 / 3 / 4 person crews.</div>
       </div>
-      <div class="version">VIP Tool v1.10</div>
+      <div class="version">VIP Tool v1.11</div>
     </div>
   </header>
 
@@ -252,7 +256,8 @@
     map: null,
     mapLayer: null,
     centerLayer: null,
-    boundaryLayer: null
+    boundaryLayer: null,
+    quadrantOverlayLayer: null
   };
 
   const colAliases = {
@@ -571,6 +576,7 @@
     state.mapLayer = L.layerGroup().addTo(state.map);
     state.centerLayer = L.layerGroup().addTo(state.map);
     state.boundaryLayer = L.layerGroup().addTo(state.map);
+    state.quadrantOverlayLayer = L.layerGroup().addTo(state.map);
     setTimeout(()=>state.map.invalidateSize(), 80);
     return state.map;
   }
@@ -591,6 +597,7 @@
     state.mapLayer.clearLayers();
     state.centerLayer.clearLayers();
     state.boundaryLayer.clearLayers();
+    if (state.quadrantOverlayLayer) state.quadrantOverlayLayer.clearLayers();
 
     const cLat = Number($("centerLat").value) || 39.961176;
     const cLon = Number($("centerLon").value) || -82.998794;
@@ -602,11 +609,29 @@
     const allMatched = state.computed.filter(r => r.matchedSubdivision?.lat != null && r.matchedSubdivision?.lon != null);
     const lats = allMatched.map(r => r.matchedSubdivision.lat);
     const lons = allMatched.map(r => r.matchedSubdivision.lon);
+    let minLat = cLat - .45, maxLat = cLat + .45, minLon = cLon - .65, maxLon = cLon + .65;
     if (lats.length && lons.length){
-      const minLat = Math.min(...lats, cLat), maxLat = Math.max(...lats, cLat);
-      const minLon = Math.min(...lons, cLon), maxLon = Math.max(...lons, cLon);
-      L.polyline([[minLat, cLon],[maxLat, cLon]], {color:"#c8d8ef", weight:2, opacity:.55, dashArray:"7 7"}).addTo(state.boundaryLayer);
-      L.polyline([[cLat, minLon],[cLat, maxLon]], {color:"#c8d8ef", weight:2, opacity:.55, dashArray:"7 7"}).addTo(state.boundaryLayer);
+      minLat = Math.min(...lats, cLat);
+      maxLat = Math.max(...lats, cLat);
+      minLon = Math.min(...lons, cLon);
+      maxLon = Math.max(...lons, cLon);
+      const padLat = Math.max((maxLat - minLat) * .18, .08);
+      const padLon = Math.max((maxLon - minLon) * .18, .08);
+      minLat -= padLat; maxLat += padLat; minLon -= padLon; maxLon += padLon;
+    }
+
+    const overlayStyle = q => ({color:qColor(q), fillColor:qColor(q), fillOpacity:.08, opacity:.55, weight:1});
+    const rects = {NW:[[cLat,minLon],[maxLat,cLon]], NE:[[cLat,cLon],[maxLat,maxLon]], SW:[[minLat,minLon],[cLat,cLon]], SE:[[minLat,cLon],[cLat,maxLon]]};
+    for (const q of QNAMES) L.rectangle(rects[q], overlayStyle(q)).addTo(state.quadrantOverlayLayer);
+    L.polyline([[minLat,cLon],[maxLat,cLon]], {color:"#eaf2ff", weight:3, opacity:.78, dashArray:"8 7"}).addTo(state.boundaryLayer);
+    L.polyline([[cLat,minLon],[cLat,maxLon]], {color:"#eaf2ff", weight:3, opacity:.78, dashArray:"8 7"}).addTo(state.boundaryLayer);
+
+    const labelPositions = {NW:[(cLat+maxLat)/2,(minLon+cLon)/2], NE:[(cLat+maxLat)/2,(cLon+maxLon)/2], SW:[(minLat+cLat)/2,(minLon+cLon)/2], SE:[(minLat+cLat)/2,(cLon+maxLon)/2]};
+    for (const q of QNAMES){
+      const rows = groups[q] || [];
+      const h = rows.reduce((a,r)=>a+(Number(r.hours)||0),0);
+      const crew = recommendCrew(h).label;
+      L.marker(labelPositions[q], {interactive:false, icon:L.divIcon({className:"", html:`<div class="quadLabel" style="border-color:${qColor(q)}"><div class="big">${q}</div><div class="hrs">${fmt(h)} hrs</div><div class="jobs">${rows.length} jobs • ${crew}</div></div>`, iconSize:[116,64], iconAnchor:[58,32]})}).addTo(state.quadrantOverlayLayer);
     }
 
     const byLocation = new Map();
@@ -688,6 +713,7 @@
     `;
 
     $("quadGrid").innerHTML = [...QNAMES, "Unmatched"].map(q => renderQuadrant(q, groups[q] || [])).join("");
+    renderMap(groups);
     renderIssues();
   }
 
@@ -831,6 +857,9 @@
   });
   $("clearBtn").addEventListener("click", () => {
     state.subdivisions = []; state.taskTypes = []; state.jobs = []; state.computed = [];
+    if (state.mapLayer) state.mapLayer.clearLayers();
+    if (state.boundaryLayer) state.boundaryLayer.clearLayers();
+    if (state.quadrantOverlayLayer) state.quadrantOverlayLayer.clearLayers();
     ["subFile","taskFile","jobsFile"].forEach(id => $(id).value = "");
     $("summarySection").classList.add("hidden");
     $("dateFilter").innerHTML = '<option value="">All Dates</option>';
