@@ -1,7 +1,7 @@
 {
   "app": "VIP Quadrant Man-Hour Review",
-  "version": "1.30",
-  "exportedAt": "2026-05-01T23:25:50.445Z",
+  "version": "1.50",
+  "exportedAt": "2026-05-01T23:37:54.292Z",
   "columbusCenter": {
     "lat": 39.9612,
     "lon": -82.9988
@@ -20251,6 +20251,36 @@
       "quadrant": "NW",
       "hours": 0,
       "hoursSource": "missing Other hours"
+    }
+  ],
+  "issues": [
+    {
+      "kind": "hours",
+      "msg": "4-28-2026.xlsx row 8: No hours found for Eastwood lot 235 task “Other”."
+    },
+    {
+      "kind": "hours",
+      "msg": "5-1-2026.xlsx row 7: No hours found for Sycamore Grove lot 15 task “Other”."
+    },
+    {
+      "kind": "hours",
+      "msg": "5-4-2026.xlsx row 21: No hours found for Towns On The Parkway lot 23 task “Other”."
+    },
+    {
+      "kind": "hours",
+      "msg": "5-4-2026.xlsx row 27: No hours found for Jerome Village Applewood lot 2446 task “Other”."
+    },
+    {
+      "kind": "hours",
+      "msg": "5-4-2026.xlsx row 52: No hours found for Nottingham Trace lot 118 task “Other”."
+    },
+    {
+      "kind": "hours",
+      "msg": "5-4-2026.xlsx row 53: No hours found for Scotts lot 220 task “Other”."
+    },
+    {
+      "kind": "hours",
+      "msg": "5-4-2026.xlsx row 54: No hours found for Scotts lot 242 task “Other”."
     }
   ]
 }
