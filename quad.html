@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VIP Quadrant Week / Month Review Dashboard v1.50</title>
+  <title>VIP Quadrant Week / Month Review Dashboard v1.51</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -40,10 +40,11 @@
       <div class="sub">Upload subdivisions + task hours + multiple daily job files. Review a day, week, month, or the whole batch on a map.</div>
     </div>
     <details class="versionBox">
-      <summary class="version">v1.50 • Saved exports are standalone ▾</summary>
+      <summary class="version">v1.51 • Saved export load fix ▾</summary>
       <div class="versionDrop">
         <h3>Version history</h3>
         <ul>
+          <li><b>v1.51</b> — Fixed saved review loading error where the dashboard called populateSelectors instead of the active filter dropdown function.</li>
           <li><b>v1.50</b> — Saved review exports now clearly load without needing the original Excel sheets; added this version history dropdown.</li>
           <li><b>v1.40</b> — Added saved review dropdown for hosted GitHub JSON exports.</li>
           <li><b>v1.30</b> — Added GitHub review JSON export/import, fixed bubble sizing, removed crew recommendations, and restored map quadrants.</li>
@@ -279,7 +280,7 @@ function exportSnapshot(){
   if(!state.loaded){ alert("Load and calculate your Excel files first."); return; }
   const payload={
     app:"VIP Quadrant Man-Hour Review",
-    version:"1.50",
+    version:"1.51",
     exportedAt:new Date().toISOString(),
     columbusCenter:COLUMBUS,
     subdivisions:state.subs,
@@ -297,7 +298,7 @@ function loadSnapshotObject(payload){
   state.subs=Array.isArray(payload.subdivisions)?payload.subdivisions:[];
   state.tasks=Array.isArray(payload.taskTypes)?payload.taskTypes:[];
   state.rawJobs=[]; state.jobs=payload.jobs.map(j=>({week:j.week||isoWeek(j.date),month:j.month||monthKey(j.date),...j})); state.issues=Array.isArray(payload.issues)?payload.issues:[]; state.loaded=true;
-  populateSelectors(); applyFilters();
+  populateFilters(); applyFilters();
 }
 async function loadSnapshotFile(file){ const text=await file.text(); loadSnapshotObject(JSON.parse(text)); }
 function labelFromReviewFile(name){
