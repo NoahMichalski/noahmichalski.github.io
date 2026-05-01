@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VIP Quadrant Week / Month Review Dashboard</title>
+  <title>VIP Quadrant Week / Month Review Dashboard v1.50</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -19,6 +19,7 @@
     .wrap{max-width:1500px;margin:0 auto;padding:18px;}
     .top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
     h1{margin:0;font-size:clamp(22px,3vw,34px);letter-spacing:-.04em}.sub{color:var(--muted);margin-top:5px;font-size:14px}.version{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.04)}
+    .versionBox{position:relative}.versionDrop{position:absolute;right:0;top:42px;width:min(420px,90vw);background:#0d1b2f;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:12px;z-index:2000}.versionDrop h3{margin:0 0 8px;font-size:15px}.versionDrop ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.45}.versionDrop li{margin:5px 0}.versionDrop b{color:var(--text)}details.versionBox summary{list-style:none;cursor:pointer}details.versionBox summary::-webkit-details-marker{display:none}.dataNote{margin-top:12px;padding:12px;border:1px solid rgba(55,189,248,.35);background:rgba(55,189,248,.08);border-radius:14px;color:var(--muted);line-height:1.35}.dataNote b{color:var(--text)}
     .grid{display:grid;gap:16px}.uploads{grid-template-columns:repeat(3,minmax(240px,1fr));margin-top:16px}.dashboard{grid-template-columns:390px 1fr;align-items:start}.cards{grid-template-columns:repeat(4,minmax(160px,1fr));margin:16px 0}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
     @media(max-width:1000px){.uploads,.dashboard,.cards,.two,.three{grid-template-columns:1fr}.mapPanel{min-height:520px}}
     .panel,.upload,.stat,.miniCard{background:linear-gradient(180deg,rgba(18,35,58,.97),rgba(13,27,47,.97));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
@@ -38,14 +39,27 @@
       <h1>VIP Quadrant Man-Hour Review</h1>
       <div class="sub">Upload subdivisions + task hours + multiple daily job files. Review a day, week, month, or the whole batch on a map.</div>
     </div>
-    <div class="version">v1.40 • Saved Review Dropdown</div>
+    <details class="versionBox">
+      <summary class="version">v1.50 • Saved exports are standalone ▾</summary>
+      <div class="versionDrop">
+        <h3>Version history</h3>
+        <ul>
+          <li><b>v1.50</b> — Saved review exports now clearly load without needing the original Excel sheets; added this version history dropdown.</li>
+          <li><b>v1.40</b> — Added saved review dropdown for hosted GitHub JSON exports.</li>
+          <li><b>v1.30</b> — Added GitHub review JSON export/import, fixed bubble sizing, removed crew recommendations, and restored map quadrants.</li>
+          <li><b>v1.20</b> — Added week/month review mode, multi-day upload, filename-based work dates, and busiest day tracking.</li>
+          <li><b>v1.11</b> — Fixed map refresh and added quadrant hour labels directly on the map.</li>
+          <li><b>v1.00</b> — First quadrant man-hour dashboard with daily Excel upload, totals, and map view.</li>
+        </ul>
+      </div>
+    </details>
   </div>
 </header>
 <main class="wrap">
   <section class="grid uploads">
-    <div class="upload"><label>1) Subdivisions file</label><small>Needs Subdivision, Builder, Lat, Lon. Optional: Quadrant/Area.</small><input id="subsFile" type="file" accept=".xlsx,.xls,.csv" /></div>
-    <div class="upload"><label>2) Task Types file</label><small>Needs Task and Hours. Builder/Floor Plan can be Any.</small><input id="tasksFile" type="file" accept=".xlsx,.xls,.csv" /></div>
-    <div class="upload"><label>3) Daily Job files</label><small>Select one day, a full week, or a month. The filename is used as the work date.</small><input id="jobsFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
+    <div class="upload"><label>1) Subdivisions file</label><small>Only needed when creating a new review from Excel. Saved review JSON already includes this.</small><input id="subsFile" type="file" accept=".xlsx,.xls,.csv" /></div>
+    <div class="upload"><label>2) Task Types file</label><small>Only needed when creating a new review from Excel. Saved review JSON already includes calculated job hours.</small><input id="tasksFile" type="file" accept=".xlsx,.xls,.csv" /></div>
+    <div class="upload"><label>3) Daily Job files</label><small>Only needed when creating a new review. Select one day, a full week, or a month.</small><input id="jobsFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
   </section>
 
   <section class="controls panel">
@@ -63,6 +77,7 @@
     <label class="btn ghost" style="display:inline-flex;align-items:center;gap:8px;margin:0">Load Review JSON<input id="reviewJsonFile" type="file" accept=".json" style="display:none"></label>
     <button id="loadHostedBtn" class="btn ghost" title="Loads the selected hosted review JSON from the same GitHub folder">Load Saved Review</button>
   </section>
+  <div class="dataNote"><b>Saved reviews do not need the original Excel sheets.</b> Use the Excel uploads only to create a new review/export. Once you load a saved review JSON from the dropdown or upload one with “Load Review JSON,” the dashboard has everything it needs to show the map, quadrant totals, busiest day, tables, and exports.</div>
 
   <section class="grid cards" id="summaryCards"></section>
 
@@ -264,12 +279,13 @@ function exportSnapshot(){
   if(!state.loaded){ alert("Load and calculate your Excel files first."); return; }
   const payload={
     app:"VIP Quadrant Man-Hour Review",
-    version:"1.40",
+    version:"1.50",
     exportedAt:new Date().toISOString(),
     columbusCenter:COLUMBUS,
     subdivisions:state.subs,
     taskTypes:state.tasks,
-    jobs:state.jobs
+    jobs:state.jobs,
+    issues:state.issues
   };
   const dates=[...new Set(state.jobs.map(j=>j.date).filter(Boolean))].sort();
   const name=dates.length?`quadrant-review-${dates[0]}-to-${dates[dates.length-1]}.json`:"quadrant-review-data.json";
@@ -280,7 +296,7 @@ function loadSnapshotObject(payload){
   if(!payload || !Array.isArray(payload.jobs)) throw new Error("That JSON does not look like a review export.");
   state.subs=Array.isArray(payload.subdivisions)?payload.subdivisions:[];
   state.tasks=Array.isArray(payload.taskTypes)?payload.taskTypes:[];
-  state.rawJobs=[]; state.jobs=payload.jobs.map(j=>({week:j.week||isoWeek(j.date),month:j.month||monthKey(j.date),...j})); state.issues=[]; state.loaded=true;
+  state.rawJobs=[]; state.jobs=payload.jobs.map(j=>({week:j.week||isoWeek(j.date),month:j.month||monthKey(j.date),...j})); state.issues=Array.isArray(payload.issues)?payload.issues:[]; state.loaded=true;
   populateSelectors(); applyFilters();
 }
 async function loadSnapshotFile(file){ const text=await file.text(); loadSnapshotObject(JSON.parse(text)); }
@@ -314,7 +330,7 @@ document.getElementById("reviewJsonFile").addEventListener("change",e=>{ const f
 document.getElementById("loadHostedBtn").addEventListener("click",()=>loadHostedSnapshot().catch(err=>{console.error(err); setStatusCards(err.message); alert(err.message+"\n\nMake sure the JSON file is uploaded to the same GitHub folder as this HTML and is listed in SAVED_REVIEW_FILES near the top of the script.");}));
 document.getElementById("copyBtn").addEventListener("click",async()=>{ await navigator.clipboard.writeText(summaryText()); const b=document.getElementById("copyBtn"); const old=b.textContent; b.textContent="Copied!"; setTimeout(()=>b.textContent=old,1200); });
 populateSavedReviews();
-setStatusCards("Ready. Upload your three file groups to begin, or pick a saved hosted review from the dropdown.");
+setStatusCards("Ready. Upload Excel files to create a new review, or load a saved review JSON from the dropdown. Saved reviews do not need the sheets.");
 initMap();
 </script>
 </body>
