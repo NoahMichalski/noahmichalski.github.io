@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIP Quadrant Week / Month Review Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root{
+      --bg:#07111f; --panel:#0d1b2f; --panel2:#12233a; --card:#0f2038; --line:#263c5c;
+      --text:#eaf2ff; --muted:#92a5bf; --accent:#37bdf8; --good:#37d67a; --warn:#ffd166; --bad:#ff5c7a; --purple:#b197fc;
+      --nw:#37bdf8; --ne:#37d67a; --sw:#ffd166; --se:#ff5c7a; --radius:18px; --shadow:0 18px 50px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:radial-gradient(circle at top left,rgba(55,189,248,.18),transparent 30%),linear-gradient(180deg,#07111f,#081426 55%,#060d18);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+    header{position:sticky;top:0;z-index:1000;background:rgba(7,17,31,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
+    .wrap{max-width:1500px;margin:0 auto;padding:18px;}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+    h1{margin:0;font-size:clamp(22px,3vw,34px);letter-spacing:-.04em}.sub{color:var(--muted);margin-top:5px;font-size:14px}.version{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.04)}
+    .grid{display:grid;gap:16px}.uploads{grid-template-columns:repeat(3,minmax(240px,1fr));margin-top:16px}.dashboard{grid-template-columns:390px 1fr;align-items:start}.cards{grid-template-columns:repeat(4,minmax(160px,1fr));margin:16px 0}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
+    @media(max-width:1000px){.uploads,.dashboard,.cards,.two,.three{grid-template-columns:1fr}.mapPanel{min-height:520px}}
+    .panel,.upload,.stat,.miniCard{background:linear-gradient(180deg,rgba(18,35,58,.97),rgba(13,27,47,.97));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .panel{padding:16px}.upload{padding:14px}.upload label{font-weight:800;display:block;margin-bottom:8px}.upload small,.hint{display:block;color:var(--muted);line-height:1.35}.upload input{width:100%;margin-top:12px;color:var(--muted)}
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:16px 0}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}select,input[type="search"],input[type="date"]{background:#081427;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:40px;outline:none}input[type="search"]{min-width:280px}.btn{border:1px solid var(--line);background:linear-gradient(180deg,#16304f,#10243d);color:var(--text);border-radius:12px;padding:10px 13px;font-weight:800;cursor:pointer;min-height:40px}.btn:hover{border-color:var(--accent);transform:translateY(-1px)}.btn.primary{background:linear-gradient(180deg,#0891c9,#0e7490);border-color:#22b8e8}.btn.ghost{background:rgba(255,255,255,.05)}
+    .stat{padding:16px;position:relative;overflow:hidden}.stat:before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--accent)}.stat h3{margin:0;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.09em}.stat .num{font-size:30px;font-weight:950;letter-spacing:-.04em;margin-top:8px}.stat p{margin:5px 0 0;color:var(--muted);font-size:13px}.stat.good:before{background:var(--good)}.stat.warn:before{background:var(--warn)}.stat.bad:before{background:var(--bad)}.stat.purple:before{background:var(--purple)}
+    .quadList{display:grid;gap:12px}.quad{border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:16px;padding:13px}.quadHead{display:flex;align-items:center;justify-content:space-between;gap:10px}.quadName{font-weight:950;font-size:18px}.pill{font-size:12px;font-weight:900;border:1px solid var(--line);border-radius:999px;padding:5px 8px;color:#06101e}.pill.dark{color:var(--text);background:rgba(255,255,255,.05)}.qNW{background:var(--nw)}.qNE{background:var(--ne)}.qSW{background:var(--sw)}.qSE{background:var(--se)}.bar{height:9px;border-radius:999px;background:#081427;border:1px solid var(--line);overflow:hidden;margin-top:10px}.bar>span{display:block;height:100%;width:0;background:var(--accent)}.quadMeta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.quadMeta div{background:rgba(0,0,0,.18);border-radius:12px;padding:8px}.quadMeta b{display:block;font-size:16px}.quadMeta small{color:var(--muted)}
+    #map{height:720px;min-height:520px;border-radius:18px;border:1px solid var(--line);overflow:hidden;background:#07111f}.mapPanel{padding:12px}.leaflet-container{background:#081426}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0d1b2f;color:var(--text);border:1px solid var(--line)}.leaflet-popup-content{margin:12px;min-width:230px}.markerDot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#06101e;font-weight:950;border:3px solid rgba(255,255,255,.85);box-shadow:0 8px 24px rgba(0,0,0,.5)}.lineLabel{background:rgba(7,17,31,.9);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:4px 8px;font-weight:900;font-size:12px;box-shadow:0 8px 25px rgba(0,0,0,.35)}.quadLabel{background:rgba(7,17,31,.92);color:var(--text);border:1px solid var(--line);border-radius:16px;padding:10px 12px;min-width:150px;box-shadow:0 12px 30px rgba(0,0,0,.45)}.quadLabel b{font-size:20px}.quadLabel span{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px}th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;text-align:left;padding:0 10px}td{background:rgba(255,255,255,.04);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px;vertical-align:top}td:first-child{border-left:1px solid var(--line);border-radius:12px 0 0 12px}td:last-child{border-right:1px solid var(--line);border-radius:0 12px 12px 0}.muted{color:var(--muted)}.right{text-align:right}.sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.sectionTitle h2{margin:0;font-size:18px}.scroll{max-height:430px;overflow:auto;padding-right:5px}.issue{border-left:4px solid var(--warn);padding:10px;margin:8px 0;background:rgba(255,209,102,.08);border-radius:12px;color:#ffedbd}.empty{border:1px dashed var(--line);border-radius:16px;padding:22px;text-align:center;color:var(--muted)}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab{padding:9px 12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:999px;cursor:pointer;font-weight:900}.tab.active{background:rgba(55,189,248,.18);border-color:var(--accent)}
+    .miniCard{padding:13px}.miniCard h3{margin:0 0 8px}.miniCard .big{font-size:26px;font-weight:950}.miniCard small{color:var(--muted)}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap top">
+    <div>
+      <h1>VIP Quadrant Man-Hour Review</h1>
+      <div class="sub">Upload subdivisions + task hours + multiple daily job files. Review a day, week, month, or the whole batch on a map.</div>
+    </div>
+    <div class="version">v1.20 • Week / Month Review</div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="grid uploads">
+    <div class="upload"><label>1) Subdivisions file</label><small>Needs Subdivision, Builder, Lat, Lon. Optional: Quadrant/Area.</small><input id="subsFile" type="file" accept=".xlsx,.xls,.csv" /></div>
+    <div class="upload"><label>2) Task Types file</label><small>Needs Task and Hours. Builder/Floor Plan can be Any.</small><input id="tasksFile" type="file" accept=".xlsx,.xls,.csv" /></div>
+    <div class="upload"><label>3) Daily Job files</label><small>Select one day, a full week, or a month. The filename is used as the work date.</small><input id="jobsFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
+  </section>
+
+  <section class="controls panel">
+    <div class="field"><label>Review Mode</label><select id="mode"><option value="all">All Uploaded</option><option value="day">Single Day</option><option value="week">Week</option><option value="month">Month</option></select></div>
+    <div class="field"><label>Day</label><select id="daySelect"><option value="">All</option></select></div>
+    <div class="field"><label>Week</label><select id="weekSelect"><option value="">All</option></select></div>
+    <div class="field"><label>Month</label><select id="monthSelect"><option value="">All</option></select></div>
+    <div class="field"><label>Search</label><input id="search" type="search" placeholder="Builder, subdivision, lot, task..." /></div>
+    <button id="calcBtn" class="btn primary">Calculate</button>
+    <button id="fitBtn" class="btn ghost">Fit Map</button>
+    <button id="copyBtn" class="btn ghost">Copy Summary</button>
+    <button id="csvBtn" class="btn ghost">Export CSV</button>
+  </section>
+
+  <section class="grid cards" id="summaryCards"></section>
+
+  <section class="grid dashboard">
+    <aside class="panel">
+      <div class="sectionTitle"><h2>Quadrant Totals</h2><span class="muted" id="rangeLabel">No data loaded</span></div>
+      <div id="quadList" class="quadList"></div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+      <div class="sectionTitle"><h2>Busiest Day</h2><span class="pill dark" id="busiestBadge">—</span></div>
+      <div id="busiestDayBox" class="empty">Upload daily job files to find the busiest day.</div>
+      <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
+      <div class="sectionTitle"><h2>Issues</h2><span class="pill dark" id="issueCount">0</span></div>
+      <div id="issues" class="scroll"></div>
+    </aside>
+    <section class="panel mapPanel"><div id="map"></div></section>
+  </section>
+
+  <section class="grid two" style="margin-top:16px">
+    <div class="panel">
+      <div class="sectionTitle"><h2>Day-by-Day Review</h2><span class="muted">sorted busiest first</span></div>
+      <div class="scroll"><table id="dayTable"></table></div>
+    </div>
+    <div class="panel">
+      <div class="sectionTitle"><h2>Subdivision Breakdown</h2><span class="muted">current filter</span></div>
+      <div class="scroll"><table id="subTable"></table></div>
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top:16px">
+    <div class="sectionTitle"><h2>Job Detail</h2><span class="muted" id="jobCountLabel">0 jobs</span></div>
+    <div class="scroll"><table id="jobTable"></table></div>
+  </section>
+</main>
+
+<script>
+const COLUMBUS = { lat:39.9612, lon:-82.9988 };
+const QUADS = ["NW","NE","SW","SE"];
+let state = { subs:[], tasks:[], rawJobs:[], jobs:[], filtered:[], issues:[], map:null, layers:[], loaded:false };
+
+const colAliases = {
+  builder:["Builder","builder","Company","Account"], subdivision:["Subdivision","Community","Project","Neighborhood","Subdivision Name"], lot:["Lot","Lot #","Lot Number","Plat Lot","Lot/Block"], task:["Task","Description","Job","Job Type","Type"], notes:["Notes","Note","Directions"], hours:["Hours","Man Hours","ManHours","MH","Budget Hours"], am:["AM Job","AM","AM/PM"], lat:["Lat","Latitude"], lon:["Lon","Lng","Long","Longitude"], address:["Address","Street Address"], quadrant:["Quadrant","Area","Zone"], floorplan:["Floor Plan","FloorPlan","Plan"], abbreviation:["Abbreviation","Abbrev","Short"]
+};
+function norm(v){return String(v??"").toLowerCase().trim().replace(/[’']/g,"").replace(/&/g,"and").replace(/[^a-z0-9]+/g," ").replace(/\s+/g," ").trim();}
+function cleanSub(v){return norm(v).replace(/\bpulte\b|\bdr horton\b|\bd r horton\b|\bryan\b|\bryan homes\b|\bepcon\b|\bschott\b|\bschottenstein\b|\bmi homes\b|\brockford\b/g,"").replace(/\s+/g," ").trim();}
+function num(v){ if(v===null||v===undefined||v==="")return 0; if(typeof v==="number")return isFinite(v)?v:0; const n=parseFloat(String(v).replace(/[^0-9.\-]/g,"")); return isFinite(n)?n:0;}
+function fmt(n){return (Math.round((Number(n)||0)*100)/100).toLocaleString(undefined,{maximumFractionDigits:2});}
+function safe(v){return String(v??"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function get(row, field){ const aliases=colAliases[field]||[field]; for(const k of aliases){ if(Object.prototype.hasOwnProperty.call(row,k) && row[k]!==undefined && row[k]!==null && row[k]!=="") return row[k]; } const keys=Object.keys(row); for(const a of aliases){ const ak=norm(a); const found=keys.find(k=>norm(k)===ak); if(found && row[found]!==undefined && row[found]!==null && row[found]!=="") return row[found]; } return "";}
+function normalizeQuadrant(v){ const s=norm(v).toUpperCase(); if(["NW","NE","SW","SE"].includes(s)) return s; if(s.includes("NORTH WEST")||s.includes("NORTHWEST"))return"NW"; if(s.includes("NORTH EAST")||s.includes("NORTHEAST"))return"NE"; if(s.includes("SOUTH WEST")||s.includes("SOUTHWEST"))return"SW"; if(s.includes("SOUTH EAST")||s.includes("SOUTHEAST"))return"SE"; return "";}
+function quadrantFromLatLon(lat,lon){ if(!lat||!lon)return""; const north=lat>=COLUMBUS.lat, east=lon>=COLUMBUS.lon; if(north&&!east)return"NW"; if(north&&east)return"NE"; if(!north&&!east)return"SW"; return"SE";}
+function qColor(q){return {NW:"var(--nw)",NE:"var(--ne)",SW:"var(--sw)",SE:"var(--se)"}[q]||"var(--purple)";}
+function recommendCrew(hours){ const h=Number(hours)||0; if(h<=0)return"—"; if(h<=16)return"2 crew"; if(h<=24)return"3 crew"; if(h<=32)return"4 crew"; return"4+ crew";}
+function capacityPct(hours){ return Math.min(100, ((Number(hours)||0)/32)*100); }
+function isoWeek(dateStr){ const d=new Date(dateStr+"T12:00:00"); if(isNaN(d))return"Unknown"; const date=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())); const dayNum=date.getUTCDay()||7; date.setUTCDate(date.getUTCDate()+4-dayNum); const yearStart=new Date(Date.UTC(date.getUTCFullYear(),0,1)); const week=Math.ceil((((date-yearStart)/86400000)+1)/7); return `${date.getUTCFullYear()}-W${String(week).padStart(2,"0")}`;}
+function monthKey(dateStr){ return /^\d{4}-\d{2}-\d{2}$/.test(dateStr) ? dateStr.slice(0,7) : "Unknown";}
+function displayDate(dateStr){ if(!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr||"Unknown"; const d=new Date(dateStr+"T12:00:00"); return d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric",year:"numeric"});}
+function parseDateFromFileName(name){
+  const base=String(name||"").replace(/\.[^.]+$/,'');
+  let m=base.match(/(20\d{2})[-_. ](\d{1,2})[-_. ](\d{1,2})/); if(m)return `${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;
+  m=base.match(/(\d{1,2})[-_. ](\d{1,2})[-_. ](20\d{2})/); if(m)return `${m[3]}-${m[1].padStart(2,"0")}-${m[2].padStart(2,"0")}`;
+  m=base.match(/(\d{1,2})[-_. ](\d{1,2})[-_. ](\d{2})(?!\d)/); if(m){ const yy=Number(m[3]); const yyyy=yy>=70?1900+yy:2000+yy; return `${yyyy}-${m[1].padStart(2,"0")}-${m[2].padStart(2,"0")}`; }
+  m=base.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*[-_ ]*(\d{1,2})(?:[-_, ]+(20\d{2}|\d{2}))?/i);
+  if(m){ const months={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,sept:9,oct:10,nov:11,dec:12}; const mon=months[m[1].toLowerCase().slice(0,3)]||months[m[1].toLowerCase()]; const y=m[3]? (String(m[3]).length===2?2000+Number(m[3]):Number(m[3])) : new Date().getFullYear(); return `${y}-${String(mon).padStart(2,"0")}-${String(m[2]).padStart(2,"0")}`; }
+  return base;
+}
+async function readRows(file){
+  const buf=await file.arrayBuffer();
+  const wb=XLSX.read(buf,{type:"array",cellDates:true});
+  const ws=wb.Sheets[wb.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(ws,{defval:"",raw:false});
+}
+function makeSub(r){ const lat=num(get(r,"lat")), lon=num(get(r,"lon")); const manual=normalizeQuadrant(get(r,"quadrant")); return { builder:String(get(r,"builder")||"").trim(), subdivision:String(get(r,"subdivision")||"").trim(), key:cleanSub(get(r,"subdivision")), lat, lon, address:String(get(r,"address")||"").trim(), quadrant:manual || quadrantFromLatLon(lat,lon) }; }
+function makeTask(r){ return { type:String(get(r,"type")||"").trim(), builder:String(get(r,"builder")||"Any").trim(), floorplan:String(get(r,"floorplan")||"Any").trim(), task:String(get(r,"task")||"").trim(), abbr:String(get(r,"abbreviation")||"").trim(), hours:num(get(r,"hours")), taskKey:norm(get(r,"task")), abbrKey:norm(get(r,"abbreviation")) }; }
+function makeJob(r, file, idx){ const date=parseDateFromFileName(file.name); return { sourceFile:file.name, date, week:isoWeek(date), month:monthKey(date), row:idx+2, builder:String(get(r,"builder")||"").trim(), subdivision:String(get(r,"subdivision")||"").trim(), lot:String(get(r,"lot")||"").trim(), task:String(get(r,"task")||"").trim(), notes:String(get(r,"notes")||"").trim(), am:String(get(r,"am")||"").trim(), manualHours:num(get(r,"hours")), raw:r }; }
+function buildSubIndex(subs){ const map=new Map(); subs.forEach(s=>{ if(!s.key)return; if(!map.has(s.key))map.set(s.key,[]); map.get(s.key).push(s); }); return map; }
+function findSub(job, index, subs){ const key=cleanSub(job.subdivision); if(index.has(key))return index.get(key)[0]; let best=null,score=0; for(const s of subs){ if(!key||!s.key)continue; let sc=0; if(s.key.includes(key)||key.includes(s.key))sc=Math.min(s.key.length,key.length); if(sc>score){score=sc;best=s;} } return score>=5?best:null; }
+function findTaskHours(job,tasks){
+  const jt=norm(job.task), notes=norm(job.notes);
+  const isOther=jt==="other" || jt.includes("other") || jt==="raw";
+  if(isOther){ if(job.manualHours>0)return {hours:job.manualHours, source:"daily file Other hours"}; return {hours:0, source:"missing Other hours"}; }
+  if(job.manualHours>0)return {hours:job.manualHours, source:"daily file"};
+  let best=null, score=-1;
+  for(const t of tasks){
+    if(!t.hours)continue;
+    const tk=t.taskKey, ak=t.abbrKey;
+    let sc=-1;
+    if(jt && tk && jt===tk)sc=100;
+    else if(jt && ak && jt===ak)sc=95;
+    else if(jt && tk && (jt.includes(tk)||tk.includes(jt)))sc=Math.min(jt.length,tk.length)+40;
+    else if(notes && tk && notes.includes(tk))sc=30;
+    const tb=norm(t.builder); const jb=norm(job.builder);
+    if(tb && tb!=="any" && jb && tb===jb)sc+=10;
+    if(sc>score){score=sc;best=t;}
+  }
+  if(best && score>=35)return {hours:best.hours, source:`task types: ${best.task}`};
+  return {hours:0, source:"missing task type"};
+}
+async function loadAndCompute(){
+  state.issues=[]; state.subs=[]; state.tasks=[]; state.rawJobs=[]; state.jobs=[]; state.filtered=[];
+  const subsFile=document.getElementById("subsFile").files[0];
+  const tasksFile=document.getElementById("tasksFile").files[0];
+  const jobFiles=[...document.getElementById("jobsFiles").files];
+  if(!subsFile||!tasksFile||!jobFiles.length){ setStatusCards("Upload the subdivisions, task types, and at least one daily job file."); return; }
+  const subRows=await readRows(subsFile); state.subs=subRows.map(makeSub).filter(s=>s.subdivision);
+  const taskRows=await readRows(tasksFile); state.tasks=taskRows.map(makeTask).filter(t=>t.task || t.abbr);
+  for(const f of jobFiles){ const rows=await readRows(f); rows.forEach((r,i)=>state.rawJobs.push(makeJob(r,f,i))); }
+  const index=buildSubIndex(state.subs);
+  state.jobs=state.rawJobs.filter(j=>j.subdivision||j.task||j.lot).map(j=>{
+    const sub=findSub(j,index,state.subs);
+    const h=findTaskHours(j,state.tasks);
+    const quadrant=sub?.quadrant || "Unmatched";
+    if(!sub) state.issues.push({kind:"subdivision", msg:`${j.sourceFile} row ${j.row}: No subdivision match for “${j.subdivision}”.`});
+    if(!h.hours) state.issues.push({kind:"hours", msg:`${j.sourceFile} row ${j.row}: No hours found for ${j.subdivision} lot ${j.lot} task “${j.task}”.`});
+    return {...j, subMatch:sub, lat:sub?.lat||0, lon:sub?.lon||0, quadrant, hours:h.hours, hoursSource:h.source};
+  });
+  state.loaded=true; populateFilters(); applyFilters();
+}
+function populateFilters(){
+  const days=[...new Set(state.jobs.map(j=>j.date))].sort();
+  const weeks=[...new Set(state.jobs.map(j=>j.week))].sort();
+  const months=[...new Set(state.jobs.map(j=>j.month))].sort();
+  fillSelect("daySelect",days,"All"); fillSelect("weekSelect",weeks,"All"); fillSelect("monthSelect",months,"All");
+}
+function fillSelect(id,values,allLabel){ const el=document.getElementById(id); const old=el.value; el.innerHTML=`<option value="">${allLabel}</option>`+values.map(v=>`<option value="${safe(v)}">${safe(id==="daySelect"?displayDate(v):v)}</option>`).join(""); if(values.includes(old))el.value=old; }
+function applyFilters(){
+  const mode=document.getElementById("mode").value; const day=document.getElementById("daySelect").value; const week=document.getElementById("weekSelect").value; const month=document.getElementById("monthSelect").value; const q=norm(document.getElementById("search").value);
+  state.filtered=state.jobs.filter(j=>{
+    if(mode==="day" && day && j.date!==day)return false;
+    if(mode==="week" && week && j.week!==week)return false;
+    if(mode==="month" && month && j.month!==month)return false;
+    if(mode==="all"){}
+    if(q){ const blob=norm([j.builder,j.subdivision,j.lot,j.task,j.notes,j.date,j.sourceFile,j.quadrant].join(" ")); if(!blob.includes(q))return false; }
+    return true;
+  });
+  render();
+}
+function groupBy(arr, keyFn){ const m=new Map(); arr.forEach(x=>{ const k=keyFn(x); if(!m.has(k))m.set(k,[]); m.get(k).push(x); }); return m; }
+function sums(rows){ return { jobs:rows.length, hours:rows.reduce((a,r)=>a+(Number(r.hours)||0),0), subs:new Set(rows.map(r=>r.subdivision)).size }; }
+function quadTotals(rows=state.filtered){ const out={}; [...QUADS,"Unmatched"].forEach(q=>out[q]=[]); rows.forEach(r=>{ (out[r.quadrant] ||= []).push(r); }); return out; }
+function busiestDay(rows=state.jobs){ const by=groupBy(rows,j=>j.date||"Unknown"); const list=[...by.entries()].map(([date,rs])=>({date,...sums(rs), rows:rs})).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs); return list[0]||null; }
+function render(){ renderCards(); renderQuadrants(); renderBusiest(); renderTables(); renderIssues(); renderMap(); }
+function renderCards(){ const total=sums(state.filtered); const busy=busiestDay(state.jobs); const dates=[...new Set(state.filtered.map(j=>j.date))].sort(); document.getElementById("rangeLabel").textContent=dates.length?`${displayDate(dates[0])}${dates.length>1?" → "+displayDate(dates[dates.length-1]):""}`:"No data";
+  const cards=[
+    ["Total Hours",fmt(total.hours),`${total.jobs} jobs in current view`,""],
+    ["Recommended Crew",recommendCrew(total.hours),"Based on 8-hour day capacity","good"],
+    ["Busiest Day",busy?displayDate(busy.date):"—",busy?`${fmt(busy.hours)} hrs • ${busy.jobs} jobs`:"Upload multiple files","warn"],
+    ["Uploaded Days",new Set(state.jobs.map(j=>j.date)).size,`${state.jobs.length} total imported jobs`,"purple"]
+  ];
+  document.getElementById("summaryCards").innerHTML=cards.map(c=>`<div class="stat ${c[3]}"><h3>${c[0]}</h3><div class="num">${c[1]}</div><p>${c[2]}</p></div>`).join("");
+  document.getElementById("jobCountLabel").textContent=`${total.jobs} jobs`;
+}
+function renderQuadrants(){ const qt=quadTotals(); const max=Math.max(1,...QUADS.map(q=>sums(qt[q]||[]).hours)); document.getElementById("quadList").innerHTML=QUADS.map(q=>{ const s=sums(qt[q]||[]); return `<div class="quad"><div class="quadHead"><div class="quadName">${q}</div><span class="pill q${q}">${recommendCrew(s.hours)}</span></div><div class="bar"><span style="width:${Math.max(3,(s.hours/max)*100)}%;background:${qColor(q)}"></span></div><div class="quadMeta"><div><b>${fmt(s.hours)}</b><small>hours</small></div><div><b>${s.jobs}</b><small>jobs</small></div><div><b>${s.subs}</b><small>subdivisions</small></div></div></div>`; }).join(""); }
+function renderBusiest(){ const busy=busiestDay(state.jobs); const box=document.getElementById("busiestDayBox"); const badge=document.getElementById("busiestBadge"); if(!busy){box.className="empty"; box.textContent="Upload daily job files to find the busiest day."; badge.textContent="—"; return;} badge.textContent=`${fmt(busy.hours)} hrs`; const qs=quadTotals(busy.rows); box.className="miniCard"; box.innerHTML=`<h3>${displayDate(busy.date)}</h3><div class="big">${fmt(busy.hours)} hours</div><small>${busy.jobs} jobs • ${busy.subs} subdivisions • ${recommendCrew(busy.hours)}</small><div class="grid two" style="margin-top:10px;gap:8px">${QUADS.map(q=>{const s=sums(qs[q]||[]);return `<div style="border:1px solid var(--line);border-radius:12px;padding:8px"><b>${q}</b><br><span>${fmt(s.hours)} hrs</span><br><small>${s.jobs} jobs</small></div>`}).join("")}</div>`; }
+function renderTables(){ renderDayTable(); renderSubTable(); renderJobTable(); }
+function renderDayTable(){ const list=[...groupBy(state.jobs,j=>j.date||"Unknown").entries()].map(([date,rs])=>({date,...sums(rs), rows:rs})).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs); document.getElementById("dayTable").innerHTML=`<thead><tr><th>Date</th><th class="right">Hours</th><th class="right">Jobs</th><th>Crew</th><th>Top Quadrant</th></tr></thead><tbody>${list.map(d=>{ const qt=quadTotals(d.rows); const top=QUADS.map(q=>({q,...sums(qt[q]||[])})).sort((a,b)=>b.hours-a.hours)[0]; return `<tr><td><b>${displayDate(d.date)}</b><br><span class="muted">${safe(d.date)}</span></td><td class="right"><b>${fmt(d.hours)}</b></td><td class="right">${d.jobs}</td><td>${recommendCrew(d.hours)}</td><td><span class="pill q${top.q}">${top.q} • ${fmt(top.hours)} hrs</span></td></tr>`;}).join("")}</tbody>`; }
+function renderSubTable(){ const list=[...groupBy(state.filtered,j=>`${j.quadrant}|${j.builder}|${j.subdivision}`).entries()].map(([k,rs])=>{ const [q,b,su]=k.split("|"); return {q,b,su,...sums(rs), rows:rs}; }).sort((a,b)=>b.hours-a.hours); document.getElementById("subTable").innerHTML=`<thead><tr><th>Subdivision</th><th>Q</th><th class="right">Hours</th><th class="right">Jobs</th></tr></thead><tbody>${list.map(r=>`<tr><td><b>${safe(r.su)}</b><br><span class="muted">${safe(r.b)}</span></td><td><span class="pill q${r.q}">${safe(r.q)}</span></td><td class="right"><b>${fmt(r.hours)}</b></td><td class="right">${r.jobs}</td></tr>`).join("")}</tbody>`; }
+function renderJobTable(){ document.getElementById("jobTable").innerHTML=`<thead><tr><th>Date</th><th>Builder / Subdivision</th><th>Lot</th><th>Task</th><th>Q</th><th class="right">Hours</th><th>Source</th></tr></thead><tbody>${state.filtered.map(j=>`<tr><td><b>${displayDate(j.date)}</b><br><span class="muted">${safe(j.sourceFile)}</span></td><td><b>${safe(j.builder)}</b><br>${safe(j.subdivision)}</td><td>${safe(j.lot)}</td><td><b>${safe(j.task)}</b>${j.notes?`<br><span class="muted">${safe(j.notes)}</span>`:""}</td><td><span class="pill q${j.quadrant}">${safe(j.quadrant)}</span></td><td class="right"><b>${fmt(j.hours)}</b></td><td class="muted">${safe(j.hoursSource)}</td></tr>`).join("")}</tbody>`; }
+function renderIssues(){ document.getElementById("issueCount").textContent=state.issues.length; document.getElementById("issues").innerHTML=state.issues.length?state.issues.slice(0,200).map(i=>`<div class="issue">${safe(i.msg)}</div>`).join(""):`<div class="empty">No issues found.</div>`; }
+function initMap(){ if(state.map)return; state.map=L.map("map",{scrollWheelZoom:true}).setView([COLUMBUS.lat,COLUMBUS.lon],10); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"&copy; OpenStreetMap"}).addTo(state.map); setTimeout(()=>state.map.invalidateSize(),200); }
+function clearLayers(){ state.layers.forEach(l=>{try{state.map.removeLayer(l)}catch(e){}}); state.layers=[]; }
+function addLayer(l){ l.addTo(state.map); state.layers.push(l); return l; }
+function renderMap(){ initMap(); clearLayers(); const rows=state.filtered.filter(r=>r.lat&&r.lon); const bounds=[]; const latMin=COLUMBUS.lat-.72, latMax=COLUMBUS.lat+.72, lonMin=COLUMBUS.lon-.92, lonMax=COLUMBUS.lon+.92;
+  addLayer(L.polyline([[latMin,COLUMBUS.lon],[latMax,COLUMBUS.lon]],{color:"#eaf2ff",weight:2,dashArray:"8,8",opacity:.85}));
+  addLayer(L.polyline([[COLUMBUS.lat,lonMin],[COLUMBUS.lat,lonMax]],{color:"#eaf2ff",weight:2,dashArray:"8,8",opacity:.85}));
+  addLayer(L.marker([COLUMBUS.lat,COLUMBUS.lon],{icon:L.divIcon({className:"",html:`<div class="lineLabel">Columbus Center</div>`,iconSize:[140,28],iconAnchor:[70,14]})}));
+  const qt=quadTotals(); const labelPos={NW:[COLUMBUS.lat+.38,COLUMBUS.lon-.48],NE:[COLUMBUS.lat+.38,COLUMBUS.lon+.48],SW:[COLUMBUS.lat-.38,COLUMBUS.lon-.48],SE:[COLUMBUS.lat-.38,COLUMBUS.lon+.48]};
+  QUADS.forEach(q=>{ const s=sums(qt[q]||[]); addLayer(L.marker(labelPos[q],{icon:L.divIcon({className:"",html:`<div class="quadLabel" style="border-color:${qColor(q)}"><b>${q}</b><span>${fmt(s.hours)} hrs • ${s.jobs} jobs</span><span>${recommendCrew(s.hours)}</span></div>`,iconSize:[170,74],iconAnchor:[85,37]})})); });
+  const groups=[...groupBy(rows,r=>`${r.lat}|${r.lon}|${r.subdivision}|${r.builder}`).entries()].map(([k,rs])=>{ const [lat,lon,sub,builder]=k.split("|"); return {lat:Number(lat),lon:Number(lon),sub,builder,rows:rs,...sums(rs),q:rs[0].quadrant}; });
+  groups.forEach(g=>{ bounds.push([g.lat,g.lon]); const size=Math.max(28,Math.min(62,24+Math.sqrt(g.hours)*8)); const html=`<div class="markerDot" style="width:${size}px;height:${size}px;background:${qColor(g.q)}">${g.jobs}</div>`; const marker=addLayer(L.marker([g.lat,g.lon],{icon:L.divIcon({className:"",html,iconSize:[size,size],iconAnchor:[size/2,size/2]})})); marker.bindPopup(`<b>${safe(g.sub)}</b><br>${safe(g.builder)}<br><b>${safe(g.q)}</b> • ${fmt(g.hours)} hours • ${g.jobs} jobs<hr style="border:0;border-top:1px solid #263c5c">${g.rows.slice(0,12).map(r=>`${safe(displayDate(r.date))}: Lot ${safe(r.lot)} — ${safe(r.task)} (${fmt(r.hours)} hrs)`).join("<br>")}${g.rows.length>12?"<br>...":""}`); });
+  if(bounds.length) state.map.fitBounds(bounds,{padding:[55,55],maxZoom:12}); else state.map.setView([COLUMBUS.lat,COLUMBUS.lon],10);
+  setTimeout(()=>state.map.invalidateSize(),100);
+}
+function setStatusCards(msg){ document.getElementById("summaryCards").innerHTML=`<div class="stat" style="grid-column:1/-1"><h3>Status</h3><div class="num" style="font-size:20px">${safe(msg)}</div><p>Upload all required files, then click Calculate.</p></div>`; }
+function toCsv(rows){ const headers=["Date","Source File","Builder","Subdivision","Lot","Task","Notes","Quadrant","Hours","Hours Source"]; const body=rows.map(r=>[r.date,r.sourceFile,r.builder,r.subdivision,r.lot,r.task,r.notes,r.quadrant,r.hours,r.hoursSource].map(csvCell).join(",")); return headers.join(",")+"\n"+body.join("\n"); }
+function csvCell(v){ const s=String(v??""); return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s; }
+function download(name,text){ const blob=new Blob([text],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+function summaryText(){ const total=sums(state.filtered); const busy=busiestDay(state.jobs); const qt=quadTotals(); return [`VIP Quadrant Man-Hour Review`,`Current View: ${fmt(total.hours)} hours • ${total.jobs} jobs • ${recommendCrew(total.hours)}`,busy?`Busiest Day: ${displayDate(busy.date)} — ${fmt(busy.hours)} hours • ${busy.jobs} jobs`:"Busiest Day: —",``,...QUADS.map(q=>{const s=sums(qt[q]||[]); return `${q}: ${fmt(s.hours)} hrs • ${s.jobs} jobs • ${recommendCrew(s.hours)}`;})].join("\n"); }
+
+document.getElementById("calcBtn").addEventListener("click",()=>loadAndCompute().catch(err=>{console.error(err); setStatusCards("Error: "+err.message);}));
+["mode","daySelect","weekSelect","monthSelect","search"].forEach(id=>document.getElementById(id).addEventListener(id==="search"?"input":"change",()=>{ if(state.loaded) applyFilters(); }));
+document.getElementById("fitBtn").addEventListener("click",()=>renderMap());
+document.getElementById("csvBtn").addEventListener("click",()=>download("quadrant-review.csv",toCsv(state.filtered)));
+document.getElementById("copyBtn").addEventListener("click",async()=>{ await navigator.clipboard.writeText(summaryText()); const b=document.getElementById("copyBtn"); const old=b.textContent; b.textContent="Copied!"; setTimeout(()=>b.textContent=old,1200); });
+setStatusCards("Ready. Upload your three file groups to begin.");
+initMap();
+</script>
+</body>
+</html>
