@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VIP Quadrant Week / Month Review Dashboard v1.70</title>
+  <title>VIP Quadrant Week / Month Review Dashboard v1.80</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -30,6 +30,9 @@
     #map{height:720px;min-height:520px;border-radius:18px;border:1px solid var(--line);overflow:hidden;background:#07111f}.mapPanel{padding:12px}.leaflet-container{background:#081426}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0d1b2f;color:var(--text);border:1px solid var(--line)}.leaflet-popup-content{margin:12px;min-width:230px}.markerDot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#06101e;font-weight:950;border:3px solid rgba(255,255,255,.9);box-shadow:0 8px 24px rgba(0,0,0,.5);font-size:14px}.lineLabel{background:rgba(7,17,31,.9);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:4px 8px;font-weight:900;font-size:12px;box-shadow:0 8px 25px rgba(0,0,0,.35)}.quadLabel{background:rgba(7,17,31,.94);color:var(--text);border:1px solid var(--line);border-radius:16px;padding:10px 12px;min-width:145px;box-shadow:0 12px 30px rgba(0,0,0,.45)}.quadLabel b{font-size:20px}.quadLabel span{display:block;color:var(--muted);font-size:12px;margin-top:2px}.quadShadeLabel{background:rgba(7,17,31,.75);border:1px solid rgba(255,255,255,.25);color:var(--text);border-radius:999px;padding:4px 9px;font-weight:950;font-size:12px}
     table{width:100%;border-collapse:separate;border-spacing:0 8px}th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;text-align:left;padding:0 10px}td{background:rgba(255,255,255,.04);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px;vertical-align:top}td:first-child{border-left:1px solid var(--line);border-radius:12px 0 0 12px}td:last-child{border-right:1px solid var(--line);border-radius:0 12px 12px 0}.muted{color:var(--muted)}.right{text-align:right}.sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.sectionTitle h2{margin:0;font-size:18px}.scroll{max-height:430px;overflow:auto;padding-right:5px}.issue{border-left:4px solid var(--warn);padding:10px;margin:8px 0;background:rgba(255,209,102,.08);border-radius:12px;color:#ffedbd}.empty{border:1px dashed var(--line);border-radius:16px;padding:22px;text-align:center;color:var(--muted)}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab{padding:9px 12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:999px;cursor:pointer;font-weight:900}.tab.active{background:rgba(55,189,248,.18);border-color:var(--accent)}
     .miniCard{padding:13px}.miniCard h3{margin:0 0 8px}.miniCard .big{font-size:26px;font-weight:950}.miniCard small{color:var(--muted)}.workBadge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 7px;font-size:11px;font-weight:900;background:rgba(255,255,255,.06);color:var(--muted)}.pctText{font-size:12px;color:var(--muted);font-weight:800}
+
+    .mapTools{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.mapTools .panelLite{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;padding:12px}.panelLite h3{margin:0 0 10px;font-size:15px}.splitRow,.pressureRow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}.splitBar{height:12px;border-radius:999px;background:#081427;border:1px solid var(--line);overflow:hidden;display:flex;margin:10px 0}.splitBar span{height:100%;display:block}.trendBars{display:grid;gap:9px}.trendRow{display:grid;grid-template-columns:105px 1fr 70px;gap:8px;align-items:center}.trendStack{height:18px;border-radius:999px;background:#081427;border:1px solid var(--line);overflow:hidden;display:flex}.trendStack span{height:100%;display:block}.legendDot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}.subheadRow td{background:rgba(55,189,248,.12)!important;color:var(--text);font-weight:950;border-radius:12px!important}.warningCard{border-left:4px solid var(--warn);background:rgba(255,209,102,.08)}
+    @media(max-width:1000px){.mapTools{grid-template-columns:1fr}.trendRow{grid-template-columns:90px 1fr 58px}}
   </style>
 </head>
 <body>
@@ -40,10 +43,11 @@
       <div class="sub">Upload subdivisions + task hours + labor and cleaning daily files. Review a day, week, month, or the whole batch on a map.</div>
     </div>
     <details class="versionBox">
-      <summary class="version">v1.70 • Cleaning floorplan hours ▾</summary>
+      <summary class="version">v1.80 • Split labor/cleaning review ▾</summary>
       <div class="versionDrop">
         <h3>Version history</h3>
         <ul>
+          <li><b>v1.80</b> — Fully separated Labor/Cleaning review mode, separate quadrant totals, separate busiest days, split task and subdivision breakdowns, lot history keeps both types, added daily trend chart, workload split card, busiest quadrant by type, and unmapped jobs warning.</li>
           <li><b>v1.70</b> — Added Floor Plans upload for cleaning hours by lot/subdivision, cleaning fallback-to-1-hour flagging, and exported review JSON now preserves floorplan reference data.</li>
           <li><b>v1.60</b> — Added Labor/Cleaning uploads and toggles, task workload breakdown, lot history breakdown, quadrant percent-of-total bars, and standalone review export improvements.</li>
           <li><b>v1.51</b> — Fixed saved review loading error where the dashboard called populateSelectors instead of the active filter dropdown function.</li>
@@ -98,7 +102,15 @@
       <div class="sectionTitle"><h2>Issues</h2><span class="pill dark" id="issueCount">0</span></div>
       <div id="issues" class="scroll"></div>
     </aside>
-    <section class="panel mapPanel"><div id="map"></div></section>
+    <section class="panel mapPanel">
+      <div id="map"></div>
+      <div class="mapTools">
+        <div class="panelLite" id="splitCard"></div>
+        <div class="panelLite" id="pressureCard"></div>
+        <div class="panelLite" style="grid-column:1/-1" id="trendCard"></div>
+        <div class="panelLite warningCard" style="grid-column:1/-1" id="unmappedCard"></div>
+      </div>
+    </section>
   </section>
 
   <section class="grid two" style="margin-top:16px">
@@ -132,7 +144,7 @@
 <script>
 const COLUMBUS = { lat:39.9612, lon:-82.9988 };
 const QUADS = ["NW","NE","SW","SE"];
-let state = { subs:[], tasks:[], floorPlans:[], floorIndex:new Map(), rawJobs:[], jobs:[], filtered:[], issues:[], map:null, layers:[], loaded:false, workTypes:[] };
+let state = { subs:[], tasks:[], floorPlans:[], floorIndex:new Map(), rawJobs:[], jobs:[], filtered:[], filteredAllTypes:[], issues:[], map:null, layers:[], loaded:false, workTypes:[] };
 
 // Add exported review JSON filenames here after uploading them to the same GitHub folder as this HTML.
 // Example export names are created by the dashboard automatically.
@@ -262,58 +274,124 @@ function populateFilters(){
   fillSelect("daySelect",days,"All"); fillSelect("weekSelect",weeks,"All"); fillSelect("monthSelect",months,"All");
 }
 function fillSelect(id,values,allLabel){ const el=document.getElementById(id); const old=el.value; el.innerHTML=`<option value="">${allLabel}</option>`+values.map(v=>`<option value="${safe(v)}">${safe(id==="daySelect"?displayDate(v):v)}</option>`).join(""); if(values.includes(old))el.value=old; }
+function currentWorkType(){ return document.getElementById("workType")?.value || "all"; }
+function passesDateSearch(j){
+  const mode=document.getElementById("mode").value;
+  const day=document.getElementById("daySelect").value;
+  const week=document.getElementById("weekSelect").value;
+  const month=document.getElementById("monthSelect").value;
+  const q=norm(document.getElementById("search").value);
+  if(mode==="day" && day && j.date!==day)return false;
+  if(mode==="week" && week && j.week!==week)return false;
+  if(mode==="month" && month && j.month!==month)return false;
+  if(q){ const blob=norm([j.workGroup,j.builder,j.subdivision,j.lot,j.taskDisplay||j.task,j.notes,j.date,j.sourceFile,j.quadrant].join(" ")); if(!blob.includes(q))return false; }
+  return true;
+}
 function applyFilters(){
-  const mode=document.getElementById("mode").value; const workType=document.getElementById("workType").value; const day=document.getElementById("daySelect").value; const week=document.getElementById("weekSelect").value; const month=document.getElementById("monthSelect").value; const q=norm(document.getElementById("search").value);
-  state.filtered=state.jobs.filter(j=>{
-    if(mode==="day" && day && j.date!==day)return false;
-    if(mode==="week" && week && j.week!==week)return false;
-    if(mode==="month" && month && j.month!==month)return false;
-    if(mode==="all"){}
-    if(workType!=="all" && j.workGroup!==workType)return false;
-    if(q){ const blob=norm([j.workGroup,j.builder,j.subdivision,j.lot,j.taskDisplay||j.task,j.notes,j.date,j.sourceFile,j.quadrant].join(" ")); if(!blob.includes(q))return false; }
-    return true;
-  });
+  const workType=currentWorkType();
+  state.filteredAllTypes=state.jobs.filter(passesDateSearch);
+  state.filtered=state.filteredAllTypes.filter(j=>workType==="all" || j.workGroup===workType);
   render();
 }
+function rowsForType(type, base=state.filteredAllTypes){ return type==="all" ? base : base.filter(j=>(j.workGroup||"Labor")===type); }
+function activeTypes(){ const wt=currentWorkType(); return wt==="all" ? ["Labor","Cleaning"] : [wt]; }
 function groupBy(arr, keyFn){ const m=new Map(); arr.forEach(x=>{ const k=keyFn(x); if(!m.has(k))m.set(k,[]); m.get(k).push(x); }); return m; }
 function sums(rows){ return { jobs:rows.length, hours:rows.reduce((a,r)=>a+(Number(r.hours)||0),0), subs:new Set(rows.map(r=>r.subdivision).filter(Boolean)).size }; }
 function quadTotals(rows=state.filtered){ const out={}; [...QUADS,"Unmatched"].forEach(q=>out[q]=[]); rows.forEach(r=>{ (out[r.quadrant] ||= []).push(r); }); return out; }
-function busiestDay(rows=state.jobs){ const by=groupBy(rows,j=>j.date||"Unknown"); const list=[...by.entries()].map(([date,rs])=>({date,...sums(rs), rows:rs})).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs); return list[0]||null; }
-function render(){ renderCards(); renderQuadrants(); renderBusiest(); renderTables(); renderTaskBreakdown(); renderLotBreakdown(); renderIssues(); renderMap(); }
-function renderCards(){ const total=sums(state.filtered); const busy=busiestDay(state.jobs); const dates=[...new Set(state.filtered.map(j=>j.date))].sort(); document.getElementById("rangeLabel").textContent=dates.length?`${displayDate(dates[0])}${dates.length>1?" → "+displayDate(dates[dates.length-1]):""}`:"No data";
-  const cards=[
-    ["Total Hours",fmt(total.hours),`${total.jobs} jobs in current view`,""],
-    ["Busiest Day",busy?displayDate(busy.date):"—",busy?`${fmt(busy.hours)} hrs • ${busy.jobs} jobs`:"Upload multiple files","warn"],
-    ["Subdivisions",total.subs,`unique subdivisions in current view`,"good"],
-    ["Uploaded Days",new Set(state.jobs.map(j=>j.date)).size,`${state.jobs.length} total imported jobs`,"purple"]
-  ];
+function busiestDay(rows=state.filtered){ const clean=rows.filter(r=>r.date); const by=groupBy(clean,j=>j.date||"Unknown"); const list=[...by.entries()].map(([date,rs])=>({date,...sums(rs), rows:rs})).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs); return list[0]||null; }
+function render(){ renderCards(); renderQuadrants(); renderBusiest(); renderTables(); renderTaskBreakdown(); renderLotBreakdown(); renderIssues(); renderMap(); renderMapTools(); }
+function renderCards(){
+  const wt=currentWorkType(); const base=state.filteredAllTypes.length?state.filteredAllTypes:state.filtered; const dates=[...new Set(state.filtered.map(j=>j.date))].sort();
+  document.getElementById("rangeLabel").textContent=dates.length?`${displayDate(dates[0])}${dates.length>1?" → "+displayDate(dates[dates.length-1]):""}`:"No data";
+  let cards=[];
+  if(wt==="all"){
+    const labor=sums(rowsForType("Labor")); const cleaning=sums(rowsForType("Cleaning")); const combined=sums(state.filtered);
+    cards=[
+      ["Labor Hours",fmt(labor.hours),`${labor.jobs} jobs • ${labor.subs} subdivisions`,""],
+      ["Cleaning Hours",fmt(cleaning.hours),`${cleaning.jobs} jobs • ${cleaning.subs} subdivisions`,"good"],
+      ["Combined Hours",fmt(combined.hours),`${combined.jobs} total jobs in current view`,"warn"],
+      ["Uploaded Days",new Set(base.map(j=>j.date)).size,`${state.jobs.length} total imported jobs`,"purple"]
+    ];
+  } else {
+    const total=sums(state.filtered); const busy=busiestDay(state.filtered);
+    cards=[
+      [`${wt} Hours`,fmt(total.hours),`${total.jobs} jobs in current view`,""],
+      [`Busiest ${wt} Day`,busy?displayDate(busy.date):"—",busy?`${fmt(busy.hours)} hrs • ${busy.jobs} jobs`:"No day loaded","warn"],
+      [`${wt} Subdivisions`,total.subs,`unique subdivisions in current view`,"good"],
+      ["Uploaded Days",new Set(base.map(j=>j.date)).size,`${state.jobs.length} total imported jobs`,"purple"]
+    ];
+  }
   document.getElementById("summaryCards").innerHTML=cards.map(c=>`<div class="stat ${c[3]}"><h3>${c[0]}</h3><div class="num">${c[1]}</div><p>${c[2]}</p></div>`).join("");
-  document.getElementById("jobCountLabel").textContent=`${total.jobs} jobs`;
+  document.getElementById("jobCountLabel").textContent=`${sums(state.filtered).jobs} jobs`;
 }
-function renderQuadrants(){ const qt=quadTotals(); const total=sums(state.filtered).hours || 0; document.getElementById("quadList").innerHTML=QUADS.map(q=>{ const s=sums(qt[q]||[]); const pct=total? (s.hours/total*100) : 0; return `<div class="quad"><div class="quadHead"><div class="quadName">${q}</div><span class="pill q${q}">${fmt(s.hours)} hrs</span></div><div class="bar" title="${fmt(pct)}% of total hours"><span style="width:${Math.max(s.hours?2:0,pct)}%;background:${qColor(q)}"></span></div><div class="pctText">${fmt(pct)}% of selected workload</div><div class="quadMeta"><div><b>${fmt(s.hours)}</b><small>hours</small></div><div><b>${s.jobs}</b><small>jobs</small></div><div><b>${s.subs}</b><small>subdivisions</small></div></div></div>`; }).join(""); }
-function renderBusiest(){ const busy=busiestDay(state.jobs); const box=document.getElementById("busiestDayBox"); const badge=document.getElementById("busiestBadge"); if(!busy){box.className="empty"; box.textContent="Upload daily job files to find the busiest day."; badge.textContent="—"; return;} badge.textContent=`${fmt(busy.hours)} hrs`; const qs=quadTotals(busy.rows); box.className="miniCard"; box.innerHTML=`<h3>${displayDate(busy.date)}</h3><div class="big">${fmt(busy.hours)} hours</div><small>${busy.jobs} jobs • ${busy.subs} subdivisions</small><div class="grid two" style="margin-top:10px;gap:8px">${QUADS.map(q=>{const s=sums(qs[q]||[]);return `<div style="border:1px solid var(--line);border-radius:12px;padding:8px"><b>${q}</b><br><span>${fmt(s.hours)} hrs</span><br><small>${s.jobs} jobs</small></div>`}).join("")}</div>`; }
+function quadrantBlock(title, rows){ const qt=quadTotals(rows); const total=sums(rows).hours || 0; return `<div class="quadGroup"><div class="sectionTitle" style="margin:6px 0 8px"><h2 style="font-size:16px">${safe(title)}</h2><span class="muted">${fmt(total)} hrs</span></div>${QUADS.map(q=>{ const s=sums(qt[q]||[]); const pct=total? (s.hours/total*100) : 0; return `<div class="quad"><div class="quadHead"><div class="quadName">${q}</div><span class="pill q${q}">${fmt(s.hours)} hrs</span></div><div class="bar" title="${fmt(pct)}% of ${safe(title)}"><span style="width:${Math.max(s.hours?2:0,pct)}%;background:${qColor(q)}"></span></div><div class="pctText">${fmt(pct)}% of ${safe(title).toLowerCase()}</div><div class="quadMeta"><div><b>${fmt(s.hours)}</b><small>hours</small></div><div><b>${s.jobs}</b><small>jobs</small></div><div><b>${s.subs}</b><small>subdivisions</small></div></div></div>`; }).join("")}</div>`; }
+function renderQuadrants(){
+  const wt=currentWorkType();
+  if(wt==="all") document.getElementById("quadList").innerHTML=quadrantBlock("Labor", rowsForType("Labor"))+`<hr style="border:0;border-top:1px solid var(--line);margin:14px 0">`+quadrantBlock("Cleaning", rowsForType("Cleaning"));
+  else document.getElementById("quadList").innerHTML=quadrantBlock(wt, state.filtered);
+}
+function renderBusiest(){
+  const box=document.getElementById("busiestDayBox"); const badge=document.getElementById("busiestBadge"); const wt=currentWorkType();
+  const types=activeTypes(); const cards=[];
+  types.forEach(type=>{ const rows=rowsForType(type); const busy=busiestDay(rows); if(!busy){ cards.push(`<div class="empty">No ${safe(type)} jobs in this view.</div>`); return; } const qs=quadTotals(busy.rows); cards.push(`<div class="miniCard"><h3>${safe(type)} • ${displayDate(busy.date)}</h3><div class="big">${fmt(busy.hours)} hours</div><small>${busy.jobs} jobs • ${busy.subs} subdivisions</small><div class="grid two" style="margin-top:10px;gap:8px">${QUADS.map(q=>{const s=sums(qs[q]||[]);return `<div style="border:1px solid var(--line);border-radius:12px;padding:8px"><b>${q}</b><br><span>${fmt(s.hours)} hrs</span><br><small>${s.jobs} jobs</small></div>`}).join("")}</div></div>`); });
+  const totalRows=wt==="all"?state.filtered:rowsForType(wt); const busy=busiestDay(totalRows); badge.textContent=busy?`${fmt(busy.hours)} hrs`:"—"; box.className=""; box.innerHTML=cards.join(`<div style="height:10px"></div>`) || `<div class="empty">Upload daily job files to find the busiest day.</div>`;
+}
 function renderTables(){ renderDayTable(); renderSubTable(); renderJobTable(); }
-function renderDayTable(){ const basis=state.filtered.length?state.filtered:state.jobs; const list=[...groupBy(basis,j=>j.date||"Unknown").entries()].map(([date,rs])=>({date,...sums(rs), rows:rs})).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs); document.getElementById("dayTable").innerHTML=`<thead><tr><th>Date</th><th class="right">Hours</th><th class="right">Jobs</th><th>Type Mix</th><th>Top Quadrant</th></tr></thead><tbody>${list.map(d=>{ const qt=quadTotals(d.rows); const top=QUADS.map(q=>({q,...sums(qt[q]||[])})).sort((a,b)=>b.hours-a.hours)[0]; return `<tr><td><b>${displayDate(d.date)}</b><br><span class="muted">${safe(d.date)}</span></td><td class="right"><b>${fmt(d.hours)}</b></td><td class="right">${d.jobs}</td><td>${typeMix(d.rows)}</td><td><span class="pill q${top.q}">${top.q} • ${fmt(top.hours)} hrs</span></td></tr>`;}).join("")}</tbody>`; }
-function renderSubTable(){ const list=[...groupBy(state.filtered,j=>`${j.quadrant}|${j.builder}|${j.subdivision}`).entries()].map(([k,rs])=>{ const [q,b,su]=k.split("|"); return {q,b,su,...sums(rs), rows:rs}; }).sort((a,b)=>b.hours-a.hours); document.getElementById("subTable").innerHTML=`<thead><tr><th>Subdivision</th><th>Q</th><th class="right">Hours</th><th class="right">Jobs</th><th>Type Mix</th></tr></thead><tbody>${list.map(r=>`<tr><td><b>${safe(r.su)}</b><br><span class="muted">${safe(r.b)}</span></td><td><span class="pill q${r.q}">${safe(r.q)}</span></td><td class="right"><b>${fmt(r.hours)}</b></td><td class="right">${r.jobs}</td><td>${typeMix(r.rows)}</td></tr>`).join("")}</tbody>`; }
+function topQuadrant(rows){ const qt=quadTotals(rows); return QUADS.map(q=>({q,...sums(qt[q]||[])})).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs)[0] || {q:"—",hours:0,jobs:0}; }
+function renderDayTable(){
+  const wt=currentWorkType(); const basis=state.filteredAllTypes.length?state.filteredAllTypes:state.jobs; const grouped=[...groupBy(basis,j=>j.date||"Unknown").entries()].map(([date,rs])=>({date, rows:rs, labor:sums(rowsForType("Labor",rs)), cleaning:sums(rowsForType("Cleaning",rs)), total:sums(wt==="all"?rs:rowsForType(wt,rs))})).sort((a,b)=>b.total.hours-a.total.hours||b.total.jobs-a.total.jobs);
+  if(wt==="all"){
+    document.getElementById("dayTable").innerHTML=`<thead><tr><th>Date</th><th class="right">Labor Hrs</th><th class="right">Cleaning Hrs</th><th class="right">Total Hrs</th><th class="right">Jobs</th><th>Top Quadrant</th></tr></thead><tbody>${grouped.map(d=>{ const top=topQuadrant(d.rows); return `<tr><td><b>${displayDate(d.date)}</b><br><span class="muted">${safe(d.date)}</span></td><td class="right"><b>${fmt(d.labor.hours)}</b><br><span class="muted">${d.labor.jobs} jobs</span></td><td class="right"><b>${fmt(d.cleaning.hours)}</b><br><span class="muted">${d.cleaning.jobs} jobs</span></td><td class="right"><b>${fmt(d.total.hours)}</b></td><td class="right">${d.total.jobs}</td><td><span class="pill q${top.q}">${top.q} • ${fmt(top.hours)} hrs</span></td></tr>`;}).join("")}</tbody>`;
+  } else {
+    const list=grouped.map(d=>({date:d.date, rows:rowsForType(wt,d.rows), ...sums(rowsForType(wt,d.rows))})).filter(d=>d.jobs).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs);
+    document.getElementById("dayTable").innerHTML=`<thead><tr><th>Date</th><th class="right">${safe(wt)} Hours</th><th class="right">Jobs</th><th>Top Quadrant</th></tr></thead><tbody>${list.map(d=>{ const top=topQuadrant(d.rows); return `<tr><td><b>${displayDate(d.date)}</b><br><span class="muted">${safe(d.date)}</span></td><td class="right"><b>${fmt(d.hours)}</b></td><td class="right">${d.jobs}</td><td><span class="pill q${top.q}">${top.q} • ${fmt(top.hours)} hrs</span></td></tr>`;}).join("")}</tbody>`;
+  }
+}
+function renderSubTable(){
+  const wt=currentWorkType(); const basis=state.filteredAllTypes.length?state.filteredAllTypes:state.filtered;
+  const list=[...groupBy(basis,j=>`${j.quadrant}|${j.builder}|${j.subdivision}`).entries()].map(([k,rs])=>{ const [q,b,su]=k.split("|"); const labor=sums(rowsForType("Labor",rs)); const cleaning=sums(rowsForType("Cleaning",rs)); const total=sums(wt==="all"?rs:rowsForType(wt,rs)); return {q,b,su,labor,cleaning,total,rows:rs}; }).filter(r=>r.total.jobs).sort((a,b)=>b.total.hours-a.total.hours);
+  if(wt==="all") document.getElementById("subTable").innerHTML=`<thead><tr><th>Subdivision</th><th>Q</th><th class="right">Labor Hrs</th><th class="right">Cleaning Hrs</th><th class="right">Total</th><th class="right">Jobs</th></tr></thead><tbody>${list.map(r=>`<tr><td><b>${safe(r.su)}</b><br><span class="muted">${safe(r.b)}</span></td><td><span class="pill q${r.q}">${safe(r.q)}</span></td><td class="right"><b>${fmt(r.labor.hours)}</b><br><span class="muted">${r.labor.jobs} jobs</span></td><td class="right"><b>${fmt(r.cleaning.hours)}</b><br><span class="muted">${r.cleaning.jobs} jobs</span></td><td class="right"><b>${fmt(r.total.hours)}</b></td><td class="right">${r.total.jobs}</td></tr>`).join("")}</tbody>`;
+  else document.getElementById("subTable").innerHTML=`<thead><tr><th>Subdivision</th><th>Q</th><th class="right">${safe(wt)} Hours</th><th class="right">Jobs</th></tr></thead><tbody>${list.map(r=>`<tr><td><b>${safe(r.su)}</b><br><span class="muted">${safe(r.b)}</span></td><td><span class="pill q${r.q}">${safe(r.q)}</span></td><td class="right"><b>${fmt(r.total.hours)}</b></td><td class="right">${r.total.jobs}</td></tr>`).join("")}</tbody>`;
+}
 function renderJobTable(){ document.getElementById("jobTable").innerHTML=`<thead><tr><th>Date</th><th>Type</th><th>Builder / Subdivision</th><th>Lot</th><th>Task</th><th>Q</th><th class="right">Hours</th><th>Source</th></tr></thead><tbody>${state.filtered.map(j=>`<tr><td><b>${displayDate(j.date)}</b><br><span class="muted">${safe(j.sourceFile)}</span></td><td><span class="workBadge">${safe(j.workGroup||"Labor")}</span></td><td><b>${safe(j.builder)}</b><br>${safe(j.subdivision)}</td><td>${safe(j.lot)}</td><td><b>${safe(j.taskDisplay||j.task)}</b>${j.notes?`<br><span class="muted">${safe(j.notes)}</span>`:""}</td><td><span class="pill q${j.quadrant}">${safe(j.quadrant)}</span></td><td class="right"><b>${fmt(j.hours)}</b></td><td class="muted">${safe(j.hoursSource)}</td></tr>`).join("")}</tbody>`; }
 function typeMix(rows){
   const m=[...groupBy(rows,j=>j.workGroup||"Labor").entries()].map(([k,rs])=>`${safe(k)} ${fmt(sums(rs).hours)}h`);
   return m.map(x=>`<span class="workBadge">${x}</span>`).join(" ");
 }
 function renderTaskBreakdown(){
-  const total=sums(state.filtered).hours || 0;
-  const list=[...groupBy(state.filtered,j=>`${j.workGroup||"Labor"}|${j.taskDisplay||j.task||"Other"}`).entries()]
+  const wt=currentWorkType(); const basis=wt==="all"?state.filteredAllTypes:state.filtered; const total=sums(basis).hours || 0;
+  const list=[...groupBy(basis,j=>`${j.workGroup||"Labor"}|${j.taskDisplay||j.task||"Other"}`).entries()]
     .map(([k,rs])=>{const [type,task]=k.split("|"); const s=sums(rs); return {type,task,...s, rows:rs, pct:total? s.hours/total*100:0};})
-    .sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs);
-  document.getElementById("taskTable").innerHTML=`<thead><tr><th>Task</th><th>Type</th><th class="right">Hours</th><th class="right">Jobs</th><th>%</th></tr></thead><tbody>${list.map(r=>`<tr><td><b>${safe(r.task)}</b></td><td><span class="workBadge">${safe(r.type)}</span></td><td class="right"><b>${fmt(r.hours)}</b></td><td class="right">${r.jobs}</td><td><div class="bar" style="margin:0;min-width:120px"><span style="width:${Math.max(r.hours?2:0,r.pct)}%;background:var(--accent)"></span></div><span class="pctText">${fmt(r.pct)}%</span></td></tr>`).join("")}</tbody>`;
+    .sort((a,b)=>String(a.type).localeCompare(String(b.type)) || b.hours-a.hours || b.jobs-a.jobs);
+  let last="";
+  const rows=list.map(r=>{ const header=wt==="all" && r.type!==last ? (last=r.type, `<tr class="subheadRow"><td colspan="5">${safe(r.type)} Task Workload</td></tr>`) : ""; return header+`<tr><td><b>${safe(r.task)}</b></td><td><span class="workBadge">${safe(r.type)}</span></td><td class="right"><b>${fmt(r.hours)}</b></td><td class="right">${r.jobs}</td><td><div class="bar" style="margin:0;min-width:120px"><span style="width:${Math.max(r.hours?2:0,r.pct)}%;background:var(--accent)"></span></div><span class="pctText">${fmt(r.pct)}%</span></td></tr>`; }).join("");
+  document.getElementById("taskTable").innerHTML=`<thead><tr><th>Task</th><th>Type</th><th class="right">Hours</th><th class="right">Jobs</th><th>% of view</th></tr></thead><tbody>${rows}</tbody>`;
 }
 function renderLotBreakdown(){
-  const list=[...groupBy(state.filtered,j=>`${j.builder}|${j.subdivision}|${j.lot}|${j.quadrant}`).entries()]
-    .map(([k,rs])=>{const [builder,sub,lot,q]=k.split("|"); const s=sums(rs); const dates=[...new Set(rs.map(r=>r.date))].sort(); const tasks=[...groupBy(rs,r=>`${r.workGroup||"Labor"}: ${r.taskDisplay||r.task||"Other"}`).entries()].map(([name,items])=>`${name} (${fmt(sums(items).hours)}h)`).join("<br>"); return {builder,sub,lot,q,...s,dates,tasks, rows:rs};})
-    .sort((a,b)=>b.hours-a.hours||String(a.sub).localeCompare(String(b.sub)));
-  document.getElementById("lotTable").innerHTML=`<thead><tr><th>Lot</th><th>Dates</th><th>Tasks completed</th><th class="right">Hours</th><th class="right">Jobs</th></tr></thead><tbody>${list.map(r=>`<tr><td><b>${safe(r.lot||"—")}</b> ${r.q?`<span class="pill q${r.q}">${safe(r.q)}</span>`:""}<br><span class="muted">${safe(r.builder)} • ${safe(r.sub)}</span></td><td>${r.dates.map(displayDate).map(safe).join("<br>")}</td><td>${r.tasks}</td><td class="right"><b>${fmt(r.hours)}</b></td><td class="right">${r.jobs}</td></tr>`).join("")}</tbody>`;
+  const basis=state.filteredAllTypes.length?state.filteredAllTypes:state.filtered; // Always keep labor + cleaning together here.
+  const list=[...groupBy(basis,j=>`${j.builder}|${j.subdivision}|${j.lot}|${j.quadrant}`).entries()]
+    .map(([k,rs])=>{const [builder,sub,lot,q]=k.split("|"); const labor=sums(rowsForType("Labor",rs)); const cleaning=sums(rowsForType("Cleaning",rs)); const total=sums(rs); const dates=[...new Set(rs.map(r=>r.date))].sort(); const tasks=[...groupBy(rs,r=>`${r.workGroup||"Labor"}: ${r.taskDisplay||r.task||"Other"}`).entries()].map(([name,items])=>`${safe(name)} (${fmt(sums(items).hours)}h)`).join("<br>"); return {builder,sub,lot,q,labor,cleaning,total,dates,tasks, rows:rs};})
+    .sort((a,b)=>b.total.hours-a.total.hours||String(a.sub).localeCompare(String(b.sub)));
+  document.getElementById("lotTable").innerHTML=`<thead><tr><th>Lot</th><th>Dates</th><th>Tasks completed</th><th class="right">Labor</th><th class="right">Cleaning</th><th class="right">Total</th><th class="right">Jobs</th></tr></thead><tbody>${list.map(r=>`<tr><td><b>${safe(r.lot||"—")}</b> ${r.q?`<span class="pill q${r.q}">${safe(r.q)}</span>`:""}<br><span class="muted">${safe(r.builder)} • ${safe(r.sub)}</span></td><td>${r.dates.map(displayDate).map(safe).join("<br>")}</td><td>${r.tasks}</td><td class="right"><b>${fmt(r.labor.hours)}</b><br><span class="muted">${r.labor.jobs} jobs</span></td><td class="right"><b>${fmt(r.cleaning.hours)}</b><br><span class="muted">${r.cleaning.jobs} jobs</span></td><td class="right"><b>${fmt(r.total.hours)}</b></td><td class="right">${r.total.jobs}</td></tr>`).join("")}</tbody>`;
 }
 function renderIssues(){ document.getElementById("issueCount").textContent=state.issues.length; document.getElementById("issues").innerHTML=state.issues.length?state.issues.slice(0,200).map(i=>`<div class="issue">${safe(i.msg)}</div>`).join(""):`<div class="empty">No issues found.</div>`; }
+function renderMapTools(){ renderSplitCard(); renderPressureCard(); renderTrendCard(); renderUnmappedCard(); }
+function renderSplitCard(){
+  const labor=sums(rowsForType("Labor")); const cleaning=sums(rowsForType("Cleaning")); const total=labor.hours+cleaning.hours; const lp=total?labor.hours/total*100:0; const cp=total?cleaning.hours/total*100:0;
+  document.getElementById("splitCard").innerHTML=`<h3>Labor vs Cleaning Split</h3><div class="splitBar"><span style="width:${lp}%;background:var(--accent)"></span><span style="width:${cp}%;background:var(--good)"></span></div><div class="splitRow"><span><i class="legendDot" style="background:var(--accent)"></i>Labor</span><b>${fmt(labor.hours)} hrs • ${fmt(lp)}%</b></div><div class="splitRow"><span><i class="legendDot" style="background:var(--good)"></i>Cleaning</span><b>${fmt(cleaning.hours)} hrs • ${fmt(cp)}%</b></div>`;
+}
+function renderPressureCard(){
+  const parts=["Labor","Cleaning"].map(type=>{ const rows=rowsForType(type); const top=topQuadrant(rows); return `<div class="pressureRow"><span>${safe(type)} pressure</span><b><span class="pill q${top.q}">${top.q}</span> ${fmt(top.hours)} hrs</b></div>`; }).join("");
+  document.getElementById("pressureCard").innerHTML=`<h3>Busiest Quadrant by Type</h3>${parts || `<div class="empty">No jobs loaded.</div>`}`;
+}
+function renderTrendCard(){
+  const basis=state.filteredAllTypes.length?state.filteredAllTypes:state.filtered; const days=[...groupBy(basis,j=>j.date||"Unknown").entries()].map(([date,rs])=>({date,labor:sums(rowsForType("Labor",rs)).hours,cleaning:sums(rowsForType("Cleaning",rs)).hours,total:sums(rs).hours})).sort((a,b)=>String(a.date).localeCompare(String(b.date))); const max=Math.max(1,...days.map(d=>d.total));
+  document.getElementById("trendCard").innerHTML=`<h3>Daily Workload Trend</h3><div class="trendBars">${days.map(d=>{ const lw=d.labor/max*100; const cw=d.cleaning/max*100; return `<div class="trendRow"><b>${safe(displayDate(d.date)).replace(/, 2026/,"")}</b><div class="trendStack" title="Labor ${fmt(d.labor)} hrs • Cleaning ${fmt(d.cleaning)} hrs"><span style="width:${lw}%;background:var(--accent)"></span><span style="width:${cw}%;background:var(--good)"></span></div><b class="right">${fmt(d.total)}h</b></div>`; }).join("") || `<div class="empty">Load a review to see the daily trend.</div>`}</div><div class="muted" style="margin-top:8px"><i class="legendDot" style="background:var(--accent)"></i>Labor <i class="legendDot" style="background:var(--good);margin-left:12px"></i>Cleaning</div>`;
+}
+function renderUnmappedCard(){
+  const basis=state.filtered.length?state.filtered:state.filteredAllTypes; const missing=basis.filter(r=>!r.lat||!r.lon||r.quadrant==="Unmatched");
+  document.getElementById("unmappedCard").innerHTML=missing.length?`<h3>Map Warning</h3><b>${missing.length} jobs not shown or unmatched on the map.</b><div class="muted" style="margin-top:6px">Usually this means a subdivision name did not match or the subdivision is missing Lat/Lon.</div>`:`<h3>Map Warning</h3><div class="muted">All jobs in the current view are matched to map coordinates.</div>`;
+}
 function initMap(){ if(state.map)return; state.map=L.map("map",{scrollWheelZoom:true}).setView([COLUMBUS.lat,COLUMBUS.lon],10); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"&copy; OpenStreetMap"}).addTo(state.map); setTimeout(()=>state.map.invalidateSize(),200); }
 function clearLayers(){ state.layers.forEach(l=>{try{state.map.removeLayer(l)}catch(e){}}); state.layers=[]; }
 function addLayer(l){ l.addTo(state.map); state.layers.push(l); return l; }
@@ -351,7 +429,7 @@ function exportSnapshot(){
   if(!state.loaded){ alert("Load and calculate your Excel files first."); return; }
   const payload={
     app:"VIP Quadrant Man-Hour Review",
-    version:"1.70",
+    version:"1.80",
     exportedAt:new Date().toISOString(),
     columbusCenter:COLUMBUS,
     subdivisions:state.subs,
