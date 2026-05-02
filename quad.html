@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VIP Quadrant Week / Month Review Dashboard v1.80</title>
+  <title>VIP Quadrant Week / Month Review Dashboard v1.81</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -32,7 +32,16 @@
     .miniCard{padding:13px}.miniCard h3{margin:0 0 8px}.miniCard .big{font-size:26px;font-weight:950}.miniCard small{color:var(--muted)}.workBadge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 7px;font-size:11px;font-weight:900;background:rgba(255,255,255,.06);color:var(--muted)}.pctText{font-size:12px;color:var(--muted);font-weight:800}
 
     .mapTools{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.mapTools .panelLite{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;padding:12px}.panelLite h3{margin:0 0 10px;font-size:15px}.splitRow,.pressureRow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}.splitBar{height:12px;border-radius:999px;background:#081427;border:1px solid var(--line);overflow:hidden;display:flex;margin:10px 0}.splitBar span{height:100%;display:block}.trendBars{display:grid;gap:9px}.trendRow{display:grid;grid-template-columns:105px 1fr 70px;gap:8px;align-items:center}.trendStack{height:18px;border-radius:999px;background:#081427;border:1px solid var(--line);overflow:hidden;display:flex}.trendStack span{height:100%;display:block}.legendDot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}.subheadRow td{background:rgba(55,189,248,.12)!important;color:var(--text);font-weight:950;border-radius:12px!important}.warningCard{border-left:4px solid var(--warn);background:rgba(255,209,102,.08)}
-    @media(max-width:1000px){.mapTools{grid-template-columns:1fr}.trendRow{grid-template-columns:90px 1fr 58px}}
+
+    .lotGrid{grid-template-columns:minmax(320px,.95fr) minmax(560px,1.35fr)}
+    .taskRow{cursor:pointer}.taskRow:hover td{border-color:rgba(55,189,248,.5);background:rgba(55,189,248,.08)}
+    .dateChips{display:flex;flex-wrap:wrap;gap:6px}.dateChip{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:12px;color:var(--text)}
+    .lotTaskList{display:grid;gap:8px;min-width:260px}.lotTaskItem{padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03)}.lotTaskItem b{display:block;margin-bottom:4px}.lotTaskDates{margin-top:4px;color:var(--muted);font-size:12px;line-height:1.35}
+    #lotTable th:nth-child(2), #lotTable td:nth-child(2){min-width:185px} #lotTable th:nth-child(3), #lotTable td:nth-child(3){min-width:300px}
+    .mapHeader{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}.mapHeader h2{margin:0;font-size:18px}.mapHeader .field{min-width:220px}
+    .subList{display:grid;gap:8px}.subItem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03)}.subItem b{display:block}.subItem small{color:var(--muted)}
+    .modalBack{position:fixed;inset:0;background:rgba(3,8,15,.72);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:24px;z-index:5000}.modalBack.show{display:flex}.modalCard{width:min(980px,95vw);max-height:88vh;display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(18,35,58,.98),rgba(13,27,47,.98));border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}.modalHead{display:flex;align-items:start;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--line)}.modalHead h3{margin:0 0 4px;font-size:22px}.modalClose{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);border-radius:12px;padding:9px 12px;font-size:18px;line-height:1;cursor:pointer}.modalBody{padding:16px 20px;overflow:auto}.modalBody table{border-spacing:0 8px}.modalMeta{color:var(--muted);font-size:13px}
+    @media(max-width:1000px){.mapTools{grid-template-columns:1fr}.trendRow{grid-template-columns:90px 1fr 58px}.lotGrid{grid-template-columns:1fr}.mapHeader .field{min-width:100%}}
   </style>
 </head>
 <body>
@@ -43,10 +52,11 @@
       <div class="sub">Upload subdivisions + task hours + labor and cleaning daily files. Review a day, week, month, or the whole batch on a map.</div>
     </div>
     <details class="versionBox">
-      <summary class="version">v1.80 • Split labor/cleaning review ▾</summary>
+      <summary class="version">v1.81 • Task popup + map toggle ▾</summary>
       <div class="versionDrop">
         <h3>Version history</h3>
         <ul>
+          <li><b>v1.81</b> — Added clickable task workload popup with dates/lots, improved lot history readability with per-task dates, added map-only Labor/Cleaning/Both toggle, and filled unused map space with top subdivisions and day snapshot cards.</li>
           <li><b>v1.80</b> — Fully separated Labor/Cleaning review mode, separate quadrant totals, separate busiest days, split task and subdivision breakdowns, lot history keeps both types, added daily trend chart, workload split card, busiest quadrant by type, and unmapped jobs warning.</li>
           <li><b>v1.70</b> — Added Floor Plans upload for cleaning hours by lot/subdivision, cleaning fallback-to-1-hour flagging, and exported review JSON now preserves floorplan reference data.</li>
           <li><b>v1.60</b> — Added Labor/Cleaning uploads and toggles, task workload breakdown, lot history breakdown, quadrant percent-of-total bars, and standalone review export improvements.</li>
@@ -103,17 +113,31 @@
       <div id="issues" class="scroll"></div>
     </aside>
     <section class="panel mapPanel">
+      <div class="mapHeader">
+        <h2>Map</h2>
+        <div class="field">
+          <label>Map View</label>
+          <select id="mapWorkType">
+            <option value="current">Match Review Filter</option>
+            <option value="all">Labor + Cleaning</option>
+            <option value="Labor">Labor Only</option>
+            <option value="Cleaning">Cleaning Only</option>
+          </select>
+        </div>
+      </div>
       <div id="map"></div>
       <div class="mapTools">
         <div class="panelLite" id="splitCard"></div>
         <div class="panelLite" id="pressureCard"></div>
         <div class="panelLite" style="grid-column:1/-1" id="trendCard"></div>
         <div class="panelLite warningCard" style="grid-column:1/-1" id="unmappedCard"></div>
+        <div class="panelLite" id="topMapCard"></div>
+        <div class="panelLite" id="mapDayCard"></div>
       </div>
     </section>
   </section>
 
-  <section class="grid two" style="margin-top:16px">
+  <section class="grid two lotGrid" style="margin-top:16px">
     <div class="panel">
       <div class="sectionTitle"><h2>Day-by-Day Review</h2><span class="muted">sorted busiest first</span></div>
       <div class="scroll"><table id="dayTable"></table></div>
@@ -139,6 +163,19 @@
     <div class="sectionTitle"><h2>Job Detail</h2><span class="muted" id="jobCountLabel">0 jobs</span></div>
     <div class="scroll"><table id="jobTable"></table></div>
   </section>
+
+  <div id="taskModal" class="modalBack" aria-hidden="true">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div>
+          <h3 id="taskModalTitle">Task Details</h3>
+          <div class="modalMeta" id="taskModalMeta">Dates and lots for this task.</div>
+        </div>
+        <button class="modalClose" id="taskModalClose" aria-label="Close">✕</button>
+      </div>
+      <div class="modalBody" id="taskModalBody"></div>
+    </div>
+  </div>
 </main>
 
 <script>
@@ -161,6 +198,7 @@ function num(v){ if(v===null||v===undefined||v==="")return 0; if(typeof v==="num
 function lotKey(v){ return norm(v).replace(/^lot\s*/g,"").replace(/\s+/g,""); }
 function fmt(n){return (Math.round((Number(n)||0)*100)/100).toLocaleString(undefined,{maximumFractionDigits:2});}
 function safe(v){return String(v??"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function attrSafe(v){return String(v??"").replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function get(row, field){ const aliases=colAliases[field]||[field]; for(const k of aliases){ if(Object.prototype.hasOwnProperty.call(row,k) && row[k]!==undefined && row[k]!==null && row[k]!=="") return row[k]; } const keys=Object.keys(row); for(const a of aliases){ const ak=norm(a); const found=keys.find(k=>norm(k)===ak); if(found && row[found]!==undefined && row[found]!==null && row[found]!=="") return row[found]; } return "";}
 function normalizeQuadrant(v){ const s=norm(v).toUpperCase(); if(["NW","NE","SW","SE"].includes(s)) return s; if(s.includes("NORTH WEST")||s.includes("NORTHWEST"))return"NW"; if(s.includes("NORTH EAST")||s.includes("NORTHEAST"))return"NE"; if(s.includes("SOUTH WEST")||s.includes("SOUTHWEST"))return"SW"; if(s.includes("SOUTH EAST")||s.includes("SOUTHEAST"))return"SE"; return "";}
 function quadrantFromLatLon(lat,lon){ if(!lat||!lon)return""; const north=lat>=COLUMBUS.lat, east=lon>=COLUMBUS.lon; if(north&&!east)return"NW"; if(north&&east)return"NE"; if(!north&&!east)return"SW"; return"SE";}
@@ -275,6 +313,8 @@ function populateFilters(){
 }
 function fillSelect(id,values,allLabel){ const el=document.getElementById(id); const old=el.value; el.innerHTML=`<option value="">${allLabel}</option>`+values.map(v=>`<option value="${safe(v)}">${safe(id==="daySelect"?displayDate(v):v)}</option>`).join(""); if(values.includes(old))el.value=old; }
 function currentWorkType(){ return document.getElementById("workType")?.value || "all"; }
+function currentMapType(){ const v=document.getElementById("mapWorkType")?.value || "current"; return v==="current" ? currentWorkType() : v; }
+function mapRows(){ const mt=currentMapType(); return mt==="all" ? state.filteredAllTypes : rowsForType(mt,state.filteredAllTypes); }
 function passesDateSearch(j){
   const mode=document.getElementById("mode").value;
   const day=document.getElementById("daySelect").value;
@@ -364,38 +404,59 @@ function renderTaskBreakdown(){
     .map(([k,rs])=>{const [type,task]=k.split("|"); const s=sums(rs); return {type,task,...s, rows:rs, pct:total? s.hours/total*100:0};})
     .sort((a,b)=>String(a.type).localeCompare(String(b.type)) || b.hours-a.hours || b.jobs-a.jobs);
   let last="";
-  const rows=list.map(r=>{ const header=wt==="all" && r.type!==last ? (last=r.type, `<tr class="subheadRow"><td colspan="5">${safe(r.type)} Task Workload</td></tr>`) : ""; return header+`<tr><td><b>${safe(r.task)}</b></td><td><span class="workBadge">${safe(r.type)}</span></td><td class="right"><b>${fmt(r.hours)}</b></td><td class="right">${r.jobs}</td><td><div class="bar" style="margin:0;min-width:120px"><span style="width:${Math.max(r.hours?2:0,r.pct)}%;background:var(--accent)"></span></div><span class="pctText">${fmt(r.pct)}%</span></td></tr>`; }).join("");
+  const rows=list.map(r=>{ const header=wt==="all" && r.type!==last ? (last=r.type, `<tr class="subheadRow"><td colspan="5">${safe(r.type)} Task Workload</td></tr>`) : ""; return header+`<tr class="taskRow" data-type="${attrSafe(r.type)}" data-task="${attrSafe(r.task)}" title="Click to see dates and lots"><td><b>${safe(r.task)}</b><br><span class="muted">Click for dates + lots</span></td><td><span class="workBadge">${safe(r.type)}</span></td><td class="right"><b>${fmt(r.hours)}</b></td><td class="right">${r.jobs}</td><td><div class="bar" style="margin:0;min-width:120px"><span style="width:${Math.max(r.hours?2:0,r.pct)}%;background:var(--accent)"></span></div><span class="pctText">${fmt(r.pct)}%</span></td></tr>`; }).join("");
   document.getElementById("taskTable").innerHTML=`<thead><tr><th>Task</th><th>Type</th><th class="right">Hours</th><th class="right">Jobs</th><th>% of view</th></tr></thead><tbody>${rows}</tbody>`;
 }
 function renderLotBreakdown(){
   const basis=state.filteredAllTypes.length?state.filteredAllTypes:state.filtered; // Always keep labor + cleaning together here.
   const list=[...groupBy(basis,j=>`${j.builder}|${j.subdivision}|${j.lot}|${j.quadrant}`).entries()]
-    .map(([k,rs])=>{const [builder,sub,lot,q]=k.split("|"); const labor=sums(rowsForType("Labor",rs)); const cleaning=sums(rowsForType("Cleaning",rs)); const total=sums(rs); const dates=[...new Set(rs.map(r=>r.date))].sort(); const tasks=[...groupBy(rs,r=>`${r.workGroup||"Labor"}: ${r.taskDisplay||r.task||"Other"}`).entries()].map(([name,items])=>`${safe(name)} (${fmt(sums(items).hours)}h)`).join("<br>"); return {builder,sub,lot,q,labor,cleaning,total,dates,tasks, rows:rs};})
+    .map(([k,rs])=>{
+      const [builder,sub,lot,q]=k.split("|");
+      const labor=sums(rowsForType("Labor",rs)); const cleaning=sums(rowsForType("Cleaning",rs)); const total=sums(rs); const dates=[...new Set(rs.map(r=>r.date))].sort();
+      const tasks=[...groupBy(rs,r=>`${r.workGroup||"Labor"}: ${r.taskDisplay||r.task||"Other"}`).entries()]
+        .map(([name,items])=>{ const itemDates=[...new Set(items.map(i=>i.date))].sort(); return `<div class="lotTaskItem"><b>${safe(name)}</b><span class="workBadge">${fmt(sums(items).hours)}h • ${items.length} job${items.length===1?"":"s"}</span><div class="lotTaskDates">${itemDates.map(d=>safe(displayDate(d))).join("<br>")}</div></div>`; })
+        .join("");
+      return {builder,sub,lot,q,labor,cleaning,total,dates,tasks, rows:rs};
+    })
     .sort((a,b)=>b.total.hours-a.total.hours||String(a.sub).localeCompare(String(b.sub)));
-  document.getElementById("lotTable").innerHTML=`<thead><tr><th>Lot</th><th>Dates</th><th>Tasks completed</th><th class="right">Labor</th><th class="right">Cleaning</th><th class="right">Total</th><th class="right">Jobs</th></tr></thead><tbody>${list.map(r=>`<tr><td><b>${safe(r.lot||"—")}</b> ${r.q?`<span class="pill q${r.q}">${safe(r.q)}</span>`:""}<br><span class="muted">${safe(r.builder)} • ${safe(r.sub)}</span></td><td>${r.dates.map(displayDate).map(safe).join("<br>")}</td><td>${r.tasks}</td><td class="right"><b>${fmt(r.labor.hours)}</b><br><span class="muted">${r.labor.jobs} jobs</span></td><td class="right"><b>${fmt(r.cleaning.hours)}</b><br><span class="muted">${r.cleaning.jobs} jobs</span></td><td class="right"><b>${fmt(r.total.hours)}</b></td><td class="right">${r.total.jobs}</td></tr>`).join("")}</tbody>`;
+  document.getElementById("lotTable").innerHTML=`<thead><tr><th>Lot</th><th style="width:190px">Dates worked</th><th style="width:340px">Tasks completed</th><th class="right">Labor</th><th class="right">Cleaning</th><th class="right">Total</th><th class="right">Jobs</th></tr></thead><tbody>${list.map(r=>`<tr><td><b>${safe(r.lot||"—")}</b> ${r.q?`<span class="pill q${r.q}">${safe(r.q)}</span>`:""}<br><span class="muted">${safe(r.builder)} • ${safe(r.sub)}</span></td><td><div class="dateChips">${r.dates.map(d=>`<span class="dateChip">${safe(displayDate(d))}</span>`).join("")}</div></td><td><div class="lotTaskList">${r.tasks || `<span class="muted">No tasks found.</span>`}</div></td><td class="right"><b>${fmt(r.labor.hours)}</b><br><span class="muted">${r.labor.jobs} jobs</span></td><td class="right"><b>${fmt(r.cleaning.hours)}</b><br><span class="muted">${r.cleaning.jobs} jobs</span></td><td class="right"><b>${fmt(r.total.hours)}</b></td><td class="right">${r.total.jobs}</td></tr>`).join("")}</tbody>`;
 }
 function renderIssues(){ document.getElementById("issueCount").textContent=state.issues.length; document.getElementById("issues").innerHTML=state.issues.length?state.issues.slice(0,200).map(i=>`<div class="issue">${safe(i.msg)}</div>`).join(""):`<div class="empty">No issues found.</div>`; }
-function renderMapTools(){ renderSplitCard(); renderPressureCard(); renderTrendCard(); renderUnmappedCard(); }
+function renderMapTools(){ renderSplitCard(); renderPressureCard(); renderTrendCard(); renderUnmappedCard(); renderTopMapCard(); renderMapDayCard(); }
 function renderSplitCard(){
-  const labor=sums(rowsForType("Labor")); const cleaning=sums(rowsForType("Cleaning")); const total=labor.hours+cleaning.hours; const lp=total?labor.hours/total*100:0; const cp=total?cleaning.hours/total*100:0;
-  document.getElementById("splitCard").innerHTML=`<h3>Labor vs Cleaning Split</h3><div class="splitBar"><span style="width:${lp}%;background:var(--accent)"></span><span style="width:${cp}%;background:var(--good)"></span></div><div class="splitRow"><span><i class="legendDot" style="background:var(--accent)"></i>Labor</span><b>${fmt(labor.hours)} hrs • ${fmt(lp)}%</b></div><div class="splitRow"><span><i class="legendDot" style="background:var(--good)"></i>Cleaning</span><b>${fmt(cleaning.hours)} hrs • ${fmt(cp)}%</b></div>`;
+  const rows=mapRows();
+  const labor=sums(rowsForType("Labor",rows)); const cleaning=sums(rowsForType("Cleaning",rows)); const total=labor.hours+cleaning.hours; const lp=total?labor.hours/total*100:0; const cp=total?cleaning.hours/total*100:0;
+  const mode=currentMapType()==="all" ? "Both" : currentMapType();
+  document.getElementById("splitCard").innerHTML=`<h3>Map Labor vs Cleaning Split</h3><div class="muted" style="margin-bottom:6px">Current map: <b>${safe(mode)}</b></div><div class="splitBar"><span style="width:${lp}%;background:var(--accent)"></span><span style="width:${cp}%;background:var(--good)"></span></div><div class="splitRow"><span><i class="legendDot" style="background:var(--accent)"></i>Labor</span><b>${fmt(labor.hours)} hrs • ${fmt(lp)}%</b></div><div class="splitRow"><span><i class="legendDot" style="background:var(--good)"></i>Cleaning</span><b>${fmt(cleaning.hours)} hrs • ${fmt(cp)}%</b></div>`;
 }
 function renderPressureCard(){
-  const parts=["Labor","Cleaning"].map(type=>{ const rows=rowsForType(type); const top=topQuadrant(rows); return `<div class="pressureRow"><span>${safe(type)} pressure</span><b><span class="pill q${top.q}">${top.q}</span> ${fmt(top.hours)} hrs</b></div>`; }).join("");
-  document.getElementById("pressureCard").innerHTML=`<h3>Busiest Quadrant by Type</h3>${parts || `<div class="empty">No jobs loaded.</div>`}`;
+  const base=mapRows();
+  const parts=(currentMapType()==="all"?["Labor","Cleaning"]:[currentMapType()]).map(type=>{ const rows=type==="all"?base:rowsForType(type,base); const top=topQuadrant(rows); return `<div class="pressureRow"><span>${safe(type)}</span><b>${safe(top.q)} • ${fmt(top.hours)} hrs</b></div>`; }).join("");
+  document.getElementById("pressureCard").innerHTML=`<h3>Busiest Quadrant by Map Type</h3>${parts || `<div class="empty">No jobs loaded.</div>`}`;
 }
 function renderTrendCard(){
-  const basis=state.filteredAllTypes.length?state.filteredAllTypes:state.filtered; const days=[...groupBy(basis,j=>j.date||"Unknown").entries()].map(([date,rs])=>({date,labor:sums(rowsForType("Labor",rs)).hours,cleaning:sums(rowsForType("Cleaning",rs)).hours,total:sums(rs).hours})).sort((a,b)=>String(a.date).localeCompare(String(b.date))); const max=Math.max(1,...days.map(d=>d.total));
+  const days=[...groupBy(mapRows().filter(j=>j.date),j=>j.date).entries()].map(([date,rs])=>({date,labor:sums(rowsForType("Labor",rs)).hours,cleaning:sums(rowsForType("Cleaning",rs)).hours,total:sums(rs).hours})).sort((a,b)=>a.date.localeCompare(b.date));
+  const max=Math.max(1,...days.map(d=>d.total));
   document.getElementById("trendCard").innerHTML=`<h3>Daily Workload Trend</h3><div class="trendBars">${days.map(d=>{ const lw=d.labor/max*100; const cw=d.cleaning/max*100; return `<div class="trendRow"><b>${safe(displayDate(d.date)).replace(/, 2026/,"")}</b><div class="trendStack" title="Labor ${fmt(d.labor)} hrs • Cleaning ${fmt(d.cleaning)} hrs"><span style="width:${lw}%;background:var(--accent)"></span><span style="width:${cw}%;background:var(--good)"></span></div><b class="right">${fmt(d.total)}h</b></div>`; }).join("") || `<div class="empty">Load a review to see the daily trend.</div>`}</div><div class="muted" style="margin-top:8px"><i class="legendDot" style="background:var(--accent)"></i>Labor <i class="legendDot" style="background:var(--good);margin-left:12px"></i>Cleaning</div>`;
 }
 function renderUnmappedCard(){
-  const basis=state.filtered.length?state.filtered:state.filteredAllTypes; const missing=basis.filter(r=>!r.lat||!r.lon||r.quadrant==="Unmatched");
+  const rows=mapRows(); const missing=rows.filter(r=>!r.lat||!r.lon||r.quadrant==="Unmatched");
   document.getElementById("unmappedCard").innerHTML=missing.length?`<h3>Map Warning</h3><b>${missing.length} jobs not shown or unmatched on the map.</b><div class="muted" style="margin-top:6px">Usually this means a subdivision name did not match or the subdivision is missing Lat/Lon.</div>`:`<h3>Map Warning</h3><div class="muted">All jobs in the current view are matched to map coordinates.</div>`;
+}
+function renderTopMapCard(){
+  const rows=mapRows();
+  const list=[...groupBy(rows.filter(r=>r.lat&&r.lon), r=>`${r.builder}|${r.subdivision}|${r.quadrant}`).entries()].map(([k,rs])=>{ const [builder,sub,q]=k.split('|'); return {builder,sub,q,...sums(rs)}; }).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs).slice(0,8);
+  document.getElementById('topMapCard').innerHTML=`<h3>Top Mapped Subdivisions</h3>${list.length?`<div class="subList">${list.map(r=>`<div class="subItem"><div><b>${safe(r.sub)}</b><small>${safe(r.builder)} • ${safe(r.q)}</small></div><div class="right"><b>${fmt(r.hours)} hrs</b><br><small>${r.jobs} jobs</small></div></div>`).join('')}</div>`:`<div class="empty">No mapped subdivisions in this view.</div>`}`;
+}
+function renderMapDayCard(){
+  const rows=mapRows();
+  const days=[...groupBy(rows.filter(r=>r.date),j=>j.date).entries()].map(([date,rs])=>({date,...sums(rs), top:topQuadrant(rs)})).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs).slice(0,5);
+  document.getElementById('mapDayCard').innerHTML=`<h3>Top Days in Map View</h3>${days.length?`<div class="subList">${days.map(d=>`<div class="subItem"><div><b>${safe(displayDate(d.date))}</b><small>Top quadrant: ${safe(d.top.q)} • ${fmt(d.top.hours)} hrs</small></div><div class="right"><b>${fmt(d.hours)} hrs</b><br><small>${d.jobs} jobs</small></div></div>`).join('')}</div>`:`<div class="empty">No day data in this view.</div>`}`;
 }
 function initMap(){ if(state.map)return; state.map=L.map("map",{scrollWheelZoom:true}).setView([COLUMBUS.lat,COLUMBUS.lon],10); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"&copy; OpenStreetMap"}).addTo(state.map); setTimeout(()=>state.map.invalidateSize(),200); }
 function clearLayers(){ state.layers.forEach(l=>{try{state.map.removeLayer(l)}catch(e){}}); state.layers=[]; }
 function addLayer(l){ l.addTo(state.map); state.layers.push(l); return l; }
-function renderMap(){ initMap(); clearLayers(); const rows=state.filtered.filter(r=>r.lat&&r.lon); const bounds=[];
+function renderMap(){ initMap(); clearLayers(); const rows=mapRows().filter(r=>r.lat&&r.lon); const bounds=[];
   const latMin=COLUMBUS.lat-.72, latMax=COLUMBUS.lat+.72, lonMin=COLUMBUS.lon-.92, lonMax=COLUMBUS.lon+.92;
   const quadBoxes={
     NW:[[COLUMBUS.lat,lonMin],[latMax,COLUMBUS.lon]],
@@ -409,12 +470,12 @@ function renderMap(){ initMap(); clearLayers(); const rows=state.filtered.filter
   });
   addLayer(L.polyline([[latMin,COLUMBUS.lon],[latMax,COLUMBUS.lon]],{color:"#eaf2ff",weight:3,dashArray:"8,8",opacity:.9}));
   addLayer(L.polyline([[COLUMBUS.lat,lonMin],[COLUMBUS.lat,lonMax]],{color:"#eaf2ff",weight:3,dashArray:"8,8",opacity:.9}));
-  addLayer(L.marker([COLUMBUS.lat,COLUMBUS.lon],{icon:L.divIcon({className:"",html:`<div class="lineLabel">Columbus Center</div>`,iconSize:[140,28],iconAnchor:[70,14]})}));
-  const qt=quadTotals(); const labelPos={NW:[COLUMBUS.lat+.42,COLUMBUS.lon-.54],NE:[COLUMBUS.lat+.42,COLUMBUS.lon+.54],SW:[COLUMBUS.lat-.42,COLUMBUS.lon-.54],SE:[COLUMBUS.lat-.42,COLUMBUS.lon+.54]};
+  addLayer(L.marker([COLUMBUS.lat,COLUMBUS.lon],{icon:L.divIcon({className:"",html:`<div class="lineLabel">Columbus Center • ${safe(currentMapType()==="all"?"Both":currentMapType())}</div>`,iconSize:[190,28],iconAnchor:[95,14]})}));
+  const qt=quadTotals(rows); const labelPos={NW:[COLUMBUS.lat+.42,COLUMBUS.lon-.54],NE:[COLUMBUS.lat+.42,COLUMBUS.lon+.54],SW:[COLUMBUS.lat-.42,COLUMBUS.lon-.54],SE:[COLUMBUS.lat-.42,COLUMBUS.lon+.54]};
   QUADS.forEach(q=>{ const s=sums(qt[q]||[]); bounds.push(labelPos[q]); addLayer(L.marker(labelPos[q],{icon:L.divIcon({className:"",html:`<div class="quadLabel" style="border-color:${qColor(q)}"><b>${q}</b><span>${fmt(s.hours)} hours</span><span>${s.jobs} jobs • ${s.subs} subdivisions</span></div>`,iconSize:[165,72],iconAnchor:[82,36]})})); });
   bounds.push([COLUMBUS.lat,COLUMBUS.lon]);
   const groups=[...groupBy(rows,r=>`${r.lat}|${r.lon}|${r.subdivision}|${r.builder}`).entries()].map(([k,rs])=>{ const [lat,lon,sub,builder]=k.split("|"); return {lat:Number(lat),lon:Number(lon),sub,builder,rows:rs,...sums(rs),q:rs[0].quadrant}; });
-  groups.forEach(g=>{ bounds.push([g.lat,g.lon]); const size=34; const html=`<div class="markerDot" style="background:${qColor(g.q)}">${g.jobs}</div>`; const marker=addLayer(L.marker([g.lat,g.lon],{icon:L.divIcon({className:"",html,iconSize:[size,size],iconAnchor:[size/2,size/2]})})); marker.bindPopup(`<b>${safe(g.sub)}</b><br>${safe(g.builder)}<br><b>${safe(g.q)}</b> • ${fmt(g.hours)} hours • ${g.jobs} jobs<hr style="border:0;border-top:1px solid #263c5c">${g.rows.slice(0,12).map(r=>`${safe(displayDate(r.date))}: ${safe(r.workGroup||"Labor")} • Lot ${safe(r.lot)} — ${safe(r.taskDisplay||r.task)} (${fmt(r.hours)} hrs)`).join("<br>")}${g.rows.length>12?"<br>...":""}`); });
+  groups.forEach(g=>{ bounds.push([g.lat,g.lon]); const size=34; const html=`<div class="markerDot" style="background:${qColor(g.q)}">${g.jobs}</div>`; const marker=addLayer(L.marker([g.lat,g.lon],{icon:L.divIcon({className:"",html,iconSize:[size,size],iconAnchor:[size/2,size/2]})})); marker.bindPopup(`<b>${safe(g.sub)}</b><br>${safe(g.builder)}<br><b>${safe(g.q)}</b> • ${fmt(g.hours)} hours • ${g.jobs} jobs<hr style="border:0;border-top:1px solid #263c5c">${g.rows.slice(0,14).map(r=>`${safe(displayDate(r.date))}: ${safe(r.workGroup||"Labor")} • Lot ${safe(r.lot)} — ${safe(r.taskDisplay||r.task)} (${fmt(r.hours)} hrs)`).join("<br>")}${g.rows.length>14?"<br>...":""}`); });
   if(bounds.length) state.map.fitBounds(bounds,{padding:[55,55],maxZoom:11}); else state.map.setView([COLUMBUS.lat,COLUMBUS.lon],10);
   setTimeout(()=>state.map.invalidateSize(),100);
 }
@@ -423,13 +484,25 @@ function toCsv(rows){ const headers=["Date","Work Type","Source File","Builder",
 function csvCell(v){ const s=String(v??""); return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s; }
 function download(name,text){ const blob=new Blob([text],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
 function summaryText(){ const total=sums(state.filtered); const busy=busiestDay(state.jobs); const qt=quadTotals(); return [`VIP Quadrant Man-Hour Review`,`Current View: ${fmt(total.hours)} hours • ${total.jobs} jobs`,busy?`Busiest Day: ${displayDate(busy.date)} — ${fmt(busy.hours)} hours • ${busy.jobs} jobs`:"Busiest Day: —",``,...QUADS.map(q=>{const s=sums(qt[q]||[]); return `${q}: ${fmt(s.hours)} hrs • ${s.jobs} jobs`;})].join("\n"); }
-
+function taskBreakdownRows(){ const wt=currentWorkType(); const basis=wt==="all"?state.filteredAllTypes:state.filtered; return [...groupBy(basis,j=>`${j.workGroup||"Labor"}|${j.taskDisplay||j.task||"Other"}`).entries()].map(([k,rs])=>{const [type,task]=k.split('|'); return {type,task,rows:rs,...sums(rs)};}); }
+function openTaskModal(type, task){
+  const rec=taskBreakdownRows().find(r=>r.type===type && r.task===task);
+  const modal=document.getElementById('taskModal'); if(!modal) return;
+  const title=document.getElementById('taskModalTitle'); const meta=document.getElementById('taskModalMeta'); const body=document.getElementById('taskModalBody');
+  title.textContent=`${type} • ${task}`;
+  if(!rec){ meta.textContent='No task rows found.'; body.innerHTML='<div class="empty">No task rows found.</div>'; modal.classList.add('show'); return; }
+  meta.textContent=`${fmt(rec.hours)} hours • ${rec.jobs} jobs • Click outside or press Esc to close`;
+  const rows=[...rec.rows].sort((a,b)=>(a.date||'').localeCompare(b.date||'') || String(a.subdivision).localeCompare(String(b.subdivision)) || String(a.lot).localeCompare(String(b.lot)));
+  body.innerHTML=`<table><thead><tr><th>Date</th><th>Builder / Subdivision</th><th>Lot</th><th>Notes</th><th>Q</th><th class="right">Hours</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${safe(displayDate(r.date))}</b><br><span class="muted">${safe(r.sourceFile)}</span></td><td><b>${safe(r.builder)}</b><br>${safe(r.subdivision)}</td><td>${safe(r.lot||'—')}</td><td>${safe(r.notes||'—')}</td><td>${r.quadrant?`<span class="pill q${r.quadrant}">${safe(r.quadrant)}</span>`:'—'}</td><td class="right"><b>${fmt(r.hours)}</b></td></tr>`).join('')}</tbody></table>`;
+  modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+}
+function closeTaskModal(){ const modal=document.getElementById('taskModal'); if(modal){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); } }
 
 function exportSnapshot(){
   if(!state.loaded){ alert("Load and calculate your Excel files first."); return; }
   const payload={
     app:"VIP Quadrant Man-Hour Review",
-    version:"1.80",
+    version:"1.81",
     exportedAt:new Date().toISOString(),
     columbusCenter:COLUMBUS,
     subdivisions:state.subs,
@@ -477,6 +550,11 @@ async function loadHostedSnapshot(fileName){
 document.getElementById("calcBtn").addEventListener("click",()=>loadAndCompute().catch(err=>{console.error(err); setStatusCards("Error: "+err.message);}));
 ["mode","workType","daySelect","weekSelect","monthSelect","search"].forEach(id=>document.getElementById(id).addEventListener(id==="search"?"input":"change",()=>{ if(state.loaded) applyFilters(); }));
 document.getElementById("fitBtn").addEventListener("click",()=>renderMap());
+document.getElementById("mapWorkType").addEventListener("change",()=>{ if(state.loaded) { renderMap(); renderMapTools(); } });
+document.getElementById("taskTable").addEventListener("click",e=>{ const row=e.target.closest("tr.taskRow"); if(!row) return; openTaskModal(row.dataset.type,row.dataset.task); });
+document.getElementById("taskModalClose").addEventListener("click",closeTaskModal);
+document.getElementById("taskModal").addEventListener("click",e=>{ if(e.target.id==="taskModal") closeTaskModal(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeTaskModal(); });
 document.getElementById("csvBtn").addEventListener("click",()=>download("quadrant-review.csv",toCsv(state.filtered)));
 document.getElementById("jsonBtn").addEventListener("click",()=>exportSnapshot());
 document.getElementById("reviewJsonFile").addEventListener("change",e=>{ const f=e.target.files?.[0]; if(f) loadSnapshotFile(f).catch(err=>{console.error(err); setStatusCards("JSON load error: "+err.message);}); });
