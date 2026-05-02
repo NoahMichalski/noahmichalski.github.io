@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VIP Quadrant Week / Month Review Dashboard v1.60</title>
+  <title>VIP Quadrant Week / Month Review Dashboard v1.70</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -20,7 +20,7 @@
     .top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
     h1{margin:0;font-size:clamp(22px,3vw,34px);letter-spacing:-.04em}.sub{color:var(--muted);margin-top:5px;font-size:14px}.version{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.04)}
     .versionBox{position:relative}.versionDrop{position:absolute;right:0;top:42px;width:min(420px,90vw);background:#0d1b2f;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:12px;z-index:2000}.versionDrop h3{margin:0 0 8px;font-size:15px}.versionDrop ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.45}.versionDrop li{margin:5px 0}.versionDrop b{color:var(--text)}details.versionBox summary{list-style:none;cursor:pointer}details.versionBox summary::-webkit-details-marker{display:none}.dataNote{margin-top:12px;padding:12px;border:1px solid rgba(55,189,248,.35);background:rgba(55,189,248,.08);border-radius:14px;color:var(--muted);line-height:1.35}.dataNote b{color:var(--text)}
-    .grid{display:grid;gap:16px}.uploads{grid-template-columns:repeat(4,minmax(220px,1fr));margin-top:16px}.dashboard{grid-template-columns:390px 1fr;align-items:start}.cards{grid-template-columns:repeat(4,minmax(160px,1fr));margin:16px 0}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
+    .grid{display:grid;gap:16px}.uploads{grid-template-columns:repeat(5,minmax(200px,1fr));margin-top:16px}.dashboard{grid-template-columns:390px 1fr;align-items:start}.cards{grid-template-columns:repeat(4,minmax(160px,1fr));margin:16px 0}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
     @media(max-width:1000px){.uploads,.dashboard,.cards,.two,.three{grid-template-columns:1fr}.mapPanel{min-height:520px}}
     .panel,.upload,.stat,.miniCard{background:linear-gradient(180deg,rgba(18,35,58,.97),rgba(13,27,47,.97));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
     .panel{padding:16px}.upload{padding:14px}.upload label{font-weight:800;display:block;margin-bottom:8px}.upload small,.hint{display:block;color:var(--muted);line-height:1.35}.upload input{width:100%;margin-top:12px;color:var(--muted)}
@@ -40,10 +40,11 @@
       <div class="sub">Upload subdivisions + task hours + labor and cleaning daily files. Review a day, week, month, or the whole batch on a map.</div>
     </div>
     <details class="versionBox">
-      <summary class="version">v1.60 • Labor + Cleaning review ▾</summary>
+      <summary class="version">v1.70 • Cleaning floorplan hours ▾</summary>
       <div class="versionDrop">
         <h3>Version history</h3>
         <ul>
+          <li><b>v1.70</b> — Added Floor Plans upload for cleaning hours by lot/subdivision, cleaning fallback-to-1-hour flagging, and exported review JSON now preserves floorplan reference data.</li>
           <li><b>v1.60</b> — Added Labor/Cleaning uploads and toggles, task workload breakdown, lot history breakdown, quadrant percent-of-total bars, and standalone review export improvements.</li>
           <li><b>v1.51</b> — Fixed saved review loading error where the dashboard called populateSelectors instead of the active filter dropdown function.</li>
           <li><b>v1.50</b> — Saved review exports now clearly load without needing the original Excel sheets; added this version history dropdown.</li>
@@ -60,9 +61,10 @@
 <main class="wrap">
   <section class="grid uploads">
     <div class="upload"><label>1) Subdivisions file</label><small>Only needed when creating a new review from Excel. Saved review JSON already includes this.</small><input id="subsFile" type="file" accept=".xlsx,.xls,.csv" /></div>
-    <div class="upload"><label>2) Task Types file</label><small>Only needed when creating a new review from Excel. Saved review JSON already includes calculated job hours.</small><input id="tasksFile" type="file" accept=".xlsx,.xls,.csv" /></div>
-    <div class="upload"><label>3) Labor Daily Job files</label><small>Select labor files for one day, week, or month. File names are used as work dates.</small><input id="jobsFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
-    <div class="upload"><label>4) Cleaning Daily Job files</label><small>Optional. Supports Original, Reclean, Windows, Other, Models, Floors only, etc. File names are used as work dates.</small><input id="cleaningFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
+    <div class="upload"><label>2) Task Types file</label><small>Labor task hours and fallback cleaning task hours. Saved review JSON already includes calculated job hours.</small><input id="tasksFile" type="file" accept=".xlsx,.xls,.csv" /></div>
+    <div class="upload"><label>3) Floor Plans / Lot Hours file</label><small>Needed for cleaning review hours. Uses Builder, Subdivision, Lot, Floorplan, Original, Reclean, Windows.</small><input id="floorPlansFile" type="file" accept=".xlsx,.xls,.csv" /></div>
+    <div class="upload"><label>4) Labor Daily Job files</label><small>Select labor files for one day, week, or month. File names are used as work dates.</small><input id="jobsFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
+    <div class="upload"><label>5) Cleaning Daily Job files</label><small>Optional. Original/Reclean/Windows hours come from the Floor Plans file. Other uses file/task hours.</small><input id="cleaningFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
   </section>
 
   <section class="controls panel">
@@ -81,7 +83,7 @@
     <label class="btn ghost" style="display:inline-flex;align-items:center;gap:8px;margin:0">Load Review JSON<input id="reviewJsonFile" type="file" accept=".json" style="display:none"></label>
     <button id="loadHostedBtn" class="btn ghost" title="Loads the selected hosted review JSON from the same GitHub folder">Load Saved Review</button>
   </section>
-  <div class="dataNote"><b>Saved reviews do not need the original Excel sheets.</b> Use the Excel uploads only to create a new review/export. Once you load a saved review JSON from the dropdown or upload one with “Load Review JSON,” the dashboard has everything it needs to show the map, quadrant totals, busiest day, task breakdown, lot history, tables, and exports.</div>
+  <div class="dataNote"><b>Saved reviews do not need the original Excel sheets.</b> Use the Excel uploads only to create a new review/export. Cleaning hours are pulled from the Floor Plans file by subdivision + lot for Original/Reclean/Windows. Once you load a saved review JSON from the dropdown or upload one with “Load Review JSON,” the dashboard has everything it needs to show the map, quadrant totals, busiest day, task breakdown, lot history, tables, and exports.</div>
 
   <section class="grid cards" id="summaryCards"></section>
 
@@ -130,7 +132,7 @@
 <script>
 const COLUMBUS = { lat:39.9612, lon:-82.9988 };
 const QUADS = ["NW","NE","SW","SE"];
-let state = { subs:[], tasks:[], rawJobs:[], jobs:[], filtered:[], issues:[], map:null, layers:[], loaded:false, workTypes:[] };
+let state = { subs:[], tasks:[], floorPlans:[], floorIndex:new Map(), rawJobs:[], jobs:[], filtered:[], issues:[], map:null, layers:[], loaded:false, workTypes:[] };
 
 // Add exported review JSON filenames here after uploading them to the same GitHub folder as this HTML.
 // Example export names are created by the dashboard automatically.
@@ -139,11 +141,12 @@ const SAVED_REVIEW_FILES = [
 ];
 
 const colAliases = {
-  builder:["Builder","builder","Company","Account"], subdivision:["Subdivision","Community","Project","Neighborhood","Subdivision Name"], lot:["Lot","Lot #","Lot Number","Plat Lot","Lot/Block"], task:["Task","Description","Job","Job Type","Type"], notes:["Notes","Note","Directions"], hours:["Hours","Man Hours","ManHours","MH","Budget Hours"], am:["AM Job","AM","AM/PM"], lat:["Lat","Latitude"], lon:["Lon","Lng","Long","Longitude"], address:["Address","Street Address"], quadrant:["Quadrant","Area","Zone"], floorplan:["Floor Plan","FloorPlan","Plan"], abbreviation:["Abbreviation","Abbrev","Short"]
+  builder:["Builder","builder","Company","Account"], subdivision:["Subdivision","Community","Project","Neighborhood","Subdivision Name"], lot:["Lot","Lot #","Lot Number","Plat Lot","Lot/Block"], task:["Task","Description","Job","Job Type","Type"], notes:["Notes","Note","Directions"], hours:["Hours","Man Hours","ManHours","MH","Budget Hours"], am:["AM Job","AM","AM/PM"], lat:["Lat","Latitude"], lon:["Lon","Lng","Long","Longitude"], address:["Address","Street Address"], quadrant:["Quadrant","Area","Zone"], floorplan:["Floor Plan","FloorPlan","Plan"], abbreviation:["Abbreviation","Abbrev","Short"], original:["Original","Original Hours"], reclean:["Reclean","Reclean Hours"], windows:["Windows","Window","Window Hours","Windows Hours"]
 };
 function norm(v){return String(v??"").toLowerCase().trim().replace(/[’']/g,"").replace(/&/g,"and").replace(/[^a-z0-9]+/g," ").replace(/\s+/g," ").trim();}
 function cleanSub(v){return norm(v).replace(/\bpulte\b|\bdr horton\b|\bd r horton\b|\bryan\b|\bryan homes\b|\bepcon\b|\bschott\b|\bschottenstein\b|\bmi homes\b|\brockford\b/g,"").replace(/\s+/g," ").trim();}
 function num(v){ if(v===null||v===undefined||v==="")return 0; if(typeof v==="number")return isFinite(v)?v:0; const n=parseFloat(String(v).replace(/[^0-9.\-]/g,"")); return isFinite(n)?n:0;}
+function lotKey(v){ return norm(v).replace(/^lot\s*/g,"").replace(/\s+/g,""); }
 function fmt(n){return (Math.round((Number(n)||0)*100)/100).toLocaleString(undefined,{maximumFractionDigits:2});}
 function safe(v){return String(v??"").replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function get(row, field){ const aliases=colAliases[field]||[field]; for(const k of aliases){ if(Object.prototype.hasOwnProperty.call(row,k) && row[k]!==undefined && row[k]!==null && row[k]!=="") return row[k]; } const keys=Object.keys(row); for(const a of aliases){ const ak=norm(a); const found=keys.find(k=>norm(k)===ak); if(found && row[found]!==undefined && row[found]!==null && row[found]!=="") return row[found]; } return "";}
@@ -172,6 +175,9 @@ async function readRows(file){
 }
 function makeSub(r){ const lat=num(get(r,"lat")), lon=num(get(r,"lon")); const manual=normalizeQuadrant(get(r,"quadrant")); return { builder:String(get(r,"builder")||"").trim(), subdivision:String(get(r,"subdivision")||"").trim(), key:cleanSub(get(r,"subdivision")), lat, lon, address:String(get(r,"address")||"").trim(), quadrant:manual || quadrantFromLatLon(lat,lon) }; }
 function makeTask(r){ return { type:String(get(r,"type")||"").trim(), builder:String(get(r,"builder")||"Any").trim(), floorplan:String(get(r,"floorplan")||"Any").trim(), task:String(get(r,"task")||"").trim(), abbr:String(get(r,"abbreviation")||"").trim(), hours:num(get(r,"hours")), taskKey:norm(get(r,"task")), abbrKey:norm(get(r,"abbreviation")) }; }
+function makeFloorPlan(r){ const subdivision=String(get(r,"subdivision")||"").trim(); const lot=String(get(r,"lot")||"").trim(); return { builder:String(get(r,"builder")||"").trim(), subdivision, lot, lotKey:lotKey(lot), subKey:cleanSub(subdivision), floorplan:String(get(r,"floorplan")||"").trim(), original:num(get(r,"original")), reclean:num(get(r,"reclean")), windows:num(get(r,"windows")), address:String(get(r,"address")||"").trim() }; }
+function buildFloorIndex(rows){ const map=new Map(); rows.forEach(fp=>{ if(!fp.subKey||!fp.lotKey)return; const keys=[`${fp.subKey}|${fp.lotKey}`, `${norm(fp.builder)}|${fp.subKey}|${fp.lotKey}`]; keys.forEach(k=>{ if(!map.has(k)) map.set(k,fp); }); }); return map; }
+function findFloorPlan(job){ const subKey=cleanSub(job.subdivision), lk=lotKey(job.lot), b=norm(job.builder); if(!subKey||!lk)return null; return state.floorIndex.get(`${b}|${subKey}|${lk}`) || state.floorIndex.get(`${subKey}|${lk}`) || null; }
 function makeJob(r, file, idx, workGroup="Labor"){ const date=parseDateFromFileName(file.name); return { workGroup, sourceFile:file.name, date, week:isoWeek(date), month:monthKey(date), row:idx+2, builder:String(get(r,"builder")||"").trim(), subdivision:String(get(r,"subdivision")||"").trim(), lot:String(get(r,"lot")||"").trim(), task:String(get(r,"task")||"").trim(), notes:String(get(r,"notes")||"").trim(), am:String(get(r,"am")||"").trim(), manualHours:num(get(r,"hours")), raw:r }; }
 function buildSubIndex(subs){ const map=new Map(); subs.forEach(s=>{ if(!s.key)return; if(!map.has(s.key))map.set(s.key,[]); map.get(s.key).push(s); }); return map; }
 function findSub(job, index, subs){ const key=cleanSub(job.subdivision); if(index.has(key))return index.get(key)[0]; let best=null,score=0; for(const s of subs){ if(!key||!s.key)continue; let sc=0; if(s.key.includes(key)||key.includes(s.key))sc=Math.min(s.key.length,key.length); if(sc>score){score=sc;best=s;} } return score>=5?best:null; }
@@ -189,8 +195,20 @@ function displayTaskName(job){ return job.workGroup==="Cleaning" ? canonicalClea
 function findTaskHours(job,tasks){
   const taskName = job.workGroup==="Cleaning" ? canonicalCleaningTask(job.task, job.notes) : job.task;
   const jt=norm(taskName), notes=norm(job.notes);
+  if(job.workGroup==="Cleaning"){
+    if(["original","reclean","windows"].includes(jt)){
+      const fp=findFloorPlan(job);
+      if(fp){
+        const hours = jt==="original" ? fp.original : jt==="reclean" ? fp.reclean : fp.windows;
+        if(hours>0) return {hours, source:`floor plans: ${taskName}${fp.floorplan?" • "+fp.floorplan:""}`};
+        return {hours:1, source:`default 1 hr: missing ${taskName} hours in floor plans`, flag:`Cleaning • ${job.sourceFile} row ${job.row}: Floor Plans matched ${job.subdivision} lot ${job.lot}, but ${taskName} hours are blank/0. Defaulted to 1 hour.`};
+      }
+      return {hours:1, source:`default 1 hr: no floor plan match`, flag:`Cleaning • ${job.sourceFile} row ${job.row}: No Floor Plans match for ${job.subdivision} lot ${job.lot}. Defaulted ${taskName} to 1 hour.`};
+    }
+    if(job.manualHours>0)return {hours:job.manualHours, source:"daily cleaning file"};
+  }
   const isOther=jt==="other" || jt.includes("other") || jt==="raw";
-  if(isOther){ if(job.manualHours>0)return {hours:job.manualHours, source:"daily file Other hours"}; return {hours:0, source:"missing Other hours"}; }
+  if(isOther){ if(job.manualHours>0)return {hours:job.manualHours, source:"daily file Other hours"}; }
   if(job.manualHours>0)return {hours:job.manualHours, source:"daily file"};
   let best=null, score=-1;
   for(const t of tasks){
@@ -206,17 +224,21 @@ function findTaskHours(job,tasks){
     if(sc>score){score=sc;best=t;}
   }
   if(best && score>=35)return {hours:best.hours, source:`task types: ${best.task}`};
+  if(job.workGroup==="Cleaning") return {hours:1, source:"default 1 hr: missing cleaning hours", flag:`Cleaning • ${job.sourceFile} row ${job.row}: No hours found for ${job.subdivision} lot ${job.lot} task “${taskName}”. Defaulted to 1 hour.`};
   return {hours:0, source:"missing task type"};
 }
 async function loadAndCompute(){
-  state.issues=[]; state.subs=[]; state.tasks=[]; state.rawJobs=[]; state.jobs=[]; state.filtered=[]; state.workTypes=[];
+  state.issues=[]; state.subs=[]; state.tasks=[]; state.floorPlans=[]; state.floorIndex=new Map(); state.rawJobs=[]; state.jobs=[]; state.filtered=[]; state.workTypes=[];
   const subsFile=document.getElementById("subsFile").files[0];
   const tasksFile=document.getElementById("tasksFile").files[0];
+  const floorPlansFile=document.getElementById("floorPlansFile").files[0];
   const laborFiles=[...document.getElementById("jobsFiles").files];
   const cleaningFiles=[...document.getElementById("cleaningFiles").files];
   if(!subsFile||!tasksFile||(!laborFiles.length && !cleaningFiles.length)){ setStatusCards("Upload subdivisions, task types, and at least one labor or cleaning daily file."); return; }
+  if(cleaningFiles.length && !floorPlansFile){ setStatusCards("Upload the Floor Plans / Lot Hours file when importing cleaning files so Original/Reclean/Windows hours can be calculated by lot."); return; }
   const subRows=await readRows(subsFile); state.subs=subRows.map(makeSub).filter(s=>s.subdivision);
   const taskRows=await readRows(tasksFile); state.tasks=taskRows.map(makeTask).filter(t=>t.task || t.abbr);
+  if(floorPlansFile){ const fpRows=await readRows(floorPlansFile); state.floorPlans=fpRows.map(makeFloorPlan).filter(fp=>fp.subdivision && fp.lot); state.floorIndex=buildFloorIndex(state.floorPlans); }
   for(const f of laborFiles){ const rows=await readRows(f); rows.forEach((r,i)=>state.rawJobs.push(makeJob(r,f,i,"Labor"))); }
   for(const f of cleaningFiles){ const rows=await readRows(f); rows.forEach((r,i)=>state.rawJobs.push(makeJob(r,f,i,"Cleaning"))); }
   const index=buildSubIndex(state.subs);
@@ -226,7 +248,8 @@ async function loadAndCompute(){
     const quadrant=sub?.quadrant || "Unmatched";
     const taskDisplay=displayTaskName(j);
     if(!sub) state.issues.push({kind:"subdivision", msg:`${j.workGroup} • ${j.sourceFile} row ${j.row}: No subdivision match for “${j.subdivision}”.`});
-    if(!h.hours) state.issues.push({kind:"hours", msg:`${j.workGroup} • ${j.sourceFile} row ${j.row}: No hours found for ${j.subdivision} lot ${j.lot} task “${taskDisplay}”.`});
+    if(h.flag) state.issues.push({kind:"hours", msg:h.flag});
+    else if(!h.hours) state.issues.push({kind:"hours", msg:`${j.workGroup} • ${j.sourceFile} row ${j.row}: No hours found for ${j.subdivision} lot ${j.lot} task “${taskDisplay}”.`});
     return {...j, taskDisplay, subMatch:sub, lat:sub?.lat||0, lon:sub?.lon||0, quadrant, hours:h.hours, hoursSource:h.source};
   });
   state.workTypes=[...new Set(state.jobs.map(j=>j.workGroup))].sort();
@@ -328,11 +351,12 @@ function exportSnapshot(){
   if(!state.loaded){ alert("Load and calculate your Excel files first."); return; }
   const payload={
     app:"VIP Quadrant Man-Hour Review",
-    version:"1.60",
+    version:"1.70",
     exportedAt:new Date().toISOString(),
     columbusCenter:COLUMBUS,
     subdivisions:state.subs,
     taskTypes:state.tasks,
+    floorPlans:state.floorPlans,
     jobs:state.jobs,
     issues:state.issues,
     workTypes:[...new Set(state.jobs.map(j=>j.workGroup||"Labor"))]
@@ -346,6 +370,7 @@ function loadSnapshotObject(payload){
   if(!payload || !Array.isArray(payload.jobs)) throw new Error("That JSON does not look like a review export.");
   state.subs=Array.isArray(payload.subdivisions)?payload.subdivisions:[];
   state.tasks=Array.isArray(payload.taskTypes)?payload.taskTypes:[];
+  state.floorPlans=Array.isArray(payload.floorPlans)?payload.floorPlans:[]; state.floorIndex=buildFloorIndex(state.floorPlans);
   state.rawJobs=[]; state.jobs=payload.jobs.map(j=>{ const workGroup=j.workGroup||"Labor"; return {week:j.week||isoWeek(j.date),month:j.month||monthKey(j.date),workGroup,taskDisplay:j.taskDisplay || (workGroup==="Cleaning"?canonicalCleaningTask(j.task,j.notes):(j.task||"Other")),...j,workGroup}; }); state.workTypes=[...new Set(state.jobs.map(j=>j.workGroup||"Labor"))].sort(); state.issues=Array.isArray(payload.issues)?payload.issues:[]; state.loaded=true;
   populateFilters(); applyFilters();
 }
@@ -380,7 +405,7 @@ document.getElementById("reviewJsonFile").addEventListener("change",e=>{ const f
 document.getElementById("loadHostedBtn").addEventListener("click",()=>loadHostedSnapshot().catch(err=>{console.error(err); setStatusCards(err.message); alert(err.message+"\n\nMake sure the JSON file is uploaded to the same GitHub folder as this HTML and is listed in SAVED_REVIEW_FILES near the top of the script.");}));
 document.getElementById("copyBtn").addEventListener("click",async()=>{ await navigator.clipboard.writeText(summaryText()); const b=document.getElementById("copyBtn"); const old=b.textContent; b.textContent="Copied!"; setTimeout(()=>b.textContent=old,1200); });
 populateSavedReviews();
-setStatusCards("Ready. Upload Excel files to create a new Labor/Cleaning review, or load a saved review JSON from the dropdown. Saved reviews do not need the sheets.");
+setStatusCards("Ready. Upload Excel files to create a new Labor/Cleaning review, or load a saved review JSON from the dropdown. Cleaning imports use the Floor Plans file for Original/Reclean/Windows hours. Saved reviews do not need the sheets.");
 initMap();
 </script>
 </body>
