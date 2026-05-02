@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VIP Quadrant Week / Month Review Dashboard v1.81</title>
+  <title>VIP Quadrant Week / Month Review Dashboard v1.82</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -34,6 +34,8 @@
     .mapTools{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.mapTools .panelLite{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;padding:12px}.panelLite h3{margin:0 0 10px;font-size:15px}.splitRow,.pressureRow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}.splitBar{height:12px;border-radius:999px;background:#081427;border:1px solid var(--line);overflow:hidden;display:flex;margin:10px 0}.splitBar span{height:100%;display:block}.trendBars{display:grid;gap:9px}.trendRow{display:grid;grid-template-columns:105px 1fr 70px;gap:8px;align-items:center}.trendStack{height:18px;border-radius:999px;background:#081427;border:1px solid var(--line);overflow:hidden;display:flex}.trendStack span{height:100%;display:block}.legendDot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}.subheadRow td{background:rgba(55,189,248,.12)!important;color:var(--text);font-weight:950;border-radius:12px!important}.warningCard{border-left:4px solid var(--warn);background:rgba(255,209,102,.08)}
 
     .lotGrid{grid-template-columns:minmax(320px,.95fr) minmax(560px,1.35fr)}
+    .dayCellDate b{display:block;font-size:18px;line-height:1.2}.daySnapshot{display:grid;grid-template-columns:repeat(4,minmax(82px,1fr));gap:8px;min-width:360px}.dayMetric{padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03)}.dayMetric b{display:block;font-size:18px}.dayMetric small{color:var(--muted)}.dayMetric.compact{grid-column:span 2}.timelineHint{font-size:12px;color:var(--muted)}.lotRow{cursor:pointer}.lotRow:hover td{border-color:rgba(55,189,248,.5);background:rgba(55,189,248,.08)}.builderRow:hover td{border-color:rgba(55,189,248,.4)} .timelineList{display:grid;gap:10px}.timelineItem{padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.03)}.timelineItemTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.timelineDate{font-weight:900;font-size:15px}.timelineSub{color:var(--muted);font-size:12px;margin-top:2px}.timelineMeta{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.4}.timelineTag{display:inline-block;margin-right:6px;margin-top:4px;padding:3px 7px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:11px;font-weight:900}.builderGrid{display:grid;grid-template-columns:repeat(6,minmax(72px,1fr));gap:8px;min-width:500px}.builderMetric{padding:8px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);text-align:center}.builderMetric b{display:block;font-size:16px}.builderMetric small{color:var(--muted);font-size:11px}
+
     .taskRow{cursor:pointer}.taskRow:hover td{border-color:rgba(55,189,248,.5);background:rgba(55,189,248,.08)}
     .dateChips{display:flex;flex-wrap:wrap;gap:6px}.dateChip{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:12px;color:var(--text)}
     .lotTaskList{display:grid;gap:8px;min-width:260px}.lotTaskItem{padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03)}.lotTaskItem b{display:block;margin-bottom:4px}.lotTaskDates{margin-top:4px;color:var(--muted);font-size:12px;line-height:1.35}
@@ -52,10 +54,11 @@
       <div class="sub">Upload subdivisions + task hours + labor and cleaning daily files. Review a day, week, month, or the whole batch on a map.</div>
     </div>
     <details class="versionBox">
-      <summary class="version">v1.81 • Task popup + map toggle ▾</summary>
+      <summary class="version">v1.82 • Day cards + builders + lot timeline ▾</summary>
       <div class="versionDrop">
         <h3>Version history</h3>
         <ul>
+          <li><b>v1.82</b> — Reworked Day-by-Day Review into cleaner snapshot rows, added Top Builders breakdown with labor/cleaning jobs and hours, and added clickable Lot Timeline popup from Lot History.</li>
           <li><b>v1.81</b> — Added clickable task workload popup with dates/lots, improved lot history readability with per-task dates, added map-only Labor/Cleaning/Both toggle, and filled unused map space with top subdivisions and day snapshot cards.</li>
           <li><b>v1.80</b> — Fully separated Labor/Cleaning review mode, separate quadrant totals, separate busiest days, split task and subdivision breakdowns, lot history keeps both types, added daily trend chart, workload split card, busiest quadrant by type, and unmapped jobs warning.</li>
           <li><b>v1.70</b> — Added Floor Plans upload for cleaning hours by lot/subdivision, cleaning fallback-to-1-hour flagging, and exported review JSON now preserves floorplan reference data.</li>
@@ -150,13 +153,18 @@
 
   <section class="grid two" style="margin-top:16px">
     <div class="panel">
+      <div class="sectionTitle"><h2>Top Builders</h2><span class="muted">hours and jobs by builder</span></div>
+      <div class="scroll"><table id="builderTable"></table></div>
+    </div>
+    <div class="panel">
       <div class="sectionTitle"><h2>Task Workload Breakdown</h2><span class="muted">what is driving the hours</span></div>
       <div class="scroll"><table id="taskTable"></table></div>
     </div>
-    <div class="panel">
-      <div class="sectionTitle"><h2>Lot History Breakdown</h2><span class="muted">what happened on each lot</span></div>
-      <div class="scroll"><table id="lotTable"></table></div>
-    </div>
+  </section>
+
+  <section class="panel" style="margin-top:16px">
+    <div class="sectionTitle"><h2>Lot History Breakdown</h2><span class="muted">click a lot to see the full timeline</span></div>
+    <div class="scroll"><table id="lotTable"></table></div>
   </section>
 
   <section class="panel" style="margin-top:16px">
@@ -339,7 +347,7 @@ function groupBy(arr, keyFn){ const m=new Map(); arr.forEach(x=>{ const k=keyFn(
 function sums(rows){ return { jobs:rows.length, hours:rows.reduce((a,r)=>a+(Number(r.hours)||0),0), subs:new Set(rows.map(r=>r.subdivision).filter(Boolean)).size }; }
 function quadTotals(rows=state.filtered){ const out={}; [...QUADS,"Unmatched"].forEach(q=>out[q]=[]); rows.forEach(r=>{ (out[r.quadrant] ||= []).push(r); }); return out; }
 function busiestDay(rows=state.filtered){ const clean=rows.filter(r=>r.date); const by=groupBy(clean,j=>j.date||"Unknown"); const list=[...by.entries()].map(([date,rs])=>({date,...sums(rs), rows:rs})).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs); return list[0]||null; }
-function render(){ renderCards(); renderQuadrants(); renderBusiest(); renderTables(); renderTaskBreakdown(); renderLotBreakdown(); renderIssues(); renderMap(); renderMapTools(); }
+function render(){ renderCards(); renderQuadrants(); renderBusiest(); renderTables(); renderBuilderBreakdown(); renderTaskBreakdown(); renderLotBreakdown(); renderIssues(); renderMap(); renderMapTools(); }
 function renderCards(){
   const wt=currentWorkType(); const base=state.filteredAllTypes.length?state.filteredAllTypes:state.filtered; const dates=[...new Set(state.filtered.map(j=>j.date))].sort();
   document.getElementById("rangeLabel").textContent=dates.length?`${displayDate(dates[0])}${dates.length>1?" → "+displayDate(dates[dates.length-1]):""}`:"No data";
@@ -379,12 +387,14 @@ function renderBusiest(){
 function renderTables(){ renderDayTable(); renderSubTable(); renderJobTable(); }
 function topQuadrant(rows){ const qt=quadTotals(rows); return QUADS.map(q=>({q,...sums(qt[q]||[])})).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs)[0] || {q:"—",hours:0,jobs:0}; }
 function renderDayTable(){
-  const wt=currentWorkType(); const basis=state.filteredAllTypes.length?state.filteredAllTypes:state.jobs; const grouped=[...groupBy(basis,j=>j.date||"Unknown").entries()].map(([date,rs])=>({date, rows:rs, labor:sums(rowsForType("Labor",rs)), cleaning:sums(rowsForType("Cleaning",rs)), total:sums(wt==="all"?rs:rowsForType(wt,rs))})).sort((a,b)=>b.total.hours-a.total.hours||b.total.jobs-a.total.jobs);
+  const wt=currentWorkType();
+  const basis=state.filteredAllTypes.length?state.filteredAllTypes:state.jobs;
+  const grouped=[...groupBy(basis,j=>j.date||"Unknown").entries()].map(([date,rs])=>({date, rows:rs, labor:sums(rowsForType("Labor",rs)), cleaning:sums(rowsForType("Cleaning",rs)), total:sums(wt==="all"?rs:rowsForType(wt,rs))})).sort((a,b)=>b.total.hours-a.total.hours||b.total.jobs-a.total.jobs);
   if(wt==="all"){
-    document.getElementById("dayTable").innerHTML=`<thead><tr><th>Date</th><th class="right">Labor Hrs</th><th class="right">Cleaning Hrs</th><th class="right">Total Hrs</th><th class="right">Jobs</th><th>Top Quadrant</th></tr></thead><tbody>${grouped.map(d=>{ const top=topQuadrant(d.rows); return `<tr><td><b>${displayDate(d.date)}</b><br><span class="muted">${safe(d.date)}</span></td><td class="right"><b>${fmt(d.labor.hours)}</b><br><span class="muted">${d.labor.jobs} jobs</span></td><td class="right"><b>${fmt(d.cleaning.hours)}</b><br><span class="muted">${d.cleaning.jobs} jobs</span></td><td class="right"><b>${fmt(d.total.hours)}</b></td><td class="right">${d.total.jobs}</td><td><span class="pill q${top.q}">${top.q} • ${fmt(top.hours)} hrs</span></td></tr>`;}).join("")}</tbody>`;
+    document.getElementById("dayTable").innerHTML=`<thead><tr><th style="width:240px">Date</th><th>Workload Snapshot</th><th style="width:170px">Top Quadrant</th></tr></thead><tbody>${grouped.map(d=>{ const top=topQuadrant(d.rows); return `<tr><td class="dayCellDate"><b>${displayDate(d.date)}</b><span class="muted">${safe(d.date)}</span></td><td><div class="daySnapshot"><div class="dayMetric"><b>${fmt(d.labor.hours)}</b><small>Labor hrs</small><div class="muted">${d.labor.jobs} jobs</div></div><div class="dayMetric"><b>${fmt(d.cleaning.hours)}</b><small>Cleaning hrs</small><div class="muted">${d.cleaning.jobs} jobs</div></div><div class="dayMetric"><b>${fmt(d.total.hours)}</b><small>Total hrs</small></div><div class="dayMetric"><b>${d.total.jobs}</b><small>Total jobs</small></div></div></td><td><span class="pill q${top.q}">${top.q} • ${fmt(top.hours)} hrs</span></td></tr>`;}).join("")}</tbody>`;
   } else {
     const list=grouped.map(d=>({date:d.date, rows:rowsForType(wt,d.rows), ...sums(rowsForType(wt,d.rows))})).filter(d=>d.jobs).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs);
-    document.getElementById("dayTable").innerHTML=`<thead><tr><th>Date</th><th class="right">${safe(wt)} Hours</th><th class="right">Jobs</th><th>Top Quadrant</th></tr></thead><tbody>${list.map(d=>{ const top=topQuadrant(d.rows); return `<tr><td><b>${displayDate(d.date)}</b><br><span class="muted">${safe(d.date)}</span></td><td class="right"><b>${fmt(d.hours)}</b></td><td class="right">${d.jobs}</td><td><span class="pill q${top.q}">${top.q} • ${fmt(top.hours)} hrs</span></td></tr>`;}).join("")}</tbody>`;
+    document.getElementById("dayTable").innerHTML=`<thead><tr><th style="width:240px">Date</th><th>Workload Snapshot</th><th style="width:170px">Top Quadrant</th></tr></thead><tbody>${list.map(d=>{ const top=topQuadrant(d.rows); return `<tr><td class="dayCellDate"><b>${displayDate(d.date)}</b><span class="muted">${safe(d.date)}</span></td><td><div class="daySnapshot" style="grid-template-columns:repeat(2,minmax(120px,1fr))"><div class="dayMetric"><b>${fmt(d.hours)}</b><small>${safe(wt)} hrs</small></div><div class="dayMetric"><b>${d.jobs}</b><small>Jobs</small></div></div></td><td><span class="pill q${top.q}">${top.q} • ${fmt(top.hours)} hrs</span></td></tr>`;}).join("")}</tbody>`;
   }
 }
 function renderSubTable(){
@@ -397,6 +407,13 @@ function renderJobTable(){ document.getElementById("jobTable").innerHTML=`<thead
 function typeMix(rows){
   const m=[...groupBy(rows,j=>j.workGroup||"Labor").entries()].map(([k,rs])=>`${safe(k)} ${fmt(sums(rs).hours)}h`);
   return m.map(x=>`<span class="workBadge">${x}</span>`).join(" ");
+}
+function renderBuilderBreakdown(){
+  const wt=currentWorkType();
+  const basis=state.filteredAllTypes.length?state.filteredAllTypes:state.filtered;
+  const list=[...groupBy(basis,j=>`${j.builder||"Unknown"}`).entries()].map(([builder,rs])=>{ const labor=sums(rowsForType("Labor",rs)); const cleaning=sums(rowsForType("Cleaning",rs)); const total=sums(wt==="all"?rs:rowsForType(wt,rs)); const topSub=[...groupBy(rs,r=>r.subdivision||"Unknown").entries()].map(([sub,items])=>({sub,...sums(wt==="all"?items:rowsForType(wt,items))})).sort((a,b)=>b.hours-a.hours||b.jobs-a.jobs)[0]||{sub:"—",hours:0,jobs:0}; return {builder,labor,cleaning,total,topSub}; }).filter(r=>r.total.jobs).sort((a,b)=>b.total.hours-a.total.hours||b.total.jobs-a.total.jobs);
+  if(wt==="all") document.getElementById("builderTable").innerHTML=`<thead><tr><th>Builder</th><th>Snapshot</th><th style="width:180px">Top Subdivision</th></tr></thead><tbody>${list.map(r=>`<tr class="builderRow"><td><b>${safe(r.builder)}</b><br><span class="muted">${r.total.jobs} total jobs • ${fmt(r.total.hours)} hrs</span></td><td><div class="builderGrid"><div class="builderMetric"><b>${fmt(r.labor.hours)}</b><small>Labor hrs</small></div><div class="builderMetric"><b>${r.labor.jobs}</b><small>Labor jobs</small></div><div class="builderMetric"><b>${fmt(r.cleaning.hours)}</b><small>Cleaning hrs</small></div><div class="builderMetric"><b>${r.cleaning.jobs}</b><small>Cleaning jobs</small></div><div class="builderMetric"><b>${fmt(r.total.hours)}</b><small>Total hrs</small></div><div class="builderMetric"><b>${r.total.jobs}</b><small>Total jobs</small></div></div></td><td><b>${safe(r.topSub.sub)}</b><br><span class="muted">${fmt(r.topSub.hours)} hrs • ${r.topSub.jobs} jobs</span></td></tr>`).join("")}</tbody>`;
+  else document.getElementById("builderTable").innerHTML=`<thead><tr><th>Builder</th><th class="right">${safe(wt)} Hours</th><th class="right">Jobs</th><th>Top Subdivision</th></tr></thead><tbody>${list.map(r=>`<tr class="builderRow"><td><b>${safe(r.builder)}</b></td><td class="right"><b>${fmt(r.total.hours)}</b></td><td class="right">${r.total.jobs}</td><td><b>${safe(r.topSub.sub)}</b><br><span class="muted">${fmt(r.topSub.hours)} hrs • ${r.topSub.jobs} jobs</span></td></tr>`).join("")}</tbody>`;
 }
 function renderTaskBreakdown(){
   const wt=currentWorkType(); const basis=wt==="all"?state.filteredAllTypes:state.filtered; const total=sums(basis).hours || 0;
@@ -419,7 +436,7 @@ function renderLotBreakdown(){
       return {builder,sub,lot,q,labor,cleaning,total,dates,tasks, rows:rs};
     })
     .sort((a,b)=>b.total.hours-a.total.hours||String(a.sub).localeCompare(String(b.sub)));
-  document.getElementById("lotTable").innerHTML=`<thead><tr><th>Lot</th><th style="width:190px">Dates worked</th><th style="width:340px">Tasks completed</th><th class="right">Labor</th><th class="right">Cleaning</th><th class="right">Total</th><th class="right">Jobs</th></tr></thead><tbody>${list.map(r=>`<tr><td><b>${safe(r.lot||"—")}</b> ${r.q?`<span class="pill q${r.q}">${safe(r.q)}</span>`:""}<br><span class="muted">${safe(r.builder)} • ${safe(r.sub)}</span></td><td><div class="dateChips">${r.dates.map(d=>`<span class="dateChip">${safe(displayDate(d))}</span>`).join("")}</div></td><td><div class="lotTaskList">${r.tasks || `<span class="muted">No tasks found.</span>`}</div></td><td class="right"><b>${fmt(r.labor.hours)}</b><br><span class="muted">${r.labor.jobs} jobs</span></td><td class="right"><b>${fmt(r.cleaning.hours)}</b><br><span class="muted">${r.cleaning.jobs} jobs</span></td><td class="right"><b>${fmt(r.total.hours)}</b></td><td class="right">${r.total.jobs}</td></tr>`).join("")}</tbody>`;
+  document.getElementById("lotTable").innerHTML=`<thead><tr><th>Lot</th><th style="width:190px">Dates worked</th><th style="width:340px">Tasks completed</th><th class="right">Labor</th><th class="right">Cleaning</th><th class="right">Total</th><th class="right">Jobs</th></tr></thead><tbody>${list.map(r=>`<tr class="lotRow" data-builder="${attrSafe(r.builder)}" data-sub="${attrSafe(r.sub)}" data-lot="${attrSafe(r.lot)}" data-q="${attrSafe(r.q)}"><td><b>${safe(r.lot||"—")}</b> ${r.q?`<span class="pill q${r.q}">${safe(r.q)}</span>`:""}<br><span class="muted">${safe(r.builder)} • ${safe(r.sub)}</span></td><td><div class="dateChips">${r.dates.map(d=>`<span class="dateChip">${safe(displayDate(d))}</span>`).join("")}</div></td><td><div class="lotTaskList">${r.tasks || `<span class="muted">No tasks found.</span>`}</div><div class="timelineHint">Click row for full lot timeline</div></td><td class="right"><b>${fmt(r.labor.hours)}</b><br><span class="muted">${r.labor.jobs} jobs</span></td><td class="right"><b>${fmt(r.cleaning.hours)}</b><br><span class="muted">${r.cleaning.jobs} jobs</span></td><td class="right"><b>${fmt(r.total.hours)}</b></td><td class="right">${r.total.jobs}</td></tr>`).join("")}</tbody>`;
 }
 function renderIssues(){ document.getElementById("issueCount").textContent=state.issues.length; document.getElementById("issues").innerHTML=state.issues.length?state.issues.slice(0,200).map(i=>`<div class="issue">${safe(i.msg)}</div>`).join(""):`<div class="empty">No issues found.</div>`; }
 function renderMapTools(){ renderSplitCard(); renderPressureCard(); renderTrendCard(); renderUnmappedCard(); renderTopMapCard(); renderMapDayCard(); }
@@ -497,12 +514,22 @@ function openTaskModal(type, task){
   modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
 }
 function closeTaskModal(){ const modal=document.getElementById('taskModal'); if(modal){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); } }
+function openLotTimeline(builder, sub, lot, q){
+  const basis=state.filteredAllTypes.length?state.filteredAllTypes:state.filtered;
+  const rows=basis.filter(r=>String(r.builder||'')===builder && String(r.subdivision||'')===sub && String(r.lot||'')===lot && String(r.quadrant||'')===q).sort((a,b)=>(a.date||'').localeCompare(b.date||'') || String(a.workGroup||'').localeCompare(String(b.workGroup||'')));
+  const title=document.getElementById('taskModalTitle'); const meta=document.getElementById('taskModalMeta'); const body=document.getElementById('taskModalBody');
+  const total=sums(rows), labor=sums(rowsForType('Labor',rows)), cleaning=sums(rowsForType('Cleaning',rows));
+  title.textContent=`Lot ${lot || '—'} • ${sub}`;
+  meta.textContent=`${builder} • ${q || '—'} • ${fmt(total.hours)} total hrs • ${total.jobs} jobs • Labor ${fmt(labor.hours)} hrs • Cleaning ${fmt(cleaning.hours)} hrs`;
+  body.innerHTML=rows.length?`<div class="timelineList">${rows.map(r=>`<div class="timelineItem"><div class="timelineItemTop"><div><div class="timelineDate">${safe(displayDate(r.date))}</div><div class="timelineSub">${safe(r.workGroup||'Labor')} • ${safe(r.taskDisplay||r.task||'Other')}</div></div><div class="right"><b>${fmt(r.hours)} hrs</b><br>${r.quadrant?`<span class="pill q${r.quadrant}">${safe(r.quadrant)}</span>`:''}</div></div><div class="timelineMeta">${r.notes?`<div><b>Notes:</b> ${safe(r.notes)}</div>`:''}<div><span class="timelineTag">${safe(r.sourceFile)}</span><span class="timelineTag">${safe(r.hoursSource)}</span></div></div></div>`).join('')}</div>`:`<div class="empty">No jobs found for this lot in the current filtered review.</div>`;
+  const modal=document.getElementById('taskModal'); modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+}
 
 function exportSnapshot(){
   if(!state.loaded){ alert("Load and calculate your Excel files first."); return; }
   const payload={
     app:"VIP Quadrant Man-Hour Review",
-    version:"1.81",
+    version:"1.82",
     exportedAt:new Date().toISOString(),
     columbusCenter:COLUMBUS,
     subdivisions:state.subs,
@@ -552,6 +579,7 @@ document.getElementById("calcBtn").addEventListener("click",()=>loadAndCompute()
 document.getElementById("fitBtn").addEventListener("click",()=>renderMap());
 document.getElementById("mapWorkType").addEventListener("change",()=>{ if(state.loaded) { renderMap(); renderMapTools(); } });
 document.getElementById("taskTable").addEventListener("click",e=>{ const row=e.target.closest("tr.taskRow"); if(!row) return; openTaskModal(row.dataset.type,row.dataset.task); });
+document.getElementById("lotTable").addEventListener("click",e=>{ const row=e.target.closest("tr.lotRow"); if(!row) return; openLotTimeline(row.dataset.builder,row.dataset.sub,row.dataset.lot,row.dataset.q); });
 document.getElementById("taskModalClose").addEventListener("click",closeTaskModal);
 document.getElementById("taskModal").addEventListener("click",e=>{ if(e.target.id==="taskModal") closeTaskModal(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeTaskModal(); });
