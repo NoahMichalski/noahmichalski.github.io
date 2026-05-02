@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VIP Quadrant Week / Month Review Dashboard v1.85</title>
+  <title>VIP Quadrant Week / Month Review Dashboard v1.86</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -19,7 +19,7 @@
     .wrap{max-width:1500px;margin:0 auto;padding:18px;}
     .top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
     h1{margin:0;font-size:clamp(22px,3vw,34px);letter-spacing:-.04em}.sub{color:var(--muted);margin-top:5px;font-size:14px}.version{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.04)}
-    .versionBox{position:relative}.versionDrop{position:absolute;right:0;top:42px;width:min(420px,90vw);background:#0d1b2f;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:12px;z-index:2000}.versionDrop h3{margin:0 0 8px;font-size:15px}.versionDrop ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.45}.versionDrop li{margin:5px 0}.versionDrop b{color:var(--text)}details.versionBox summary{list-style:none;cursor:pointer}details.versionBox summary::-webkit-details-marker{display:none}.dataNote{margin-top:12px;padding:12px;border:1px solid rgba(55,189,248,.35);background:rgba(55,189,248,.08);border-radius:14px;color:var(--muted);line-height:1.35}.dataNote b{color:var(--text)}
+    .versionBox{position:relative}.versionDrop{position:absolute;right:0;top:42px;width:min(430px,90vw);max-height:430px;overflow:auto;background:#0d1b2f;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:10px;z-index:2000}.versionDrop h3{margin:0 0 8px;font-size:14px}.versionDrop ul{margin:0;padding-left:16px;color:var(--muted);line-height:1.28;font-size:12px}.versionDrop li{margin:4px 0}.versionDrop b{color:var(--text)}details.versionBox summary{list-style:none;cursor:pointer}details.versionBox summary::-webkit-details-marker{display:none}.dataNote{margin-top:12px;padding:12px;border:1px solid rgba(55,189,248,.35);background:rgba(55,189,248,.08);border-radius:14px;color:var(--muted);line-height:1.35}.dataNote b{color:var(--text)}
     .grid{display:grid;gap:16px}.uploads{grid-template-columns:repeat(5,minmax(200px,1fr));margin-top:16px}.dashboard{grid-template-columns:390px 1fr;align-items:start}.cards{grid-template-columns:repeat(4,minmax(160px,1fr));margin:16px 0}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
     @media(max-width:1000px){.uploads,.dashboard,.cards,.two,.three{grid-template-columns:1fr}.mapPanel{min-height:520px}}
     .panel,.upload,.stat,.miniCard{background:linear-gradient(180deg,rgba(18,35,58,.97),rgba(13,27,47,.97));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
@@ -59,10 +59,11 @@
       <div class="sub">Upload subdivisions + task hours + labor and cleaning daily files. Review a day, week, month, or the whole batch on a map.</div>
     </div>
     <details class="versionBox">
-      <summary class="version">v1.85 • Workflow cleanup + Other tasks ▾</summary>
+      <summary class="version">v1.86 • Lot search + labor Other ▾</summary>
       <div class="versionDrop">
         <h3>Version history</h3>
         <ul>
+          <li><b>v1.86</b> — Made version history scrollable/compact, added Lot History search, and updated Labor “Other” handling so Notes becomes the real task and Hours only applies to Other/custom labor rows.</li>
           <li><b>v1.85</b> — Split the top workflow into Create New Review and Load Saved Review boxes, clarified filter controls, and fixed Cleaning “Other” handling so Notes becomes the real task name while Hours only applies to Other/custom cleaning rows.</li>
           <li><b>v1.84</b> — Added GitHub API auto-detect for saved review JSON files in the main repo folder, newest-first saved review sorting, GitHub status display, refresh saved reviews button, and manual fallback list if GitHub cannot be reached.</li>
           <li><b>v1.83</b> — Removed the duplicate ready status card, fixed the squished Day-by-Day top quadrant by moving it into the snapshot row, and compacted Lot History so tasks use the full width in one-line timeline chips.</li>
@@ -128,7 +129,7 @@
       <button id="fitBtn" class="btn ghost">Fit Map</button>
     </div>
   </section>
-  <div class="dataNote"><b>Saved reviews do not need the original Excel sheets.</b> Saved review dropdowns are auto-detected from GitHub files named <b>quadrant-review*.json</b> in the main repo folder. Use the Excel uploads only to create a new review/export. Cleaning hours are pulled from the Floor Plans file by subdivision + lot for Original/Reclean/Windows. Cleaning rows marked Other use the Notes column as the task name and the daily Hours column as the hours. Once you load a saved review JSON from the dropdown or upload one with “Load Review JSON,” the dashboard has everything it needs to show the map, quadrant totals, busiest day, task breakdown, lot history, tables, and exports.</div>
+  <div class="dataNote"><b>Saved reviews do not need the original Excel sheets.</b> Saved review dropdowns are auto-detected from GitHub files named <b>quadrant-review*.json</b> in the main repo folder. Use the Excel uploads only to create a new review/export. Cleaning hours are pulled from the Floor Plans file by subdivision + lot for Original/Reclean/Windows. Cleaning and Labor rows marked Other use the Notes column as the task name and the daily Hours column as the hours. Once you load a saved review JSON from the dropdown or upload one with “Load Review JSON,” the dashboard has everything it needs to show the map, quadrant totals, busiest day, task breakdown, lot history, tables, and exports.</div>
 
   <section class="grid cards" id="summaryCards"></section>
 
@@ -191,7 +192,10 @@
   </section>
 
   <section class="panel" style="margin-top:16px">
-    <div class="sectionTitle"><h2>Lot History Breakdown</h2><span class="muted">click a lot to see the full timeline</span></div>
+    <div class="lotHeaderTools">
+      <div class="sectionTitle"><h2>Lot History Breakdown</h2><span class="muted">click a lot to see the full timeline</span></div>
+      <input id="lotHistorySearch" class="lotSearchBox" type="search" placeholder="Search lot history: lot, task, subdivision..." />
+    </div>
     <div class="scroll"><table id="lotTable"></table></div>
   </section>
 
@@ -301,13 +305,25 @@ function cleaningTaskInfo(task, notes=""){
   return {name:taskRaw || titleCaseFromNote(noteRaw), kind:"custom"};
 }
 function canonicalCleaningTask(task, notes=""){ return cleaningTaskInfo(task, notes).name; }
-function displayTaskName(job){ return job.workGroup==="Cleaning" ? cleaningTaskInfo(job.task, job.notes).name : (job.task || "Other"); }
+function genericTaskInfo(task, notes=""){
+  const taskRaw=String(task||"").trim();
+  const noteRaw=String(notes||"").trim();
+  const t=norm(taskRaw);
+  if(t==="other" || t.includes("other")) return {name:titleCaseFromNote(noteRaw), kind:"other", missingNote:!noteRaw};
+  return {name:taskRaw || titleCaseFromNote(noteRaw), kind:"standard", missingNote:false};
+}
+function displayTaskName(job){
+  if(job.workGroup==="Cleaning") return cleaningTaskInfo(job.task, job.notes).name;
+  const info=genericTaskInfo(job.task, job.notes);
+  return info.name || "Other";
+}
 function findTaskHours(job,tasks){
-  const info = job.workGroup==="Cleaning" ? cleaningTaskInfo(job.task, job.notes) : null;
-  const taskName = job.workGroup==="Cleaning" ? info.name : job.task;
+  const cleaningInfo = job.workGroup==="Cleaning" ? cleaningTaskInfo(job.task, job.notes) : null;
+  const laborInfo = job.workGroup!=="Cleaning" ? genericTaskInfo(job.task, job.notes) : null;
+  const taskName = job.workGroup==="Cleaning" ? cleaningInfo.name : laborInfo.name;
   const jt=norm(taskName), notes=norm(job.notes);
   if(job.workGroup==="Cleaning"){
-    if(info.kind==="budget" && ["original","reclean","windows"].includes(jt)){
+    if(cleaningInfo.kind==="budget" && ["original","reclean","windows"].includes(jt)){
       const fp=findFloorPlan(job);
       if(fp){
         const hours = jt==="original" ? fp.original : jt==="reclean" ? fp.reclean : fp.windows;
@@ -318,16 +334,21 @@ function findTaskHours(job,tasks){
     }
     // Cleaning "Other" rows use Notes as the real task type and the daily Hours column as the hours.
     // The Hours column is intentionally not used for Original/Reclean/Windows.
-    if(info.kind==="other" || info.kind==="custom"){
+    if(cleaningInfo.kind==="other" || cleaningInfo.kind==="custom"){
       if(job.manualHours>0){
-        return {hours:job.manualHours, source:info.kind==="other"?"daily cleaning Other hours":"daily cleaning custom hours", flag:info.missingNote?`Cleaning • ${job.sourceFile} row ${job.row}: Task is Other but Notes is blank. Used daily Hours column and labeled it Other.`:undefined};
+        return {hours:job.manualHours, source:cleaningInfo.kind==="other"?"daily cleaning Other hours":"daily cleaning custom hours", flag:cleaningInfo.missingNote?`Cleaning • ${job.sourceFile} row ${job.row}: Task is Other but Notes is blank. Used daily Hours column and labeled it Other.`:undefined};
       }
-      return {hours:1, source:"default 1 hr: missing Other/custom cleaning hours", flag:`Cleaning • ${job.sourceFile} row ${job.row}: ${info.kind==="other"?"Task is Other" : "Custom cleaning task"} for ${job.subdivision} lot ${job.lot} is missing usable Hours${info.missingNote?" and Notes is blank":""}. Defaulted ${taskName} to 1 hour.`};
+      return {hours:1, source:"default 1 hr: missing Other/custom cleaning hours", flag:`Cleaning • ${job.sourceFile} row ${job.row}: ${cleaningInfo.kind==="other"?"Task is Other" : "Custom cleaning task"} for ${job.subdivision} lot ${job.lot} is missing usable Hours${cleaningInfo.missingNote?" and Notes is blank":""}. Defaulted ${taskName} to 1 hour.`};
+    }
+  } else {
+    // Labor "Other" rows match the cleaning concept: Notes becomes the real task type, and the daily Hours column applies only to Other/custom labor rows.
+    if(laborInfo.kind==="other"){
+      if(job.manualHours>0){
+        return {hours:job.manualHours, source:"daily labor Other hours", flag:laborInfo.missingNote?`Labor • ${job.sourceFile} row ${job.row}: Task is Other but Notes is blank. Used daily Hours column and labeled it Other.`:undefined};
+      }
+      return {hours:1, source:"default 1 hr: missing Other labor hours", flag:`Labor • ${job.sourceFile} row ${job.row}: Task is Other for ${job.subdivision} lot ${job.lot} is missing usable Hours${laborInfo.missingNote?" and Notes is blank":""}. Defaulted ${taskName} to 1 hour.`};
     }
   }
-  const isOther=jt==="other" || jt.includes("other") || jt==="raw";
-  if(isOther){ if(job.manualHours>0)return {hours:job.manualHours, source:"daily file Other hours"}; }
-  if(job.manualHours>0)return {hours:job.manualHours, source:"daily file"};
   let best=null, score=-1;
   for(const t of tasks){
     if(!t.hours)continue;
@@ -488,18 +509,21 @@ function renderTaskBreakdown(){
 }
 function renderLotBreakdown(){
   const basis=state.filteredAllTypes.length?state.filteredAllTypes:state.filtered; // Always keep labor + cleaning together here.
+  const q=norm(document.getElementById("lotHistorySearch")?.value || "");
   const list=[...groupBy(basis,j=>`${j.builder}|${j.subdivision}|${j.lot}|${j.quadrant}`).entries()]
     .map(([k,rs])=>{
-      const [builder,sub,lot,q]=k.split("|");
+      const [builder,sub,lot,qdr]=k.split("|");
       const labor=sums(rowsForType("Labor",rs)); const cleaning=sums(rowsForType("Cleaning",rs)); const total=sums(rs); const dates=[...new Set(rs.map(r=>r.date))].sort();
       const tasks=[...groupBy(rs,r=>`${r.workGroup||"Labor"}: ${r.taskDisplay||r.task||"Other"}`).entries()]
         .map(([name,items])=>{ const itemDates=[...new Set(items.map(i=>i.date))].sort(); const ss=sums(items); return `<span class="lotTaskItem"><span class="lotTaskDates">${itemDates.map(d=>safe(displayDate(d)).replace(/, 2026/g,"")).join(" + ")}</span><span class="lotTaskType">${safe(name)}</span><span class="lotTaskHours">${fmt(ss.hours)}h • ${items.length} job${items.length===1?"":"s"}</span></span>`; })
         .join("");
-      return {builder,sub,lot,q,labor,cleaning,total,dates,tasks, rows:rs};
+      const searchBlob=norm([builder,sub,lot,qdr,...rs.map(r=>`${r.workGroup} ${r.taskDisplay||r.task} ${r.notes} ${r.date} ${r.sourceFile}`)].join(" "));
+      return {builder,sub,lot,q:qdr,labor,cleaning,total,dates,tasks, rows:rs, searchBlob};
     })
+    .filter(r=>!q || r.searchBlob.includes(q))
     .sort((a,b)=>b.total.hours-a.total.hours||String(a.sub).localeCompare(String(b.sub)));
   document.getElementById("lotTable").className="lotCompactTable";
-  document.getElementById("lotTable").innerHTML=`<thead><tr><th style="width:285px">Lot</th><th style="width:210px">Dates worked</th><th>Task timeline</th><th style="width:310px" class="right">Summary</th></tr></thead><tbody>${list.map(r=>`<tr class="lotRow" data-builder="${attrSafe(r.builder)}" data-sub="${attrSafe(r.sub)}" data-lot="${attrSafe(r.lot)}" data-q="${attrSafe(r.q)}"><td><b class="lotMain">${safe(r.lot||"—")}</b> ${r.q?`<span class="pill q${r.q}">${safe(r.q)}</span>`:""}<br><span class="muted">${safe(r.builder)} • ${safe(r.sub)}</span></td><td><div class="dateChips">${r.dates.map(d=>`<span class="dateChip">${safe(displayDate(d)).replace(/, 2026/g,"")}</span>`).join("")}</div></td><td><div class="lotTaskList">${r.tasks || `<span class="muted">No tasks found.</span>`}</div><span class="timelineHint">Click row for full timeline</span></td><td class="right summaryCell"><div class="lotTotalsInline"><span><b>${fmt(r.labor.hours)}</b> Labor<br><small class="muted">${r.labor.jobs} jobs</small></span><span><b>${fmt(r.cleaning.hours)}</b> Cleaning<br><small class="muted">${r.cleaning.jobs} jobs</small></span><span><b>${fmt(r.total.hours)}</b> Total<br><small class="muted">${r.total.jobs} jobs</small></span></div></td></tr>`).join("")}</tbody>`;
+  document.getElementById("lotTable").innerHTML=`<thead><tr><th style="width:285px">Lot</th><th style="width:210px">Dates worked</th><th>Task timeline</th><th style="width:310px" class="right">Summary</th></tr></thead><tbody>${list.length?list.map(r=>`<tr class="lotRow" data-builder="${attrSafe(r.builder)}" data-sub="${attrSafe(r.sub)}" data-lot="${attrSafe(r.lot)}" data-q="${attrSafe(r.q)}"><td><b class="lotMain">${safe(r.lot||"—")}</b> ${r.q?`<span class="pill q${r.q}">${safe(r.q)}</span>`:""}<br><span class="muted">${safe(r.builder)} • ${safe(r.sub)}</span></td><td><div class="dateChips">${r.dates.map(d=>`<span class="dateChip">${safe(displayDate(d)).replace(/, 2026/g,"")}</span>`).join("")}</div></td><td><div class="lotTaskList">${r.tasks || `<span class="muted">No tasks found.</span>`}</div><span class="timelineHint">Click row for full timeline</span></td><td class="right summaryCell"><div class="lotTotalsInline"><span><b>${fmt(r.labor.hours)}</b> Labor<br><small class="muted">${r.labor.jobs} jobs</small></span><span><b>${fmt(r.cleaning.hours)}</b> Cleaning<br><small class="muted">${r.cleaning.jobs} jobs</small></span><span><b>${fmt(r.total.hours)}</b> Total<br><small class="muted">${r.total.jobs} jobs</small></span></div></td></tr>`).join(""):`<tr><td colspan="4"><div class="empty">No lot history matches that search.</div></td></tr>`}</tbody>`;
 }
 function renderIssues(){ document.getElementById("issueCount").textContent=state.issues.length; document.getElementById("issues").innerHTML=state.issues.length?state.issues.slice(0,200).map(i=>`<div class="issue">${safe(i.msg)}</div>`).join(""):`<div class="empty">No issues found.</div>`; }
 function renderMapTools(){ renderSplitCard(); renderPressureCard(); renderTrendCard(); renderUnmappedCard(); renderTopMapCard(); renderMapDayCard(); }
@@ -592,7 +616,7 @@ function exportSnapshot(){
   if(!state.loaded){ alert("Load and calculate your Excel files first."); return; }
   const payload={
     app:"VIP Quadrant Man-Hour Review",
-    version:"1.85",
+    version:"1.86",
     exportedAt:new Date().toISOString(),
     columbusCenter:COLUMBUS,
     subdivisions:state.subs,
@@ -691,6 +715,7 @@ async function loadHostedSnapshot(fileName){
 
 document.getElementById("calcBtn").addEventListener("click",()=>loadAndCompute().catch(err=>{console.error(err); setStatusCards("Error: "+err.message);}));
 ["mode","workType","daySelect","weekSelect","monthSelect","search"].forEach(id=>document.getElementById(id).addEventListener(id==="search"?"input":"change",()=>{ if(state.loaded) applyFilters(); }));
+document.getElementById("lotHistorySearch").addEventListener("input",()=>{ if(state.loaded) renderLotBreakdown(); });
 document.getElementById("fitBtn").addEventListener("click",()=>renderMap());
 document.getElementById("mapWorkType").addEventListener("change",()=>{ if(state.loaded) { renderMap(); renderMapTools(); } });
 document.getElementById("taskTable").addEventListener("click",e=>{ const row=e.target.closest("tr.taskRow"); if(!row) return; openTaskModal(row.dataset.type,row.dataset.task); });
