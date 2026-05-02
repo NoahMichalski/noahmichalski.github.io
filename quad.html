@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VIP Quadrant Week / Month Review Dashboard v1.84</title>
+  <title>VIP Quadrant Week / Month Review Dashboard v1.85</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -46,7 +46,9 @@
 
     .dayTableWrap{max-height:520px}.daySnapshot{display:grid;grid-template-columns:repeat(5,minmax(115px,1fr));gap:10px;min-width:0}.dayMetric{padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.035);min-width:0}.dayMetric b{display:block;font-size:20px;white-space:nowrap}.dayMetric small{display:block;color:var(--muted);line-height:1.25}.dayMetric .muted{font-size:13px;margin-top:2px}.dayMetric.topQ{border-color:rgba(55,189,248,.35);background:rgba(55,189,248,.08)}.topQBadge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-weight:950;color:#06101e;white-space:nowrap}
     .lotCompactTable th,.lotCompactTable td{padding:8px 10px}.lotCompactTable .lotMain{font-size:16px}.lotCompactTable .summaryCell{min-width:130px}.lotTaskList{display:flex;flex-wrap:wrap;gap:7px;align-items:flex-start}.lotTaskItem{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.035);max-width:100%;white-space:nowrap}.lotTaskItem b{display:inline;margin:0;font-size:13px}.lotTaskItem .workBadge{margin-left:0}.lotTaskDates{color:var(--muted);font-size:12px;line-height:1;white-space:nowrap}.lotTaskType{color:var(--text);font-weight:900}.lotTaskHours{color:var(--muted);font-size:12px}.lotTotalsInline{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}.lotTotalsInline span{display:inline-block;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:5px 7px;background:rgba(255,255,255,.03);white-space:nowrap}.timelineHint{display:inline-block;margin-top:6px;font-size:11px;color:var(--muted)}
-    @media(max-width:1000px){.mapTools{grid-template-columns:1fr}.trendRow{grid-template-columns:90px 1fr 58px}.lotGrid{grid-template-columns:1fr}.mapHeader .field{min-width:100%}.daySnapshot{grid-template-columns:repeat(2,minmax(120px,1fr))}}
+
+    .workflowGrid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin:16px 0}.workflowPanel{padding:16px;background:linear-gradient(180deg,rgba(18,35,58,.97),rgba(13,27,47,.97));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.workflowPanel h2{margin:0;font-size:18px}.workflowPanel p{margin:6px 0 12px;color:var(--muted);font-size:13px;line-height:1.35}.workflowActions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.filterPanel{margin:16px 0}.filterPanel .controls{margin:0;padding:0;background:transparent;border:none;box-shadow:none}.savedStatus{min-height:40px;display:flex;align-items:center;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:#081427}.savedStatus.good{border-color:rgba(55,214,122,.45);background:rgba(55,214,122,.08)}.savedStatus.warn{border-color:rgba(255,209,102,.45);background:rgba(255,209,102,.08);color:#ffedbd}.cleanRule{margin-top:8px;padding:8px 10px;border-radius:12px;background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.25);color:#ffedbd;font-size:12px;line-height:1.35}
+    @media(max-width:1000px){.workflowGrid{grid-template-columns:1fr}.mapTools{grid-template-columns:1fr}.trendRow{grid-template-columns:90px 1fr 58px}.lotGrid{grid-template-columns:1fr}.mapHeader .field{min-width:100%}.daySnapshot{grid-template-columns:repeat(2,minmax(120px,1fr))}}
   </style>
 </head>
 <body>
@@ -57,10 +59,11 @@
       <div class="sub">Upload subdivisions + task hours + labor and cleaning daily files. Review a day, week, month, or the whole batch on a map.</div>
     </div>
     <details class="versionBox">
-      <summary class="version">v1.84 • GitHub auto-detect reviews ▾</summary>
+      <summary class="version">v1.85 • Workflow cleanup + Other tasks ▾</summary>
       <div class="versionDrop">
         <h3>Version history</h3>
         <ul>
+          <li><b>v1.85</b> — Split the top workflow into Create New Review and Load Saved Review boxes, clarified filter controls, and fixed Cleaning “Other” handling so Notes becomes the real task name while Hours only applies to Other/custom cleaning rows.</li>
           <li><b>v1.84</b> — Added GitHub API auto-detect for saved review JSON files in the main repo folder, newest-first saved review sorting, GitHub status display, refresh saved reviews button, and manual fallback list if GitHub cannot be reached.</li>
           <li><b>v1.83</b> — Removed the duplicate ready status card, fixed the squished Day-by-Day top quadrant by moving it into the snapshot row, and compacted Lot History so tasks use the full width in one-line timeline chips.</li>
           <li><b>v1.82</b> — Reworked Day-by-Day Review into cleaner snapshot rows, added Top Builders breakdown with labor/cleaning jobs and hours, and added clickable Lot Timeline popup from Lot History.</li>
@@ -86,28 +89,46 @@
     <div class="upload"><label>2) Task Types file</label><small>Labor task hours and fallback cleaning task hours. Saved review JSON already includes calculated job hours.</small><input id="tasksFile" type="file" accept=".xlsx,.xls,.csv" /></div>
     <div class="upload"><label>3) Floor Plans / Lot Hours file</label><small>Needed for cleaning review hours. Uses Builder, Subdivision, Lot, Floorplan, Original, Reclean, Windows.</small><input id="floorPlansFile" type="file" accept=".xlsx,.xls,.csv" /></div>
     <div class="upload"><label>4) Labor Daily Job files</label><small>Select labor files for one day, week, or month. File names are used as work dates.</small><input id="jobsFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
-    <div class="upload"><label>5) Cleaning Daily Job files</label><small>Optional. Original/Reclean/Windows hours come from the Floor Plans file. Other uses file/task hours.</small><input id="cleaningFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
+    <div class="upload"><label>5) Cleaning Daily Job files</label><small>Optional. Original/Reclean/Windows hours come from Floor Plans. <b>Other</b> uses Notes as the task name and the daily Hours column.</small><div class="cleanRule">Example: Task = Other, Notes = Floors Only, Hours = 2 → shows as Cleaning: Floors Only.</div><input id="cleaningFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
   </section>
 
-  <section class="controls panel">
-    <div class="field"><label>Review Mode</label><select id="mode"><option value="all">All Uploaded</option><option value="day">Single Day</option><option value="week">Week</option><option value="month">Month</option></select></div>
-    <div class="field"><label>Work Type</label><select id="workType"><option value="all">Labor + Cleaning</option><option value="Labor">Labor Only</option><option value="Cleaning">Cleaning Only</option></select></div>
-    <div class="field"><label>Day</label><select id="daySelect"><option value="">All</option></select></div>
-    <div class="field"><label>Week</label><select id="weekSelect"><option value="">All</option></select></div>
-    <div class="field"><label>Month</label><select id="monthSelect"><option value="">All</option></select></div>
-    <div class="field"><label>Saved Export</label><select id="savedReviewSelect"><option value="">Choose hosted review...</option></select></div>
-    <div class="field"><label>Search</label><input id="search" type="search" placeholder="Builder, subdivision, lot, task..." /></div>
-    <button id="calcBtn" class="btn primary">Calculate</button>
-    <button id="fitBtn" class="btn ghost">Fit Map</button>
-    <button id="copyBtn" class="btn ghost">Copy Summary</button>
-    <button id="csvBtn" class="btn ghost">Export CSV</button>
-    <button id="jsonBtn" class="btn ghost">Export Review JSON</button>
-    <label class="btn ghost" style="display:inline-flex;align-items:center;gap:8px;margin:0">Load Review JSON<input id="reviewJsonFile" type="file" accept=".json" style="display:none"></label>
-    <button id="loadHostedBtn" class="btn ghost" title="Loads the selected hosted review JSON from GitHub or the same site folder">Load Saved Review</button>
-    <button id="refreshReviewsBtn" class="btn ghost" title="Re-check GitHub for quadrant-review*.json files">Refresh Saved Reviews</button>
-    <div class="field"><label>Saved Review Status</label><div id="savedReviewStatus" class="savedStatus">Checking GitHub...</div></div>
+  <section class="workflowGrid">
+    <div class="workflowPanel">
+      <h2>Create New Review</h2>
+      <p>Upload fresh Excel files above, then calculate and export a new saved review JSON. Use this side only when you are creating a new day/week/month review.</p>
+      <div class="workflowActions">
+        <button id="calcBtn" class="btn primary">Calculate New Review</button>
+        <button id="csvBtn" class="btn ghost">Export CSV</button>
+        <button id="jsonBtn" class="btn ghost">Export Review JSON</button>
+        <button id="copyBtn" class="btn ghost">Copy Summary</button>
+        <label class="btn ghost" style="display:inline-flex;align-items:center;gap:8px;margin:0">Load Local Review JSON<input id="reviewJsonFile" type="file" accept=".json" style="display:none"></label>
+      </div>
+    </div>
+    <div class="workflowPanel">
+      <h2>Load Saved Review</h2>
+      <p>Saved reviews auto-detect from GitHub. Pick one here to reload old weeks/months without the original Excel sheets.</p>
+      <div class="workflowActions">
+        <div class="field" style="flex:1 1 260px"><label>Saved Export</label><select id="savedReviewSelect"><option value="">Choose hosted review...</option></select></div>
+        <button id="loadHostedBtn" class="btn ghost" title="Loads the selected hosted review JSON from GitHub or the same site folder">Load Saved Review</button>
+        <button id="refreshReviewsBtn" class="btn ghost" title="Re-check GitHub for quadrant-review*.json files">Refresh Saved Reviews</button>
+        <div class="field" style="flex:1 1 100%"><label>Saved Review Status</label><div id="savedReviewStatus" class="savedStatus">Checking GitHub...</div></div>
+      </div>
+    </div>
   </section>
-  <div class="dataNote"><b>Saved reviews do not need the original Excel sheets.</b> Saved review dropdowns are auto-detected from GitHub files named <b>quadrant-review*.json</b> in the main repo folder. Use the Excel uploads only to create a new review/export. Cleaning hours are pulled from the Floor Plans file by subdivision + lot for Original/Reclean/Windows. Once you load a saved review JSON from the dropdown or upload one with “Load Review JSON,” the dashboard has everything it needs to show the map, quadrant totals, busiest day, task breakdown, lot history, tables, and exports.</div>
+
+  <section class="panel filterPanel">
+    <div class="sectionTitle"><h2>View Filters</h2><span class="muted">applies after calculating or loading a saved review</span></div>
+    <div class="controls">
+      <div class="field"><label>Review Mode</label><select id="mode"><option value="all">All Uploaded</option><option value="day">Single Day</option><option value="week">Week</option><option value="month">Month</option></select></div>
+      <div class="field"><label>Work Type</label><select id="workType"><option value="all">Labor + Cleaning</option><option value="Labor">Labor Only</option><option value="Cleaning">Cleaning Only</option></select></div>
+      <div class="field"><label>Day</label><select id="daySelect"><option value="">All</option></select></div>
+      <div class="field"><label>Week</label><select id="weekSelect"><option value="">All</option></select></div>
+      <div class="field"><label>Month</label><select id="monthSelect"><option value="">All</option></select></div>
+      <div class="field"><label>Search</label><input id="search" type="search" placeholder="Builder, subdivision, lot, task..." /></div>
+      <button id="fitBtn" class="btn ghost">Fit Map</button>
+    </div>
+  </section>
+  <div class="dataNote"><b>Saved reviews do not need the original Excel sheets.</b> Saved review dropdowns are auto-detected from GitHub files named <b>quadrant-review*.json</b> in the main repo folder. Use the Excel uploads only to create a new review/export. Cleaning hours are pulled from the Floor Plans file by subdivision + lot for Original/Reclean/Windows. Cleaning rows marked Other use the Notes column as the task name and the daily Hours column as the hours. Once you load a saved review JSON from the dropdown or upload one with “Load Review JSON,” the dashboard has everything it needs to show the map, quadrant totals, busiest day, task breakdown, lot history, tables, and exports.</div>
 
   <section class="grid cards" id="summaryCards"></section>
 
@@ -256,22 +277,37 @@ function findFloorPlan(job){ const subKey=cleanSub(job.subdivision), lk=lotKey(j
 function makeJob(r, file, idx, workGroup="Labor"){ const date=parseDateFromFileName(file.name); return { workGroup, sourceFile:file.name, date, week:isoWeek(date), month:monthKey(date), row:idx+2, builder:String(get(r,"builder")||"").trim(), subdivision:String(get(r,"subdivision")||"").trim(), lot:String(get(r,"lot")||"").trim(), task:String(get(r,"task")||"").trim(), notes:String(get(r,"notes")||"").trim(), am:String(get(r,"am")||"").trim(), manualHours:num(get(r,"hours")), raw:r }; }
 function buildSubIndex(subs){ const map=new Map(); subs.forEach(s=>{ if(!s.key)return; if(!map.has(s.key))map.set(s.key,[]); map.get(s.key).push(s); }); return map; }
 function findSub(job, index, subs){ const key=cleanSub(job.subdivision); if(index.has(key))return index.get(key)[0]; let best=null,score=0; for(const s of subs){ if(!key||!s.key)continue; let sc=0; if(s.key.includes(key)||key.includes(s.key))sc=Math.min(s.key.length,key.length); if(sc>score){score=sc;best=s;} } return score>=5?best:null; }
-function canonicalCleaningTask(task, notes=""){
-  const t=norm([task,notes].join(" "));
-  if(t.includes("window")) return "Windows";
-  if(t.includes("reclean") || t.includes("qc") || t.includes("buff") || t.includes("closing")) return "Reclean";
-  if(t.includes("original") || t.includes("first clean") || t.includes("full clean")) return "Original";
-  if(t.includes("model")) return "Models";
-  if(t.includes("floor")) return "Floors Only";
-  if(t.includes("other")) return "Other";
-  return String(task||"Other").trim() || "Other";
+function titleCaseFromNote(v){
+  const raw=String(v||"").trim();
+  if(!raw) return "Other";
+  const cleaned=raw.replace(/^[-:–—\s]+|[-:–—\s]+$/g,"").replace(/\s+/g," ");
+  const n=norm(cleaned);
+  if(n.includes("floor")) return "Floors Only";
+  if(n.includes("model")) return "Model";
+  if(n.includes("rewash")) return "Rewash";
+  return cleaned.replace(/\b\w/g,c=>c.toUpperCase());
 }
-function displayTaskName(job){ return job.workGroup==="Cleaning" ? canonicalCleaningTask(job.task, job.notes) : (job.task || "Other"); }
+function cleaningTaskInfo(task, notes=""){
+  const taskRaw=String(task||"").trim();
+  const noteRaw=String(notes||"").trim();
+  const t=norm(taskRaw);
+  if(t==="other" || t.includes("other")) return {name:titleCaseFromNote(noteRaw), kind:"other", missingNote:!noteRaw};
+  if(t.includes("window")) return {name:"Windows", kind:"budget"};
+  if(t.includes("reclean") || t.includes("qc") || t.includes("buff") || t.includes("closing")) return {name:"Reclean", kind:"budget"};
+  if(t.includes("original") || t.includes("first clean") || t.includes("full clean")) return {name:"Original", kind:"budget"};
+  if(t.includes("model")) return {name:"Model", kind:"custom"};
+  if(t.includes("floor")) return {name:"Floors Only", kind:"custom"};
+  if(t.includes("rewash")) return {name:"Rewash", kind:"custom"};
+  return {name:taskRaw || titleCaseFromNote(noteRaw), kind:"custom"};
+}
+function canonicalCleaningTask(task, notes=""){ return cleaningTaskInfo(task, notes).name; }
+function displayTaskName(job){ return job.workGroup==="Cleaning" ? cleaningTaskInfo(job.task, job.notes).name : (job.task || "Other"); }
 function findTaskHours(job,tasks){
-  const taskName = job.workGroup==="Cleaning" ? canonicalCleaningTask(job.task, job.notes) : job.task;
+  const info = job.workGroup==="Cleaning" ? cleaningTaskInfo(job.task, job.notes) : null;
+  const taskName = job.workGroup==="Cleaning" ? info.name : job.task;
   const jt=norm(taskName), notes=norm(job.notes);
   if(job.workGroup==="Cleaning"){
-    if(["original","reclean","windows"].includes(jt)){
+    if(info.kind==="budget" && ["original","reclean","windows"].includes(jt)){
       const fp=findFloorPlan(job);
       if(fp){
         const hours = jt==="original" ? fp.original : jt==="reclean" ? fp.reclean : fp.windows;
@@ -280,7 +316,14 @@ function findTaskHours(job,tasks){
       }
       return {hours:1, source:`default 1 hr: no floor plan match`, flag:`Cleaning • ${job.sourceFile} row ${job.row}: No Floor Plans match for ${job.subdivision} lot ${job.lot}. Defaulted ${taskName} to 1 hour.`};
     }
-    if(job.manualHours>0)return {hours:job.manualHours, source:"daily cleaning file"};
+    // Cleaning "Other" rows use Notes as the real task type and the daily Hours column as the hours.
+    // The Hours column is intentionally not used for Original/Reclean/Windows.
+    if(info.kind==="other" || info.kind==="custom"){
+      if(job.manualHours>0){
+        return {hours:job.manualHours, source:info.kind==="other"?"daily cleaning Other hours":"daily cleaning custom hours", flag:info.missingNote?`Cleaning • ${job.sourceFile} row ${job.row}: Task is Other but Notes is blank. Used daily Hours column and labeled it Other.`:undefined};
+      }
+      return {hours:1, source:"default 1 hr: missing Other/custom cleaning hours", flag:`Cleaning • ${job.sourceFile} row ${job.row}: ${info.kind==="other"?"Task is Other" : "Custom cleaning task"} for ${job.subdivision} lot ${job.lot} is missing usable Hours${info.missingNote?" and Notes is blank":""}. Defaulted ${taskName} to 1 hour.`};
+    }
   }
   const isOther=jt==="other" || jt.includes("other") || jt==="raw";
   if(isOther){ if(job.manualHours>0)return {hours:job.manualHours, source:"daily file Other hours"}; }
@@ -549,7 +592,7 @@ function exportSnapshot(){
   if(!state.loaded){ alert("Load and calculate your Excel files first."); return; }
   const payload={
     app:"VIP Quadrant Man-Hour Review",
-    version:"1.84",
+    version:"1.85",
     exportedAt:new Date().toISOString(),
     columbusCenter:COLUMBUS,
     subdivisions:state.subs,
@@ -569,7 +612,7 @@ function loadSnapshotObject(payload){
   state.subs=Array.isArray(payload.subdivisions)?payload.subdivisions:[];
   state.tasks=Array.isArray(payload.taskTypes)?payload.taskTypes:[];
   state.floorPlans=Array.isArray(payload.floorPlans)?payload.floorPlans:[]; state.floorIndex=buildFloorIndex(state.floorPlans);
-  state.rawJobs=[]; state.jobs=payload.jobs.map(j=>{ const workGroup=j.workGroup||"Labor"; return {week:j.week||isoWeek(j.date),month:j.month||monthKey(j.date),workGroup,taskDisplay:j.taskDisplay || (workGroup==="Cleaning"?canonicalCleaningTask(j.task,j.notes):(j.task||"Other")),...j,workGroup}; }); state.workTypes=[...new Set(state.jobs.map(j=>j.workGroup||"Labor"))].sort(); state.issues=Array.isArray(payload.issues)?payload.issues:[]; state.loaded=true;
+  state.rawJobs=[]; state.jobs=payload.jobs.map(j=>{ const workGroup=j.workGroup||"Labor"; const taskDisplay = workGroup==="Cleaning" ? canonicalCleaningTask(j.task,j.notes) : (j.taskDisplay || j.task || "Other"); return {week:j.week||isoWeek(j.date),month:j.month||monthKey(j.date),...j,workGroup,taskDisplay}; }); state.workTypes=[...new Set(state.jobs.map(j=>j.workGroup||"Labor"))].sort(); state.issues=Array.isArray(payload.issues)?payload.issues:[]; state.loaded=true;
   populateFilters(); applyFilters();
 }
 async function loadSnapshotFile(file){ const text=await file.text(); loadSnapshotObject(JSON.parse(text)); }
