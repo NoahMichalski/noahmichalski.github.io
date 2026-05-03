@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VIP Quadrant Week / Month Review Dashboard v1.88</title>
+  <title>VIP Quadrant Week / Month Review Dashboard v1.90</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -51,6 +51,11 @@
 
     .lotHistoryScroll{max-height:560px;overflow:auto;padding-right:6px}.lotHistoryTable{table-layout:fixed;width:100%;border-spacing:0 8px}.lotHistoryTable th{position:sticky;top:0;z-index:5;background:#12233a;padding:9px 10px}.lotHistoryTable th:nth-child(1){width:210px}.lotHistoryTable th:nth-child(2){width:170px}.lotHistoryTable th:nth-child(4){width:230px}.lotHistoryTable td{vertical-align:top}.lotTaskRows{display:grid;gap:6px}.lotTaskLine{display:grid;grid-template-columns:115px 1fr 72px;gap:8px;align-items:start;padding:6px 8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.025);line-height:1.25}.lotTaskLine .taskDate{color:var(--muted);font-size:12px;white-space:nowrap}.lotTaskLine .taskName{font-weight:900;min-width:0;overflow-wrap:anywhere}.lotTaskLine .taskHours{text-align:right;color:var(--muted);font-size:12px;white-space:nowrap}.summaryStack{display:grid;gap:6px}.summaryChip{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:7px 9px;background:rgba(255,255,255,.03)}.summaryChip b{white-space:nowrap}.summaryChip small{color:var(--muted);white-space:nowrap}.laborText{color:var(--bad)!important}.cleaningText{color:var(--good)!important}.popupSplit{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.popupBox{border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:8px;background:rgba(255,255,255,.04)}.popupBox b{display:block;margin-bottom:4px}.popupLabor{border-color:rgba(255,92,122,.5);background:rgba(255,92,122,.08)}.popupCleaning{border-color:rgba(55,214,122,.5);background:rgba(55,214,122,.08)}.pressureBlock{display:grid;gap:6px;margin:10px 0;padding:9px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03)}.pressureTitle{font-weight:950}.pressureMetric{display:flex;align-items:center;justify-content:space-between;gap:10px}.pressureMetric span{color:var(--muted)}.pressureMetric b{white-space:nowrap}.trendSummary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.trendSummaryBox{border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03);padding:9px}.trendSummaryBox b{display:block;margin-bottom:4px}.trendSummaryBox span{display:block;line-height:1.35}.savedStatus b{margin-right:4px}.savedStatus{gap:4px}.stickyHead th{position:sticky;top:0;z-index:5;background:#12233a;padding-top:9px;padding-bottom:9px}
     @media(max-width:1000px){.workflowGrid{grid-template-columns:1fr}.mapTools{grid-template-columns:1fr}.trendRow{grid-template-columns:90px 1fr 58px}.lotGrid{grid-template-columns:1fr}.mapHeader .field{min-width:100%}.daySnapshot{grid-template-columns:repeat(2,minmax(120px,1fr))}.lotHistoryTable th:nth-child(1){width:170px}.lotHistoryTable th:nth-child(2){width:130px}.lotHistoryTable th:nth-child(4){width:170px}.lotTaskLine{grid-template-columns:95px 1fr;}.lotTaskLine .taskHours{text-align:left}}
+
+    .topTabs{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 4px}.topTab{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer}.topTab.active{background:rgba(55,189,248,.18);border-color:var(--accent);box-shadow:0 0 0 1px rgba(55,189,248,.15) inset}.tabPage{display:none}.tabPage.active{display:block}
+    .actualGrid{display:grid;grid-template-columns:repeat(4,minmax(170px,1fr));gap:16px;margin:16px 0}.actualUploadGrid{grid-template-columns:repeat(3,minmax(220px,1fr));margin-top:16px}.actualBadge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:12px;font-weight:900;background:rgba(255,255,255,.06);color:var(--muted)}.actualGood{color:var(--good)}.actualBad{color:var(--bad)}.actualWarn{color:var(--warn)}.actualNote{padding:12px;border:1px solid rgba(55,214,122,.35);background:rgba(55,214,122,.08);border-radius:14px;color:var(--muted);line-height:1.35;margin-top:12px}.actualNote b{color:var(--text)}.variancePos{color:var(--bad);font-weight:950}.varianceNeg{color:var(--good);font-weight:950}.varianceZero{color:var(--muted);font-weight:950}.miniTableWrap{max-height:440px;overflow:auto}.actualIssue{border-left:4px solid var(--warn);padding:10px;margin:8px 0;background:rgba(255,209,102,.08);border-radius:12px;color:#ffedbd}
+    @media(max-width:1000px){.actualGrid,.actualUploadGrid{grid-template-columns:1fr}}
+
   </style>
 </head>
 <body>
@@ -61,10 +66,12 @@
       <div class="sub">Upload subdivisions + task hours + labor and cleaning daily files. Review a day, week, month, or the whole batch on a map.</div>
     </div>
     <details class="versionBox">
-      <summary class="version">v1.88 • Cleanup revert + spacing fixes ▾</summary>
+      <summary class="version">v1.90 • Actuals tab version note ▾</summary>
       <div class="versionDrop">
         <h3>Version history</h3>
         <ul>
+          <li><b>v1.90</b> — Added missing version-history entry for the Cleaning Actuals tab and clarified that actuals are currently separate until cross-reference matching is added.</li>
+          <li><b>v1.89</b> — Added separate Cleaning Actuals tab for testing actual-vs-budget cleaning hours without changing map, quadrant, workload, or saved review totals.</li>
           <li><b>v1.88</b> — Reverted Lot History to a structured scrollable layout, fixed spacing in map stats/trend summaries, color-coded Labor/Cleaning in map popups, and cleaned saved review status text spacing.</li>
           <li><b>v1.87</b> — Converted Lot History into responsive cards with no horizontal scroll, added labor/cleaning summary to map popups, added busiest quadrants by hours and jobs, added busiest day by job count, and froze table headers.</li>
           <li><b>v1.86</b> — Made version history scrollable/compact, added Lot History search, and updated Labor “Other” handling so Notes becomes the real task and Hours only applies to Other/custom labor rows.</li>
@@ -89,6 +96,11 @@
   </div>
 </header>
 <main class="wrap">
+  <nav class="topTabs">
+    <button class="topTab active" data-tab="reviewTab">Workload Review</button>
+    <button class="topTab" data-tab="actualsTab">Cleaning Actuals</button>
+  </nav>
+  <section id="reviewTab" class="tabPage active">
   <section class="grid uploads">
     <div class="upload"><label>1) Subdivisions file</label><small>Only needed when creating a new review from Excel. Saved review JSON already includes this.</small><input id="subsFile" type="file" accept=".xlsx,.xls,.csv" /></div>
     <div class="upload"><label>2) Task Types file</label><small>Labor task hours and fallback cleaning task hours. Saved review JSON already includes calculated job hours.</small><input id="tasksFile" type="file" accept=".xlsx,.xls,.csv" /></div>
@@ -208,6 +220,60 @@
     <div class="scroll"><table id="jobTable"></table></div>
   </section>
 
+
+  </section>
+
+  <section id="actualsTab" class="tabPage">
+    <section class="grid actualUploadGrid">
+      <div class="upload">
+        <label>1) Floor Plans / Lot Hours</label>
+        <small>Optional if already loaded in the main review. Needed to compare Actual vs Budget for Original/Reclean/Windows.</small>
+        <input id="actualFloorPlansFile" type="file" accept=".xlsx,.xls,.csv" />
+      </div>
+      <div class="upload">
+        <label>2) Cleaning Actual Hours files</label>
+        <small>Select one or more actual-hours files. File names are used as work dates. Labor is not tracked here.</small>
+        <input id="actualFiles" type="file" accept=".xlsx,.xls,.csv" multiple />
+      </div>
+      <div class="upload">
+        <label>Actuals Rules</label>
+        <small>Original/Reclean/Windows compare to Floor Plans budget. Other uses Notes as the task name. Actual Hours is kept separate from the map and workload review totals.</small>
+        <button id="loadActualsBtn" class="btn primary" style="margin-top:12px;width:100%">Load Cleaning Actuals</button>
+      </div>
+    </section>
+
+    <div class="actualNote"><b>Cleaning Actuals are separate.</b> This tab does not change the map, quadrant totals, workload hours, saved review dropdown, or labor numbers. It is only for reviewing cleaning efficiency when actual-hours files are uploaded.</div>
+
+    <section class="actualGrid" id="actualCards"></section>
+
+    <section class="grid two" style="margin-top:16px">
+      <div class="panel">
+        <div class="sectionTitle"><h2>Efficiency by Crew</h2><span class="muted">actual vs budget</span></div>
+        <div class="miniTableWrap"><table id="actualCrewTable"></table></div>
+      </div>
+      <div class="panel">
+        <div class="sectionTitle"><h2>Efficiency by Cleaning Task</h2><span class="muted">Original / Reclean / Windows / Other</span></div>
+        <div class="miniTableWrap"><table id="actualTaskTable"></table></div>
+      </div>
+    </section>
+
+    <section class="grid two" style="margin-top:16px">
+      <div class="panel">
+        <div class="sectionTitle"><h2>Efficiency by Floor Plan</h2><span class="muted">where budget match exists</span></div>
+        <div class="miniTableWrap"><table id="actualFloorplanTable"></table></div>
+      </div>
+      <div class="panel">
+        <div class="sectionTitle"><h2>Actuals Issues</h2><span class="pill dark" id="actualIssueCount">0</span></div>
+        <div id="actualIssues" class="scroll"></div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:16px">
+      <div class="sectionTitle"><h2>Cleaning Actual Detail</h2><span class="muted" id="actualDetailCount">0 rows</span></div>
+      <div class="scroll"><table id="actualDetailTable"></table></div>
+    </section>
+  </section>
+
   <div id="taskModal" class="modalBack" aria-hidden="true">
     <div class="modalCard">
       <div class="modalHead">
@@ -225,7 +291,7 @@
 <script>
 const COLUMBUS = { lat:39.9612, lon:-82.9988 };
 const QUADS = ["NW","NE","SW","SE"];
-let state = { subs:[], tasks:[], floorPlans:[], floorIndex:new Map(), rawJobs:[], jobs:[], filtered:[], filteredAllTypes:[], issues:[], map:null, layers:[], loaded:false, workTypes:[] };
+let state = { subs:[], tasks:[], floorPlans:[], floorIndex:new Map(), rawJobs:[], jobs:[], filtered:[], filteredAllTypes:[], issues:[], map:null, layers:[], loaded:false, workTypes:[], actuals:[], actualIssues:[] };
 
 // GitHub Pages saved-review auto-detect.
 // The dashboard looks in this public repo folder for files named quadrant-review*.json.
@@ -244,6 +310,7 @@ const SAVED_REVIEW_FILES = [
 let savedReviewRecords = [];
 
 const colAliases = {
+  crew:["Crew","Cleaner","Cleaners","Team","Employee"], actualHours:["Actual Hours","Actual","Actual Hrs","Hours Worked","Worked Hours","Man Hours","Hours"],
   builder:["Builder","builder","Company","Account"], subdivision:["Subdivision","Community","Project","Neighborhood","Subdivision Name"], lot:["Lot","Lot #","Lot Number","Plat Lot","Lot/Block"], task:["Task","Description","Job","Job Type","Type"], notes:["Notes","Note","Directions"], hours:["Hours","Man Hours","ManHours","MH","Budget Hours"], am:["AM Job","AM","AM/PM"], lat:["Lat","Latitude"], lon:["Lon","Lng","Long","Longitude"], address:["Address","Street Address"], quadrant:["Quadrant","Area","Zone"], floorplan:["Floor Plan","FloorPlan","Plan"], abbreviation:["Abbreviation","Abbrev","Short"], original:["Original","Original Hours"], reclean:["Reclean","Reclean Hours"], windows:["Windows","Window","Window Hours","Windows Hours"]
 };
 function norm(v){return String(v??"").toLowerCase().trim().replace(/[’']/g,"").replace(/&/g,"and").replace(/[^a-z0-9]+/g," ").replace(/\s+/g," ").trim();}
@@ -396,7 +463,7 @@ async function loadAndCompute(){
     return {...j, taskDisplay, subMatch:sub, lat:sub?.lat||0, lon:sub?.lon||0, quadrant, hours:h.hours, hoursSource:h.source};
   });
   state.workTypes=[...new Set(state.jobs.map(j=>j.workGroup))].sort();
-  state.loaded=true; populateFilters(); applyFilters();
+  state.loaded=true; populateFilters(); applyFilters(); if(state.actuals && state.actuals.length) renderActuals();
 }
 function populateFilters(){
   const days=[...new Set(state.jobs.map(j=>j.date))].sort();
@@ -635,11 +702,94 @@ function openLotTimeline(builder, sub, lot, q){
   const modal=document.getElementById('taskModal'); modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
 }
 
+
+function realTaskFromOther(task, notes){
+  const t=norm(task), n=String(notes||"").trim();
+  if(t==="other" || t.includes("other")) return n || "Other";
+  return String(task||"Other").trim() || "Other";
+}
+function makeActualRow(r,file,idx){
+  const rawTask=String(get(r,"task")||"").trim();
+  const notes=String(get(r,"notes")||"").trim();
+  const task=realTaskFromOther(rawTask,notes);
+  return { sourceFile:file.name, date:parseDateFromFileName(file.name), row:idx+2, crew:String(get(r,"crew")||"").trim()||"Unknown", builder:String(get(r,"builder")||"").trim(), subdivision:String(get(r,"subdivision")||"").trim(), lot:String(get(r,"lot")||"").trim(), rawTask, task, notes, actualHours:num(get(r,"actualHours")), raw:r };
+}
+function budgetForActual(a){
+  const key=norm(a.task);
+  if(!["original","reclean","windows"].includes(key)) return {budget:null, floorplan:"", source:"custom/other task"};
+  const fp=findFloorPlan({builder:a.builder, subdivision:a.subdivision, lot:a.lot});
+  if(!fp) return {budget:null, floorplan:"", source:"no floor plan match", issue:`Actuals • ${a.sourceFile} row ${a.row}: No Floor Plans match for ${a.subdivision} lot ${a.lot} (${a.task}).`};
+  const budget = key==="original" ? fp.original : key==="reclean" ? fp.reclean : fp.windows;
+  if(!budget) return {budget:null, floorplan:fp.floorplan||"", source:"missing budget", issue:`Actuals • ${a.sourceFile} row ${a.row}: Floor Plan matched ${a.subdivision} lot ${a.lot}, but ${a.task} budget is blank/0.`};
+  return {budget, floorplan:fp.floorplan||"", source:"floor plans"};
+}
+async function loadActuals(){
+  state.actuals=[]; state.actualIssues=[];
+  const fpFile=document.getElementById("actualFloorPlansFile")?.files?.[0] || document.getElementById("floorPlansFile")?.files?.[0];
+  if(fpFile){ const fpRows=await readRows(fpFile); state.floorPlans=fpRows.map(makeFloorPlan).filter(fp=>fp.subdivision && fp.lot); state.floorIndex=buildFloorIndex(state.floorPlans); }
+  const files=[...document.getElementById("actualFiles").files];
+  if(!files.length){ renderActualsEmpty("Upload at least one Cleaning Actual Hours file."); return; }
+  for(const f of files){ const rows=await readRows(f); rows.forEach((r,i)=>state.actuals.push(makeActualRow(r,f,i))); }
+  state.actuals=state.actuals.filter(a=>a.crew||a.builder||a.subdivision||a.lot||a.task||a.actualHours);
+  state.actuals=state.actuals.map(a=>{
+    const b=budgetForActual(a);
+    if(norm(a.rawTask).includes("other") && !a.notes) state.actualIssues.push({msg:`Actuals • ${a.sourceFile} row ${a.row}: Other task has no Notes value, so task name is shown as Other.`});
+    if(!a.actualHours) state.actualIssues.push({msg:`Actuals • ${a.sourceFile} row ${a.row}: Actual Hours is blank/0 for ${a.subdivision} lot ${a.lot} (${a.task}).`});
+    if(b.issue) state.actualIssues.push({msg:b.issue});
+    const variance = b.budget==null ? null : a.actualHours - b.budget;
+    const efficiency = b.budget && a.actualHours ? (b.budget / a.actualHours * 100) : null;
+    return {...a, budgetHours:b.budget, floorplan:b.floorplan, budgetSource:b.source, variance, efficiency};
+  });
+  renderActuals();
+}
+function actualSums(rows){
+  const actual=rows.reduce((a,r)=>a+(Number(r.actualHours)||0),0);
+  const budget=rows.reduce((a,r)=>a+(Number(r.budgetHours)||0),0);
+  const matched=rows.filter(r=>r.budgetHours!=null).length;
+  return {jobs:rows.length, actual, budget, variance: actual-budget, matched, crews:new Set(rows.map(r=>r.crew).filter(Boolean)).size};
+}
+function efficiencyText(v){ return v==null ? "—" : `${fmt(v)}%`; }
+function varianceClass(v){ if(v==null || Math.abs(v)<.01) return "varianceZero"; return v>0 ? "variancePos" : "varianceNeg"; }
+function varianceText(v){ return v==null ? "—" : `${v>0?"+":""}${fmt(v)} hrs`; }
+function renderActualsEmpty(msg="No actuals loaded yet."){
+  document.getElementById("actualCards").innerHTML=`<div class="stat" style="grid-column:1/-1"><h3>Status</h3><div class="num" style="font-size:20px">${safe(msg)}</div><p>Upload actual cleaning hours to review efficiency.</p></div>`;
+  ["actualCrewTable","actualTaskTable","actualFloorplanTable","actualDetailTable"].forEach(id=>document.getElementById(id).innerHTML="");
+  document.getElementById("actualIssues").innerHTML=`<div class="empty">No actuals loaded.</div>`;
+  document.getElementById("actualIssueCount").textContent="0";
+  document.getElementById("actualDetailCount").textContent="0 rows";
+}
+function renderActuals(){ renderActualCards(); renderActualCrewTable(); renderActualTaskTable(); renderActualFloorplanTable(); renderActualDetailTable(); renderActualIssues(); }
+function renderActualCards(){
+  const s=actualSums(state.actuals); const eff=s.budget&&s.actual?s.budget/s.actual*100:null;
+  const rows=[
+    ["Actual Hours",fmt(s.actual),`${s.jobs} cleaning actual rows`,""],
+    ["Budget Hours",fmt(s.budget),`${s.matched} rows matched to budget`,"good"],
+    ["Variance",varianceText(s.variance),s.variance>0?"over budget":"under/on budget",s.variance>0?"bad":"good"],
+    ["Efficiency",efficiencyText(eff),`${s.crews} crews`,"purple"]
+  ];
+  document.getElementById("actualCards").innerHTML=rows.map(c=>`<div class="stat ${c[3]}"><h3>${safe(c[0])}</h3><div class="num">${safe(c[1])}</div><p>${safe(c[2])}</p></div>`).join("");
+}
+function renderActualGroupTable(id, rows, groupFn, labelName){
+  const list=[...groupBy(rows,groupFn).entries()].map(([name,items])=>({name, ...actualSums(items), rows:items})).sort((a,b)=>b.actual-a.actual||b.jobs-a.jobs);
+  document.getElementById(id).innerHTML=`<thead><tr><th>${safe(labelName)}</th><th class="right">Actual</th><th class="right">Budget</th><th class="right">Variance</th><th class="right">Efficiency</th><th class="right">Jobs</th></tr></thead><tbody>${list.map(r=>{ const eff=r.budget&&r.actual?r.budget/r.actual*100:null; return `<tr><td><b>${safe(r.name||"—")}</b></td><td class="right"><b>${fmt(r.actual)}</b></td><td class="right">${fmt(r.budget)}</td><td class="right"><span class="${varianceClass(r.variance)}">${varianceText(r.variance)}</span></td><td class="right">${efficiencyText(eff)}</td><td class="right">${r.jobs}</td></tr>`; }).join("")}</tbody>`;
+}
+function renderActualCrewTable(){ renderActualGroupTable("actualCrewTable",state.actuals,r=>r.crew||"Unknown","Crew"); }
+function renderActualTaskTable(){ renderActualGroupTable("actualTaskTable",state.actuals,r=>r.task||"Other","Task"); }
+function renderActualFloorplanTable(){ renderActualGroupTable("actualFloorplanTable",state.actuals.filter(r=>r.floorplan),r=>r.floorplan||"No Floorplan","Floor Plan"); }
+function renderActualDetailTable(){
+  document.getElementById("actualDetailCount").textContent=`${state.actuals.length} rows`;
+  document.getElementById("actualDetailTable").innerHTML=`<thead><tr><th>Date</th><th>Crew</th><th>Builder / Subdivision</th><th>Lot</th><th>Task</th><th>Floor Plan</th><th class="right">Actual</th><th class="right">Budget</th><th class="right">Variance</th><th class="right">Efficiency</th></tr></thead><tbody>${state.actuals.map(r=>`<tr><td><b>${safe(displayDate(r.date))}</b><br><span class="muted">${safe(r.sourceFile)}</span></td><td>${safe(r.crew)}</td><td><b>${safe(r.builder)}</b><br>${safe(r.subdivision)}</td><td>${safe(r.lot)}</td><td><b>${safe(r.task)}</b>${r.notes?`<br><span class="muted">${safe(r.notes)}</span>`:""}</td><td>${safe(r.floorplan||"—")}</td><td class="right"><b>${fmt(r.actualHours)}</b></td><td class="right">${r.budgetHours==null?"—":fmt(r.budgetHours)}</td><td class="right"><span class="${varianceClass(r.variance)}">${varianceText(r.variance)}</span></td><td class="right">${efficiencyText(r.efficiency)}</td></tr>`).join("")}</tbody>`;
+}
+function renderActualIssues(){
+  document.getElementById("actualIssueCount").textContent=state.actualIssues.length;
+  document.getElementById("actualIssues").innerHTML=state.actualIssues.length?state.actualIssues.map(i=>`<div class="actualIssue">${safe(i.msg)}</div>`).join(""):`<div class="empty">No actuals issues found.</div>`;
+}
+
 function exportSnapshot(){
   if(!state.loaded){ alert("Load and calculate your Excel files first."); return; }
   const payload={
     app:"VIP Quadrant Man-Hour Review",
-    version:"1.88",
+    version:"1.90",
     exportedAt:new Date().toISOString(),
     columbusCenter:COLUMBUS,
     subdivisions:state.subs,
@@ -647,7 +797,9 @@ function exportSnapshot(){
     floorPlans:state.floorPlans,
     jobs:state.jobs,
     issues:state.issues,
-    workTypes:[...new Set(state.jobs.map(j=>j.workGroup||"Labor"))]
+    workTypes:[...new Set(state.jobs.map(j=>j.workGroup||"Labor"))],
+    actuals:state.actuals,
+    actualIssues:state.actualIssues
   };
   const dates=[...new Set(state.jobs.map(j=>j.date).filter(Boolean))].sort();
   const name=dates.length?`quadrant-review-${dates[0]}-to-${dates[dates.length-1]}.json`:"quadrant-review-data.json";
@@ -659,8 +811,8 @@ function loadSnapshotObject(payload){
   state.subs=Array.isArray(payload.subdivisions)?payload.subdivisions:[];
   state.tasks=Array.isArray(payload.taskTypes)?payload.taskTypes:[];
   state.floorPlans=Array.isArray(payload.floorPlans)?payload.floorPlans:[]; state.floorIndex=buildFloorIndex(state.floorPlans);
-  state.rawJobs=[]; state.jobs=payload.jobs.map(j=>{ const workGroup=j.workGroup||"Labor"; const taskDisplay = workGroup==="Cleaning" ? canonicalCleaningTask(j.task,j.notes) : (j.taskDisplay || j.task || "Other"); return {week:j.week||isoWeek(j.date),month:j.month||monthKey(j.date),...j,workGroup,taskDisplay}; }); state.workTypes=[...new Set(state.jobs.map(j=>j.workGroup||"Labor"))].sort(); state.issues=Array.isArray(payload.issues)?payload.issues:[]; state.loaded=true;
-  populateFilters(); applyFilters();
+  state.rawJobs=[]; state.jobs=payload.jobs.map(j=>{ const workGroup=j.workGroup||"Labor"; const taskDisplay = workGroup==="Cleaning" ? canonicalCleaningTask(j.task,j.notes) : (j.taskDisplay || j.task || "Other"); return {week:j.week||isoWeek(j.date),month:j.month||monthKey(j.date),...j,workGroup,taskDisplay}; }); state.workTypes=[...new Set(state.jobs.map(j=>j.workGroup||"Labor"))].sort(); state.issues=Array.isArray(payload.issues)?payload.issues:[]; state.actuals=Array.isArray(payload.actuals)?payload.actuals:[]; state.actualIssues=Array.isArray(payload.actualIssues)?payload.actualIssues:[]; state.loaded=true;
+  populateFilters(); applyFilters(); if(state.actuals && state.actuals.length) renderActuals();
 }
 async function loadSnapshotFile(file){ const text=await file.text(); loadSnapshotObject(JSON.parse(text)); }
 function labelFromReviewFile(name){
@@ -737,6 +889,7 @@ async function loadHostedSnapshot(fileName){
 }
 
 document.getElementById("calcBtn").addEventListener("click",()=>loadAndCompute().catch(err=>{console.error(err); setStatusCards("Error: "+err.message);}));
+document.getElementById("loadActualsBtn").addEventListener("click",()=>loadActuals().catch(err=>{console.error(err); renderActualsEmpty("Actuals error: "+err.message);}));
 ["mode","workType","daySelect","weekSelect","monthSelect","search"].forEach(id=>document.getElementById(id).addEventListener(id==="search"?"input":"change",()=>{ if(state.loaded) applyFilters(); }));
 document.getElementById("lotHistorySearch").addEventListener("input",()=>{ if(state.loaded) renderLotBreakdown(); });
 document.getElementById("fitBtn").addEventListener("click",()=>renderMap());
@@ -752,6 +905,8 @@ document.getElementById("reviewJsonFile").addEventListener("change",e=>{ const f
 document.getElementById("loadHostedBtn").addEventListener("click",()=>loadHostedSnapshot().catch(err=>{console.error(err); setStatusCards(err.message); alert(err.message+"\n\nMake sure the JSON file is public, starts with quadrant-review, ends with .json, and is in the main folder of NoahMichalski/noahmichalski.github.io.");}));
 document.getElementById("refreshReviewsBtn").addEventListener("click",()=>populateSavedReviews());
 document.getElementById("copyBtn").addEventListener("click",async()=>{ await navigator.clipboard.writeText(summaryText()); const b=document.getElementById("copyBtn"); const old=b.textContent; b.textContent="Copied!"; setTimeout(()=>b.textContent=old,1200); });
+document.querySelectorAll(".topTab").forEach(btn=>btn.addEventListener("click",()=>{ document.querySelectorAll(".topTab").forEach(b=>b.classList.remove("active")); document.querySelectorAll(".tabPage").forEach(p=>p.classList.remove("active")); btn.classList.add("active"); document.getElementById(btn.dataset.tab).classList.add("active"); if(btn.dataset.tab==="reviewTab" && state.map) setTimeout(()=>state.map.invalidateSize(),120); }));
+renderActualsEmpty();
 populateSavedReviews();
 document.getElementById("summaryCards").innerHTML="";
 initMap();
