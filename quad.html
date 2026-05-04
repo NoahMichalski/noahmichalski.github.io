@@ -3,38 +3,38 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VIP Quadrant Week / Month Review Dashboard v1.90</title>
+  <title>VIP Quadrant Week / Month Review Dashboard v1.94</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     :root{
-      --bg:#07111f; --panel:#0d1b2f; --panel2:#12233a; --card:#0f2038; --line:#263c5c;
+      --bg:#05070b; --panel:#0b0f16; --panel2:#111823; --card:#0e141d; --line:#273244;
       --text:#eaf2ff; --muted:#92a5bf; --accent:#37bdf8; --good:#37d67a; --warn:#ffd166; --bad:#ff5c7a; --purple:#b197fc;
       --nw:#37bdf8; --ne:#37d67a; --sw:#ffd166; --se:#ff5c7a; --radius:18px; --shadow:0 18px 50px rgba(0,0,0,.35);
     }
     *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;background:radial-gradient(circle at top left,rgba(55,189,248,.18),transparent 30%),linear-gradient(180deg,#07111f,#081426 55%,#060d18);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
-    header{position:sticky;top:0;z-index:1000;background:rgba(7,17,31,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
+    body{margin:0;background:radial-gradient(circle at top left,rgba(55,189,248,.10),transparent 28%),linear-gradient(180deg,#04060a,#070a10 55%,#030407);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+    header{position:sticky;top:0;z-index:1000;background:rgba(4,6,10,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
     .wrap{max-width:1500px;margin:0 auto;padding:18px;}
     .top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
     h1{margin:0;font-size:clamp(22px,3vw,34px);letter-spacing:-.04em}.sub{color:var(--muted);margin-top:5px;font-size:14px}.version{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.04)}
-    .versionBox{position:relative}.versionDrop{position:absolute;right:0;top:42px;width:min(430px,90vw);max-height:430px;overflow:auto;background:#0d1b2f;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:10px;z-index:2000}.versionDrop h3{margin:0 0 8px;font-size:14px}.versionDrop ul{margin:0;padding-left:16px;color:var(--muted);line-height:1.28;font-size:12px}.versionDrop li{margin:4px 0}.versionDrop b{color:var(--text)}details.versionBox summary{list-style:none;cursor:pointer}details.versionBox summary::-webkit-details-marker{display:none}.dataNote{margin-top:12px;padding:12px;border:1px solid rgba(55,189,248,.35);background:rgba(55,189,248,.08);border-radius:14px;color:var(--muted);line-height:1.35}.dataNote b{color:var(--text)}
+    .versionBox{position:relative}.versionDrop{position:absolute;right:0;top:42px;width:min(430px,90vw);max-height:430px;overflow:auto;background:#0b0f16;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:10px;z-index:2000}.versionDrop h3{margin:0 0 8px;font-size:14px}.versionDrop ul{margin:0;padding-left:16px;color:var(--muted);line-height:1.28;font-size:12px}.versionDrop li{margin:4px 0}.versionDrop b{color:var(--text)}details.versionBox summary{list-style:none;cursor:pointer}details.versionBox summary::-webkit-details-marker{display:none}.dataNote{margin-top:12px;padding:12px;border:1px solid rgba(55,189,248,.35);background:rgba(55,189,248,.08);border-radius:14px;color:var(--muted);line-height:1.35}.dataNote b{color:var(--text)}
     .grid{display:grid;gap:16px}.uploads{grid-template-columns:repeat(5,minmax(200px,1fr));margin-top:16px}.dashboard{grid-template-columns:390px 1fr;align-items:start}.cards{grid-template-columns:repeat(4,minmax(160px,1fr));margin:16px 0}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}
     @media(max-width:1000px){.uploads,.dashboard,.cards,.two,.three{grid-template-columns:1fr}.mapPanel{min-height:520px}}
-    .panel,.upload,.stat,.miniCard{background:linear-gradient(180deg,rgba(18,35,58,.97),rgba(13,27,47,.97));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .panel,.upload,.stat,.miniCard{background:linear-gradient(180deg,rgba(14,20,29,.97),rgba(8,12,18,.97));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
     .panel{padding:16px}.upload{padding:14px}.upload label{font-weight:800;display:block;margin-bottom:8px}.upload small,.hint{display:block;color:var(--muted);line-height:1.35}.upload input{width:100%;margin-top:12px;color:var(--muted)}
-    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:16px 0}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}select,input[type="search"],input[type="date"]{background:#081427;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:40px;outline:none}input[type="search"]{min-width:280px}.btn{border:1px solid var(--line);background:linear-gradient(180deg,#16304f,#10243d);color:var(--text);border-radius:12px;padding:10px 13px;font-weight:800;cursor:pointer;min-height:40px}.btn:hover{border-color:var(--accent);transform:translateY(-1px)}.btn.primary{background:linear-gradient(180deg,#0891c9,#0e7490);border-color:#22b8e8}.btn.ghost{background:rgba(255,255,255,.05)}
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:16px 0}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}select,input[type="search"],input[type="date"]{background:#070a10;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:40px;outline:none}input[type="search"]{min-width:280px}.btn{border:1px solid var(--line);background:linear-gradient(180deg,#111c2b,#0b111a);color:var(--text);border-radius:12px;padding:10px 13px;font-weight:800;cursor:pointer;min-height:40px}.btn:hover{border-color:var(--accent);transform:translateY(-1px)}.btn.primary{background:linear-gradient(180deg,#0891c9,#0e7490);border-color:#22b8e8}.btn.ghost{background:rgba(255,255,255,.05)}
     .stat{padding:16px;position:relative;overflow:hidden}.stat:before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--accent)}.stat h3{margin:0;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.09em}.stat .num{font-size:30px;font-weight:950;letter-spacing:-.04em;margin-top:8px}.stat p{margin:5px 0 0;color:var(--muted);font-size:13px}.stat.good:before{background:var(--good)}.stat.warn:before{background:var(--warn)}.stat.bad:before{background:var(--bad)}.stat.purple:before{background:var(--purple)}
-    .quadList{display:grid;gap:12px}.quad{border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:16px;padding:13px}.quadHead{display:flex;align-items:center;justify-content:space-between;gap:10px}.quadName{font-weight:950;font-size:18px}.pill{font-size:12px;font-weight:900;border:1px solid var(--line);border-radius:999px;padding:5px 8px;color:#06101e}.pill.dark{color:var(--text);background:rgba(255,255,255,.05)}.qNW{background:var(--nw)}.qNE{background:var(--ne)}.qSW{background:var(--sw)}.qSE{background:var(--se)}.bar{height:9px;border-radius:999px;background:#081427;border:1px solid var(--line);overflow:hidden;margin-top:10px}.bar>span{display:block;height:100%;width:0;background:var(--accent)}.quadMeta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.quadMeta div{background:rgba(0,0,0,.18);border-radius:12px;padding:8px}.quadMeta b{display:block;font-size:16px}.quadMeta small{color:var(--muted)}
-    #map{height:720px;min-height:520px;border-radius:18px;border:1px solid var(--line);overflow:hidden;background:#07111f}.mapPanel{padding:12px}.leaflet-container{background:#081426}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0d1b2f;color:var(--text);border:1px solid var(--line)}.leaflet-popup-content{margin:12px;min-width:230px}.markerDot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#06101e;font-weight:950;border:3px solid rgba(255,255,255,.9);box-shadow:0 8px 24px rgba(0,0,0,.5);font-size:14px}.lineLabel{background:rgba(7,17,31,.9);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:4px 8px;font-weight:900;font-size:12px;box-shadow:0 8px 25px rgba(0,0,0,.35)}.quadLabel{background:rgba(7,17,31,.94);color:var(--text);border:1px solid var(--line);border-radius:16px;padding:10px 12px;min-width:145px;box-shadow:0 12px 30px rgba(0,0,0,.45)}.quadLabel b{font-size:20px}.quadLabel span{display:block;color:var(--muted);font-size:12px;margin-top:2px}.quadShadeLabel{background:rgba(7,17,31,.75);border:1px solid rgba(255,255,255,.25);color:var(--text);border-radius:999px;padding:4px 9px;font-weight:950;font-size:12px}
-    table{width:100%;border-collapse:separate;border-spacing:0 8px} .scroll th{position:sticky;top:0;z-index:5;background:#12233a;padding-top:9px;padding-bottom:9px} th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;text-align:left;padding:0 10px}td{background:rgba(255,255,255,.04);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px;vertical-align:top}td:first-child{border-left:1px solid var(--line);border-radius:12px 0 0 12px}td:last-child{border-right:1px solid var(--line);border-radius:0 12px 12px 0}.muted{color:var(--muted)}.right{text-align:right}.sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.sectionTitle h2{margin:0;font-size:18px}.scroll{max-height:430px;overflow:auto;padding-right:5px}.issue{border-left:4px solid var(--warn);padding:10px;margin:8px 0;background:rgba(255,209,102,.08);border-radius:12px;color:#ffedbd}.empty{border:1px dashed var(--line);border-radius:16px;padding:22px;text-align:center;color:var(--muted)}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab{padding:9px 12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:999px;cursor:pointer;font-weight:900}.tab.active{background:rgba(55,189,248,.18);border-color:var(--accent)}
+    .quadList{display:grid;gap:12px}.quad{border:1px solid var(--line);background:rgba(255,255,255,.04);border-radius:16px;padding:13px}.quadHead{display:flex;align-items:center;justify-content:space-between;gap:10px}.quadName{font-weight:950;font-size:18px}.pill{font-size:12px;font-weight:900;border:1px solid var(--line);border-radius:999px;padding:5px 8px;color:#06101e}.pill.dark{color:var(--text);background:rgba(255,255,255,.05)}.qNW{background:var(--nw)}.qNE{background:var(--ne)}.qSW{background:var(--sw)}.qSE{background:var(--se)}.bar{height:9px;border-radius:999px;background:#070a10;border:1px solid var(--line);overflow:hidden;margin-top:10px}.bar>span{display:block;height:100%;width:0;background:var(--accent)}.quadMeta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.quadMeta div{background:rgba(0,0,0,.18);border-radius:12px;padding:8px}.quadMeta b{display:block;font-size:16px}.quadMeta small{color:var(--muted)}
+    #map{height:720px;min-height:520px;border-radius:18px;border:1px solid var(--line);overflow:hidden;background:#05070b}.mapPanel{padding:12px}.leaflet-container{background:#05070b}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0b0f16;color:var(--text);border:1px solid var(--line)}.leaflet-popup-content{margin:12px;min-width:230px}.markerDot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#06101e;font-weight:950;border:3px solid rgba(255,255,255,.9);box-shadow:0 8px 24px rgba(0,0,0,.5);font-size:14px}.lineLabel{background:rgba(4,6,10,.9);border:1px solid var(--line);color:var(--text);border-radius:999px;padding:4px 8px;font-weight:900;font-size:12px;box-shadow:0 8px 25px rgba(0,0,0,.35)}.centerDot{width:12px;height:12px;border-radius:50%;background:#050505;border:2px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.55),0 8px 18px rgba(0,0,0,.55)}.quadLabel{background:rgba(7,17,31,.94);color:var(--text);border:1px solid var(--line);border-radius:16px;padding:10px 12px;min-width:145px;box-shadow:0 12px 30px rgba(0,0,0,.45)}.quadLabel b{font-size:20px}.quadLabel span{display:block;color:var(--muted);font-size:12px;margin-top:2px}.quadShadeLabel{background:rgba(7,17,31,.75);border:1px solid rgba(255,255,255,.25);color:var(--text);border-radius:999px;padding:4px 9px;font-weight:950;font-size:12px}
+    table{width:100%;border-collapse:separate;border-spacing:0 8px} .scroll th{position:sticky;top:0;z-index:5;background:#111823;padding-top:9px;padding-bottom:9px} th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;text-align:left;padding:0 10px}td{background:rgba(255,255,255,.04);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px;vertical-align:top}td:first-child{border-left:1px solid var(--line);border-radius:12px 0 0 12px}td:last-child{border-right:1px solid var(--line);border-radius:0 12px 12px 0}.muted{color:var(--muted)}.right{text-align:right}.sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.sectionTitle h2{margin:0;font-size:18px}.scroll{max-height:430px;overflow:auto;padding-right:5px}.issue{border-left:4px solid var(--warn);padding:10px;margin:8px 0;background:rgba(255,209,102,.08);border-radius:12px;color:#ffedbd}.empty{border:1px dashed var(--line);border-radius:16px;padding:22px;text-align:center;color:var(--muted)}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab{padding:9px 12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:999px;cursor:pointer;font-weight:900}.tab.active{background:rgba(55,189,248,.18);border-color:var(--accent)}
     .miniCard{padding:13px}.miniCard h3{margin:0 0 8px}.miniCard .big{font-size:26px;font-weight:950}.miniCard small{color:var(--muted)}.workBadge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 7px;font-size:11px;font-weight:900;background:rgba(255,255,255,.06);color:var(--muted)}.pctText{font-size:12px;color:var(--muted);font-weight:800}
 
-    .mapTools{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.mapTools .panelLite{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;padding:12px}.panelLite h3{margin:0 0 10px;font-size:15px}.splitRow,.pressureRow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}.splitBar{height:12px;border-radius:999px;background:#081427;border:1px solid var(--line);overflow:hidden;display:flex;margin:10px 0}.splitBar span{height:100%;display:block}.trendBars{display:grid;gap:9px}.trendRow{display:grid;grid-template-columns:105px 1fr 70px;gap:8px;align-items:center}.trendStack{height:18px;border-radius:999px;background:#081427;border:1px solid var(--line);overflow:hidden;display:flex}.trendStack span{height:100%;display:block}.legendDot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}.subheadRow td{background:rgba(55,189,248,.12)!important;color:var(--text);font-weight:950;border-radius:12px!important}.warningCard{border-left:4px solid var(--warn);background:rgba(255,209,102,.08)}
+    .mapTools{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.mapTools .panelLite{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;padding:12px}.panelLite h3{margin:0 0 10px;font-size:15px}.splitRow,.pressureRow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}.splitBar{height:12px;border-radius:999px;background:#070a10;border:1px solid var(--line);overflow:hidden;display:flex;margin:10px 0}.splitBar span{height:100%;display:block}.trendBars{display:grid;gap:9px}.trendRow{display:grid;grid-template-columns:105px 1fr 70px;gap:8px;align-items:center}.trendStack{height:18px;border-radius:999px;background:#070a10;border:1px solid var(--line);overflow:hidden;display:flex}.trendStack span{height:100%;display:block}.legendDot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}.subheadRow td{background:rgba(55,189,248,.12)!important;color:var(--text);font-weight:950;border-radius:12px!important}.warningCard{border-left:4px solid var(--warn);background:rgba(255,209,102,.08)}
 
     .lotGrid{grid-template-columns:minmax(320px,.95fr) minmax(560px,1.35fr)}
-    .dayCellDate b{display:block;font-size:18px;line-height:1.2}.daySnapshot{display:grid;grid-template-columns:repeat(4,minmax(82px,1fr));gap:8px;min-width:360px}.dayMetric{padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03)}.dayMetric b{display:block;font-size:18px}.dayMetric small{color:var(--muted)}.dayMetric.compact{grid-column:span 2}.timelineHint{font-size:12px;color:var(--muted)}.lotRow{cursor:pointer}.lotRow:hover td{border-color:rgba(55,189,248,.5);background:rgba(55,189,248,.08)}.builderRow:hover td{border-color:rgba(55,189,248,.4)} .timelineList{display:grid;gap:10px}.timelineItem{padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.03)}.timelineItemTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.timelineDate{font-weight:900;font-size:15px}.timelineSub{color:var(--muted);font-size:12px;margin-top:2px}.timelineMeta{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.4}.timelineTag{display:inline-block;margin-right:6px;margin-top:4px;padding:3px 7px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:11px;font-weight:900}.builderGrid{display:grid;grid-template-columns:repeat(6,minmax(72px,1fr));gap:8px;min-width:500px}.builderMetric{padding:8px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);text-align:center}.builderMetric b{display:block;font-size:16px}.builderMetric small{color:var(--muted);font-size:11px}
+    .dayCellDate b{display:block;font-size:18px;line-height:1.2}.daySnapshot{display:grid;grid-template-columns:repeat(4,minmax(82px,1fr));gap:8px;min-width:360px}.dayMetric{padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03)}.dayMetric b{display:block;font-size:18px}.dayMetric small{color:var(--muted)}.dayMetric.compact{grid-column:span 2}.timelineHint{font-size:12px;color:var(--muted)}.lotRow{cursor:pointer}.lotRow:hover td{border-color:rgba(55,189,248,.5);background:rgba(55,189,248,.08)}.builderRow:hover td{border-color:rgba(55,189,248,.4)} .timelineList{display:grid;gap:10px}.timelineItem{padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.03)}.timelineItemTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.timelineDate{font-weight:900;font-size:15px}.timelineSub{color:var(--text);font-size:16px;font-weight:950;margin-top:4px}.timelineMeta{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.4}.timelineTag{display:inline-block;margin-right:6px;margin-top:4px;padding:3px 7px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:11px;font-weight:900}.builderGrid{display:grid;grid-template-columns:repeat(6,minmax(72px,1fr));gap:8px;min-width:500px}.builderMetric{padding:8px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);text-align:center}.builderMetric b{display:block;font-size:16px}.builderMetric small{color:var(--muted);font-size:11px}
 
     .taskRow{cursor:pointer}.taskRow:hover td{border-color:rgba(55,189,248,.5);background:rgba(55,189,248,.08)}
     .dateChips{display:flex;flex-wrap:wrap;gap:6px}.dateChip{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:12px;color:var(--text)}
@@ -42,19 +42,27 @@
     #lotTable th:nth-child(2), #lotTable td:nth-child(2){min-width:185px} #lotTable th:nth-child(3), #lotTable td:nth-child(3){min-width:300px}
     .mapHeader{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}.mapHeader h2{margin:0;font-size:18px}.mapHeader .field{min-width:220px}
     .subList{display:grid;gap:8px}.subItem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03)}.subItem b{display:block}.subItem small{color:var(--muted)}
-    .modalBack{position:fixed;inset:0;background:rgba(3,8,15,.72);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:24px;z-index:5000}.modalBack.show{display:flex}.modalCard{width:min(980px,95vw);max-height:88vh;display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(18,35,58,.98),rgba(13,27,47,.98));border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}.modalHead{display:flex;align-items:start;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--line)}.modalHead h3{margin:0 0 4px;font-size:22px}.modalClose{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);border-radius:12px;padding:9px 12px;font-size:18px;line-height:1;cursor:pointer}.modalBody{padding:16px 20px;overflow:auto}.modalBody table{border-spacing:0 8px}.modalMeta{color:var(--muted);font-size:13px}
+    .modalBack{position:fixed;inset:0;background:rgba(3,8,15,.72);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:24px;z-index:5000}.modalBack.show{display:flex}.modalCard{width:min(980px,95vw);max-height:88vh;display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(14,20,29,.98),rgba(8,12,18,.98));border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}.modalHead{display:flex;align-items:start;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--line)}.modalHead h3{margin:0 0 4px;font-size:22px}.modalClose{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);border-radius:12px;padding:9px 12px;font-size:18px;line-height:1;cursor:pointer}.modalBody{padding:16px 20px;overflow:auto}.modalBody table{border-spacing:0 8px}.modalMeta{color:var(--muted);font-size:13px}
 
     .dayTableWrap{max-height:520px}.daySnapshot{display:grid;grid-template-columns:repeat(5,minmax(115px,1fr));gap:10px;min-width:0}.dayMetric{padding:10px 12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.035);min-width:0}.dayMetric b{display:block;font-size:20px;white-space:nowrap}.dayMetric small{display:block;color:var(--muted);line-height:1.25}.dayMetric .muted{font-size:13px;margin-top:2px}.dayMetric.topQ{border-color:rgba(55,189,248,.35);background:rgba(55,189,248,.08)}.topQBadge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-weight:950;color:#06101e;white-space:nowrap}
     .lotCompactTable th,.lotCompactTable td{padding:8px 10px}.lotCompactTable .lotMain{font-size:16px}.lotCompactTable .summaryCell{min-width:130px}.lotTaskList{display:flex;flex-wrap:wrap;gap:7px;align-items:flex-start}.lotTaskItem{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.035);max-width:100%;white-space:nowrap}.lotTaskItem b{display:inline;margin:0;font-size:13px}.lotTaskItem .workBadge{margin-left:0}.lotTaskDates{color:var(--muted);font-size:12px;line-height:1;white-space:nowrap}.lotTaskType{color:var(--text);font-weight:900}.lotTaskHours{color:var(--muted);font-size:12px}.lotTotalsInline{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}.lotTotalsInline span{display:inline-block;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:5px 7px;background:rgba(255,255,255,.03);white-space:nowrap}.timelineHint{display:inline-block;margin-top:6px;font-size:11px;color:var(--muted)}
 
-    .workflowGrid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin:16px 0}.workflowPanel{padding:16px;background:linear-gradient(180deg,rgba(18,35,58,.97),rgba(13,27,47,.97));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.workflowPanel h2{margin:0;font-size:18px}.workflowPanel p{margin:6px 0 12px;color:var(--muted);font-size:13px;line-height:1.35}.workflowActions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.filterPanel{margin:16px 0}.filterPanel .controls{margin:0;padding:0;background:transparent;border:none;box-shadow:none}.savedStatus{min-height:40px;display:flex;align-items:center;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:#081427}.savedStatus.good{border-color:rgba(55,214,122,.45);background:rgba(55,214,122,.08)}.savedStatus.warn{border-color:rgba(255,209,102,.45);background:rgba(255,209,102,.08);color:#ffedbd}.cleanRule{margin-top:8px;padding:8px 10px;border-radius:12px;background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.25);color:#ffedbd;font-size:12px;line-height:1.35}
+    .workflowGrid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin:16px 0}.workflowPanel{padding:16px;background:linear-gradient(180deg,rgba(14,20,29,.97),rgba(8,12,18,.97));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.workflowPanel h2{margin:0;font-size:18px}.workflowPanel p{margin:6px 0 12px;color:var(--muted);font-size:13px;line-height:1.35}.workflowActions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.filterPanel{margin:16px 0}.filterPanel .controls{margin:0;padding:0;background:transparent;border:none;box-shadow:none}.savedStatus{min-height:40px;display:flex;align-items:center;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:#070a10}.savedStatus.good{border-color:rgba(55,214,122,.45);background:rgba(55,214,122,.08)}.savedStatus.warn{border-color:rgba(255,209,102,.45);background:rgba(255,209,102,.08);color:#ffedbd}
 
-    .lotHistoryScroll{max-height:560px;overflow:auto;padding-right:6px}.lotHistoryTable{table-layout:fixed;width:100%;border-spacing:0 8px}.lotHistoryTable th{position:sticky;top:0;z-index:5;background:#12233a;padding:9px 10px}.lotHistoryTable th:nth-child(1){width:210px}.lotHistoryTable th:nth-child(2){width:170px}.lotHistoryTable th:nth-child(4){width:230px}.lotHistoryTable td{vertical-align:top}.lotTaskRows{display:grid;gap:6px}.lotTaskLine{display:grid;grid-template-columns:115px 1fr 72px;gap:8px;align-items:start;padding:6px 8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.025);line-height:1.25}.lotTaskLine .taskDate{color:var(--muted);font-size:12px;white-space:nowrap}.lotTaskLine .taskName{font-weight:900;min-width:0;overflow-wrap:anywhere}.lotTaskLine .taskHours{text-align:right;color:var(--muted);font-size:12px;white-space:nowrap}.summaryStack{display:grid;gap:6px}.summaryChip{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:7px 9px;background:rgba(255,255,255,.03)}.summaryChip b{white-space:nowrap}.summaryChip small{color:var(--muted);white-space:nowrap}.laborText{color:var(--bad)!important}.cleaningText{color:var(--good)!important}.popupSplit{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.popupBox{border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:8px;background:rgba(255,255,255,.04)}.popupBox b{display:block;margin-bottom:4px}.popupLabor{border-color:rgba(255,92,122,.5);background:rgba(255,92,122,.08)}.popupCleaning{border-color:rgba(55,214,122,.5);background:rgba(55,214,122,.08)}.pressureBlock{display:grid;gap:6px;margin:10px 0;padding:9px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03)}.pressureTitle{font-weight:950}.pressureMetric{display:flex;align-items:center;justify-content:space-between;gap:10px}.pressureMetric span{color:var(--muted)}.pressureMetric b{white-space:nowrap}.trendSummary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.trendSummaryBox{border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03);padding:9px}.trendSummaryBox b{display:block;margin-bottom:4px}.trendSummaryBox span{display:block;line-height:1.35}.savedStatus b{margin-right:4px}.savedStatus{gap:4px}.stickyHead th{position:sticky;top:0;z-index:5;background:#12233a;padding-top:9px;padding-bottom:9px}
+    .lotHistoryScroll{max-height:560px;overflow:auto;padding-right:6px}.lotHistoryTable{table-layout:fixed;width:100%;border-spacing:0 8px}.lotHistoryTable th{position:sticky;top:0;z-index:5;background:#111823;padding:9px 10px}.lotHistoryTable th:nth-child(1){width:210px}.lotHistoryTable th:nth-child(2){width:170px}.lotHistoryTable th:nth-child(4){width:230px}.lotHistoryTable td{vertical-align:top}.lotTaskRows{display:grid;gap:6px}.lotTaskLine{display:grid;grid-template-columns:115px 1fr 72px;gap:8px;align-items:start;padding:6px 8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.025);line-height:1.25}.lotTaskLine .taskDate{color:var(--muted);font-size:12px;white-space:nowrap}.lotTaskLine .taskName{font-weight:900;min-width:0;overflow-wrap:anywhere}.lotTaskLine .taskHours{text-align:right;color:var(--muted);font-size:12px;white-space:nowrap}.summaryStack{display:grid;gap:6px}.summaryChip{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:7px 9px;background:rgba(255,255,255,.03)}.summaryChip b{white-space:nowrap}.summaryChip small{color:var(--muted);white-space:nowrap}.laborText{color:var(--accent)!important}.cleaningText{color:var(--good)!important}.popupSplit{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.popupBox{border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:8px;background:rgba(255,255,255,.04)}.popupBox b{display:block;margin-bottom:4px}.popupLabor{border-color:rgba(55,189,248,.55);background:rgba(55,189,248,.10)}.popupCleaning{border-color:rgba(55,214,122,.5);background:rgba(55,214,122,.08)}.pressureBlock{display:grid;gap:6px;margin:10px 0;padding:9px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03)}.pressureTitle{font-weight:950}.pressureMetric{display:flex;align-items:center;justify-content:space-between;gap:10px}.pressureMetric span{color:var(--muted)}.pressureMetric b{white-space:nowrap}.trendSummary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.trendSummaryBox{border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03);padding:9px}.trendSummaryBox b{display:block;margin-bottom:4px}.trendSummaryBox span{display:block;line-height:1.35}.savedStatus b{margin-right:4px}.savedStatus{gap:4px}.stickyHead th{position:sticky;top:0;z-index:5;background:#111823;padding-top:9px;padding-bottom:9px}
     @media(max-width:1000px){.workflowGrid{grid-template-columns:1fr}.mapTools{grid-template-columns:1fr}.trendRow{grid-template-columns:90px 1fr 58px}.lotGrid{grid-template-columns:1fr}.mapHeader .field{min-width:100%}.daySnapshot{grid-template-columns:repeat(2,minmax(120px,1fr))}.lotHistoryTable th:nth-child(1){width:170px}.lotHistoryTable th:nth-child(2){width:130px}.lotHistoryTable th:nth-child(4){width:170px}.lotTaskLine{grid-template-columns:95px 1fr;}.lotTaskLine .taskHours{text-align:left}}
 
     .topTabs{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 4px}.topTab{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer}.topTab.active{background:rgba(55,189,248,.18);border-color:var(--accent);box-shadow:0 0 0 1px rgba(55,189,248,.15) inset}.tabPage{display:none}.tabPage.active{display:block}
-    .actualGrid{display:grid;grid-template-columns:repeat(4,minmax(170px,1fr));gap:16px;margin:16px 0}.actualUploadGrid{grid-template-columns:repeat(3,minmax(220px,1fr));margin-top:16px}.actualBadge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:12px;font-weight:900;background:rgba(255,255,255,.06);color:var(--muted)}.actualGood{color:var(--good)}.actualBad{color:var(--bad)}.actualWarn{color:var(--warn)}.actualNote{padding:12px;border:1px solid rgba(55,214,122,.35);background:rgba(55,214,122,.08);border-radius:14px;color:var(--muted);line-height:1.35;margin-top:12px}.actualNote b{color:var(--text)}.variancePos{color:var(--bad);font-weight:950}.varianceNeg{color:var(--good);font-weight:950}.varianceZero{color:var(--muted);font-weight:950}.miniTableWrap{max-height:440px;overflow:auto}.actualIssue{border-left:4px solid var(--warn);padding:10px;margin:8px 0;background:rgba(255,209,102,.08);border-radius:12px;color:#ffedbd}
-    @media(max-width:1000px){.actualGrid,.actualUploadGrid{grid-template-columns:1fr}}
+    .actualGrid{display:grid;grid-template-columns:repeat(4,minmax(170px,1fr));gap:16px;margin:16px 0}.actualUploadGrid{grid-template-columns:repeat(4,minmax(220px,1fr));margin-top:16px}.actualBadge{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:12px;font-weight:900;background:rgba(255,255,255,.06);color:var(--muted)}.actualGood{color:var(--good)}.actualBad{color:var(--bad)}.actualWarn{color:var(--warn)}.actualNote{padding:12px;border:1px solid rgba(55,189,248,.28);background:rgba(55,189,248,.06);border-radius:14px;color:var(--muted);line-height:1.35;margin-top:12px}.actualNote b{color:var(--text)}.variancePos{color:var(--bad);font-weight:950}.varianceNeg{color:var(--good);font-weight:950}.varianceZero{color:var(--muted);font-weight:950}.miniTableWrap{max-height:440px;overflow:auto}.actualIssue{border-left:4px solid var(--warn);padding:10px;margin:8px 0;background:rgba(255,209,102,.08);border-radius:12px;color:#ffedbd}
+
+    .headerActions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.gearBtn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:999px;padding:8px 12px;font-weight:900;cursor:pointer}.gearBtn:hover{border-color:var(--accent);transform:translateY(-1px)}
+    .dmBack{position:fixed;inset:0;background:rgba(3,8,15,.72);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:18px;z-index:6000}.dmBack.show{display:flex}.dmCard{width:min(1320px,96vw);height:min(900px,92vh);display:flex;flex-direction:column;background:linear-gradient(180deg,rgba(14,20,29,.99),rgba(8,12,18,.99));border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}.dmHead{display:flex;align-items:start;justify-content:space-between;gap:14px;padding:16px 18px;border-bottom:1px solid var(--line)}.dmHead h2{margin:0}.dmClose{border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);border-radius:12px;padding:9px 12px;font-size:18px;line-height:1;cursor:pointer}.dmBody{display:grid;grid-template-columns:260px 1fr;min-height:0;flex:1}.dmSide{border-right:1px solid var(--line);padding:14px;overflow:auto;background:rgba(0,0,0,.08)}.dmMain{padding:14px;overflow:auto;min-width:0}.dmDatasetBtn{width:100%;text-align:left;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);border-radius:12px;padding:10px 11px;margin-bottom:8px;cursor:pointer}.dmDatasetBtn.active{border-color:var(--accent);background:rgba(55,189,248,.14)}.dmDatasetBtn b{display:block}.dmDatasetBtn small{color:var(--muted)}.dmToolbar{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin-bottom:12px}.dmStatusGrid{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:10px;margin-bottom:14px}.dmFileCard{border:1px solid var(--line);border-radius:14px;padding:10px;background:rgba(255,255,255,.04)}.dmFileCard b{display:block}.dmFileCard small{display:block;color:var(--muted);margin-top:3px}.dmTableWrap{overflow:auto;max-height:520px;border:1px solid var(--line);border-radius:16px;background:rgba(0,0,0,.12)}.dmTable{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}.dmTable th{position:sticky;top:0;z-index:2;background:#111823;padding:9px 10px}.dmTable td{border-radius:0!important;min-width:110px;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dmTable td.dmEditable{cursor:text;background:rgba(55,189,248,.05)}.dmTable td.dmEditable:focus{outline:2px solid var(--accent);white-space:normal;background:rgba(55,189,248,.14)}.dmTable td.dmReadonly{color:var(--muted);background:rgba(255,255,255,.025)}.dmNote{padding:10px;border:1px solid rgba(255,209,102,.35);background:rgba(255,209,102,.07);border-radius:12px;color:var(--muted);line-height:1.35;margin-bottom:12px}.dmPager{color:var(--muted);font-size:12px;margin-top:8px}.dmChanged{color:var(--warn);font-weight:900}.dmDanger{border-color:rgba(255,92,122,.5)!important;color:#ffd8df!important}
+    @media(max-width:1000px){.dmBody{grid-template-columns:1fr}.dmSide{border-right:0;border-bottom:1px solid var(--line);max-height:230px}.dmStatusGrid{grid-template-columns:1fr}}
+
+    
+    .actualFilters{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-top:12px}.actualFilters .field{min-width:150px}.actualDayTable td:first-child{min-width:180px}.actualDayTable .miniSplit{display:flex;flex-wrap:wrap;gap:6px}.actualDayTable .miniSplit span{border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:4px 7px;background:rgba(255,255,255,.03);font-size:12px;color:var(--muted)}
+    .dmStatusGrid{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px}.dmFileCard{border:1px solid var(--line);border-radius:14px;padding:10px;background:rgba(255,255,255,.035);display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.dmFileCard b{display:block}.dmFileCard small{display:block;color:var(--muted);margin-top:3px}.dmFileMeta{min-width:0}.dmFileName{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dmFileCard .btn{grid-row:1 / span 2;grid-column:2;min-height:32px;padding:6px 9px;margin:0}.dmGroupTitle{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:900;margin:10px 0 6px}.dmCompactNote{font-size:12px;color:var(--muted);line-height:1.25}
+    @media(max-width:1000px){.actualGrid,.actualUploadGrid{grid-template-columns:1fr}.dmFileCard{grid-template-columns:1fr}.dmFileCard .btn{grid-row:auto;grid-column:auto}}
 
   </style>
 </head>
@@ -65,11 +73,17 @@
       <h1>VIP Quadrant Man-Hour Review</h1>
       <div class="sub">Upload subdivisions + task hours + labor and cleaning daily files. Review a day, week, month, or the whole batch on a map.</div>
     </div>
-    <details class="versionBox">
-      <summary class="version">v1.90 • Actuals tab version note ▾</summary>
+    <div class="headerActions">
+      <button id="dataManagerBtn" class="gearBtn" title="Open Data Manager">⚙️ Data Manager</button>
+      <details class="versionBox">
+      <summary class="version">v1.94 • Actuals polish + dark cleanup ▾</summary>
       <div class="versionDrop">
         <h3>Version history</h3>
         <ul>
+          <li><b>v1.94</b> — Cleaned Data Manager file cards, removed extra instruction blocks, added Actuals filters/day overview, split floor-plan efficiency by builder, changed labor to blue, switched to darker black theme, simplified Columbus center marker, and enlarged timeline job text.</li>
+          <li><b>v1.93</b> — Added Data Manager gear with uploaded-file status, parsed data viewer, editable rows, recalculate-from-edits, and corrected-data export to CSV/Excel/JSON.</li>
+          <li><b>v1.92</b> — Fixed actuals budget double-counting when the same cleaning schedule is loaded in the main review and Actuals tab, and re-applied Labor Other task naming from Notes when loading older saved reviews.</li>
+          <li><b>v1.91</b> — Cleaning Actuals now cross-reference cleaning schedule/day files for budget hours, including Other jobs where Notes is the real task name and the daily Hours column is the budget source.</li>
           <li><b>v1.90</b> — Added missing version-history entry for the Cleaning Actuals tab and clarified that actuals are currently separate until cross-reference matching is added.</li>
           <li><b>v1.89</b> — Added separate Cleaning Actuals tab for testing actual-vs-budget cleaning hours without changing map, quadrant, workload, or saved review totals.</li>
           <li><b>v1.88</b> — Reverted Lot History to a structured scrollable layout, fixed spacing in map stats/trend summaries, color-coded Labor/Cleaning in map popups, and cleaned saved review status text spacing.</li>
@@ -92,7 +106,8 @@
           <li><b>v1.00</b> — First quadrant man-hour dashboard with daily Excel upload, totals, and map view.</li>
         </ul>
       </div>
-    </details>
+      </details>
+    </div>
   </div>
 </header>
 <main class="wrap">
@@ -106,7 +121,7 @@
     <div class="upload"><label>2) Task Types file</label><small>Labor task hours and fallback cleaning task hours. Saved review JSON already includes calculated job hours.</small><input id="tasksFile" type="file" accept=".xlsx,.xls,.csv" /></div>
     <div class="upload"><label>3) Floor Plans / Lot Hours file</label><small>Needed for cleaning review hours. Uses Builder, Subdivision, Lot, Floorplan, Original, Reclean, Windows.</small><input id="floorPlansFile" type="file" accept=".xlsx,.xls,.csv" /></div>
     <div class="upload"><label>4) Labor Daily Job files</label><small>Select labor files for one day, week, or month. File names are used as work dates.</small><input id="jobsFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
-    <div class="upload"><label>5) Cleaning Daily Job files</label><small>Optional. Original/Reclean/Windows hours come from Floor Plans. <b>Other</b> uses Notes as the task name and the daily Hours column.</small><div class="cleanRule">Example: Task = Other, Notes = Floors Only, Hours = 2 → shows as Cleaning: Floors Only.</div><input id="cleaningFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
+    <div class="upload"><label>5) Cleaning Daily Job files</label><small>Optional. Original/Reclean/Windows hours come from Floor Plans. <b>Other</b> uses Notes as the task name and the daily Hours column.</small><input id="cleaningFiles" type="file" accept=".xlsx,.xls,.csv" multiple /></div>
   </section>
 
   <section class="workflowGrid">
@@ -145,7 +160,6 @@
       <button id="fitBtn" class="btn ghost">Fit Map</button>
     </div>
   </section>
-  <div class="dataNote"><b>Saved reviews do not need the original Excel sheets.</b> Saved review dropdowns are auto-detected from GitHub files named <b>quadrant-review*.json</b> in the main repo folder. Use the Excel uploads only to create a new review/export. Cleaning hours are pulled from the Floor Plans file by subdivision + lot for Original/Reclean/Windows. Cleaning and Labor rows marked Other use the Notes column as the task name and the daily Hours column as the hours. Once you load a saved review JSON from the dropdown or upload one with “Load Review JSON,” the dashboard has everything it needs to show the map, quadrant totals, busiest day, task breakdown, lot history, tables, and exports.</div>
 
   <section class="grid cards" id="summaryCards"></section>
 
@@ -227,24 +241,43 @@
     <section class="grid actualUploadGrid">
       <div class="upload">
         <label>1) Floor Plans / Lot Hours</label>
-        <small>Optional if already loaded in the main review. Needed to compare Actual vs Budget for Original/Reclean/Windows.</small>
+        <small>Optional if already loaded in the main review. Used for Original/Reclean/Windows budget hours.</small>
         <input id="actualFloorPlansFile" type="file" accept=".xlsx,.xls,.csv" />
       </div>
       <div class="upload">
-        <label>2) Cleaning Actual Hours files</label>
+        <label>2) Cleaning Schedule / Day files</label>
+        <small>Optional if already loaded in the main review. This is the budget source for Other jobs: Notes = task, Hours = budget.</small>
+        <input id="actualScheduleFiles" type="file" accept=".xlsx,.xls,.csv" multiple />
+      </div>
+      <div class="upload">
+        <label>3) Cleaning Actual Hours files</label>
         <small>Select one or more actual-hours files. File names are used as work dates. Labor is not tracked here.</small>
         <input id="actualFiles" type="file" accept=".xlsx,.xls,.csv" multiple />
       </div>
       <div class="upload">
         <label>Actuals Rules</label>
-        <small>Original/Reclean/Windows compare to Floor Plans budget. Other uses Notes as the task name. Actual Hours is kept separate from the map and workload review totals.</small>
+        <small>Actuals match schedule by Date + Subdivision + Lot + Task. Original/Reclean/Windows use Floor Plans. Other uses Notes + daily Hours.</small>
         <button id="loadActualsBtn" class="btn primary" style="margin-top:12px;width:100%">Load Cleaning Actuals</button>
       </div>
     </section>
 
-    <div class="actualNote"><b>Cleaning Actuals are separate.</b> This tab does not change the map, quadrant totals, workload hours, saved review dropdown, or labor numbers. It is only for reviewing cleaning efficiency when actual-hours files are uploaded.</div>
+    <section class="panel actualFilters">
+      <div class="field"><label>Actuals View</label><select id="actualMode"><option value="all">All Uploaded</option><option value="day">Single Day</option><option value="week">Week</option><option value="month">Month</option></select></div>
+      <div class="field"><label>Day</label><select id="actualDaySelect"><option value="">All</option></select></div>
+      <div class="field"><label>Week</label><select id="actualWeekSelect"><option value="">All</option></select></div>
+      <div class="field"><label>Month</label><select id="actualMonthSelect"><option value="">All</option></select></div>
+      <div class="field"><label>Crew</label><select id="actualCrewSelect"><option value="">All</option></select></div>
+      <div class="field"><label>Builder</label><select id="actualBuilderSelect"><option value="">All</option></select></div>
+      <div class="field"><label>Task</label><select id="actualTaskSelect"><option value="">All</option></select></div>
+      <div class="field"><label>Search Actuals</label><input id="actualSearch" type="search" placeholder="lot, subdivision, floorplan..." /></div>
+    </section>
 
     <section class="actualGrid" id="actualCards"></section>
+
+    <section class="panel" style="margin-top:16px">
+      <div class="sectionTitle"><h2>Actuals Day Review</h2><span class="muted">daily efficiency overview</span></div>
+      <div class="miniTableWrap"><table id="actualDayTable" class="actualDayTable"></table></div>
+    </section>
 
     <section class="grid two" style="margin-top:16px">
       <div class="panel">
@@ -286,6 +319,40 @@
       <div class="modalBody" id="taskModalBody"></div>
     </div>
   </div>
+
+  <div id="dataManagerModal" class="dmBack" aria-hidden="true">
+    <div class="dmCard">
+      <div class="dmHead">
+        <div>
+          <h2>⚙️ Data Manager</h2>
+          <div class="modalMeta">View exactly what the site parsed, edit rows in-browser, recalculate, and export corrected files.</div>
+        </div>
+        <button id="dataManagerClose" class="dmClose" aria-label="Close">✕</button>
+      </div>
+      <div class="dmBody">
+        <aside class="dmSide">
+          <div class="dmNote"><b>Tip:</b> Edits here change the in-browser data only. Export corrected files if you want to keep them, or reload the page to discard edits.</div>
+          <div id="dmFileStatus"></div>
+          <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+          <div id="dmDatasetList"></div>
+        </aside>
+        <main class="dmMain">
+          <div class="dmToolbar">
+            <div class="field"><label>Search Data</label><input id="dmSearch" type="search" placeholder="Search current dataset..." /></div>
+            <div class="field"><label>Rows shown</label><select id="dmLimit"><option value="50">50</option><option value="100" selected>100</option><option value="250">250</option><option value="500">500</option></select></div>
+            <button id="dmRecalcBtn" class="btn primary">Recalculate From Edits</button>
+            <button id="dmExportCsvBtn" class="btn ghost">Export CSV</button>
+            <button id="dmExportXlsxBtn" class="btn ghost">Export Excel</button>
+            <button id="dmExportJsonBtn" class="btn ghost">Export JSON</button>
+          </div>
+          <div id="dmTitle" class="sectionTitle"><h2>Parsed Data</h2><span class="muted">pick a dataset</span></div>
+          <div id="dmTableWrap" class="dmTableWrap"></div>
+          <div id="dmPager" class="dmPager"></div>
+        </main>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <script>
@@ -619,11 +686,12 @@ function renderPressureCard(){
   document.getElementById("pressureCard").innerHTML=`<h3>Busiest Quadrant by Map Type</h3>${parts || `<div class="empty">No jobs loaded.</div>`}`;
 }
 function renderTrendCard(){
-  const days=[...groupBy(mapRows().filter(j=>j.date),j=>j.date).entries()].map(([date,rs])=>({date,labor:sums(rowsForType("Labor",rs)).hours,cleaning:sums(rowsForType("Cleaning",rs)).hours,total:sums(rs).hours,jobs:sums(rs).jobs,laborJobs:sums(rowsForType("Labor",rs)).jobs,cleaningJobs:sums(rowsForType("Cleaning",rs)).jobs})).sort((a,b)=>a.date.localeCompare(b.date));
-  const max=Math.max(1,...days.map(d=>d.total));
-  const topHours=[...days].sort((a,b)=>b.total-a.total||b.jobs-a.jobs)[0];
-  const topJobs=[...days].sort((a,b)=>b.jobs-a.jobs||b.total-a.total)[0];
-  document.getElementById("trendCard").innerHTML=`<h3>Daily Workload Trend</h3><div class="trendBars">${days.map(d=>{ const lw=d.labor/max*100; const cw=d.cleaning/max*100; return `<div class="trendRow"><b>${safe(displayDate(d.date)).replace(/, 2026/,"")}</b><div class="trendStack" title="Labor ${fmt(d.labor)} hrs • Cleaning ${fmt(d.cleaning)} hrs • ${d.jobs} jobs"><span style="width:${lw}%;background:var(--accent)"></span><span style="width:${cw}%;background:var(--good)"></span></div><b class="right">${fmt(d.total)}h</b></div>`; }).join("") || `<div class="empty">Load a review to see the daily trend.</div>`}</div><div class="muted" style="margin-top:8px"><i class="legendDot" style="background:var(--bad)"></i>Labor <i class="legendDot" style="background:var(--good);margin-left:12px"></i>Cleaning</div>${days.length?`<div class="trendSummary"><div class="trendSummaryBox"><b>Busiest by Hours:</b><span>${safe(displayDate(topHours.date))}</span><span>${fmt(topHours.total)} hrs • ${topHours.jobs} jobs</span></div><div class="trendSummaryBox"><b>Busiest by Jobs:</b><span>${safe(displayDate(topJobs.date))}</span><span>${topJobs.jobs} jobs • ${fmt(topJobs.total)} hrs</span><small class="muted">Labor ${topJobs.laborJobs} • Cleaning ${topJobs.cleaningJobs}</small></div></div>`:""}`;
+  const days=[...groupBy(mapRows().filter(j=>j.date),j=>j.date).entries()].map(([date,rs])=>({date,labor:sums(rowsForType("Labor",rs)),cleaning:sums(rowsForType("Cleaning",rs)),total:sums(rs)})).sort((a,b)=>a.date.localeCompare(b.date));
+  const max=Math.max(1,...days.map(d=>d.total.hours));
+  const topHours=[...days].sort((a,b)=>b.total.hours-a.total.hours||b.total.jobs-a.total.jobs)[0];
+  const topJobs=[...days].sort((a,b)=>b.total.jobs-a.total.jobs||b.total.hours-a.total.hours)[0];
+  const box=d=>d?`<span>${safe(displayDate(d.date))}</span><span>${fmt(d.total.hours)} hrs • ${d.total.jobs} jobs</span><small class="muted">Labor ${fmt(d.labor.hours)} hrs / ${d.labor.jobs} jobs • Cleaning ${fmt(d.cleaning.hours)} hrs / ${d.cleaning.jobs} jobs</small>`:"<span>—</span>";
+  document.getElementById("trendCard").innerHTML=`<h3>Daily Workload Trend</h3><div class="trendBars">${days.map(d=>{ const lw=d.labor.hours/max*100; const cw=d.cleaning.hours/max*100; return `<div class="trendRow"><b>${safe(displayDate(d.date)).replace(/, 2026/,"")}</b><div class="trendStack" title="Labor ${fmt(d.labor.hours)} hrs • Cleaning ${fmt(d.cleaning.hours)} hrs • ${d.total.jobs} jobs"><span style="width:${lw}%;background:var(--accent)"></span><span style="width:${cw}%;background:var(--good)"></span></div><b class="right">${fmt(d.total.hours)}h</b></div>`; }).join("") || `<div class="empty">Load a review to see the daily trend.</div>`}</div><div class="muted" style="margin-top:8px"><i class="legendDot" style="background:var(--accent)"></i>Labor <i class="legendDot" style="background:var(--good);margin-left:12px"></i>Cleaning</div>${days.length?`<div class="trendSummary"><div class="trendSummaryBox"><b>Busiest by Hours:</b>${box(topHours)}</div><div class="trendSummaryBox"><b>Busiest by Jobs:</b>${box(topJobs)}</div></div>`:""}`;
 }
 function renderUnmappedCard(){
   const rows=mapRows(); const missing=rows.filter(r=>!r.lat||!r.lon||r.quadrant==="Unmatched");
@@ -656,7 +724,7 @@ function renderMap(){ initMap(); clearLayers(); const rows=mapRows().filter(r=>r
   });
   addLayer(L.polyline([[latMin,COLUMBUS.lon],[latMax,COLUMBUS.lon]],{color:"#eaf2ff",weight:3,dashArray:"8,8",opacity:.9}));
   addLayer(L.polyline([[COLUMBUS.lat,lonMin],[COLUMBUS.lat,lonMax]],{color:"#eaf2ff",weight:3,dashArray:"8,8",opacity:.9}));
-  addLayer(L.marker([COLUMBUS.lat,COLUMBUS.lon],{icon:L.divIcon({className:"",html:`<div class="lineLabel">Columbus Center • ${safe(currentMapType()==="all"?"Both":currentMapType())}</div>`,iconSize:[190,28],iconAnchor:[95,14]})}));
+  addLayer(L.marker([COLUMBUS.lat,COLUMBUS.lon],{icon:L.divIcon({className:"",html:`<div class="centerDot" title="Columbus Center"></div>`,iconSize:[16,16],iconAnchor:[8,8]})}));
   const qt=quadTotals(rows); const labelPos={NW:[COLUMBUS.lat+.42,COLUMBUS.lon-.54],NE:[COLUMBUS.lat+.42,COLUMBUS.lon+.54],SW:[COLUMBUS.lat-.42,COLUMBUS.lon-.54],SE:[COLUMBUS.lat-.42,COLUMBUS.lon+.54]};
   QUADS.forEach(q=>{ const s=sums(qt[q]||[]); bounds.push(labelPos[q]); addLayer(L.marker(labelPos[q],{icon:L.divIcon({className:"",html:`<div class="quadLabel" style="border-color:${qColor(q)}"><b>${q}</b><span>${fmt(s.hours)} hours</span><span>${s.jobs} jobs • ${s.subs} subdivisions</span></div>`,iconSize:[165,72],iconAnchor:[82,36]})})); });
   bounds.push([COLUMBUS.lat,COLUMBUS.lon]);
@@ -668,7 +736,7 @@ function renderMap(){ initMap(); clearLayers(); const rows=mapRows().filter(r=>r
     const cleaning=sums(rowsForType("Cleaning",g.rows));
     const html=`<div class="markerDot" style="background:${qColor(g.q)}">${g.jobs}</div>`;
     const marker=addLayer(L.marker([g.lat,g.lon],{icon:L.divIcon({className:"",html,iconSize:[size,size],iconAnchor:[size/2,size/2]})}));
-    marker.bindPopup(`<b>${safe(g.sub)}</b><br>${safe(g.builder)}<br><b>${safe(g.q)}</b> • ${fmt(g.hours)} hours • ${g.jobs} jobs<div class="popupSplit"><div class="popupBox popupLabor"><b class="laborText">Labor</b>${labor.jobs} jobs • ${fmt(labor.hours)} hrs</div><div class="popupBox popupCleaning"><b class="cleaningText">Cleaning</b>${cleaning.jobs} jobs • ${fmt(cleaning.hours)} hrs</div></div><hr style="border:0;border-top:1px solid #263c5c">${g.rows.slice(0,14).map(r=>`${safe(displayDate(r.date))}: ${safe(r.workGroup||"Labor")} • Lot ${safe(r.lot)} — ${safe(r.taskDisplay||r.task)} (${fmt(r.hours)} hrs)`).join("<br>")}${g.rows.length>14?"<br>...":""}`);
+    marker.bindPopup(`<b>${safe(g.sub)}</b><br>${safe(g.builder)}<br><b>${safe(g.q)}</b> • ${fmt(g.hours)} hours • ${g.jobs} jobs<div class="popupSplit"><div class="popupBox popupLabor"><b class="laborText">Labor</b>${labor.jobs} jobs • ${fmt(labor.hours)} hrs</div><div class="popupBox popupCleaning"><b class="cleaningText">Cleaning</b>${cleaning.jobs} jobs • ${fmt(cleaning.hours)} hrs</div></div><hr style="border:0;border-top:1px solid #273244">${g.rows.slice(0,14).map(r=>`${safe(displayDate(r.date))}: ${safe(r.workGroup||"Labor")} • Lot ${safe(r.lot)} — ${safe(r.taskDisplay||r.task)} (${fmt(r.hours)} hrs)`).join("<br>")}${g.rows.length>14?"<br>...":""}`);
   });
   if(bounds.length) state.map.fitBounds(bounds,{padding:[55,55],maxZoom:11}); else state.map.setView([COLUMBUS.lat,COLUMBUS.lon],10);
   setTimeout(()=>state.map.invalidateSize(),100);
@@ -698,15 +766,18 @@ function openLotTimeline(builder, sub, lot, q){
   const total=sums(rows), labor=sums(rowsForType('Labor',rows)), cleaning=sums(rowsForType('Cleaning',rows));
   title.textContent=`Lot ${lot || '—'} • ${sub}`;
   meta.textContent=`${builder} • ${q || '—'} • ${fmt(total.hours)} total hrs • ${total.jobs} jobs • Labor ${fmt(labor.hours)} hrs • Cleaning ${fmt(cleaning.hours)} hrs`;
-  body.innerHTML=rows.length?`<div class="timelineList">${rows.map(r=>`<div class="timelineItem"><div class="timelineItemTop"><div><div class="timelineDate">${safe(displayDate(r.date))}</div><div class="timelineSub">${safe(r.workGroup||'Labor')} • ${safe(r.taskDisplay||r.task||'Other')}</div></div><div class="right"><b>${fmt(r.hours)} hrs</b><br>${r.quadrant?`<span class="pill q${r.quadrant}">${safe(r.quadrant)}</span>`:''}</div></div><div class="timelineMeta">${r.notes?`<div><b>Notes:</b> ${safe(r.notes)}</div>`:''}<div><span class="timelineTag">${safe(r.sourceFile)}</span><span class="timelineTag">${safe(r.hoursSource)}</span></div></div></div>`).join('')}</div>`:`<div class="empty">No jobs found for this lot in the current filtered review.</div>`;
+  body.innerHTML=rows.length?`<div class="timelineList">${rows.map(r=>`<div class="timelineItem"><div class="timelineItemTop"><div><div class="timelineDate">${safe(displayDate(r.date))}</div><div class="timelineSub">${safe(r.workGroup||'Labor')}: ${safe(r.taskDisplay||r.task||'Other')}</div></div><div class="right"><b>${fmt(r.hours)} hrs</b><br>${r.quadrant?`<span class="pill q${r.quadrant}">${safe(r.quadrant)}</span>`:''}</div></div><div class="timelineMeta">${r.notes?`<div><b>Notes:</b> ${safe(r.notes)}</div>`:''}<div><span class="timelineTag">${safe(r.sourceFile)}</span><span class="timelineTag">${safe(r.hoursSource)}</span></div></div></div>`).join('')}</div>`:`<div class="empty">No jobs found for this lot in the current filtered review.</div>`;
   const modal=document.getElementById('taskModal'); modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
 }
 
 
 function realTaskFromOther(task, notes){
   const t=norm(task), n=String(notes||"").trim();
-  if(t==="other" || t.includes("other")) return n || "Other";
+  if(t==="other" || t.includes("other")) return titleCaseFromNote(n);
   return String(task||"Other").trim() || "Other";
+}
+function actualTaskKey(task, notes=""){
+  return norm(realTaskFromOther(task, notes));
 }
 function makeActualRow(r,file,idx){
   const rawTask=String(get(r,"task")||"").trim();
@@ -714,31 +785,107 @@ function makeActualRow(r,file,idx){
   const task=realTaskFromOther(rawTask,notes);
   return { sourceFile:file.name, date:parseDateFromFileName(file.name), row:idx+2, crew:String(get(r,"crew")||"").trim()||"Unknown", builder:String(get(r,"builder")||"").trim(), subdivision:String(get(r,"subdivision")||"").trim(), lot:String(get(r,"lot")||"").trim(), rawTask, task, notes, actualHours:num(get(r,"actualHours")), raw:r };
 }
-function budgetForActual(a){
+function actualMatchKeys(obj, taskName){
+  const date=obj.date||"";
+  const sub=cleanSub(obj.subdivision);
+  const lot=lotKey(obj.lot);
+  const task=norm(taskName || obj.taskDisplay || obj.task || "Other");
+  const builder=norm(obj.builder||"");
+  return {
+    strict:`${date}|${builder}|${sub}|${lot}|${task}`,
+    loose:`${date}|${sub}|${lot}|${task}`
+  };
+}
+function addScheduleBudget(index, job){
+  const taskName=job.taskDisplay || displayTaskName(job);
+  const keys=actualMatchKeys(job, taskName);
+  const fp=findFloorPlan({builder:job.builder, subdivision:job.subdivision, lot:job.lot});
+  const rec={
+    date:job.date, builder:job.builder, subdivision:job.subdivision, lot:job.lot,
+    task:taskName, budget:Number(job.hours)||0, floorplan:fp?.floorplan||"",
+    source:`cleaning schedule: ${job.sourceFile||"loaded review"}`,
+    scheduleRow:job.row||"",
+    dedupeKey:[job.date, norm(job.builder||""), cleanSub(job.subdivision), lotKey(job.lot), norm(taskName), Number(job.hours)||0, job.sourceFile||"loaded review", job.row||""].join("|")
+  };
+  [keys.strict, keys.loose].forEach(k=>{
+    if(!index.has(k)) index.set(k,[]);
+    const arr=index.get(k);
+    if(!arr.some(existing=>existing.dedupeKey===rec.dedupeKey)) arr.push(rec);
+  });
+}
+async function buildActualScheduleIndex(){
+  const index=new Map();
+  // If Actuals tab schedule files are uploaded, use those as the source of truth.
+  // Otherwise use cleaning jobs already loaded in the main workload review or saved review.
+  // This prevents the same schedule from being counted twice when both are present.
+  const scheduleFiles=[...document.getElementById("actualScheduleFiles")?.files || []];
+  if(!scheduleFiles.length){
+    state.jobs.filter(j=>(j.workGroup||"")==="Cleaning").forEach(addScheduleBudget.bind(null,index));
+    return index;
+  }
+  for(const f of scheduleFiles){
+    const rows=await readRows(f);
+    rows.forEach((r,i)=>{
+      const job=makeJob(r,f,i,"Cleaning");
+      if(!(job.subdivision||job.lot||job.task)) return;
+      const h=findTaskHours(job,state.tasks||[]);
+      const taskDisplay=displayTaskName(job);
+      const cInfo=cleaningTaskInfo(job.task,job.notes);
+      if(cInfo.kind==="other" && cInfo.missingNote){
+        state.actualIssues.push({msg:`Actuals schedule • ${f.name} row ${i+2}: Other task has no Notes value, so task name is shown as Other.`});
+      }
+      if(!h.hours){
+        state.actualIssues.push({msg:`Actuals schedule • ${f.name} row ${i+2}: No budget hours found for ${job.subdivision} lot ${job.lot} (${taskDisplay}).`});
+      }
+      addScheduleBudget(index,{...job, taskDisplay, hours:h.hours, hoursSource:h.source});
+    });
+  }
+  return index;
+}
+function budgetFromSchedule(a, scheduleIndex){
+  const keys=actualMatchKeys(a, a.task);
+  const rawMatches=(scheduleIndex.get(keys.strict) || scheduleIndex.get(keys.loose) || []).filter(m=>Number(m.budget)>0);
+  const seen=new Set();
+  const matches=[];
+  rawMatches.forEach(m=>{ const k=m.dedupeKey || [m.date,norm(m.builder||""),cleanSub(m.subdivision),lotKey(m.lot),norm(m.task),m.budget,m.source,m.scheduleRow].join("|"); if(!seen.has(k)){ seen.add(k); matches.push(m); } });
+  if(!matches.length) return null;
+  const totalBudget=matches.reduce((sum,m)=>sum+(Number(m.budget)||0),0);
+  const floorplan=matches.find(m=>m.floorplan)?.floorplan || "";
+  const sources=[...new Set(matches.map(m=>m.source).filter(Boolean))].join("; ");
+  return {budget:totalBudget, floorplan, source:sources || "cleaning schedule", matchCount:matches.length, matches};
+}
+function budgetForActual(a, scheduleIndex){
+  const scheduled=budgetFromSchedule(a, scheduleIndex);
+  if(scheduled) return scheduled;
+
   const key=norm(a.task);
-  if(!["original","reclean","windows"].includes(key)) return {budget:null, floorplan:"", source:"custom/other task"};
-  const fp=findFloorPlan({builder:a.builder, subdivision:a.subdivision, lot:a.lot});
-  if(!fp) return {budget:null, floorplan:"", source:"no floor plan match", issue:`Actuals • ${a.sourceFile} row ${a.row}: No Floor Plans match for ${a.subdivision} lot ${a.lot} (${a.task}).`};
-  const budget = key==="original" ? fp.original : key==="reclean" ? fp.reclean : fp.windows;
-  if(!budget) return {budget:null, floorplan:fp.floorplan||"", source:"missing budget", issue:`Actuals • ${a.sourceFile} row ${a.row}: Floor Plan matched ${a.subdivision} lot ${a.lot}, but ${a.task} budget is blank/0.`};
-  return {budget, floorplan:fp.floorplan||"", source:"floor plans"};
+  if(["original","reclean","windows"].includes(key)){
+    const fp=findFloorPlan({builder:a.builder, subdivision:a.subdivision, lot:a.lot});
+    if(!fp) return {budget:null, floorplan:"", source:"no schedule/floor plan match", issue:`Actuals • ${a.sourceFile} row ${a.row}: No cleaning schedule match and no Floor Plans match for ${a.subdivision} lot ${a.lot} (${a.task}).`};
+    const budget = key==="original" ? fp.original : key==="reclean" ? fp.reclean : fp.windows;
+    if(!budget) return {budget:null, floorplan:fp.floorplan||"", source:"missing budget", issue:`Actuals • ${a.sourceFile} row ${a.row}: Floor Plan matched ${a.subdivision} lot ${a.lot}, but ${a.task} budget is blank/0.`};
+    return {budget, floorplan:fp.floorplan||"", source:"floor plans fallback", matchCount:0};
+  }
+
+  return {budget:null, floorplan:"", source:"no schedule match", issue:`Actuals • ${a.sourceFile} row ${a.row}: No matching cleaning schedule budget found for ${a.subdivision} lot ${a.lot} (${a.task}). Upload the cleaning schedule/day file for this date so Other/custom task budget can be pulled from the daily Hours column.`};
 }
 async function loadActuals(){
   state.actuals=[]; state.actualIssues=[];
   const fpFile=document.getElementById("actualFloorPlansFile")?.files?.[0] || document.getElementById("floorPlansFile")?.files?.[0];
   if(fpFile){ const fpRows=await readRows(fpFile); state.floorPlans=fpRows.map(makeFloorPlan).filter(fp=>fp.subdivision && fp.lot); state.floorIndex=buildFloorIndex(state.floorPlans); }
+  const scheduleIndex=await buildActualScheduleIndex();
   const files=[...document.getElementById("actualFiles").files];
   if(!files.length){ renderActualsEmpty("Upload at least one Cleaning Actual Hours file."); return; }
   for(const f of files){ const rows=await readRows(f); rows.forEach((r,i)=>state.actuals.push(makeActualRow(r,f,i))); }
   state.actuals=state.actuals.filter(a=>a.crew||a.builder||a.subdivision||a.lot||a.task||a.actualHours);
   state.actuals=state.actuals.map(a=>{
-    const b=budgetForActual(a);
+    const b=budgetForActual(a, scheduleIndex);
     if(norm(a.rawTask).includes("other") && !a.notes) state.actualIssues.push({msg:`Actuals • ${a.sourceFile} row ${a.row}: Other task has no Notes value, so task name is shown as Other.`});
     if(!a.actualHours) state.actualIssues.push({msg:`Actuals • ${a.sourceFile} row ${a.row}: Actual Hours is blank/0 for ${a.subdivision} lot ${a.lot} (${a.task}).`});
     if(b.issue) state.actualIssues.push({msg:b.issue});
     const variance = b.budget==null ? null : a.actualHours - b.budget;
     const efficiency = b.budget && a.actualHours ? (b.budget / a.actualHours * 100) : null;
-    return {...a, budgetHours:b.budget, floorplan:b.floorplan, budgetSource:b.source, variance, efficiency};
+    return {...a, budgetHours:b.budget, floorplan:b.floorplan, budgetSource:b.source, scheduleMatchCount:b.matchCount||0, variance, efficiency};
   });
   renderActuals();
 }
@@ -753,32 +900,68 @@ function varianceClass(v){ if(v==null || Math.abs(v)<.01) return "varianceZero";
 function varianceText(v){ return v==null ? "—" : `${v>0?"+":""}${fmt(v)} hrs`; }
 function renderActualsEmpty(msg="No actuals loaded yet."){
   document.getElementById("actualCards").innerHTML=`<div class="stat" style="grid-column:1/-1"><h3>Status</h3><div class="num" style="font-size:20px">${safe(msg)}</div><p>Upload actual cleaning hours to review efficiency.</p></div>`;
-  ["actualCrewTable","actualTaskTable","actualFloorplanTable","actualDetailTable"].forEach(id=>document.getElementById(id).innerHTML="");
+  ["actualCrewTable","actualTaskTable","actualFloorplanTable","actualDetailTable","actualDayTable"].forEach(id=>document.getElementById(id).innerHTML="");
   document.getElementById("actualIssues").innerHTML=`<div class="empty">No actuals loaded.</div>`;
   document.getElementById("actualIssueCount").textContent="0";
   document.getElementById("actualDetailCount").textContent="0 rows";
 }
-function renderActuals(){ renderActualCards(); renderActualCrewTable(); renderActualTaskTable(); renderActualFloorplanTable(); renderActualDetailTable(); renderActualIssues(); }
-function renderActualCards(){
-  const s=actualSums(state.actuals); const eff=s.budget&&s.actual?s.budget/s.actual*100:null;
-  const rows=[
-    ["Actual Hours",fmt(s.actual),`${s.jobs} cleaning actual rows`,""],
+function populateActualFilters(){
+  const rows=state.actuals||[];
+  const days=[...new Set(rows.map(r=>r.date).filter(Boolean))].sort();
+  const weeks=[...new Set(rows.map(r=>isoWeek(r.date)).filter(Boolean))].sort();
+  const months=[...new Set(rows.map(r=>monthKey(r.date)).filter(Boolean))].sort();
+  const crews=[...new Set(rows.map(r=>r.crew).filter(Boolean))].sort();
+  const builders=[...new Set(rows.map(r=>r.builder).filter(Boolean))].sort();
+  const tasks=[...new Set(rows.map(r=>r.task).filter(Boolean))].sort();
+  fillSelect("actualDaySelect",days,"All"); fillSelect("actualWeekSelect",weeks,"All"); fillSelect("actualMonthSelect",months,"All");
+  fillSelect("actualCrewSelect",crews,"All"); fillSelect("actualBuilderSelect",builders,"All"); fillSelect("actualTaskSelect",tasks,"All");
+}
+function actualViewRows(){
+  const mode=document.getElementById("actualMode")?.value||"all";
+  const day=document.getElementById("actualDaySelect")?.value||"";
+  const week=document.getElementById("actualWeekSelect")?.value||"";
+  const month=document.getElementById("actualMonthSelect")?.value||"";
+  const crew=document.getElementById("actualCrewSelect")?.value||"";
+  const builder=document.getElementById("actualBuilderSelect")?.value||"";
+  const task=document.getElementById("actualTaskSelect")?.value||"";
+  const q=norm(document.getElementById("actualSearch")?.value||"");
+  return (state.actuals||[]).filter(r=>{
+    if(mode==="day" && day && r.date!==day) return false;
+    if(mode==="week" && week && isoWeek(r.date)!==week) return false;
+    if(mode==="month" && month && monthKey(r.date)!==month) return false;
+    if(crew && r.crew!==crew) return false;
+    if(builder && r.builder!==builder) return false;
+    if(task && r.task!==task) return false;
+    if(q && !norm([r.date,r.crew,r.builder,r.subdivision,r.lot,r.task,r.floorplan,r.notes,r.sourceFile].join(" ")).includes(q)) return false;
+    return true;
+  });
+}
+function renderActuals(){ populateActualFilters(); const rows=actualViewRows(); renderActualCards(rows); renderActualDayTable(rows); renderActualCrewTable(rows); renderActualTaskTable(rows); renderActualFloorplanTable(rows); renderActualDetailTable(rows); renderActualIssues(); }
+function renderActualCards(rows=actualViewRows()){
+  const s=actualSums(rows); const eff=s.budget&&s.actual?s.budget/s.actual*100:null;
+  const all=state.actuals?.length||0;
+  const cards=[
+    ["Actual Hours",fmt(s.actual),`${s.jobs} of ${all} actual rows in view`,""],
     ["Budget Hours",fmt(s.budget),`${s.matched} rows matched to budget`,"good"],
     ["Variance",varianceText(s.variance),s.variance>0?"over budget":"under/on budget",s.variance>0?"bad":"good"],
     ["Efficiency",efficiencyText(eff),`${s.crews} crews`,"purple"]
   ];
-  document.getElementById("actualCards").innerHTML=rows.map(c=>`<div class="stat ${c[3]}"><h3>${safe(c[0])}</h3><div class="num">${safe(c[1])}</div><p>${safe(c[2])}</p></div>`).join("");
+  document.getElementById("actualCards").innerHTML=cards.map(c=>`<div class="stat ${c[3]}"><h3>${safe(c[0])}</h3><div class="num">${safe(c[1])}</div><p>${safe(c[2])}</p></div>`).join("");
+}
+function renderActualDayTable(rows=actualViewRows()){
+  const list=[...groupBy(rows.filter(r=>r.date),r=>r.date).entries()].map(([date,items])=>{ const topCrew=[...groupBy(items,r=>r.crew||"Unknown").entries()].map(([crew,rs])=>({crew,...actualSums(rs)})).sort((a,b)=>b.actual-a.actual||b.jobs-a.jobs)[0]; return {date,...actualSums(items),topCrew}; }).sort((a,b)=>b.actual-a.actual||b.jobs-a.jobs);
+  document.getElementById("actualDayTable").innerHTML=`<thead><tr><th>Date</th><th class="right">Actual</th><th class="right">Budget</th><th class="right">Variance</th><th class="right">Efficiency</th><th class="right">Jobs</th><th>Top Crew</th></tr></thead><tbody>${list.map(r=>{ const eff=r.budget&&r.actual?r.budget/r.actual*100:null; return `<tr><td><b>${safe(displayDate(r.date))}</b><br><span class="muted">${safe(r.date)}</span></td><td class="right"><b>${fmt(r.actual)}</b></td><td class="right">${fmt(r.budget)}</td><td class="right"><span class="${varianceClass(r.variance)}">${varianceText(r.variance)}</span></td><td class="right">${efficiencyText(eff)}</td><td class="right">${r.jobs}</td><td><b>${safe(r.topCrew?.crew||"—")}</b><br><span class="muted">${fmt(r.topCrew?.actual||0)} hrs • ${r.topCrew?.jobs||0} jobs</span></td></tr>`;}).join("")}</tbody>`;
 }
 function renderActualGroupTable(id, rows, groupFn, labelName){
-  const list=[...groupBy(rows,groupFn).entries()].map(([name,items])=>({name, ...actualSums(items), rows:items})).sort((a,b)=>b.actual-a.actual||b.jobs-a.jobs);
+  const list=[...groupBy(rows,groupFn).entries()].map(([name,items])=>({name, ...actualSums(items), rows:items})).sort((a,b)=>String(a.name).localeCompare(String(b.name))||b.actual-a.actual||b.jobs-a.jobs);
   document.getElementById(id).innerHTML=`<thead><tr><th>${safe(labelName)}</th><th class="right">Actual</th><th class="right">Budget</th><th class="right">Variance</th><th class="right">Efficiency</th><th class="right">Jobs</th></tr></thead><tbody>${list.map(r=>{ const eff=r.budget&&r.actual?r.budget/r.actual*100:null; return `<tr><td><b>${safe(r.name||"—")}</b></td><td class="right"><b>${fmt(r.actual)}</b></td><td class="right">${fmt(r.budget)}</td><td class="right"><span class="${varianceClass(r.variance)}">${varianceText(r.variance)}</span></td><td class="right">${efficiencyText(eff)}</td><td class="right">${r.jobs}</td></tr>`; }).join("")}</tbody>`;
 }
-function renderActualCrewTable(){ renderActualGroupTable("actualCrewTable",state.actuals,r=>r.crew||"Unknown","Crew"); }
-function renderActualTaskTable(){ renderActualGroupTable("actualTaskTable",state.actuals,r=>r.task||"Other","Task"); }
-function renderActualFloorplanTable(){ renderActualGroupTable("actualFloorplanTable",state.actuals.filter(r=>r.floorplan),r=>r.floorplan||"No Floorplan","Floor Plan"); }
-function renderActualDetailTable(){
-  document.getElementById("actualDetailCount").textContent=`${state.actuals.length} rows`;
-  document.getElementById("actualDetailTable").innerHTML=`<thead><tr><th>Date</th><th>Crew</th><th>Builder / Subdivision</th><th>Lot</th><th>Task</th><th>Floor Plan</th><th class="right">Actual</th><th class="right">Budget</th><th class="right">Variance</th><th class="right">Efficiency</th></tr></thead><tbody>${state.actuals.map(r=>`<tr><td><b>${safe(displayDate(r.date))}</b><br><span class="muted">${safe(r.sourceFile)}</span></td><td>${safe(r.crew)}</td><td><b>${safe(r.builder)}</b><br>${safe(r.subdivision)}</td><td>${safe(r.lot)}</td><td><b>${safe(r.task)}</b>${r.notes?`<br><span class="muted">${safe(r.notes)}</span>`:""}</td><td>${safe(r.floorplan||"—")}</td><td class="right"><b>${fmt(r.actualHours)}</b></td><td class="right">${r.budgetHours==null?"—":fmt(r.budgetHours)}</td><td class="right"><span class="${varianceClass(r.variance)}">${varianceText(r.variance)}</span></td><td class="right">${efficiencyText(r.efficiency)}</td></tr>`).join("")}</tbody>`;
+function renderActualCrewTable(rows=actualViewRows()){ renderActualGroupTable("actualCrewTable",rows,r=>r.crew||"Unknown","Crew"); }
+function renderActualTaskTable(rows=actualViewRows()){ renderActualGroupTable("actualTaskTable",rows,r=>r.task||"Other","Task"); }
+function renderActualFloorplanTable(rows=actualViewRows()){ renderActualGroupTable("actualFloorplanTable",rows.filter(r=>r.floorplan),r=>`${r.builder||"Unknown"} • ${r.floorplan||"No Floorplan"}`,"Builder • Floor Plan"); }
+function renderActualDetailTable(rows=actualViewRows()){
+  document.getElementById("actualDetailCount").textContent=`${rows.length} rows`;
+  document.getElementById("actualDetailTable").innerHTML=`<thead><tr><th>Date</th><th>Crew</th><th>Builder / Subdivision</th><th>Lot</th><th>Task</th><th>Floor Plan</th><th class="right">Actual</th><th class="right">Budget</th><th class="right">Variance</th><th class="right">Efficiency</th><th>Budget Source</th></tr></thead><tbody>${rows.map(r=>`<tr><td><b>${safe(displayDate(r.date))}</b><br><span class="muted">${safe(r.sourceFile)}</span></td><td>${safe(r.crew)}</td><td><b>${safe(r.builder)}</b><br>${safe(r.subdivision)}</td><td>${safe(r.lot)}</td><td><b>${safe(r.task)}</b>${r.notes?`<br><span class="muted">${safe(r.notes)}</span>`:""}</td><td>${safe(r.floorplan||"—")}</td><td class="right"><b>${fmt(r.actualHours)}</b></td><td class="right">${r.budgetHours==null?"—":fmt(r.budgetHours)}</td><td class="right"><span class="${varianceClass(r.variance)}">${varianceText(r.variance)}</span></td><td class="right">${efficiencyText(r.efficiency)}</td><td class="muted">${safe(r.budgetSource||"—")}</td></tr>`).join("")}</tbody>`;
 }
 function renderActualIssues(){
   document.getElementById("actualIssueCount").textContent=state.actualIssues.length;
@@ -789,7 +972,7 @@ function exportSnapshot(){
   if(!state.loaded){ alert("Load and calculate your Excel files first."); return; }
   const payload={
     app:"VIP Quadrant Man-Hour Review",
-    version:"1.90",
+    version:"1.94",
     exportedAt:new Date().toISOString(),
     columbusCenter:COLUMBUS,
     subdivisions:state.subs,
@@ -811,7 +994,7 @@ function loadSnapshotObject(payload){
   state.subs=Array.isArray(payload.subdivisions)?payload.subdivisions:[];
   state.tasks=Array.isArray(payload.taskTypes)?payload.taskTypes:[];
   state.floorPlans=Array.isArray(payload.floorPlans)?payload.floorPlans:[]; state.floorIndex=buildFloorIndex(state.floorPlans);
-  state.rawJobs=[]; state.jobs=payload.jobs.map(j=>{ const workGroup=j.workGroup||"Labor"; const taskDisplay = workGroup==="Cleaning" ? canonicalCleaningTask(j.task,j.notes) : (j.taskDisplay || j.task || "Other"); return {week:j.week||isoWeek(j.date),month:j.month||monthKey(j.date),...j,workGroup,taskDisplay}; }); state.workTypes=[...new Set(state.jobs.map(j=>j.workGroup||"Labor"))].sort(); state.issues=Array.isArray(payload.issues)?payload.issues:[]; state.actuals=Array.isArray(payload.actuals)?payload.actuals:[]; state.actualIssues=Array.isArray(payload.actualIssues)?payload.actualIssues:[]; state.loaded=true;
+  state.rawJobs=[]; state.jobs=payload.jobs.map(j=>{ const workGroup=j.workGroup||"Labor"; const taskDisplay = workGroup==="Cleaning" ? canonicalCleaningTask(j.task,j.notes) : genericTaskInfo(j.task,j.notes).name; return {week:j.week||isoWeek(j.date),month:j.month||monthKey(j.date),...j,workGroup,taskDisplay}; }); state.workTypes=[...new Set(state.jobs.map(j=>j.workGroup||"Labor"))].sort(); state.issues=Array.isArray(payload.issues)?payload.issues:[]; state.actuals=Array.isArray(payload.actuals)?payload.actuals:[]; state.actualIssues=Array.isArray(payload.actualIssues)?payload.actualIssues:[]; state.loaded=true;
   populateFilters(); applyFilters(); if(state.actuals && state.actuals.length) renderActuals();
 }
 async function loadSnapshotFile(file){ const text=await file.text(); loadSnapshotObject(JSON.parse(text)); }
@@ -888,6 +1071,98 @@ async function loadHostedSnapshot(fileName){
   loadSnapshotObject(await res.json());
 }
 
+
+// ---------- Data Manager ----------
+const dmState = { dataset:"jobs", changed:false };
+const DM_EXCLUDE_KEYS = new Set(["raw","subMatch","rows","layers","map"]);
+function dataSets(){
+  return [
+    {id:"subs", label:"Subdivisions", hint:"map source", rows:()=>state.subs, after:()=>{}},
+    {id:"tasks", label:"Task Types", hint:"labor/task hours", rows:()=>state.tasks, after:()=>{}},
+    {id:"floorPlans", label:"Floor Plans", hint:"lot budgets", rows:()=>state.floorPlans, after:()=>{state.floorIndex=buildFloorIndex(state.floorPlans);}},
+    {id:"rawJobs", label:"Raw Imported Jobs", hint:"before matching", rows:()=>state.rawJobs, after:()=>{}},
+    {id:"jobs", label:"Review Jobs", hint:"matched workload rows", rows:()=>state.jobs, after:()=>{state.workTypes=[...new Set(state.jobs.map(j=>j.workGroup||"Labor"))].sort(); populateFilters(); applyFilters();}},
+    {id:"filtered", label:"Current Filtered Jobs", hint:"visible workload rows", rows:()=>state.filtered, readonly:true, after:()=>{}},
+    {id:"actuals", label:"Cleaning Actuals", hint:"actual vs budget rows", rows:()=>state.actuals, after:()=>renderActuals()},
+    {id:"issues", label:"Review Issues", hint:"warnings", rows:()=>state.issues, after:()=>renderIssues()},
+    {id:"actualIssues", label:"Actuals Issues", hint:"warnings", rows:()=>state.actualIssues, after:()=>renderActualIssues()}
+  ];
+}
+function dmDataset(){ return dataSets().find(d=>d.id===dmState.dataset) || dataSets()[4]; }
+function dmPrimitive(v){ return v==null || ["string","number","boolean"].includes(typeof v); }
+function dmColumns(rows){
+  const keys=[]; rows.slice(0,400).forEach(r=>Object.keys(r||{}).forEach(k=>{ if(!DM_EXCLUDE_KEYS.has(k) && !keys.includes(k)) keys.push(k); }));
+  return keys;
+}
+function dmCellValue(v){ if(v==null) return ""; if(dmPrimitive(v)) return String(v); try{return JSON.stringify(v);}catch(e){return String(v);} }
+function dmCoerce(value, oldValue){
+  const s=String(value??"").trim();
+  if(typeof oldValue==="number") return num(s);
+  if(typeof oldValue==="boolean") return /^(true|yes|1)$/i.test(s);
+  if(oldValue && typeof oldValue==="object") { try{return JSON.parse(s);}catch(e){return oldValue;} }
+  return s;
+}
+function dmFileNames(inputId){ const el=document.getElementById(inputId); const files=[...(el?.files||[])].map(f=>f.name); return files.length?files.join(", "):"none loaded"; }
+function dmFileSummary(inputId){
+  const files=[...(document.getElementById(inputId)?.files||[])].map(f=>f.name);
+  if(!files.length) return {label:"none loaded", title:""};
+  return {label:files.length===1?files[0]:`${files.length} files loaded`, title:files.join("\n")};
+}
+function dmFileStatusRows(){
+  return [
+    {group:"Create New Review", type:"Subdivisions", input:"subsFile", rows:state.subs.length},
+    {group:"Create New Review", type:"Task Types", input:"tasksFile", rows:state.tasks.length},
+    {group:"Create New Review", type:"Floor Plans", input:"floorPlansFile", rows:state.floorPlans.length},
+    {group:"Create New Review", type:"Labor Daily Files", input:"jobsFiles", rows:state.rawJobs.filter(j=>j.workGroup==="Labor").length},
+    {group:"Create New Review", type:"Cleaning Daily Files", input:"cleaningFiles", rows:state.rawJobs.filter(j=>j.workGroup==="Cleaning").length},
+    {group:"Cleaning Actuals", type:"Actuals Schedules", input:"actualScheduleFiles", rows:state.jobs.filter(j=>j.workGroup==="Cleaning").length},
+    {group:"Cleaning Actuals", type:"Cleaning Actuals", input:"actualFiles", rows:state.actuals.length}
+  ];
+}
+function renderDataManager(){ renderDmFileStatus(); renderDmDatasetList(); renderDmTable(); }
+function renderDmFileStatus(){
+  let last="";
+  const html=`<div class="dmStatusGrid">${dmFileStatusRows().map(row=>{ const f=dmFileSummary(row.input); const group=row.group!==last ? (last=row.group, `<div class="dmGroupTitle">${safe(row.group)}</div>`) : ""; return `${group}<div class="dmFileCard"><div class="dmFileMeta"><b>${safe(row.type)}</b><small class="dmFileName" title="${attrSafe(f.title||f.label)}">${safe(f.label)}</small><small>${fmt(row.rows)} rows parsed</small></div><button class="btn ghost" onclick="document.getElementById('${row.input}')?.click()">Replace</button></div>`; }).join("")}</div>`;
+  document.getElementById("dmFileStatus").innerHTML=html;
+}
+function renderDmDatasetList(){
+  document.getElementById("dmDatasetList").innerHTML=dataSets().map(d=>{ const rows=d.rows()||[]; return `<button class="dmDatasetBtn ${d.id===dmState.dataset?"active":""}" data-dataset="${safe(d.id)}"><b>${safe(d.label)}</b><small>${fmt(rows.length)} rows • ${safe(d.hint||"")}${d.readonly?" • read-only":""}</small></button>`; }).join("");
+}
+function renderDmTable(){
+  const ds=dmDataset(); const allRows=ds.rows()||[]; const q=norm(document.getElementById("dmSearch")?.value||""); const limit=Number(document.getElementById("dmLimit")?.value||100);
+  const rows=q?allRows.filter(r=>norm(JSON.stringify(r||{})).includes(q)):allRows;
+  const shown=rows.slice(0,limit); const cols=dmColumns(rows.length?rows:allRows);
+  document.getElementById("dmTitle").innerHTML=`<h2>${safe(ds.label)} ${dmState.changed?'<span class="dmChanged">• edited</span>':''}</h2><span class="muted">${fmt(rows.length)} matching rows / ${fmt(allRows.length)} total</span>`;
+  if(!cols.length){ document.getElementById("dmTableWrap").innerHTML=`<div class="empty">No rows to show for ${safe(ds.label)}.</div>`; document.getElementById("dmPager").textContent=""; return; }
+  const body=shown.map((row)=>{ const realIndex=allRows.indexOf(row); return `<tr>${cols.map(col=>{ const val=row?.[col]; const readonly=ds.readonly || !dmPrimitive(val); return `<td class="${readonly?'dmReadonly':'dmEditable'}" ${readonly?'':'contenteditable="true"'} data-row="${realIndex}" data-col="${safe(col)}" title="${safe(dmCellValue(val))}">${safe(dmCellValue(val))}</td>`; }).join("")}</tr>`; }).join("");
+  document.getElementById("dmTableWrap").innerHTML=`<table class="dmTable"><thead><tr>${cols.map(c=>`<th>${safe(c)}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table>`;
+  document.getElementById("dmPager").textContent=`Showing ${fmt(shown.length)} of ${fmt(rows.length)} matching rows. Object/raw columns are read-only in this table.`;
+}
+function openDataManager(){ document.getElementById("dataManagerModal").classList.add("show"); document.getElementById("dataManagerModal").setAttribute("aria-hidden","false"); renderDataManager(); }
+function closeDataManager(){ document.getElementById("dataManagerModal").classList.remove("show"); document.getElementById("dataManagerModal").setAttribute("aria-hidden","true"); }
+function dmApplyEdit(td){
+  const ds=dmDataset(); if(ds.readonly) return; const rows=ds.rows()||[]; const idx=Number(td.dataset.row); const col=td.dataset.col; if(!rows[idx] || !col) return;
+  const oldVal=rows[idx][col]; const newVal=dmCoerce(td.textContent, oldVal); rows[idx][col]=newVal; dmState.changed=true; td.classList.add("dmChanged");
+}
+function dmRecalculate(){
+  dataSets().forEach(d=>{ if(d.id===dmState.dataset && typeof d.after==="function") d.after(); });
+  if(dmState.dataset!=="jobs") { populateFilters(); if(state.loaded) applyFilters(); }
+  if(state.actuals?.length) renderActuals(); renderDmFileStatus(); renderDmDatasetList(); renderDmTable();
+}
+function dmRowsForExport(){ const ds=dmDataset(); const rows=ds.rows()||[]; return rows.map(r=>{ const out={}; Object.keys(r||{}).forEach(k=>{ if(!DM_EXCLUDE_KEYS.has(k)) out[k]=r[k]; }); return out; }); }
+function dmExportName(ext){ return `vip-${dmDataset().id}-corrected.${ext}`; }
+function exportDmCsv(){ download(dmExportName("csv"), toCsvGeneric(dmRowsForExport())); }
+function exportDmJson(){ downloadJson(dmExportName("json"), dmRowsForExport()); }
+function exportDmXlsx(){
+  const rows=dmRowsForExport(); if(!window.XLSX){ alert("XLSX library is not loaded."); return; }
+  const ws=XLSX.utils.json_to_sheet(rows); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, dmDataset().id.slice(0,31)); XLSX.writeFile(wb, dmExportName("xlsx"));
+}
+function toCsvGeneric(rows){
+  const cols=[...new Set(rows.flatMap(r=>Object.keys(r||{})))];
+  return cols.join(",")+"\n"+rows.map(r=>cols.map(c=>csvCell(r[c] && typeof r[c]==="object" ? JSON.stringify(r[c]) : r[c])).join(",")).join("\n");
+}
+
+
 document.getElementById("calcBtn").addEventListener("click",()=>loadAndCompute().catch(err=>{console.error(err); setStatusCards("Error: "+err.message);}));
 document.getElementById("loadActualsBtn").addEventListener("click",()=>loadActuals().catch(err=>{console.error(err); renderActualsEmpty("Actuals error: "+err.message);}));
 ["mode","workType","daySelect","weekSelect","monthSelect","search"].forEach(id=>document.getElementById(id).addEventListener(id==="search"?"input":"change",()=>{ if(state.loaded) applyFilters(); }));
@@ -907,6 +1182,19 @@ document.getElementById("refreshReviewsBtn").addEventListener("click",()=>popula
 document.getElementById("copyBtn").addEventListener("click",async()=>{ await navigator.clipboard.writeText(summaryText()); const b=document.getElementById("copyBtn"); const old=b.textContent; b.textContent="Copied!"; setTimeout(()=>b.textContent=old,1200); });
 document.querySelectorAll(".topTab").forEach(btn=>btn.addEventListener("click",()=>{ document.querySelectorAll(".topTab").forEach(b=>b.classList.remove("active")); document.querySelectorAll(".tabPage").forEach(p=>p.classList.remove("active")); btn.classList.add("active"); document.getElementById(btn.dataset.tab).classList.add("active"); if(btn.dataset.tab==="reviewTab" && state.map) setTimeout(()=>state.map.invalidateSize(),120); }));
 renderActualsEmpty();
+
+document.getElementById("dataManagerBtn").addEventListener("click",openDataManager);
+document.getElementById("dataManagerClose").addEventListener("click",closeDataManager);
+document.getElementById("dataManagerModal").addEventListener("click",e=>{ if(e.target.id==="dataManagerModal") closeDataManager(); });
+document.getElementById("dmDatasetList").addEventListener("click",e=>{ const btn=e.target.closest(".dmDatasetBtn"); if(!btn)return; dmState.dataset=btn.dataset.dataset; renderDataManager(); });
+document.getElementById("dmSearch").addEventListener("input",renderDmTable);
+document.getElementById("dmLimit").addEventListener("change",renderDmTable);
+document.getElementById("dmTableWrap").addEventListener("focusout",e=>{ const td=e.target.closest("td.dmEditable"); if(td) dmApplyEdit(td); });
+document.getElementById("dmRecalcBtn").addEventListener("click",dmRecalculate);
+document.getElementById("dmExportCsvBtn").addEventListener("click",exportDmCsv);
+document.getElementById("dmExportXlsxBtn").addEventListener("click",exportDmXlsx);
+document.getElementById("dmExportJsonBtn").addEventListener("click",exportDmJson);
+
 populateSavedReviews();
 document.getElementById("summaryCards").innerHTML="";
 initMap();
