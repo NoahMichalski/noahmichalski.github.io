@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Calendar Cleaning CSV Parser</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a31;
+      --panel2: #17213c;
+      --border: #283453;
+      --text: #f6f8ff;
+      --muted: #aab6d3;
+      --accent: #5eead4;
+      --accent2: #60a5fa;
+      --danger: #fb7185;
+      --warn: #fbbf24;
+      --green: #22c55e;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,.16), transparent 32%),
+        radial-gradient(circle at top right, rgba(94,234,212,.10), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(14px);
+      background: rgba(11,16,32,.82);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wrap { width: min(1520px, calc(100% - 28px)); margin: 0 auto; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 0;
+    }
+
+    h1 { margin: 0; font-size: clamp(22px, 3vw, 34px); letter-spacing: -.04em; }
+    .sub { color: var(--muted); margin-top: 4px; font-size: 14px; }
+
+    .version {
+      white-space: nowrap;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      font-size: 13px;
+    }
+
+    main { padding: 22px 0 44px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 470px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.025));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .cardHead {
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.035);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .cardHead h2 { margin: 0; font-size: 16px; letter-spacing: -.02em; }
+    .cardBody { padding: 16px; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: rgba(7, 11, 24, .82);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 13px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input[type="file"] { padding: 10px; font-size: 13px; }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(94,234,212,.7);
+      box-shadow: 0 0 0 4px rgba(94,234,212,.08);
+    }
+
+    textarea {
+      min-height: 160px;
+      resize: vertical;
+      line-height: 1.45;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .fields.three { grid-template-columns: 1fr 1fr 1fr; }
+
+    @media (max-width: 700px) { .fields, .fields.three { grid-template-columns: 1fr; } }
+
+    .sectionLabel {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .pill {
+      font-size: 12px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 9px;
+      background: rgba(255,255,255,.04);
+    }
+
+    .pill.good { color: #bbf7d0; border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10); }
+    .pill.warn { color: #fde68a; border-color: rgba(251,191,36,.38); background: rgba(251,191,36,.10); }
+
+    .btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: #07111e;
+      background: var(--accent);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-weight: 900;
+      letter-spacing: -.01em;
+      transition: transform .12s ease, filter .12s ease;
+    }
+
+    button:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    button:active { transform: translateY(0); }
+
+    button.secondary {
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    button.blue { background: var(--accent2); color: #06101f; }
+
+    button.danger {
+      background: rgba(251,113,133,.14);
+      color: #fecdd3;
+      border: 1px solid rgba(251,113,133,.35);
+    }
+
+    .help { color: var(--muted); font-size: 13px; line-height: 1.45; margin: 12px 0 0; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(110px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 950px) { .stats { grid-template-columns: 1fr 1fr 1fr; } }
+    @media (max-width: 620px) { .stats { grid-template-columns: 1fr 1fr; } }
+
+    .stat {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      border-radius: 16px;
+      padding: 13px;
+    }
+
+    .stat .num { font-size: 24px; font-weight: 950; letter-spacing: -.04em; }
+    .stat .txt {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: .08em;
+      margin-top: 2px;
+    }
+
+    .tableWrap {
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      max-height: 720px;
+    }
+
+    table { width: 100%; border-collapse: collapse; min-width: 1120px; font-size: 13px; }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #24304d;
+      color: #fff;
+      text-align: left;
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,.075);
+      vertical-align: top;
+      color: #eaf0ff;
+    }
+
+    tr:nth-child(even) td { background: rgba(255,255,255,.025); }
+    tr:hover td { background: rgba(94,234,212,.055); }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+      margin: 1px 2px 1px 0;
+    }
+
+    .tag.original { background: rgba(96,165,250,.15); color: #bfdbfe; border: 1px solid rgba(96,165,250,.32); }
+    .tag.reclean { background: rgba(34,197,94,.14); color: #bbf7d0; border: 1px solid rgba(34,197,94,.30); }
+    .tag.am { background: rgba(251,191,36,.14); color: #fde68a; border: 1px solid rgba(251,191,36,.35); }
+    .tag.miss { background: rgba(251,113,133,.12); color: #fecdd3; border: 1px solid rgba(251,113,133,.30); }
+
+    .empty { color: var(--muted); text-align: center; padding: 44px 20px; }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      padding: 12px 14px;
+      border-radius: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: .18s ease;
+      z-index: 99;
+      max-width: 420px;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .sampleBox {
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--muted);
+      background: rgba(0,0,0,.18);
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 10px;
+    }
+
+    .miniStatus {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .statusRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: rgba(255,255,255,.035);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .checkline {
+      display:flex;
+      align-items:center;
+      gap:9px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .checkline input { width: auto; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <div>
+        <h1>Google Calendar Cleaning CSV Parser</h1>
+        <div class="sub">Paste originals/recleans → pull saved shortcut/address data → export Google Calendar CSV.</div>
+      </div>
+      <div class="version">v1.31</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid">
+      <section>
+        <div class="card">
+          <div class="cardHead">
+            <h2>Import Text</h2>
+            <span class="pill">3 jobs / hour</span>
+          </div>
+          <div class="cardBody">
+            <div class="fields">
+              <div>
+                <label for="eventDate">Calendar Date</label>
+                <input id="eventDate" type="date" />
+              </div>
+              <div>
+                <label for="startTime">First Hour</label>
+                <input id="startTime" type="time" value="01:00" />
+              </div>
+            </div>
+
+            <div class="fields">
+              <div>
+                <label for="jobsPerHour">Jobs Per Hour</label>
+                <input id="jobsPerHour" type="number" min="1" max="12" value="3" />
+              </div>
+              <div>
+                <label for="duration">Event Length</label>
+                <select id="duration">
+                  <option value="60" selected>1 hour</option>
+                  <option value="45">45 minutes</option>
+                  <option value="30">30 minutes</option>
+                  <option value="15">15 minutes</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="checkline">
+              <input id="appendFloorplan" type="checkbox" />
+              <span>Append floorplan to calendar subject when found</span>
+            </div>
+
+            <div class="sectionLabel">
+              <label for="originalText">Original Section</label>
+              <span class="pill" id="originalCount">0 jobs</span>
+            </div>
+            <textarea id="originalText" placeholder="Paste originals here...&#10;Example:&#10;206 MD**AM&#10;102 LH (garage code 1234)"></textarea>
+
+            <div class="sectionLabel">
+              <label for="recleanText">Reclean Section</label>
+              <span class="pill" id="recleanCount">0 jobs</span>
+            </div>
+            <textarea id="recleanText" placeholder="Paste recleans here...&#10;Example:&#10;2750 Piatts (atn to bsmt)&#10;AM 4158 Glenross"></textarea>
+
+            <div class="btns">
+              <button onclick="parseAndRender()">Parse / Preview</button>
+              <button class="blue" onclick="downloadCSV()">Export CSV</button>
+              <button class="secondary" onclick="copyCSV()">Copy CSV</button>
+              <button class="danger" onclick="clearAll()">Clear Text</button>
+            </div>
+
+            <p class="help">
+              Originals start at <b>1:00 AM</b>. After the last Original hour, it leaves <b>one blank hour</b>, then schedules Recleans.
+            </p>
+
+            <div class="sampleBox">Shortcut file format supported:
+Builder | Subdivision | Shortened
+
+Example from your Shortened.xlsx:
+DR Horton | Madison Meadows *DR *Plain City | MD</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardHead">
+            <h2>Saved Data Files</h2>
+            <span class="pill good" id="storagePill">Local Storage</span>
+          </div>
+          <div class="cardBody">
+            <label for="shortcutFile">Upload Shortened.xlsx</label>
+            <input id="shortcutFile" type="file" accept=".xlsx,.xls,.csv" />
+            <p class="help">
+              Compatible with your file columns: <b>Builder</b>, <b>Subdivision</b>, <b>Shortened</b>.
+              The site saves it after upload.
+            </p>
+
+            <div style="height:14px"></div>
+
+            <label for="lotFile">Upload Floorplans / Addresses File</label>
+            <input id="lotFile" type="file" accept=".xlsx,.xls,.csv,.json" />
+            <p class="help">
+              Uses the same file for address and floorplan lookup. Expected columns include:
+              Builder, Subdivision, Lot, Floorplan, Address.
+            </p>
+
+            <div class="miniStatus">
+              <div class="statusRow">
+                <span>Shortcuts loaded</span>
+                <span class="pill" id="shortcutLoaded">0</span>
+              </div>
+              <div class="statusRow">
+                <span>Lots / addresses loaded</span>
+                <span class="pill" id="lotLoaded">0</span>
+              </div>
+              <div class="statusRow">
+                <span>Last data update</span>
+                <span class="pill" id="lastUpdate">Never</span>
+              </div>
+            </div>
+
+            <div class="btns">
+              <button class="secondary" onclick="exportSavedShortcuts()">Export Shortcuts JSON</button>
+              <button class="danger" onclick="clearSavedData()">Clear Saved Data</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="cardHead">
+          <h2>Calendar Preview</h2>
+          <span class="pill" id="rangePill">No export yet</span>
+        </div>
+        <div class="cardBody">
+          <div class="stats">
+            <div class="stat">
+              <div class="num" id="totalJobs">0</div>
+              <div class="txt">Total Jobs</div>
+            </div>
+            <div class="stat">
+              <div class="num" id="originalJobs">0</div>
+              <div class="txt">Originals</div>
+            </div>
+            <div class="stat">
+              <div class="num" id="recleanJobs">0</div>
+              <div class="txt">Recleans</div>
+            </div>
+            <div class="stat">
+              <div class="num" id="hourBlocks">0</div>
+              <div class="txt">Hour Blocks</div>
+            </div>
+            <div class="stat">
+              <div class="num" id="matchedJobs">0</div>
+              <div class="txt">Matched</div>
+            </div>
+            <div class="stat">
+              <div class="num" id="missingJobs">0</div>
+              <div class="txt">Missing</div>
+            </div>
+          </div>
+
+          <div class="tableWrap" id="tableWrap">
+            <div class="empty">Paste jobs, pick a date, then hit Parse / Preview.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEYS = {
+      shortcuts: 'gcal_cleaning_shortcuts_v130',
+      lots: 'gcal_cleaning_lots_v130',
+      updated: 'gcal_cleaning_updated_v130'
+    };
+
+    let parsedRows = [];
+    let shortcutRows = [];
+    let lotRows = [];
+
+    const byId = id => document.getElementById(id);
+
+    function todayISO() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    }
+
+    byId('eventDate').value = todayISO();
+
+    ['eventDate','startTime','jobsPerHour','duration','originalText','recleanText','appendFloorplan'].forEach(id => {
+      byId(id).addEventListener('input', parseAndRender);
+      byId(id).addEventListener('change', parseAndRender);
+    });
+
+    byId('shortcutFile').addEventListener('change', e => handleShortcutUpload(e.target.files[0]));
+    byId('lotFile').addEventListener('change', e => handleLotUpload(e.target.files[0]));
+
+    function showToast(message) {
+      const t = byId('toast');
+      t.textContent = message;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    function normalizeText(value) {
+      return String(value ?? '')
+        .toLowerCase()
+        .replace(/&/g, 'and')
+        .replace(/\*/g, ' ')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function normalizeKey(value) {
+      return normalizeText(value).replace(/\s+/g, '');
+    }
+
+    function cleanLot(value) {
+      const str = String(value ?? '').trim();
+      const match = str.match(/[A-Za-z]?\d+[A-Za-z]?|\d+[A-Za-z]?/);
+      return match ? match[0].toUpperCase() : str.toUpperCase();
+    }
+
+    function cleanLine(line) {
+      return String(line || '')
+        .replace(/^[-•–—]+\s*/, '')
+        .replace(/^\*+\s*/, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function stripKnownJobWords(value) {
+      return String(value || '')
+        .replace(/\b(original|reclean|windows?|window|p\/w|power\s*wash|pressure\s*wash)\b/ig, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function parseJobLine(line, type, sourceSectionIndex) {
+      let raw = cleanLine(line);
+      if (!raw) return null;
+
+      if (/^(originals?|recleans?|cleaning|thursday|friday|monday|tuesday|wednesday|saturday|sunday)$/i.test(raw)) return null;
+
+      const isAM = /(^|\s|\*)AM(\s|\*|:|-|$)/i.test(raw);
+
+      raw = raw
+        .replace(/^\*?AM\*?\s*[-:—–]?\s*/i, '')
+        .replace(/\s*\*+\s*AM\s*\*+\s*$/i, '')
+        .replace(/\s*\*+\s*AM\s*$/i, '')
+        .replace(/\s*AM\s*$/i, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      let note = '';
+      const noteMatch = raw.match(/\s*(\([^)]*\))\s*$/);
+      if (noteMatch) {
+        note = noteMatch[1].trim();
+        raw = raw.slice(0, noteMatch.index).trim();
+      }
+
+      raw = stripKnownJobWords(raw);
+
+      const lotMatch = raw.match(/^([A-Za-z]?\d+[A-Za-z]?)/);
+      const lot = lotMatch ? cleanLot(lotMatch[1]) : '';
+      const typedSub = lotMatch ? raw.slice(lotMatch[0].length).trim() : raw.trim();
+
+      const shortcutMatch = resolveShortcut(typedSub);
+      const lookupSub = shortcutMatch ? shortcutMatch.subdivision : typedSub;
+      const lookup = findLotRecord(lot, typedSub, lookupSub);
+
+      const typeLabel = type === 'original' ? 'Original' : 'Reclean';
+      let subjectCore = `${raw} ${typeLabel}`.replace(/\s+/g, ' ').trim();
+
+      if (byId('appendFloorplan')?.checked && lookup?.floorplan) {
+        subjectCore += ` - ${lookup.floorplan}`;
+      }
+
+      const subject = `${isAM ? '*AM* ' : ''}${subjectCore}${note ? ' ' + note : ''}`.replace(/\s+/g, ' ').trim();
+
+      return {
+        type,
+        typeLabel,
+        isAM,
+        lot,
+        typedSub,
+        shortcutSubdivision: shortcutMatch?.subdivision || '',
+        shortcutBuilder: shortcutMatch?.builder || '',
+        baseJob: raw,
+        note,
+        subject,
+        originalLine: line,
+        sourceSectionIndex,
+        address: lookup?.address || '',
+        floorplan: lookup?.floorplan || '',
+        matched: Boolean(lookup),
+        matchStatus: lookup ? 'Matched' : (lot ? 'Missing address' : 'No lot parsed')
+      };
+    }
+
+    function parseSection(text, type, sourceSectionIndex) {
+      return String(text || '')
+        .split(/\r?\n/)
+        .map(line => parseJobLine(line, type, sourceSectionIndex))
+        .filter(Boolean);
+    }
+
+    function addMinutes(timeHHMM, minutesToAdd) {
+      const [h, m] = timeHHMM.split(':').map(Number);
+      const base = new Date(2000, 0, 1, h || 0, m || 0, 0);
+      base.setMinutes(base.getMinutes() + minutesToAdd);
+      const pad = n => String(n).padStart(2, '0');
+      return `${pad(base.getHours())}:${pad(base.getMinutes())}`;
+    }
+
+    function toGoogleDate(isoDate) {
+      const [y, m, d] = isoDate.split('-').map(Number);
+      return `${m}/${d}/${y}`;
+    }
+
+    function toGoogleTime(hhmm) {
+      const [hRaw, mRaw] = hhmm.split(':').map(Number);
+      let h = hRaw || 0;
+      const m = mRaw || 0;
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12;
+      if (h === 0) h = 12;
+      return `${h}:${String(m).padStart(2, '0')} ${ampm}`;
+    }
+
+    function buildRows() {
+      const originalRows = parseSection(byId('originalText').value, 'original', 0);
+      const recleanRows = parseSection(byId('recleanText').value, 'reclean', 1);
+
+      const date = byId('eventDate').value || todayISO();
+      const startTime = byId('startTime').value || '01:00';
+      const jobsPerHour = Math.max(1, Number(byId('jobsPerHour').value) || 3);
+      const duration = Math.max(1, Number(byId('duration').value) || 60);
+
+      function scheduleSection(jobs, sectionStartTime, startingRowNum, startingHourBlock) {
+        return jobs.map((job, index) => {
+          const hourIndex = Math.floor(index / jobsPerHour);
+          const start = addMinutes(sectionStartTime, hourIndex * 60);
+          const end = addMinutes(start, duration);
+          return {
+            ...job,
+            rowNum: startingRowNum + index,
+            hourBlock: startingHourBlock + hourIndex,
+            date,
+            start,
+            end,
+            googleDate: toGoogleDate(date),
+            googleStart: toGoogleTime(start),
+            googleEnd: toGoogleTime(end)
+          };
+        });
+      }
+
+      const originalBlocks = originalRows.length ? Math.ceil(originalRows.length / jobsPerHour) : 0;
+      const blankHourGap = originalRows.length && recleanRows.length ? 1 : 0;
+      const recleanStartTime = addMinutes(startTime, (originalBlocks + blankHourGap) * 60);
+
+      const scheduledOriginals = scheduleSection(originalRows, startTime, 1, 1);
+      const scheduledRecleans = scheduleSection(
+        recleanRows,
+        recleanStartTime,
+        scheduledOriginals.length + 1,
+        originalBlocks + blankHourGap + 1
+      );
+
+      return [...scheduledOriginals, ...scheduledRecleans];
+    }
+
+    function parseAndRender() {
+      parsedRows = buildRows();
+
+      const originalCount = parsedRows.filter(r => r.type === 'original').length;
+      const recleanCount = parsedRows.filter(r => r.type === 'reclean').length;
+      const amCount = parsedRows.filter(r => r.isAM).length;
+      const matchedCount = parsedRows.filter(r => r.matched).length;
+      const missingCount = parsedRows.length - matchedCount;
+      const jobsPerHour = Math.max(1, Number(byId('jobsPerHour').value) || 3);
+      const originalBlocks = originalCount ? Math.ceil(originalCount / jobsPerHour) : 0;
+      const recleanBlocks = recleanCount ? Math.ceil(recleanCount / jobsPerHour) : 0;
+      const blocks = originalBlocks + recleanBlocks + (originalCount && recleanCount ? 1 : 0);
+
+      byId('originalCount').textContent = `${originalCount} job${originalCount === 1 ? '' : 's'}`;
+      byId('recleanCount').textContent = `${recleanCount} job${recleanCount === 1 ? '' : 's'}`;
+      byId('totalJobs').textContent = parsedRows.length;
+      byId('originalJobs').textContent = originalCount;
+      byId('recleanJobs').textContent = recleanCount;
+      byId('hourBlocks').textContent = blocks;
+      byId('matchedJobs').textContent = matchedCount;
+      byId('missingJobs').textContent = missingCount;
+
+      if (!parsedRows.length) {
+        byId('rangePill').textContent = 'No export yet';
+        byId('tableWrap').innerHTML = '<div class="empty">Paste jobs, pick a date, then hit Parse / Preview.</div>';
+        return;
+      }
+
+      const first = parsedRows[0];
+      const last = parsedRows[parsedRows.length - 1];
+      byId('rangePill').textContent = `${first.googleDate} • ${first.googleStart} - ${last.googleEnd} • ${amCount} AM`;
+
+      byId('tableWrap').innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Hour Block</th>
+              <th>Type</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Google Calendar Subject</th>
+              <th>Typed Sub</th>
+              <th>Resolved Subdivision</th>
+              <th>Floorplan</th>
+              <th>Location / Address</th>
+              <th>Status</th>
+              <th>Original Line</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${parsedRows.map(row => `
+              <tr>
+                <td>${escapeHTML(row.rowNum)}</td>
+                <td>${escapeHTML(row.hourBlock)}</td>
+                <td>
+                  <span class="tag ${row.type}">${escapeHTML(row.typeLabel)}</span>
+                  ${row.isAM ? '<span class="tag am">AM</span>' : ''}
+                </td>
+                <td>${escapeHTML(row.googleStart)}</td>
+                <td>${escapeHTML(row.googleEnd)}</td>
+                <td><b>${escapeHTML(row.subject)}</b></td>
+                <td>${escapeHTML(row.typedSub || '')}</td>
+                <td>${escapeHTML(row.shortcutSubdivision || '')}</td>
+                <td>${escapeHTML(row.floorplan || '')}</td>
+                <td>${escapeHTML(addressFloorplanLocation(row))}</td>
+                <td>${row.matched ? '<span class="tag original">Matched</span>' : '<span class="tag miss">' + escapeHTML(row.matchStatus) + '</span>'}</td>
+                <td>${escapeHTML(row.originalLine)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function csvEscape(value) {
+      const str = String(value ?? '');
+      if (/[",\n\r]/.test(str)) return `"${str.replace(/"/g, '""')}"`;
+      return str;
+    }
+
+
+    function addressFloorplanLocation(row) {
+      const address = String(row.address || '').trim();
+      const floorplan = String(row.floorplan || '').trim();
+      if (address && floorplan) return `${address}/${floorplan}`;
+      return address || floorplan || '';
+    }
+
+    function buildCSV() {
+      if (!parsedRows.length) parsedRows = buildRows();
+
+      const headers = [
+        'Subject',
+        'Start Date',
+        'Start Time',
+        'End Date',
+        'End Time',
+        'All Day Event',
+        'Location',
+        'Private'
+      ];
+
+      const lines = [headers.join(',')];
+
+      parsedRows.forEach(row => {
+        lines.push([
+          row.subject,
+          row.googleDate,
+          row.googleStart,
+          row.googleDate,
+          row.googleEnd,
+          'False',
+          addressFloorplanLocation(row),
+          'False'
+        ].map(csvEscape).join(','));
+      });
+
+      return lines.join('\r\n');
+    }
+
+    function downloadCSV() {
+      parseAndRender();
+      if (!parsedRows.length) {
+        showToast('No jobs to export yet.');
+        return;
+      }
+      const csv = buildCSV();
+      downloadBlob(csv, `google-calendar-cleaning-${byId('eventDate').value || todayISO()}.csv`, 'text/csv;charset=utf-8;');
+      showToast(`Exported ${parsedRows.length} calendar rows.`);
+    }
+
+    async function copyCSV() {
+      parseAndRender();
+      if (!parsedRows.length) {
+        showToast('No jobs to copy yet.');
+        return;
+      }
+      const csv = buildCSV();
+      try {
+        await navigator.clipboard.writeText(csv);
+        showToast(`Copied ${parsedRows.length} CSV rows.`);
+      } catch (err) {
+        const temp = document.createElement('textarea');
+        temp.value = csv;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        temp.remove();
+        showToast(`Copied ${parsedRows.length} CSV rows.`);
+      }
+    }
+
+    function clearAll() {
+      byId('originalText').value = '';
+      byId('recleanText').value = '';
+      parseAndRender();
+      showToast('Cleared text.');
+    }
+
+    function getColumnValue(row, names) {
+      const keys = Object.keys(row || {});
+      for (const name of names) {
+        const hit = keys.find(k => normalizeKey(k) === normalizeKey(name));
+        if (hit && row[hit] !== undefined && row[hit] !== null && String(row[hit]).trim() !== '') return row[hit];
+      }
+      return '';
+    }
+
+    async function readTabularFile(file) {
+      if (!file) return [];
+      const ext = file.name.split('.').pop().toLowerCase();
+
+      if (ext === 'json') {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        return Array.isArray(data) ? data : (Array.isArray(data.rows) ? data.rows : []);
+      }
+
+      if (ext === 'csv') {
+        const text = await file.text();
+        const wb = XLSX.read(text, { type: 'string' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        return XLSX.utils.sheet_to_json(ws, { defval: '' });
+      }
+
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      return XLSX.utils.sheet_to_json(ws, { defval: '' });
+    }
+
+    async function handleShortcutUpload(file) {
+      if (!file) return;
+      try {
+        const rows = await readTabularFile(file);
+        shortcutRows = rows.map(row => {
+          const builder = String(getColumnValue(row, ['Builder']) || '').trim();
+          const subdivision = String(getColumnValue(row, ['Subdivision', 'Full Subdivision', 'Full Name']) || '').trim();
+          const shortened = String(getColumnValue(row, ['Shortened', 'Short', 'Abbreviation', 'Code']) || '').trim();
+
+          return {
+            builder,
+            subdivision,
+            shortened,
+            shortKey: normalizeKey(shortened),
+            subdivisionKey: normalizeKey(subdivision)
+          };
+        }).filter(r => r.shortened && r.subdivision);
+
+        localStorage.setItem(STORAGE_KEYS.shortcuts, JSON.stringify(shortcutRows));
+        localStorage.setItem(STORAGE_KEYS.updated, new Date().toLocaleString());
+        refreshStorageUI();
+        parseAndRender();
+        showToast(`Loaded ${shortcutRows.length} shortcut rows from ${file.name}.`);
+      } catch (err) {
+        console.error(err);
+        showToast('Could not read shortcut file. Make sure it has Builder, Subdivision, Shortened.');
+      }
+    }
+
+    async function handleLotUpload(file) {
+      if (!file) return;
+      try {
+        const rows = await readTabularFile(file);
+        lotRows = rows.map(row => {
+          const builder = String(getColumnValue(row, ['Builder']) || '').trim();
+          const subdivision = String(getColumnValue(row, ['Subdivision', 'Community', 'Neighborhood']) || '').trim();
+          const lot = cleanLot(getColumnValue(row, ['Lot', 'LotNumber', 'Lot Number', 'Lot/Block', 'Job number']));
+          const floorplan = String(getColumnValue(row, ['Floorplan', 'Floor Plan', 'Plan', 'Model']) || '').trim();
+          const address = String(getColumnValue(row, ['Address', 'Street Address', 'Full Address']) || '').trim();
+
+          return {
+            builder,
+            subdivision,
+            lot,
+            floorplan,
+            address,
+            lotKey: normalizeKey(lot),
+            subdivisionKey: normalizeKey(subdivision)
+          };
+        }).filter(r => r.lot && r.subdivision);
+
+        localStorage.setItem(STORAGE_KEYS.lots, JSON.stringify(lotRows));
+        localStorage.setItem(STORAGE_KEYS.updated, new Date().toLocaleString());
+        refreshStorageUI();
+        parseAndRender();
+        showToast(`Loaded ${lotRows.length} lot/address rows from ${file.name}.`);
+      } catch (err) {
+        console.error(err);
+        showToast('Could not read floorplan/address file.');
+      }
+    }
+
+    function resolveShortcut(typedSub) {
+      const typedKey = normalizeKey(typedSub);
+      if (!typedKey) return null;
+
+      let found = shortcutRows.find(r => r.shortKey === typedKey);
+      if (found) return found;
+
+      found = shortcutRows.find(r => normalizeKey(r.shortened).startsWith(typedKey) || typedKey.startsWith(normalizeKey(r.shortened)));
+      if (found) return found;
+
+      found = shortcutRows.find(r => r.subdivisionKey === typedKey);
+      if (found) return found;
+
+      return null;
+    }
+
+    function findLotRecord(lot, typedSub, resolvedSub) {
+      if (!lot) return null;
+
+      const lotKey = normalizeKey(cleanLot(lot));
+      const subKeys = [
+        normalizeKey(resolvedSub),
+        normalizeKey(typedSub)
+      ].filter(Boolean);
+
+      let found = lotRows.find(r => normalizeKey(r.lot) === lotKey && subKeys.includes(r.subdivisionKey));
+      if (found) return found;
+
+      found = lotRows.find(r => {
+        if (normalizeKey(r.lot) !== lotKey) return false;
+        return subKeys.some(sk => sk && (r.subdivisionKey.includes(sk) || sk.includes(r.subdivisionKey)));
+      });
+      if (found) return found;
+
+      // last fallback: if the lot number is unique in the saved lot file, use it.
+      const sameLot = lotRows.filter(r => normalizeKey(r.lot) === lotKey);
+      if (sameLot.length === 1) return sameLot[0];
+
+      return null;
+    }
+
+    function loadSavedData() {
+      try {
+        shortcutRows = JSON.parse(localStorage.getItem(STORAGE_KEYS.shortcuts) || '[]');
+        lotRows = JSON.parse(localStorage.getItem(STORAGE_KEYS.lots) || '[]');
+      } catch {
+        shortcutRows = [];
+        lotRows = [];
+      }
+      refreshStorageUI();
+    }
+
+    function refreshStorageUI() {
+      byId('shortcutLoaded').textContent = String(shortcutRows.length || 0);
+      byId('lotLoaded').textContent = String(lotRows.length || 0);
+      byId('lastUpdate').textContent = localStorage.getItem(STORAGE_KEYS.updated) || 'Never';
+
+      byId('shortcutLoaded').className = 'pill ' + (shortcutRows.length ? 'good' : 'warn');
+      byId('lotLoaded').className = 'pill ' + (lotRows.length ? 'good' : 'warn');
+    }
+
+    function clearSavedData() {
+      localStorage.removeItem(STORAGE_KEYS.shortcuts);
+      localStorage.removeItem(STORAGE_KEYS.lots);
+      localStorage.removeItem(STORAGE_KEYS.updated);
+      shortcutRows = [];
+      lotRows = [];
+      refreshStorageUI();
+      parseAndRender();
+      showToast('Cleared saved shortcut and lot/address data.');
+    }
+
+    function exportSavedShortcuts() {
+      downloadBlob(JSON.stringify(shortcutRows, null, 2), 'saved-shortcuts.json', 'application/json');
+    }
+
+    function downloadBlob(content, filename, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    loadSavedData();
+    parseAndRender();
+  </script>
+</body>
+</html>
