@@ -14,15 +14,15 @@
 *{box-sizing:border-box}
 body{margin:0;background:linear-gradient(180deg,#08101f,#111827);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
 header{position:sticky;top:0;z-index:5;background:rgba(8,15,28,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
-.wrap{max-width:1500px;margin:0 auto;padding:16px}
+.wrap{max-width:1840px;margin:0 auto;padding:16px}
 h1{font-size:22px;margin:0 0 4px}
 .sub{color:var(--muted);font-size:13px}
-.grid{display:grid;grid-template-columns:430px 1fr;gap:16px;align-items:start}
+.grid{display:grid;grid-template-columns:430px minmax(0,1fr);gap:16px;align-items:start}
 @media(max-width:1050px){.grid{grid-template-columns:1fr}}
 .card{background:rgba(17,26,46,.96);border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.28);overflow:hidden}
 .card h2{font-size:15px;margin:0;padding:13px 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.025)}
 .body{padding:14px}
-textarea{width:100%;height:470px;resize:vertical;border:1px solid var(--line);border-radius:12px;background:#07101f;color:var(--text);padding:12px;font:13px/1.4 Consolas,monospace;outline:none}
+textarea{width:100%;height:420px;resize:vertical;border:1px solid var(--line);border-radius:12px;background:#07101f;color:var(--text);padding:12px;font:13px/1.4 Consolas,monospace;outline:none}
 button{border:0;border-radius:11px;padding:10px 13px;font-weight:700;cursor:pointer;color:#06101f;background:var(--blue)}
 button.secondary{background:#22314b;color:var(--text);border:1px solid #33445f}
 button.good{background:#92d050}
@@ -30,14 +30,14 @@ button.good{background:#92d050}
 .row+.row{margin-top:10px}
 label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
 input{background:#07101f;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;outline:none;min-width:0}
-.wide{width:220px}.mini{width:95px}
+.wide{width:220px}.mini{width:95px}.tiny{width:76px}
 .help{font-size:12px;color:var(--muted);line-height:1.45}
 .status{font-size:13px;color:#b9ffc0;margin-top:10px}
 .statbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .stat{background:#0b1426;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 .stat b{display:block;color:#fff;font-size:18px}.stat span{color:var(--muted);font-size:12px}
-.previewWrap{overflow:auto;max-height:72vh}
-table{border-collapse:collapse;width:100%;min-width:1160px;background:white;color:#111;font-family:Arial,sans-serif}
+.previewWrap{overflow:auto;max-height:76vh}
+table{border-collapse:collapse;width:100%;min-width:1380px;background:white;color:#111;font-family:Arial,sans-serif}
 td,th{border:1px solid #d8d8d8;padding:4px 6px;height:22px;font-size:14px;vertical-align:middle}
 th{position:sticky;top:0;background:#ececec;z-index:2;font-weight:700;text-align:left}
 .crewRow td,.dayRow td,.subRow td{border:0;background:#fff}
@@ -55,12 +55,23 @@ th{position:sticky;top:0;background:#ececec;z-index:2;font-weight:700;text-align
 .debugTable th,.debugTable td{border:1px solid #22314b;padding:5px;vertical-align:top}
 .debugTable th{position:static;background:#17233a;color:#fff}
 .goodText{color:#9dff9d;font-weight:700}.badText{color:#ffb86b;font-weight:700}
+.settingsPanel{display:none;margin-top:10px;border:1px solid var(--line);border-radius:14px;background:#07101f;padding:12px}
+.settingsPanel.show{display:block}
+.settingsPanel h3{margin:0 0 10px;font-size:14px}
+.settingsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}
+.settingsGrid label{color:var(--muted);font-size:12px}
+.settingsGrid input{display:block;width:100%;margin-top:5px}
+.gearBtn{font-size:13px}
+.smallHelp{margin-top:8px}
+#previewTable input{max-width:100%;width:100%}
+#previewTable td{overflow:visible}
+.notesInput{min-width:150px}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <h1>VIP Schedule → Budget Excel Exporter <span style="font-size:12px;color:#9fb0c7">v2.04</span></h1>
+    <h1>VIP Schedule → Budget Excel Exporter <span style="font-size:12px;color:#9fb0c7">v2.06</span></h1>
     <div class="sub">Paste schedule, upload Floor Plans sheet, fill budgets, then export a clean Excel file or copy-ready table.</div>
   </div>
 </header>
@@ -145,14 +156,24 @@ AM 5368-model-584 Rutherford Ave
   <button class="secondary" onclick="toggleDebug()">Toggle debug</button>
 </div>
 
-<p class="help">
-  <b>Budget matching:</b> subdivision is carried down from the line above each lot. Example: <code>*Slate *Pulte *Lewis Center</code> applies to lots <code>45</code> and <code>63</code> below it.
-  <br><b>Sheet columns supported:</b> Builder, Subdivision, Lot, Floorplan, Original, Reclean, Windows.
-  <br><b>Local storage:</b> after you upload the budget sheet once, the cleaned budget rows are saved in this browser so you do not have to upload it every time.
-  <br><b>Fixed rules:</b> Dry Clean = 2 hours, Floors only = 2 hours, Models = 2 hours.
-  <br><b>Export:</b> no conditional formatting, no comments, no frozen views. Budget exports as a plain number. Actual MH and Est. Complete export as formulas.
-  <br><b>Copy formulas:</b> browser copy/paste cannot behave exactly like copying cells inside Excel. Set <b>Paste start row</b> to the row number where you will paste in your main sheet, then use Copy table.
-</p>
+<div class="row" style="margin-top:12px">
+  <button class="secondary gearBtn" onclick="toggleSettings()">⚙ Default hour settings</button>
+</div>
+
+<div id="settingsPanel" class="settingsPanel">
+  <h3>Default hours</h3>
+  <div class="settingsGrid">
+    <label>Dry Clean <input id="ruleDryClean" type="number" step="0.25" value="2"></label>
+    <label>Floors Only <input id="ruleFloors" type="number" step="0.25" value="2"></label>
+    <label>Hardwood & Carpet Only <input id="ruleHardwoodCarpet" type="number" step="0.25" value="2"></label>
+    <label>Model <input id="ruleModel" type="number" step="0.25" value="2"></label>
+  </div>
+  <div class="row">
+    <button class="good" onclick="saveDefaultRules()">Save defaults</button>
+    <button class="secondary" onclick="resetDefaultRules()">Reset defaults</button>
+  </div>
+  <div class="help smallHelp">Saved in this browser. Use “Overwrite budgets” after changing defaults.</div>
+</div>
 
 <div id="status" class="status"></div>
 <div id="debugBox" class="debugBox"></div>
@@ -185,7 +206,14 @@ let lotOnlyMap = new Map();
 let addressMap = new Map();
 let sheetRowsLoaded = 0;
 let budgetRecords = [];
-const BUDGET_STORAGE_KEY = 'vipScheduleBudgetRecords_v204';
+const BUDGET_STORAGE_KEY = 'vipScheduleBudgetRecords_v206';
+const RULES_STORAGE_KEY = 'vipScheduleDefaultHourRules_v206';
+let defaultRules = {
+  dryclean: 2,
+  floors: 2,
+  hardwoodcarpet: 2,
+  model: 2
+};
 
 function clean(v){
   if (v === null || v === undefined) return '';
@@ -268,6 +296,116 @@ function addUnique(map,key,rec){
     if (!old) return;
     if (norm(old.builder)!==norm(rec.builder) || norm(old.subdivision)!==norm(rec.subdivision) || norm(old.lot)!==norm(rec.lot)) map.set(key,null);
   }
+}
+
+function setSavedBudgetStatus(text){
+  const el = document.getElementById('savedBudgetStatus');
+  if (el) el.value = text;
+}
+function toggleSettings(){
+  const p = document.getElementById('settingsPanel');
+  if (p) p.classList.toggle('show');
+}
+function loadDefaultRules(){
+  try{
+    const raw = localStorage.getItem(RULES_STORAGE_KEY);
+    if(raw) defaultRules = {...defaultRules, ...JSON.parse(raw)};
+  }catch(e){}
+  syncRuleInputs();
+}
+function syncRuleInputs(){
+  const ids = {ruleDryClean:'dryclean', ruleFloors:'floors', ruleHardwoodCarpet:'hardwoodcarpet', ruleModel:'model'};
+  Object.entries(ids).forEach(([id,key])=>{
+    const el = document.getElementById(id);
+    if(el) el.value = defaultRules[key] ?? 2;
+  });
+}
+function readRuleInputs(){
+  const val = id => {
+    const n = parseFloat(document.getElementById(id)?.value || '');
+    return Number.isFinite(n) ? n : 2;
+  };
+  defaultRules = {
+    dryclean: val('ruleDryClean'),
+    floors: val('ruleFloors'),
+    hardwoodcarpet: val('ruleHardwoodCarpet'),
+    model: val('ruleModel')
+  };
+}
+function saveDefaultRules(){
+  readRuleInputs();
+  localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify(defaultRules));
+  fillBudgets(true);
+  document.getElementById('status').textContent = 'Default hour settings saved and applied.';
+}
+function resetDefaultRules(){
+  defaultRules = {dryclean:2, floors:2, hardwoodcarpet:2, model:2};
+  localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify(defaultRules));
+  syncRuleInputs();
+  fillBudgets(true);
+  document.getElementById('status').textContent = 'Default hour settings reset and applied.';
+}
+function registerBudgetRecord(rec){
+  builderAliases(rec.builder).forEach(b=>subAliases(rec.subdivision).forEach(s=>lotAliases(rec.lot).forEach(l=>{
+    exactMap.set(`${b}|${s}|${l}`,rec);
+  })));
+  subAliases(rec.subdivision).forEach(s=>lotAliases(rec.lot).forEach(l=>subLotMap.set(`${s}|${l}`,rec)));
+  builderAliases(rec.builder).forEach(b=>lotAliases(rec.lot).forEach(l=>addUnique(builderLotMap,`${b}|${l}`,rec)));
+  lotAliases(rec.lot).forEach(l=>addUnique(lotOnlyMap,l,rec));
+  const addr = normAddress(rec.address);
+  if(addr) addUnique(addressMap,addr,rec);
+}
+function loadBudgetRecords(records){
+  exactMap.clear(); subLotMap.clear(); builderLotMap.clear(); lotOnlyMap.clear(); addressMap.clear();
+  budgetRecords = Array.isArray(records) ? records.map(r => ({
+    builder: clean(r.builder),
+    subdivision: clean(r.subdivision),
+    lot: clean(r.lot),
+    floorplan: clean(r.floorplan),
+    address: clean(r.address),
+    original: numOrBlank(r.original),
+    reclean: numOrBlank(r.reclean),
+    windows: numOrBlank(r.windows)
+  })).filter(r => r.subdivision && r.lot) : [];
+  sheetRowsLoaded = budgetRecords.length;
+  budgetRecords.forEach(registerBudgetRecord);
+}
+function saveBudgetRecords(){
+  try{
+    localStorage.setItem(BUDGET_STORAGE_KEY, JSON.stringify({savedAt:new Date().toISOString(), records:budgetRecords}));
+    setSavedBudgetStatus(`${budgetRecords.length} rows saved`);
+  }catch(e){
+    alert('Budget sheet loaded, but local storage save failed. It may be too large for this browser.');
+  }
+}
+function loadSavedBudgetRecords(){
+  try{
+    const raw = localStorage.getItem(BUDGET_STORAGE_KEY);
+    if(!raw){ setSavedBudgetStatus('Not loaded'); return false; }
+    const data = JSON.parse(raw);
+    if(!data || !Array.isArray(data.records)){ setSavedBudgetStatus('Saved data invalid'); return false; }
+    loadBudgetRecords(data.records);
+    const date = data.savedAt ? new Date(data.savedAt).toLocaleDateString() : '';
+    setSavedBudgetStatus(`${budgetRecords.length} rows saved${date ? ' • '+date : ''}`);
+    return true;
+  }catch(e){
+    setSavedBudgetStatus('Saved data error');
+    return false;
+  }
+}
+function clearSavedBudgetSheet(){
+  localStorage.removeItem(BUDGET_STORAGE_KEY);
+  exactMap.clear(); subLotMap.clear(); builderLotMap.clear(); lotOnlyMap.clear(); addressMap.clear();
+  budgetRecords = [];
+  sheetRowsLoaded = 0;
+  parsed.forEach(r=>{
+    if(r.kind==='job'){
+      r.budget=''; r.budgetFlag=false; r.budgetSource=''; r.matchType=''; r.debugAttempts=[];
+    }
+  });
+  setSavedBudgetStatus('Not loaded');
+  renderPreview();
+  document.getElementById('status').textContent = 'Saved budget sheet cleared from this browser.';
 }
 
 function setSavedBudgetStatus(text){
@@ -443,7 +581,21 @@ function parseAndRender(){
 function taskType(task){
   const t = clean(task).toLowerCase();
   if (t.includes('dry clean') || t.includes('dryclean') || t.includes('dry-clean')) return 'dryclean';
-  if (t.includes('floor only') || t.includes('floors only') || t === 'floor' || t === 'floors') return 'floors';
+
+  const hasOnly = /\bonly\b/.test(t);
+  const hasHardwood = t.includes('hardwood') || t.includes('hard wood');
+  const hasCarpet = t.includes('carpet');
+  if (hasOnly && hasHardwood && hasCarpet) return 'hardwoodcarpet';
+
+  if (
+    t.includes('floor only') ||
+    t.includes('floors only') ||
+    t.includes('floor-only') ||
+    t.includes('floors-only') ||
+    t === 'floor' ||
+    t === 'floors'
+  ) return 'floors';
+
   if (t.includes('model')) return 'model';
   if (t.includes('window')) return 'windows';
   if (t.includes('original') || t.includes('full clean') || t.includes('first clean')) return 'original';
@@ -451,7 +603,7 @@ function taskType(task){
   return '';
 }
 function fixedBudget(type){
-  if (type === 'dryclean' || type === 'floors' || type === 'model') return 2;
+  if (Object.prototype.hasOwnProperty.call(defaultRules, type)) return Number(defaultRules[type]);
   return null;
 }
 function findBudget(job){
@@ -460,7 +612,7 @@ function findBudget(job){
   if (!type) return {budget:'', flag:true, source:'Unknown task type', type:'unknown', attempts};
 
   const fixed = fixedBudget(type);
-  if (fixed !== null) return {budget:fixed, flag:false, source:`Fixed ${type}=2`, type, attempts};
+  if (fixed !== null) return {budget:fixed, flag:false, source:`Default ${type}=${fixed}`, type, attempts};
 
   for (const k of keysFor(job.builder, job.subdivision, job.lot)) {
     attempts.push(k);
@@ -581,8 +733,8 @@ function loadBudgetRows(rows){
 function renderPreview(){
   const table=document.getElementById('previewTable');
   table.innerHTML=`<thead><tr>
-    <th style="width:520px">Schedule / Job</th><th style="width:65px">People</th><th style="width:105px">In</th>
-    <th style="width:105px">Out</th><th style="width:90px">Actual MH</th><th style="width:90px">Budget</th><th style="width:135px">Est. Complete</th><th style="width:180px">Notes</th>
+    <th style="width:520px">Schedule / Job</th><th style="width:65px">People</th><th style="width:110px">In</th>
+    <th style="width:110px">Out</th><th style="width:95px">Actual MH</th><th style="width:95px">Budget</th><th style="width:145px">Est. Complete</th><th style="width:220px">Notes</th>
   </tr></thead><tbody></tbody>`;
   const body=table.querySelector('tbody');
   let crews=new Set(), jobs=0, budgets=0, flags=0;
@@ -603,7 +755,7 @@ function renderPreview(){
         <td class="mh">${mh===''?'':mh.toFixed(1)}</td>
         <td><input class="mini" type="number" step="0.1" value="${esc(r.budget)}" oninput="setRow(${idx},'budget',this.value)"></td>
         <td>${esc(est)}</td>
-        <td><input class="wide" placeholder="${r.budgetFlag?'Budget not found':''}" value="${esc(r.note||'')}" oninput="setRow(${idx},'note',this.value)"></td>
+        <td><input class="notesInput" placeholder="${r.budgetFlag?'Budget not found':''}" value="${esc(r.note||'')}" oninput="setRow(${idx},'note',this.value)"></td>
       </tr>`);
     }
   });
@@ -785,6 +937,10 @@ async function copyTable(){
   document.getElementById('status').textContent=`Copied table to clipboard with formulas targeting row ${pasteStartRow()} and down. Paste into Excel starting on that row.`;
 }
 
+if (loadSavedBudgetRecords()) {
+  document.getElementById('status').textContent = `Loaded saved budget sheet from this browser (${sheetRowsLoaded} rows).`;
+}
+loadDefaultRules();
 if (loadSavedBudgetRecords()) {
   document.getElementById('status').textContent = `Loaded saved budget sheet from this browser (${sheetRowsLoaded} rows).`;
 }
