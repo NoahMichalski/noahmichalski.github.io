@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Monday New Lot Parser</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#121a30; --panel2:#17233f; --text:#eef4ff; --muted:#9fb0d0;
+    --accent:#69a7ff; --good:#3ddc97; --warn:#ffd166; --bad:#ff6b6b; --border:#2a3a61;
+    --input:#0f172b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(135deg,#08101f,#111a33);color:var(--text)}
+  header{position:sticky;top:0;z-index:10;background:rgba(8,16,31,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:14px 18px}
+  .top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  h1{margin:0;font-size:20px;letter-spacing:.2px}
+  .version{font-size:12px;color:var(--muted);padding:4px 8px;border:1px solid var(--border);border-radius:999px}
+  main{padding:18px;max-width:1500px;margin:auto}
+  .grid{display:grid;grid-template-columns:420px 1fr;gap:16px}
+  @media(max-width:1000px){.grid{grid-template-columns:1fr}}
+  .card{background:rgba(18,26,48,.94);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:0 14px 35px rgba(0,0,0,.25)}
+  label{display:block;font-size:13px;color:var(--muted);margin:0 0 7px}
+  textarea,input,select{width:100%;background:var(--input);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font:inherit;outline:none}
+  textarea{min-height:360px;resize:vertical;line-height:1.35}
+  input[type="file"]{padding:9px;background:var(--panel2)}
+  button{border:0;border-radius:12px;padding:10px 13px;font-weight:700;cursor:pointer;color:#06101f;background:var(--accent)}
+  button.secondary{background:#223455;color:var(--text);border:1px solid var(--border)}
+  button.good{background:var(--good);color:#04130d}
+  button.warn{background:var(--warn);color:#1b1300}
+  button.bad{background:var(--bad);color:#1b0505}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .small{font-size:12px;color:var(--muted);line-height:1.45}
+  .pillbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+  .pill{background:#0f172b;border:1px solid var(--border);color:var(--muted);border-radius:999px;padding:6px 10px;font-size:12px}
+  .pill strong{color:var(--text)}
+  table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:14px;border:1px solid var(--border);font-size:13px}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top;white-space:nowrap}
+  th{position:sticky;top:65px;background:#253659;color:#fff;text-align:left;z-index:2}
+  td{background:#0f172b}
+  tr:last-child td{border-bottom:0}
+  tr.warn td{background:rgba(255,209,102,.11)}
+  tr.bad td{background:rgba(255,107,107,.11)}
+  .tablewrap{max-height:680px;overflow:auto;border-radius:14px}
+  .status{margin-top:10px;padding:10px 12px;border-radius:12px;background:#0f172b;border:1px solid var(--border);color:var(--muted);font-size:13px;white-space:pre-wrap}
+  .mappingBox{max-height:210px;overflow:auto;background:#0f172b;border:1px solid var(--border);border-radius:12px;padding:10px;font-size:12px;color:var(--muted)}
+  .mappingItem{display:grid;grid-template-columns:1fr 1.4fr;gap:8px;border-bottom:1px solid rgba(255,255,255,.06);padding:5px 0}
+  .mappingItem:last-child{border-bottom:0}
+  .missing{color:var(--warn);font-weight:700}
+  .ok{color:var(--good);font-weight:700}
+  .copyhint{font-size:12px;color:var(--muted);margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1>Monday New Lot Parser</h1>
+    <span class="version">v1.5</span>
+  </div>
+</header>
+<main>
+  <div class="grid">
+    <section class="card">
+      <div class="row">
+        <div>
+          <label>Builder</label>
+          <select id="builder">
+            <option value="DR Horton">DR Horton</option>
+            <option value="Pulte">Pulte</option>
+            <option value="Ryan Homes">Ryan Homes</option>
+            <option value="MI Homes">MI Homes</option>
+            <option value="Epcon">Epcon</option>
+            <option value="Schottenstein">Schottenstein</option>
+            <option value="Rockford">Rockford</option>
+            <option value="Drees Homes">Drees Homes</option>
+            <option value="AMH">AMH</option>
+          </select>
+        </div>
+        <div>
+          <label>lastUpdated</label>
+          <input id="lastUpdated" type="date" />
+        </div>
+      </div>
+
+      <label>Upload subdivision reference sheet</label>
+      <input id="mapFile" type="file" accept=".xlsx,.xls,.csv" />
+      <div class="small" style="margin:8px 0 12px">
+        Best columns: <b>Alias/Short/Input</b>, <b>Subdivision</b>, <b>Builder</b>, <b>City</b>, or a ready-made <b>Formatted</b> column.
+        Saved in this browser after upload.
+      </div>
+
+      <label>Paste Monday lot text</label>
+      <textarea id="rawInput" spellcheck="false" placeholder="Lot 3 Lansdowne Farms 50’s&#10;4200 Sycamore Oak Avenue&#10;X429/B&#10;Permit # NEWR2614426&#10;Dig date 5/18/26"></textarea>
+
+      <div class="btns">
+        <button class="good" id="parseBtn">Parse Lots</button>
+        <button class="secondary" id="sampleBtn">Load Sample</button>
+        <button class="secondary" id="clearBtn">Clear</button>
+      </div>
+      <div id="status" class="status">Ready.</div>
+    </section>
+
+    <section class="card">
+      <div class="pillbar">
+        <span class="pill">Rows: <strong id="countRows">0</strong></span>
+        <span class="pill">Matched subdivisions: <strong id="countMatched">0</strong></span>
+        <span class="pill">Needs review: <strong id="countReview">0</strong></span>
+        <span class="pill">Mappings saved: <strong id="countMaps">0</strong></span>
+      </div>
+      <div class="btns" style="margin-top:0;margin-bottom:12px">
+        <button id="copyTSV">Copy for Excel</button>
+        <button class="secondary" id="downloadCSV">Download CSV</button>
+        <button class="secondary" id="downloadXLSX">Download Excel</button>
+        <button class="warn" id="saveCorrections">Save Manual Corrections</button>
+        <button class="bad" id="resetMappings">Reset Saved Mappings</button>
+      </div>
+      <div class="tablewrap">
+        <table id="outTable">
+          <thead>
+            <tr>
+              <th>Builder</th><th>Subdivision</th><th>Lot</th><th>Floorplan</th><th>Original</th><th>Reclean</th><th>Windows</th><th>Address</th><th>lastUpdated</th><th>Review</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="copyhint">Manual fix tip: edit the Subdivision cell directly, then hit “Save Manual Corrections.”</div>
+      <h3 style="margin:16px 0 8px;font-size:15px">Current subdivision mappings</h3>
+      <div id="mappingBox" class="mappingBox"></div>
+    </section>
+  </div>
+</main>
+<script>
+const STORAGE_KEY = "mondayLotParser.subdivisionMappings.v2";
+
+const HARD_OVERRIDES = new Map([
+  ["kintner crossing", "Kintner Crossing *DR *Sunbury"],
+  ["kintner crossing th", "Kintner Crossing *DR *Sunbury"]
+]);
+const columns = ["Builder","Subdivision","Lot","Floorplan","Original","Reclean","Windows","Address","lastUpdated"];
+
+const defaultMappings = [
+  { alias:"Lansdowne Farms 50s", formatted:"Lansdowne *DR *Canal" },
+  { alias:"Lansdowne Farms 50's", formatted:"Lansdowne *DR *Canal" },
+  { alias:"Lansdowne Farms 50’s", formatted:"Lansdowne *DR *Canal" },
+  { alias:"Lansdowne", formatted:"Lansdowne *DR *Canal" },
+  { alias:"Kintner Crossing TH", formatted:"Kintner Crossing *DR *Sunbury" },
+  { alias:"Kintner Crossing", formatted:"Kintner Crossing *DR *Sunbury" },
+  { alias:"Brookview", formatted:"Brookview *DR *Canal" },
+  { alias:"Longview Highlands", formatted:"Longview *DR *Pickerington" },
+  { alias:"Longview", formatted:"Longview *DR *Pickerington" },
+  { alias:"Madison Meadows", formatted:"Madison Meadows *DR *Plain City" },
+  { alias:"MD", formatted:"Madison Meadows *DR *Plain City" },
+  { alias:"Maplewood", formatted:"Maplewood *DR *Reynoldsburg" },
+  { alias:"Monarch Greene", formatted:"Monarch Greene *DR *Columbus" },
+  { alias:"ParkView", formatted:"ParkView *DR *Delaware" },
+  { alias:"Piatts", formatted:"Piatts *DR *Delaware" },
+  { alias:"River Ridge", formatted:"River Ridge *DR *Circleville" },
+  { alias:"Springer Woods", formatted:"Springer Woods *DR *Delaware" },
+  { alias:"Overlook", formatted:"Overlook *DR *Newark" },
+  { alias:"Renner Park", formatted:"Renner Park *DR *Columbus" },
+  { alias:"Wagnalls", formatted:"Wagnalls *DR *Lithopolis" },
+  { alias:"Walnut", formatted:"Walnut *DR *Ashville" }
+];
+
+let mappings = loadMappings();
+let parsedRows = [];
+
+document.getElementById("lastUpdated").valueAsDate = new Date();
+renderMappings();
+
+function normalizeKey(s){
+  return String(s || "")
+    .toLowerCase()
+    .replace(/[’‘]/g,"'")
+    .replace(/[“”]/g,'"')
+    .replace(/\b50\s*['’]?s\b/g,"50s")
+    .replace(/\b40\s*['’]?s\b/g,"40s")
+    .replace(/\b60\s*['’]?s\b/g,"60s")
+    .replace(/[^a-z0-9]+/g," ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function loadMappings(){
+  let fromStorage = [];
+  try { fromStorage = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch(e) {}
+  const map = new Map();
+  [...defaultMappings, ...fromStorage].forEach(m => {
+    if(!m || !m.alias || !m.formatted) return;
+    map.set(normalizeKey(m.alias), { alias:m.alias, formatted:m.formatted });
+  });
+  return Array.from(map.values());
+}
+
+function saveMappings(){
+  const defaults = new Set(defaultMappings.map(m => normalizeKey(m.alias)));
+  const custom = mappings.filter(m => !defaults.has(normalizeKey(m.alias)));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(custom));
+}
+
+
+function builderAliases(builder){
+  const b = normalizeKey(builder);
+  if(b === "dr horton") return ["dr", "dr horton", "d r horton", "horton"];
+  if(b === "ryan homes") return ["ryan", "ryan homes"];
+  if(b === "mi homes") return ["mi", "mi homes", "m i homes"];
+  if(b === "pulte") return ["pulte", "centex"];
+  if(b === "schottenstein") return ["schottenstein"];
+  if(b === "rockford") return ["rockford"];
+  if(b === "epcon") return ["epcon"];
+  if(b === "drees homes") return ["drees", "drees homes"];
+  if(b === "amh") return ["amh"];
+  return [b].filter(Boolean);
+}
+
+const KNOWN_BUILDER_TOKENS = [
+  "dr", "dr horton", "d r horton", "horton", "pulte", "centex", "ryan", "ryan homes",
+  "mi", "mi homes", "m i homes", "epcon", "schottenstein", "rockford", "drees", "drees homes",
+  "amh", "bob webb", "fischer", "fischer homes", "3 pillar", "three pillar"
+];
+
+function builderLabelForOutput(builder){
+  const b = normalizeKey(builder);
+  if(b === "dr horton") return "DR";
+  if(b === "ryan homes") return "Ryan";
+  if(b === "drees homes") return "Drees";
+  return String(builder || "").trim();
+}
+
+function starParts(s){
+  return String(s || "").split("*").map(x => x.trim()).filter(Boolean);
+}
+
+function formattedAllowedForSelectedBuilder(formatted, selectedBuilder){
+  const parts = starParts(formatted).map(normalizeKey);
+  const selected = builderAliases(selectedBuilder);
+  const hasSelected = parts.some(p => selected.includes(p));
+  const hasAnyKnownBuilder = parts.some(p => KNOWN_BUILDER_TOKENS.includes(p));
+
+  // If the formatted value says a specific builder, it must match the selected builder.
+  // This prevents DR Horton imports from turning into Bob Webb/Fischer/etc. subdivisions.
+  if(hasAnyKnownBuilder) return hasSelected;
+  return true;
+}
+
+function cleanFormattedValue(formatted){
+  let parts = starParts(formatted);
+  if(!parts.length) return "";
+
+  // Remove duplicate builder pieces, especially bad rows like:
+  // Ludlow Ridge *DR *Bellefontaine *DR Horton
+  const out = [];
+  const seenBuilders = new Set();
+  for(const part of parts){
+    const key = normalizeKey(part);
+    let canonical = "";
+    if(["dr", "dr horton", "d r horton", "horton"].includes(key)) canonical = "dr";
+    else if(["ryan", "ryan homes"].includes(key)) canonical = "ryan";
+    else if(["drees", "drees homes"].includes(key)) canonical = "drees";
+    else if(["mi", "mi homes", "m i homes"].includes(key)) canonical = "mi homes";
+    else if(KNOWN_BUILDER_TOKENS.includes(key)) canonical = key;
+
+    if(canonical){
+      if(seenBuilders.has(canonical)) continue;
+      seenBuilders.add(canonical);
+      // Prefer short DR over DR Horton in the formatted subdivision column.
+      if(canonical === "dr") { out.push("DR"); continue; }
+      if(canonical === "ryan") { out.push("Ryan"); continue; }
+      if(canonical === "drees") { out.push("Drees"); continue; }
+    }
+    out.push(part);
+  }
+  return out.join(" *");
+}
+
+function stripSubdivisionSuffixes(key){
+  return String(key || "")
+    .replace(/\b(40s|50s|60s|70s|80s|farm|farms|estates|community|reserve|meadows|highlands|crossing|th|townhomes|townhome|towns)\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function findMapping(name){
+  const key = normalizeKey(name);
+
+  // Absolute forced fixes. These run BEFORE the uploaded sheet and before saved browser mappings.
+  // This catches Kintner Crossing TH, Kintner Crossing Townhomes, odd spacing, and any pasted variant.
+  if(key.includes("kintner") && key.includes("crossing")) {
+    return "Kintner Crossing *DR *Sunbury";
+  }
+
+  // These always win, even if the uploaded sheet/local browser storage does not contain the alias yet.
+  if(HARD_OVERRIDES.has(key)) return HARD_OVERRIDES.get(key);
+  const withoutTH = key.replace(/\bth\b/g, "").replace(/\s+/g," ").trim();
+  if(HARD_OVERRIDES.has(withoutTH)) return HARD_OVERRIDES.get(withoutTH);
+
+  const selectedBuilder = document.getElementById("builder").value;
+  let exact = mappings.find(m => normalizeKey(m.alias) === key && formattedAllowedForSelectedBuilder(m.formatted, selectedBuilder));
+  if(exact) return cleanFormattedValue(exact.formatted);
+
+  // Fuzzy fallback: remove product/suffix words like 50s/40s, Farms, TH, etc.
+  const loose = stripSubdivisionSuffixes(key);
+  let looseMatch = mappings.find(m => {
+    if(!formattedAllowedForSelectedBuilder(m.formatted, selectedBuilder)) return false;
+    const mk = stripSubdivisionSuffixes(normalizeKey(m.alias));
+    return mk && loose && (mk === loose || mk.includes(loose) || loose.includes(mk));
+  });
+  return looseMatch ? cleanFormattedValue(looseMatch.formatted) : "";
+}
+
+function parseLots(text){
+  const cleanLines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const starts = [];
+  cleanLines.forEach((line,i) => { if(/^lot\s+[a-z0-9-]+\b/i.test(line)) starts.push(i); });
+  const blocks = starts.map((start,idx) => cleanLines.slice(start, starts[idx+1] ?? cleanLines.length));
+  return blocks.map(block => parseBlock(block)).filter(Boolean);
+}
+
+function parseBlock(block){
+  const first = block[0] || "";
+  const m = first.match(/^lot\s+([a-z0-9-]+)\s+(.+)$/i);
+  if(!m) return null;
+  const lot = m[1].trim();
+  const rawSubdivision = m[2].trim();
+
+  let address = "";
+  let floorplan = "";
+  for(let i=1;i<block.length;i++){
+    const line = block[i].trim();
+    if(/^permit\b|^dig\s*date\b/i.test(line)) continue;
+    const compactLine = line.replace(/\s+/g, "").toUpperCase();
+    const looksLikeFloorplan = /^[A-Z]{0,4}\d{1,5}[A-Z]?(?:\/[A-Z0-9]+)?$/.test(compactLine);
+
+    if(!address && /\d+\s+.+/.test(line) && !looksLikeFloorplan) {
+      address = line;
+      continue;
+    }
+    if(!floorplan && looksLikeFloorplan) {
+      // Keep only the actual floorplan code. Example: X429/B -> X429, XT04/A -> XT04.
+      floorplan = compactLine.split("/")[0];
+      continue;
+    }
+  }
+
+  const formattedSubdivision = findMapping(rawSubdivision);
+  return {
+    Builder: document.getElementById("builder").value,
+    Subdivision: formattedSubdivision || rawSubdivision,
+    Lot: lot,
+    Floorplan: floorplan,
+    Original: "",
+    Reclean: "",
+    Windows: "",
+    Address: address,
+    lastUpdated: document.getElementById("lastUpdated").value,
+    rawSubdivision,
+    matched: !!formattedSubdivision,
+    review: !formattedSubdivision ? "Subdivision not mapped" : (!address ? "Missing address" : (!floorplan ? "Missing floorplan" : ""))
+  };
+}
+
+function renderRows(){
+  const tbody = document.querySelector("#outTable tbody");
+  tbody.innerHTML = "";
+  parsedRows.forEach((r, idx) => {
+    const tr = document.createElement("tr");
+    if(r.review) tr.className = r.matched ? "warn" : "bad";
+    columns.forEach(col => {
+      const td = document.createElement("td");
+      td.textContent = r[col] || "";
+      td.contentEditable = true;
+      td.dataset.row = idx;
+      td.dataset.col = col;
+      td.addEventListener("input", e => { parsedRows[idx][col] = e.currentTarget.textContent.trim(); });
+      tr.appendChild(td);
+    });
+    const tdReview = document.createElement("td");
+    tdReview.innerHTML = r.review ? `<span class="missing">${escapeHTML(r.review)}</span><br><span class="small">Raw: ${escapeHTML(r.rawSubdivision)}</span>` : `<span class="ok">OK</span>`;
+    tr.appendChild(tdReview);
+    tbody.appendChild(tr);
+  });
+  document.getElementById("countRows").textContent = parsedRows.length;
+  document.getElementById("countMatched").textContent = parsedRows.filter(r=>r.matched).length;
+  document.getElementById("countReview").textContent = parsedRows.filter(r=>r.review).length;
+}
+
+function rowsToTSV(includeHeader=true){
+  const lines = [];
+  if(includeHeader) lines.push(columns.join("\t"));
+  parsedRows.forEach(r => lines.push(columns.map(c => String(r[c] ?? "").replace(/\t/g," ")).join("\t")));
+  return lines.join("\n");
+}
+
+function rowsToCSV(){
+  const esc = v => `"${String(v ?? "").replace(/"/g,'""')}"`;
+  return [columns.map(esc).join(","), ...parsedRows.map(r => columns.map(c => esc(r[c])).join(","))].join("\n");
+}
+
+function download(name, text, type){
+  const blob = new Blob([text], {type});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function escapeHTML(s){
+  return String(s).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[ch]));
+}
+
+function renderMappings(){
+  document.getElementById("countMaps").textContent = mappings.length;
+  const box = document.getElementById("mappingBox");
+  box.innerHTML = mappings
+    .sort((a,b)=>a.alias.localeCompare(b.alias))
+    .map(m => `<div class="mappingItem"><span>${escapeHTML(m.alias)}</span><b>${escapeHTML(m.formatted)}</b></div>`)
+    .join("") || "No mappings loaded.";
+}
+
+function detectColumn(row, names){
+  const keys = Object.keys(row);
+  return keys.find(k => names.some(n => normalizeKey(k) === normalizeKey(n) || normalizeKey(k).includes(normalizeKey(n))));
+}
+
+function rowToMapping(row){
+  const aliasCol = detectColumn(row, ["alias","short","input","new name","given subdivision","raw subdivision","abbreviation"]);
+  const formattedCol = detectColumn(row, ["formatted","output","full name","floorplan sheet subdivision","schedule name"]);
+  const subCol = detectColumn(row, ["subdivision","community","neighborhood","project"]);
+  const builderCol = detectColumn(row, ["builder"]);
+  const cityCol = detectColumn(row, ["city","market","location"]);
+
+  const alias = row[aliasCol] || row[subCol] || "";
+  let formatted = row[formattedCol] || "";
+  if(!formatted && row[subCol]) {
+    const sub = String(row[subCol]).trim();
+    const b = String(row[builderCol] || "").trim();
+    const city = String(row[cityCol] || "").trim();
+
+    // If the subdivision cell is already formatted like Name *Builder *City, do not append builder again.
+    if(sub.includes("*")) formatted = sub;
+    else formatted = [sub, builderLabelForOutput(b), city].filter(Boolean).join(" *");
+  }
+  formatted = cleanFormattedValue(formatted);
+  if(!alias || !formatted) return null;
+  return { alias: String(alias).trim(), formatted: String(formatted).trim() };
+}
+
+async function handleFile(file){
+  const data = await file.arrayBuffer();
+  const wb = XLSX.read(data, {type:"array"});
+  let added = 0;
+  wb.SheetNames.forEach(name => {
+    const ws = wb.Sheets[name];
+    const rows = XLSX.utils.sheet_to_json(ws, {defval:""});
+    rows.forEach(row => {
+      const m = rowToMapping(row);
+      if(!m) return;
+      const key = normalizeKey(m.alias);
+      const existing = mappings.findIndex(x => normalizeKey(x.alias) === key);
+      if(existing >= 0) mappings[existing] = m;
+      else mappings.push(m);
+      added++;
+    });
+  });
+  saveMappings();
+  renderMappings();
+  setStatus(`Loaded ${added} subdivision mapping row(s) from ${file.name}.`);
+}
+
+function setStatus(msg){ document.getElementById("status").textContent = msg; }
+
+// Events
+parseBtn.addEventListener("click", () => {
+  parsedRows = parseLots(rawInput.value);
+  renderRows();
+  const unmatched = parsedRows.filter(r=>!r.matched).map(r=>r.rawSubdivision);
+  setStatus(parsedRows.length ? `Parsed ${parsedRows.length} lot(s).${unmatched.length ? "\nNeeds mapping: " + [...new Set(unmatched)].join(", ") : "\nAll subdivisions matched."}` : "No lots found. Make sure each block starts with 'Lot # Subdivision'.");
+});
+
+sampleBtn.addEventListener("click", () => {
+  rawInput.value = `Lot 3 Lansdowne Farms 50’s\n4200 Sycamore Oak Avenue\nX429/B\nPermit # NEWR2614426\nDig date 5/18/26\n\nLot 12 Longview Highlands\n1234 Example Drive\nX500/C\nPermit # NEWR0000000\nDig date 5/18/26`;
+  parseBtn.click();
+});
+
+clearBtn.addEventListener("click", () => { rawInput.value=""; parsedRows=[]; renderRows(); setStatus("Cleared."); });
+
+mapFile.addEventListener("change", e => { const file = e.target.files[0]; if(file) handleFile(file); });
+
+copyTSV.addEventListener("click", async () => {
+  const tsv = rowsToTSV(true);
+  await navigator.clipboard.writeText(tsv);
+  setStatus(`Copied ${parsedRows.length} row(s) for Excel paste.`);
+});
+
+downloadCSV.addEventListener("click", () => download("new_lots_floorplan_rows.csv", rowsToCSV(), "text/csv;charset=utf-8"));
+
+downloadXLSX.addEventListener("click", () => {
+  const ws = XLSX.utils.json_to_sheet(parsedRows.map(r => Object.fromEntries(columns.map(c => [c, r[c] ?? ""]))), {header:columns});
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "New Lots");
+  XLSX.writeFile(wb, "new_lots_floorplan_rows.xlsx");
+});
+
+saveCorrections.addEventListener("click", () => {
+  let added = 0;
+  parsedRows.forEach(r => {
+    if(!r.rawSubdivision || !r.Subdivision) return;
+    const key = normalizeKey(r.rawSubdivision);
+    const existing = mappings.findIndex(m => normalizeKey(m.alias) === key);
+    const newMap = { alias:r.rawSubdivision, formatted:cleanFormattedValue(r.Subdivision) };
+    if(existing >= 0) mappings[existing] = newMap;
+    else mappings.push(newMap);
+    added++;
+  });
+  saveMappings();
+  renderMappings();
+  setStatus(`Saved ${added} manual subdivision correction(s) to this browser.`);
+});
+
+resetMappings.addEventListener("click", () => {
+  if(!confirm("Reset custom saved subdivision mappings? Default DR mappings will remain.")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  mappings = loadMappings();
+  renderMappings();
+  setStatus("Custom mappings reset.");
+});
+</script>
+</body>
+</html>
