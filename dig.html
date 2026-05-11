@@ -57,7 +57,7 @@
 <header>
   <div class="top">
     <h1>Monday New Lot Parser</h1>
-    <span class="version">v1.5</span>
+    <span class="version">v1.7</span>
   </div>
 </header>
 <main>
@@ -88,7 +88,16 @@
       <input id="mapFile" type="file" accept=".xlsx,.xls,.csv" />
       <div class="small" style="margin:8px 0 12px">
         Best columns: <b>Alias/Short/Input</b>, <b>Subdivision</b>, <b>Builder</b>, <b>City</b>, or a ready-made <b>Formatted</b> column.
-        Saved in this browser after upload.
+        Mappings save in this browser after upload. Builder, date, pasted text, and same-folder/server path autosave too.
+      </div>
+
+      <label>Subdivision file from same folder / server</label>
+      <div class="row" style="grid-template-columns:1fr auto;margin-bottom:8px">
+        <input id="serverUrl" type="text" placeholder="Subdivisions.xlsx" />
+        <button class="secondary" id="loadServerBtn" type="button">Load Saved From Server</button>
+      </div>
+      <div class="small" style="margin:0 0 12px">
+        Put <b>Subdivisions.xlsx</b> in the same folder as this HTML and leave this box as <b>Subdivisions.xlsx</b>. On GitHub Pages, both files should be in the same repo folder. This path is saved locally.
       </div>
 
       <label>Paste Monday lot text</label>
@@ -134,6 +143,7 @@
 </main>
 <script>
 const STORAGE_KEY = "mondayLotParser.subdivisionMappings.v2";
+const SETTINGS_KEY = "mondayLotParser.settings.v1";
 
 const HARD_OVERRIDES = new Map([
   ["kintner crossing", "Kintner Crossing *DR *Sunbury"],
@@ -168,7 +178,7 @@ const defaultMappings = [
 let mappings = loadMappings();
 let parsedRows = [];
 
-document.getElementById("lastUpdated").valueAsDate = new Date();
+loadUiSettings();
 renderMappings();
 
 function normalizeKey(s){
@@ -200,6 +210,36 @@ function saveMappings(){
   const custom = mappings.filter(m => !defaults.has(normalizeKey(m.alias)));
   localStorage.setItem(STORAGE_KEY, JSON.stringify(custom));
 }
+
+function loadUiSettings(){
+  let settings = {};
+  try { settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}"); } catch(e) {}
+  const builderEl = document.getElementById("builder");
+  const dateEl = document.getElementById("lastUpdated");
+  const rawEl = document.getElementById("rawInput");
+  const urlEl = document.getElementById("serverUrl");
+
+  if(settings.builder) builderEl.value = settings.builder;
+  if(settings.lastUpdated) dateEl.value = settings.lastUpdated;
+  else dateEl.valueAsDate = new Date();
+  if(settings.rawInput) rawEl.value = settings.rawInput;
+  urlEl.value = settings.serverUrl || "Subdivisions.xlsx";
+}
+
+function saveUiSettings(){
+  const settings = {
+    builder: document.getElementById("builder").value,
+    lastUpdated: document.getElementById("lastUpdated").value,
+    rawInput: document.getElementById("rawInput").value,
+    serverUrl: document.getElementById("serverUrl").value.trim()
+  };
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
+
+["builder","lastUpdated","rawInput","serverUrl"].forEach(id => {
+  document.getElementById(id).addEventListener("input", saveUiSettings);
+  document.getElementById(id).addEventListener("change", saveUiSettings);
+});
 
 
 function builderAliases(builder){
@@ -449,9 +489,7 @@ function rowToMapping(row){
   return { alias: String(alias).trim(), formatted: String(formatted).trim() };
 }
 
-async function handleFile(file){
-  const data = await file.arrayBuffer();
-  const wb = XLSX.read(data, {type:"array"});
+function importMappingsFromWorkbook(wb, sourceName){
   let added = 0;
   wb.SheetNames.forEach(name => {
     const ws = wb.Sheets[name];
@@ -468,13 +506,37 @@ async function handleFile(file){
   });
   saveMappings();
   renderMappings();
-  setStatus(`Loaded ${added} subdivision mapping row(s) from ${file.name}.`);
+  setStatus(`Loaded ${added} subdivision mapping row(s) from ${sourceName}. Saved locally.`);
+  return added;
+}
+
+async function handleFile(file){
+  const data = await file.arrayBuffer();
+  const wb = XLSX.read(data, {type:"array"});
+  importMappingsFromWorkbook(wb, file.name);
+}
+
+async function loadMappingsFromServer(){
+  let url = document.getElementById("serverUrl").value.trim() || "Subdivisions.xlsx";
+  document.getElementById("serverUrl").value = url;
+  saveUiSettings();
+  try{
+    setStatus("Loading subdivision mappings from " + url + "...");
+    const res = await fetch(url, { cache:"no-store" });
+    if(!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    const data = await res.arrayBuffer();
+    const wb = XLSX.read(data, {type:"array"});
+    importMappingsFromWorkbook(wb, url);
+  }catch(err){
+    setStatus("Could not load the subdivision file. If you opened this HTML directly from your computer, the browser may block same-folder fetching. Upload both files to GitHub Pages or run a tiny local server. Error: " + err.message);
+  }
 }
 
 function setStatus(msg){ document.getElementById("status").textContent = msg; }
 
 // Events
 parseBtn.addEventListener("click", () => {
+  saveUiSettings();
   parsedRows = parseLots(rawInput.value);
   renderRows();
   const unmatched = parsedRows.filter(r=>!r.matched).map(r=>r.rawSubdivision);
@@ -486,7 +548,7 @@ sampleBtn.addEventListener("click", () => {
   parseBtn.click();
 });
 
-clearBtn.addEventListener("click", () => { rawInput.value=""; parsedRows=[]; renderRows(); setStatus("Cleared."); });
+clearBtn.addEventListener("click", () => { rawInput.value=""; saveUiSettings(); parsedRows=[]; renderRows(); setStatus("Cleared."); });
 
 mapFile.addEventListener("change", e => { const file = e.target.files[0]; if(file) handleFile(file); });
 
