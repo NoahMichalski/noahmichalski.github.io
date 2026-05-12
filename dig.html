@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Monday New Lot Parser</title>
+<title>Monday New Lot Parser v1.8</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -56,7 +56,7 @@
 <body>
 <header>
   <div class="top">
-    <h1>Monday New Lot Parser</h1>
+    <h1>Monday New Lot Parser <span style="font-size:12px;color:#9fb0d0;font-weight:700;">v1.8</span></h1>
     <span class="version">v1.7</span>
   </div>
 </header>
@@ -88,16 +88,16 @@
       <input id="mapFile" type="file" accept=".xlsx,.xls,.csv" />
       <div class="small" style="margin:8px 0 12px">
         Best columns: <b>Alias/Short/Input</b>, <b>Subdivision</b>, <b>Builder</b>, <b>City</b>, or a ready-made <b>Formatted</b> column.
-        Mappings save in this browser after upload. Builder, date, pasted text, and same-folder/server path autosave too.
+        Mappings save in this browser after upload. Builder, date, pasted text, and same-repo file path autosave too.
       </div>
 
-      <label>Subdivision file from same folder / server</label>
+      <label>Subdivision file from same GitHub repo</label>
       <div class="row" style="grid-template-columns:1fr auto;margin-bottom:8px">
         <input id="serverUrl" type="text" placeholder="Subdivisions.xlsx" />
-        <button class="secondary" id="loadServerBtn" type="button">Load Saved From Server</button>
+        <button class="secondary" id="loadServerBtn" type="button">Load From Same Repo</button>
       </div>
       <div class="small" style="margin:0 0 12px">
-        Put <b>Subdivisions.xlsx</b> in the same folder as this HTML and leave this box as <b>Subdivisions.xlsx</b>. On GitHub Pages, both files should be in the same repo folder. This path is saved locally.
+        If this HTML and <b>Subdivisions.xlsx</b> are in the same GitHub repo folder, leave this as <b>Subdivisions.xlsx</b> and click <b>Load From Same Repo</b>. If the Excel file is in another folder in the same repo, use a relative path like <b>data/Subdivisions.xlsx</b> or <b>../Subdivisions.xlsx</b>. This path is saved locally.
       </div>
 
       <label>Paste Monday lot text</label>
@@ -528,7 +528,7 @@ async function loadMappingsFromServer(){
     const wb = XLSX.read(data, {type:"array"});
     importMappingsFromWorkbook(wb, url);
   }catch(err){
-    setStatus("Could not load the subdivision file. If you opened this HTML directly from your computer, the browser may block same-folder fetching. Upload both files to GitHub Pages or run a tiny local server. Error: " + err.message);
+    setStatus("Could not load the subdivision file from the repo path. Make sure the HTML is opened through GitHub Pages, not the normal GitHub file viewer, and that the path is correct. Same folder: Subdivisions.xlsx. Folder inside repo: data/Subdivisions.xlsx. Parent folder: ../Subdivisions.xlsx. Error: " + err.message);
   }
 }
 
