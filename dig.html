@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Monday New Lot Parser v1.8</title>
+<title>Monday New Lot Parser v1.9</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -56,8 +56,8 @@
 <body>
 <header>
   <div class="top">
-    <h1>Monday New Lot Parser <span style="font-size:12px;color:#9fb0d0;font-weight:700;">v1.8</span></h1>
-    <span class="version">v1.7</span>
+    <h1>Monday New Lot Parser <span style="font-size:12px;color:#9fb0d0;font-weight:700;">v1.9</span></h1>
+    <span class="version">v1.9</span>
   </div>
 </header>
 <main>
@@ -516,20 +516,55 @@ async function handleFile(file){
   importMappingsFromWorkbook(wb, file.name);
 }
 
-async function loadMappingsFromServer(){
+function buildServerCandidates(path){
+  const raw = (path || "Subdivisions.xlsx").trim();
+  const candidates = [];
+  const add = u => { if(u && !candidates.includes(u)) candidates.push(u); };
+
+  add(raw);
+
+  // If the page is opened as /dig or /dig.html, this also tries the repo/root file:
+  // https://yourdomain/Subdivisions.xlsx
+  if(!/^https?:\/\//i.test(raw) && !raw.startsWith("/")){
+    add("/" + raw.replace(/^\.\//,""));
+  }
+
+  // Noah's GitHub Pages fallback for the custom domain.
+  // This helps when the site is opened through noahmichalski.com/dig.
+  if(location.hostname.includes("noahmichalski.com") && !/^https?:\/\//i.test(raw)){
+    add("https://noahmichalski.github.io/" + raw.replace(/^\.\//,""));
+  }
+
+  return candidates;
+}
+
+async function loadMappingsFromServer(options = {}){
+  const { silent = false, autoParse = false } = options;
   let url = document.getElementById("serverUrl").value.trim() || "Subdivisions.xlsx";
   document.getElementById("serverUrl").value = url;
   saveUiSettings();
-  try{
-    setStatus("Loading subdivision mappings from " + url + "...");
-    const res = await fetch(url, { cache:"no-store" });
-    if(!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-    const data = await res.arrayBuffer();
-    const wb = XLSX.read(data, {type:"array"});
-    importMappingsFromWorkbook(wb, url);
-  }catch(err){
-    setStatus("Could not load the subdivision file from the repo path. Make sure the HTML is opened through GitHub Pages, not the normal GitHub file viewer, and that the path is correct. Same folder: Subdivisions.xlsx. Folder inside repo: data/Subdivisions.xlsx. Parent folder: ../Subdivisions.xlsx. Error: " + err.message);
+
+  const candidates = buildServerCandidates(url);
+  const errors = [];
+
+  for(const candidate of candidates){
+    try{
+      if(!silent) setStatus("Loading subdivision mappings from " + candidate + "...");
+      const res = await fetch(candidate, { cache:"no-store" });
+      if(!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      const data = await res.arrayBuffer();
+      const wb = XLSX.read(data, {type:"array"});
+      const added = importMappingsFromWorkbook(wb, candidate);
+      setStatus(`Loaded ${added} subdivision mapping row(s) from ${candidate}. Saved locally.${autoParse && rawInput.value.trim() ? "\nAuto-parsing pasted lots..." : ""}`);
+      if(autoParse && rawInput.value.trim()) parseBtn.click();
+      return true;
+    }catch(err){
+      errors.push(`${candidate}: ${err.message}`);
+    }
   }
+
+  setStatus("Could not load the subdivision file from the same repo. I tried:\n" + errors.join("\n") + "\n\nMake sure the file is published on GitHub Pages and the capitalization matches exactly: Subdivisions.xlsx");
+  return false;
 }
 
 function setStatus(msg){ document.getElementById("status").textContent = msg; }
@@ -551,6 +586,7 @@ sampleBtn.addEventListener("click", () => {
 clearBtn.addEventListener("click", () => { rawInput.value=""; saveUiSettings(); parsedRows=[]; renderRows(); setStatus("Cleared."); });
 
 mapFile.addEventListener("change", e => { const file = e.target.files[0]; if(file) handleFile(file); });
+loadServerBtn.addEventListener("click", () => loadMappingsFromServer({silent:false, autoParse:true}));
 
 copyTSV.addEventListener("click", async () => {
   const tsv = rowsToTSV(true);
@@ -590,6 +626,13 @@ resetMappings.addEventListener("click", () => {
   renderMappings();
   setStatus("Custom mappings reset.");
 });
+
+// Auto-load the repo Subdivisions.xlsx on page open, then auto-parse if pasted text is saved.
+// Manual Browse upload still works and also saves locally.
+setTimeout(() => {
+  loadMappingsFromServer({ silent:true, autoParse:true });
+}, 250);
+
 </script>
 </body>
 </html>
