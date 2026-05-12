@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Labor Parser v1.04</title>
+<title>VIP Labor Parser v1.05</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#090f1d;--card:#111827;--card2:#162033;--line:#2a3650;--ink:#f8fafc;--muted:#9ca3af;--blue:#2563eb;--green:#16a34a;--red:#ef4444;--orange:#f59e0b}
@@ -11,11 +11,11 @@
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <span class="pill">v1.04</span></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="btn" id="aliasBtn">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div></div></header>
+<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <span class="pill">v1.05</span></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="btn" id="aliasBtn">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div></div></header>
 <main class="wrap grid">
 <section class="card"><h2>1) Files + Paste Box</h2><div class="body">
 <label>Subdivisions sheet (.xlsx) — saved to this browser</label><input id="subFile" type="file" accept=".xlsx,.xls,.csv" />
-<div class="row" style="margin-top:8px"><input id="serverSubUrl" value="Subdivisions.xlsx" title="Server file name or URL" style="flex:1;min-width:180px"><button class="btn blue" id="serverSubBtn">Load Subdivisions From Server</button></div>
+<div class="row" style="margin-top:8px"><input id="serverSubUrl" value="Subdivisions.xlsx" title="Server file name, GitHub Pages URL, raw GitHub URL, or GitHub blob URL" style="flex:1;min-width:180px"><button class="btn blue" id="serverSubBtn">Load Subdivisions From Server</button></div>
 <div id="subStatus" class="small">No subdivision file loaded yet.</div><div id="fullListBadge" class="subLoaded" style="display:none">Full subdivision list loaded.</div>
 <label>Task Types sheet (.xlsx) — optional, used for hours/exact names</label><input id="taskFile" type="file" accept=".xlsx,.xls,.csv" /><div id="taskStatus" class="small">Built-in task rules are active.</div>
 <label>Raw labor lines</label><textarea id="rawInput" spellcheck="false"></textarea>
@@ -85,7 +85,57 @@ document.getElementById('serverSubBtn').onclick=loadSubdivisionsFromServer;
 document.getElementById('taskFile').onchange=async e=>{const f=e.target.files[0]; if(!f)return; const rows=await readWorkbook(f); taskTypes=parseTaskRows(rows); localStorage.setItem(LS_TASK,JSON.stringify(taskTypes)); document.getElementById('taskStatus').textContent=`${taskTypes.length} task types loaded and saved.`}
 function applySubdivisionRows(rows,sourceLabel){subdivisions=parseSubRows(rows); localStorage.setItem(LS_SUB,JSON.stringify(subdivisions)); updateSubStatus(`${subdivisions.length} subdivisions loaded and saved. ${sourceLabel||''}`); mergeDefaultAliases(); renderSubdivisionChoices(); renderAliases()}
 function updateSubStatus(msg){document.getElementById('subStatus').textContent=msg; const badge=document.getElementById('fullListBadge'); if(subdivisions.length){badge.style.display='block'; badge.textContent=`✅ Full subdivision list loaded — ${subdivisions.length} subdivisions ready. Alias Manager updated.`} else {badge.style.display='none'}}
-async function loadSubdivisionsFromServer(){const input=(document.getElementById('serverSubUrl').value||'Subdivisions.xlsx').trim(); const urls=[input,'./'+input,'Subdivisions.xlsx','subdivisions.xlsx','Subdivisions (66).xlsx','subdivisions.json']; let lastErr=''; for(const url of [...new Set(urls)]){try{const res=await fetch(url,{cache:'no-store'}); if(!res.ok){lastErr=`${url}: ${res.status}`; continue} if(url.toLowerCase().endsWith('.json')){applySubdivisionRows(await res.json(),`Loaded from server: ${url}`); return} const wb=XLSX.read(await res.arrayBuffer(),{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; applySubdivisionRows(XLSX.utils.sheet_to_json(ws,{defval:''}),`Loaded from server: ${url}`); return}catch(err){lastErr=`${url}: ${err.message}`}} alert('Could not load the subdivision list from the server. Make sure the file is in the same GitHub repo/folder as this HTML. Last error: '+lastErr)}
+function githubBlobToRaw(url){
+  try{
+    const u=new URL(url, window.location.href);
+    if(u.hostname==='github.com' && u.pathname.includes('/blob/')){
+      const parts=u.pathname.split('/').filter(Boolean);
+      const user=parts[0], repo=parts[1], branch=parts[3];
+      const filePath=parts.slice(4).join('/');
+      return `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${filePath}`;
+    }
+  }catch(err){}
+  return url;
+}
+function serverUrlCandidates(input){
+  input=(input||'Subdivisions.xlsx').trim();
+  const c=[];
+  const add=u=>{if(u && !c.includes(u))c.push(u)};
+  add(githubBlobToRaw(input));
+  if(!/^https?:\/\//i.test(input) && !input.startsWith('./')) add('./'+input);
+  add('Subdivisions.xlsx');
+  add('./Subdivisions.xlsx');
+  add('subdivisions.xlsx');
+  add('./subdivisions.xlsx');
+  add('https://noahmichalski.github.io/Subdivisions.xlsx');
+  add('https://raw.githubusercontent.com/NoahMichalski/noahmichalski.github.io/main/Subdivisions.xlsx');
+  add('subdivisions.json');
+  add('./subdivisions.json');
+  return c;
+}
+async function loadSubdivisionsFromServer(){
+  const input=(document.getElementById('serverSubUrl').value||'Subdivisions.xlsx').trim();
+  updateSubStatus('Loading subdivision list from server/GitHub...');
+  let lastErr='';
+  for(const url of serverUrlCandidates(input)){
+    try{
+      const res=await fetch(url,{cache:'no-store'});
+      if(!res.ok){lastErr=`${url}: ${res.status}`; continue}
+      const lower=url.toLowerCase().split('?')[0];
+      if(lower.endsWith('.json')){
+        applySubdivisionRows(await res.json(),`Loaded from server: ${url}`);
+        return;
+      }
+      const buf=await res.arrayBuffer();
+      const wb=XLSX.read(buf,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      applySubdivisionRows(XLSX.utils.sheet_to_json(ws,{defval:''}),`Loaded from server: ${url}`);
+      return;
+    }catch(err){lastErr=`${url}: ${err.message}`}
+  }
+  updateSubStatus(subdivisions.length?`${subdivisions.length} saved subdivisions loaded from this browser.`:'No subdivision file loaded yet.');
+  alert('Could not load the subdivision list from the server/GitHub. If you are opening the HTML directly from your computer, same-folder fetch may be blocked by the browser, so the GitHub raw fallback is included too. Last error: '+lastErr);
+}
 function renderSubdivisionChoices(){const dl=document.getElementById('subChoices'); if(dl){dl.innerHTML=subdivisions.map(s=>`<option value="${esc(s.subdivision)}">${esc(s.builder||'')}</option>`).join('')} const c=document.getElementById('aliasSubCount'); if(c)c.textContent=subdivisions.length?`${subdivisions.length} subdivisions are available in the Alias Manager dropdown.`:'Upload or load subdivisions from server to fill this list.'}
 function mergeDefaultAliases(){const existing=new Set(aliases.map(a=>norm(a.alias))); for(const a of defaultAliases){if(!existing.has(norm(a[0]))){aliases.push({alias:a[0],exact:a[1],builder:a[2]}); existing.add(norm(a[0]))}} localStorage.setItem(LS_ALIAS,JSON.stringify(aliases))}
 document.getElementById('clearSavedBtn').onclick=()=>{if(confirm('Clear saved subdivisions, task types, and aliases from this browser?')){localStorage.removeItem(LS_SUB);localStorage.removeItem(LS_TASK);localStorage.removeItem(LS_ALIAS);subdivisions=[];taskTypes=[];aliases=defaultAliases.map(a=>({alias:a[0],exact:a[1],builder:a[2]}));loadSaved();alert('Saved parser files cleared.')}};
@@ -131,9 +181,7 @@ function stripIgnored(raw){return String(raw||'').replace(/\bPO\s*#?\s*\d+\b/ig,
 function appendNote(notes,item){notes=String(notes||'').trim(); if(!item)return notes; if(new RegExp('\\b'+item.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i').test(notes))return notes; return notes?notes+' | '+item:item}
 function extractExtra(raw,rx){let cleaned=stripIgnored(raw); let extra=cleaned.replace(rx,'').replace(/^\s*[-:]+\s*/,'').trim(); const keep=[]; const p=cleaned.match(/\([^)]*\)/g); if(p)keep.push(...p); if(keep.length)return Array.from(new Set(keep)).join(' | '); return extra.replace(/\b(bsmt|basement|garage|gar|porch|drive|drives|walks|walk|approach|patio|back courtyard|int|interior|exterior|ext|low siding|low|siding|around|foundation|curb)\b/ig,' ').replace(/[\/]+/g,' ').replace(/\s+/g,' ').trim()}
 function hasMeaningfulExtra(s){s=String(s||'').trim(); return !!s && !/^(gar|garage|basement|bsmt|porch|drive|drives|walks|walk|approach|patio|int|interior|exterior|low|siding|around|foundation|curb)+$/i.test(s.replace(/[\/]/g,' ').trim())}
-function parseAll(){const lines=document.getElementById('rawInput').value.split(/
-?
-/).map(x=>x.trim()).filter(Boolean); parsed=[]; for(const line of lines){const sp=splitLine(line); for(const lot of sp.lots){const sub=resolveSubdivision(sp.subText,lot); const t=classifyTask(sp.taskText,sub.builder); const needsReview=sub.needsReview||!sub.builder||!sub.subdivision||t.task==='Other'; parsed.push({Original:line,Builder:sub.builder,Subdivision:sub.subdivision,Lot:lot,Task:t.task,'AM Job':sp.shift==='AM'?'Yes':'','PM Job':sp.shift==='PM'?'Yes':'',Notes:t.notes,Hours:t.hours,Status:needsReview?'Review':'Ready',Message:[sub.message,t.reason].filter(Boolean).join(' | '),Match:sub.method||'',RawTask:sp.taskText,RawSubdivision:sp.subText,Candidates:sub.candidates||[],BasementWarn:t.basementWarn})}} updateStats(); renderTable()}
+function parseAll(){const lines=document.getElementById('rawInput').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean); parsed=[]; for(const line of lines){const sp=splitLine(line); for(const lot of sp.lots){const sub=resolveSubdivision(sp.subText,lot); const t=classifyTask(sp.taskText,sub.builder); const needsReview=sub.needsReview||!sub.builder||!sub.subdivision||t.task==='Other'; parsed.push({Original:line,Builder:sub.builder,Subdivision:sub.subdivision,Lot:lot,Task:t.task,'AM Job':sp.shift==='AM'?'Yes':'','PM Job':sp.shift==='PM'?'Yes':'',Notes:t.notes,Hours:t.hours,Status:needsReview?'Review':'Ready',Message:[sub.message,t.reason].filter(Boolean).join(' | '),Match:sub.method||'',RawTask:sp.taskText,RawSubdivision:sp.subText,Candidates:sub.candidates||[],BasementWarn:t.basementWarn})}} updateStats(); renderTable()}
 function updateStats(){document.getElementById('totalStat').textContent=parsed.length;document.getElementById('readyStat').textContent=parsed.filter(r=>r.Status==='Ready').length;document.getElementById('reviewStat').textContent=parsed.filter(r=>r.Status!=='Ready').length;document.getElementById('otherStat').textContent=parsed.filter(r=>r.Task==='Other').length;document.getElementById('amStat').textContent=parsed.filter(r=>r['AM Job']||r['PM Job']).length}
 function laborRows(){return parsed.map(r=>({Builder:r.Builder,Subdivision:r.Subdivision,Lot:r.Lot,Task:r.Task,'AM Job':r['AM Job'],Notes:r.Notes,Hours:r.Hours}))}
 function reviewRows(){return parsed.map(r=>({Status:r.Status,Message:r.Message,Builder:r.Builder,Subdivision:r.Subdivision,Lot:r.Lot,Task:r.Task,'AM Job':r['AM Job'],'PM Job':r['PM Job'],Notes:r.Notes,Hours:r.Hours,Match:r.Match,Original:r.Original}))}
