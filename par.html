@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Labor Parser v1.17</title>
+<title>VIP Labor Parser v1.19</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#090f1d;--card:#111827;--card2:#162033;--line:#2a3650;--ink:#f8fafc;--muted:#9ca3af;--blue:#2563eb;--green:#16a34a;--red:#ef4444;--orange:#f59e0b}
@@ -11,7 +11,7 @@
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.17</button></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
+<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.19</button></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
 <main class="wrap grid">
 <section class="card"><h2>1) Files + Paste Box</h2><div class="body">
 <div class="statusLine" id="loadStatus">Subdivisions: loading… | Task Types: loading…</div>
@@ -39,7 +39,7 @@
   </div>
   <div class="settingsBlock"><b>Tools</b><div class="row" style="margin-top:8px"><button class="btn" id="openAliasFromSettings">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div>
 </div></div>
-<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor Parser v1.17 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
+<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor Parser v1.19 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
 <ul style="line-height:1.7;color:#cbd5e1">
 <li>Moved optional uploads, server paths, Alias Manager, and Clear Saved Files into the gear settings panel.</li>
 <li>Removed the large green loaded popup and replaced it with a compact loaded-status line.</li>
@@ -52,6 +52,8 @@
 <li><b>v1.12:</b> Added condensed MI splitting, PM handling, and alias exact lookups that prefer the loaded subdivision row.</li>
 <li><b>v1.13:</b> Rebuilt the condensed MI splitter so slash-compressed lines expand reliably. Bare <b>p/w</b> now becomes <b>Other</b> with a clarification note instead of guessing <b>Powerwash Garage</b>.</li>
 <li><b>v1.17:</b> Condensed same-lot double tasks now split correctly, like <b>/392-scrap/p/w int</b> becoming two rows for lot 392: Scrap and Power Wash Interior.</li>
+<li><b>v1.18:</b> Same-lot condensed task bundles now split, like <b>22 Pinnacle-p/w int/car/scrap</b> becoming three rows: Power Wash Interior, Carpet Prep, and Scrap.</li>
+<li><b>v1.19:</b> Restored builder-specific bare p/w rules for Pulte/DR/Ryan/Rockford/Epcon, kept bare MI p/w as review, added JV Applewood alias, and split same-lot known task leftovers like car relay into separate rows.</li>
 <li><b>v1.17:</b> <b>Scrap</b> maps to <b>Scrap- inside house/floor coverings/garage</b> and <b>Crawl</b> maps to <b>Cover Crawl</b>, using the task sheet names instead of outputting plain shorthand.</li>
 <li><b>v1.17:</b> <b>Ridge at Glacier</b> is hard-locked to <b>Glacier Pointe *MI *Plain City</b> so it cannot fall back to Schottenstein.</li>
 </ul></div></div>
@@ -101,7 +103,7 @@ function cleanAliasBase(s){return norm(String(s||'').split('*')[0]).replace(/\b(
 function builderKey(s){s=norm(s); if(!s)return''; if(/\bmi\b|mi homes/.test(s))return'MI Homes'; if(/\bdr\b|horton/.test(s))return'DR Horton'; if(/pulte/.test(s))return'Pulte'; if(/ryan/.test(s))return'Ryan'; if(/rockford/.test(s))return'Rockford'; if(/epcon/.test(s))return'Epcon'; if(/schott|schottenstein/.test(s))return'Schottenstein'; if(/arbor/.test(s))return'Arbor Homes'; if(/manor/.test(s))return'Manor'; if(/fischer/.test(s))return'Fischer Homes'; return s.replace(/\b\w/g,m=>m.toUpperCase())}
 function builderFromExact(s){const m=String(s).match(/\*\s*([^*]+?)\s*\*/); return builderKey(m?m[1]:'')}
 const defaultAliases=[
- ['MD','Madison Meadows *DR *Plain City','DR Horton'],['Hyatts','Hyatts Meadows *MI *Delaware','MI Homes'],['JV','Jerome Village *Manor *Plain City','Manor'],['LH','Longview Highlands *DR *Pickerington','DR Horton'],['Darby','Darby Station *MI *Plain City','MI Homes'],['Pioneer','Pioneer *Pulte *Plain City','Pulte'],['Hyatts*MI','Hyatts Meadows *MI *Delaware','MI Homes'],['Hyatts Village','Hyatts Village *Epcon *Powell','Epcon'],['Towns Parkway','Towns on the Parkway *Pulte *Dublin','Pulte'],['Towns Greenway','Towns on the Greenway *Pulte *Westerville','Pulte'],['JV*Manor','Jerome Village *Manor *Plain City','Manor'],['Ridge at Glacier','Glacier Pointe *MI *Plain City','MI Homes'],['Ridge at Glacier Pointe','Glacier Pointe *MI *Plain City','MI Homes'],['Glacier','Glacier Pointe *MI *Plain City','MI Homes'],['Leasure Farms','Leasure Farms *Ryan *Delaware','Ryan'],['Lansdowne','Lansdowne *DR *Canal Winchester','DR Horton'],['Wagnalls','Wagnalls *DR *Lithopolis','DR Horton'],['Sugar Farms','Sugar Farms *Pulte *Hilliard','Pulte'],['Price Ponds','Price Ponds *Pulte *Sunbury','Pulte'],['Slate','Slate *Pulte *Lewis Center','Pulte'],['Buckstone','Buckstone Bend *Pulte *Lockbourne','Pulte'],['Clarkshaw *MI','Clarkshaw Crossing *MI *Powell','MI Homes'],['Johnsons Creek','Johnson\'s Creek *DR *London','DR Horton'],['Glenross','Glenross *Ryan *Delaware','Ryan'],['Hyland','Hyland *Epcon *Plain City','Epcon'],['Woodcrest','Woodcrest *MI *Delaware','MI Homes'],['Rutherford','Rutherford *Ryan *Delaware','Ryan'],['Miller','Miller Farm *MI *Galena','MI Homes'],['London*Arbor','London Landing *Arbor *London','Arbor Homes'],['London Arbor','London Landing *Arbor *London','Arbor Homes'],['London Landing','London Landing *Arbor *London','Arbor Homes'],['Liberty Crossing','Liberty Crossing *DR *Mt Vernon','DR Horton'],['Berlin','Berlin Farm *MI *Delaware','MI Homes'],['Foxfire','Foxfire *MI *Commercial Point','MI Homes'],['Clarkshaw Pulte','Clarkshaw *Pulte *Powell','Pulte'],['Clarkshaw Crossing','Clarkshaw Crossing *MI *Powell','MI Homes']
+ ['MD','Madison Meadows *DR *Plain City','DR Horton'],['Hyatts','Hyatts Meadows *MI *Delaware','MI Homes'],['JV','Jerome Village *Manor *Plain City','Manor'],['JV Applewood','Jerome Village Applewood *MI *Plain City','MI Homes'],['JV*Applewood','Jerome Village Applewood *MI *Plain City','MI Homes'],['LH','Longview Highlands *DR *Pickerington','DR Horton'],['Darby','Darby Station *MI *Plain City','MI Homes'],['Pioneer','Pioneer *Pulte *Plain City','Pulte'],['Hyatts*MI','Hyatts Meadows *MI *Delaware','MI Homes'],['Hyatts Village','Hyatts Village *Epcon *Powell','Epcon'],['Towns Parkway','Towns on the Parkway *Pulte *Dublin','Pulte'],['Towns Greenway','Towns on the Greenway *Pulte *Westerville','Pulte'],['JV*Manor','Jerome Village *Manor *Plain City','Manor'],['Ridge at Glacier','Glacier Pointe *MI *Plain City','MI Homes'],['Ridge at Glacier Pointe','Glacier Pointe *MI *Plain City','MI Homes'],['Glacier','Glacier Pointe *MI *Plain City','MI Homes'],['Leasure Farms','Leasure Farms *Ryan *Delaware','Ryan'],['Lansdowne','Lansdowne *DR *Canal Winchester','DR Horton'],['Wagnalls','Wagnalls *DR *Lithopolis','DR Horton'],['Sugar Farms','Sugar Farms *Pulte *Hilliard','Pulte'],['Price Ponds','Price Ponds *Pulte *Sunbury','Pulte'],['Slate','Slate *Pulte *Lewis Center','Pulte'],['Buckstone','Buckstone Bend *Pulte *Lockbourne','Pulte'],['Clarkshaw *MI','Clarkshaw Crossing *MI *Powell','MI Homes'],['Johnsons Creek','Johnson\'s Creek *DR *London','DR Horton'],['Glenross','Glenross *Ryan *Delaware','Ryan'],['Hyland','Hyland *Epcon *Plain City','Epcon'],['Woodcrest','Woodcrest *MI *Delaware','MI Homes'],['Rutherford','Rutherford *Ryan *Delaware','Ryan'],['Miller','Miller Farm *MI *Galena','MI Homes'],['London*Arbor','London Landing *Arbor *London','Arbor Homes'],['London Arbor','London Landing *Arbor *London','Arbor Homes'],['London Landing','London Landing *Arbor *London','Arbor Homes'],['Liberty Crossing','Liberty Crossing *DR *Mt Vernon','DR Horton'],['Berlin','Berlin Farm *MI *Delaware','MI Homes'],['Foxfire','Foxfire *MI *Commercial Point','MI Homes'],['Clarkshaw Pulte','Clarkshaw *Pulte *Powell','Pulte'],['Clarkshaw Crossing','Clarkshaw Crossing *MI *Powell','MI Homes']
 ];
 
 async function readWorkbook(file){return new Promise((resolve,reject)=>{const r=new FileReader(); r.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; resolve(XLSX.utils.sheet_to_json(ws,{defval:''}))}catch(err){reject(err)}}; r.onerror=reject; r.readAsArrayBuffer(file)})}
@@ -264,6 +266,7 @@ function detectBuilderCue(raw){
 function specialSubdivisionDefault(cleanRaw,bOver){
   const n=norm(cleanRaw);
   // Hard defaults from Noah: these short names are MI unless the competing builder is explicitly typed.
+  if(n==='jv applewood' || n==='jerome village applewood') return {exact:'Jerome Village Applewood *MI *Plain City', builder:'MI Homes'};
   if(n==='ridge at glacier' || n==='ridge at glacier pointe' || n==='ridge glacier' || n==='glacier ridge' || (n.includes('ridge') && n.includes('glacier')) || n.includes('ridge at glacier')) return {exact:'Glacier Pointe *MI *Plain City', builder:'MI Homes'};
   if(n==='berlin' && builderKey(bOver)!=='Pulte') return {exact:'Berlin Farm *MI *Delaware', builder:'MI Homes'};
   if(n==='berlin farm') return {exact:'Berlin Farm *MI *Delaware', builder:'MI Homes'};
@@ -277,7 +280,7 @@ function resolveSubdivision(raw, lot){
   let bOver=detected.builder;
   const rows=subdivisions.length?subdivisions:[];
   const special=specialSubdivisionDefault(cleanRaw,bOver);
-  if(special){return {builder:special.builder,subdivision:special.exact,address:'',method:'hard-default',needsReview:false,message:''}}
+  if(special){const r=findExact(special.exact,special.builder); return {...r,method:'hard-default',needsReview:false,message:''}}
   const directAlias=aliases.find(a=>norm(a.alias)===norm(raw) || norm(a.alias)===norm(cleanRaw));
   if(directAlias){const r=findExact(directAlias.exact,directAlias.builder); return {...r,method:'alias',needsReview:false,message:''}}
   const nraw=norm(cleanRaw), craw=cleanAliasBase(cleanRaw);
@@ -344,7 +347,7 @@ function classifyTask(taskText,builder){const raw=String(taskText||'').trim(); c
  if(isPW(raw)){
    const barePw=/^\s*(?:p\s*\/\s*w|pw|power\s*wash|powerwash)\s*$/i.test(raw);
    const customPw=isCustomPowerwash(raw,b);
-   if(barePw){ task='Other'; notes='CLARIFY POWERWASH TYPE: '+stripIgnored(raw); reason='Bare powerwash needs clarification'; }
+   if(barePw && b==='MI Homes'){ task='Other'; notes='CLARIFY POWERWASH TYPE: '+stripIgnored(raw); reason='Bare MI powerwash needs clarification'; }
    else if(customPw){ task='Other'; notes=stripIgnored(raw); reason='Custom powerwash needs review'; }
    else {
      if(b==='Pulte') task='p/w basement/garage/porch';
@@ -446,7 +449,6 @@ function expandCondensedJobs(line){
 
   const markers=findLotMarkers(afterDash);
   const leadHasMultipleLots=leadLotsText.includes('/');
-  if(!leadHasMultipleLots && !markers.length) return [{line:original,original}];
 
   const expanded=[];
   const pushRows=(lots,task)=>{
@@ -459,7 +461,14 @@ function expandCondensedJobs(line){
     }
   };
 
-  const firstTask=markers.length?afterDash.slice(0,markers[0].start).trim():afterDash;
+  // If the same lot has multiple task shorthands chained after one dash,
+  // split each task into its own row. Example: 22 Pinnacle-p/w int/car/scrap.
+  if(!markers.length){
+    pushRows(firstLots,afterDash);
+    return expanded.length>1?expanded:[{line:original,original}];
+  }
+
+  const firstTask=afterDash.slice(0,markers[0].start).trim();
   pushRows(firstLots,firstTask);
 
   let pendingLots=[];
@@ -480,6 +489,28 @@ function expandCondensedJobs(line){
   return expanded.length>1?expanded:[{line:original,original}];
 }
 
+
+function splitKnownTaskBundle(taskText,builder){
+  const raw=String(taskText||'').trim();
+  if(!raw) return [''];
+  // Pull out multiple known shorthand tasks only when the leftover text is just separators.
+  // This keeps real notes like "car (move trim)" intact, but splits "car relay" or "p/w int/car/scrap".
+  const tokenRx=/p\s*\/\s*w\s*(?:gar\s*\/\s*ext|int|interior|garage|gar|ext|exterior|bsmt|basement)?|pw\s*(?:gar\s*\/\s*ext|int|interior|garage|gar|ext|exterior|bsmt|basement)?|power\s*wash\s*(?:interior|garage|exterior)?|scrap\s+lot|scrap\s+garage|scrap\b|carpet\s*prep|car\b|2nd\s*roll|\b2nd\b|relay\b|insul\w*\b|insulation\s*prep|laq\w*\b|laquer\s*prep|lacquer\s*prep|cover\s*crawl|crawl\b|remove\s+bracing|bracing\b|bolts?\b/ig;
+  const matches=[];
+  let m;
+  while((m=tokenRx.exec(raw))){
+    matches.push({text:m[0].trim(), start:m.index, end:tokenRx.lastIndex});
+  }
+  if(matches.length<2) return [raw];
+  let leftover=raw;
+  for(let i=matches.length-1;i>=0;i--){
+    leftover=leftover.slice(0,matches[i].start)+leftover.slice(matches[i].end);
+  }
+  const onlySeparators=leftover.replace(/[\/\-–—,;:+|()\[\]{}*\s]/g,'').trim()==='';
+  if(!onlySeparators) return [raw];
+  return matches.map(x=>x.text).filter(Boolean);
+}
+
 function prependNote(notes,item){notes=String(notes||'').trim(); if(!item)return notes; return notes?item+' '+notes:item;}
 function parseAll(){
   const rawLines=document.getElementById('rawInput').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
@@ -490,11 +521,14 @@ function parseAll(){
       const sp=splitLine(expanded.line);
       for(const lot of sp.lots){
         const sub=resolveSubdivision(sp.subText,lot);
-        const t=classifyTask(sp.taskText,sub.builder);
-        const pmNote=sp.shift==='PM'?'**PM**':'';
-        const finalNotes=pmNote?prependNote(t.notes,pmNote):t.notes;
-        const needsReview=sub.needsReview||!sub.builder||!sub.subdivision||t.task==='Other';
-        parsed.push({Original:expanded.original||sourceLine,Builder:sub.builder,Subdivision:sub.subdivision,Lot:lot,Task:t.task,'AM Job':sp.shift==='AM'?'Yes':'','PM Job':sp.shift==='PM'?'Yes':'',Notes:finalNotes,Hours:t.hours,Status:needsReview?'Review':'Ready',Message:[sub.message,t.reason].filter(Boolean).join(' | '),Match:sub.method||'',RawTask:sp.taskText,RawSubdivision:sp.subText,Candidates:sub.candidates||[],BasementWarn:t.basementWarn})
+        const taskPieces=splitKnownTaskBundle(sp.taskText,sub.builder);
+        for(const taskPiece of taskPieces){
+          const t=classifyTask(taskPiece,sub.builder);
+          const pmNote=sp.shift==='PM'?'**PM**':'';
+          const finalNotes=pmNote?prependNote(t.notes,pmNote):t.notes;
+          const needsReview=sub.needsReview||!sub.builder||!sub.subdivision||t.task==='Other';
+          parsed.push({Original:expanded.original||sourceLine,Builder:sub.builder,Subdivision:sub.subdivision,Lot:lot,Task:t.task,'AM Job':sp.shift==='AM'?'Yes':'','PM Job':sp.shift==='PM'?'Yes':'',Notes:finalNotes,Hours:t.hours,Status:needsReview?'Review':'Ready',Message:[sub.message,t.reason].filter(Boolean).join(' | '),Match:sub.method||'',RawTask:taskPiece,RawSubdivision:sp.subText,Candidates:sub.candidates||[],BasementWarn:t.basementWarn})
+        }
       }
     }
   }
