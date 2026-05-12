@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Labor Parser v1.12</title>
+<title>VIP Labor Parser v1.14</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#090f1d;--card:#111827;--card2:#162033;--line:#2a3650;--ink:#f8fafc;--muted:#9ca3af;--blue:#2563eb;--green:#16a34a;--red:#ef4444;--orange:#f59e0b}
@@ -11,7 +11,7 @@
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.12</button></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
+<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.14</button></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
 <main class="wrap grid">
 <section class="card"><h2>1) Files + Paste Box</h2><div class="body">
 <div class="statusLine" id="loadStatus">Subdivisions: loading… | Task Types: loading…</div>
@@ -39,7 +39,7 @@
   </div>
   <div class="settingsBlock"><b>Tools</b><div class="row" style="margin-top:8px"><button class="btn" id="openAliasFromSettings">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div>
 </div></div>
-<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor Parser v1.12 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
+<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor Parser v1.14 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
 <ul style="line-height:1.7;color:#cbd5e1">
 <li>Moved optional uploads, server paths, Alias Manager, and Clear Saved Files into the gear settings panel.</li>
 <li>Removed the large green loaded popup and replaced it with a compact loaded-status line.</li>
@@ -49,7 +49,8 @@
 <li>PO/invoice/price junk, including <b>PO#??????</b> and unknown PO placeholders, is stripped from Notes more aggressively.</li>
 <li>Hours stay blank for every row.</li>
 <li><b>v1.11:</b> Fixed condensed lines where the task appears before the dash, like <b>371 Glacier**MI p/w int- note</b>. The parser now moves <b>p/w int</b> out of the subdivision and classifies it as the task.</li>
-<li><b>v1.12:</b> Added condensed MI splitting, so lines like <b>547 Miller-relay/499-car/498/567-2nd roll/627-insul</b> expand into separate rows while reusing the subdivision. Added PM handling: PM goes at the start of Notes as <b>**PM**</b>. Alias exact lookups now prefer the loaded subdivision row if the uploaded sheet has a different spelling.</li>
+<li><b>v1.12:</b> Added condensed MI splitting, PM handling, and alias exact lookups that prefer the loaded subdivision row.</li>
+<li><b>v1.13:</b> Rebuilt the condensed MI splitter so slash-compressed lines expand reliably. Bare <b>p/w</b> now becomes <b>Other</b> with a clarification note instead of guessing <b>Powerwash Garage</b>.</li>
 </ul></div></div>
 <div id="aliasModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">Alias Manager</h2><button class="btn" id="closeAlias">Close</button></div><p class="small">Use this for shorthand names like <b>MD</b>, <b>LH</b>, <b>Darby</b>, <b>JV*Manor</b>. Alias maps to the exact subdivision string from your uploaded sheet.</p><div class="aliasGrid"><input id="aliasName" placeholder="Alias, example: MD"><input id="aliasExact" list="subChoices" placeholder="Exact subdivision, example: Madison Meadows *DR *Plain City"><input id="aliasBuilder" placeholder="Builder"><button class="btn primary" id="addAlias">Add</button></div><datalist id="subChoices"></datalist><p id="aliasSubCount" class="small">Upload or load subdivisions from server to fill this list.</p><div id="aliasList" style="margin-top:14px"></div></div></div>
 <script>
@@ -202,6 +203,23 @@ document.getElementById('clearSavedBtn').onclick=()=>{if(confirm('Clear saved su
 document.getElementById('sampleBtn').onclick=()=>document.getElementById('rawInput').value=sample; document.getElementById('clearBtn').onclick=()=>document.getElementById('rawInput').value=''; document.getElementById('parseBtn').onclick=parseAll;
 document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{view=btn.dataset.view;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));renderTable()});
 
+
+function pullEmbeddedTaskFromSubdivision(subText, taskText){
+  subText=String(subText||'').trim();
+  taskText=String(taskText||'').trim();
+  if(!subText) return {subText, taskText};
+
+  // Handles condensed text like: Glacier**MI p/w int- do NOT throw cabinet away
+  // It pulls "p/w int" out of the subdivision side and puts it back into the task side.
+  const taskRx=/\b(?:p\s*\/\s*w|pw|power\s*wash|powerwash|car\b|carpet\b|2nd\s*roll|relay\b|bolts?\b|anchor\b|remove\s+bracing|bracing\b|insul\w*\b|insulation\b|laq\w*\b|laquer\b|lacquer\b|install\b|set\b|sweep\b|transfer\b|scrap\b)\b/i;
+  const m=subText.match(taskRx);
+  if(!m || m.index===0) return {subText, taskText};
+  const before=subText.slice(0,m.index).trim();
+  const embedded=subText.slice(m.index).trim();
+  if(!before || !embedded) return {subText, taskText};
+  return {subText:before, taskText:(embedded+' '+taskText).replace(/\s+/g,' ').trim()};
+}
+
 function detectAddressInText(text){
   const s=String(text||'');
   const rx=/\b\d{3,6}\s+[A-Z][A-Za-z0-9'’.-]*(?:\s+[A-Z][A-Za-z0-9'’.-]*){1,6}\s+(?:Street|St|Avenue|Ave|Road|Rd|Drive|Dr|Lane|Ln|Court|Ct|Circle|Cir|Boulevard|Blvd|Way|Trail|Trl|Loop|Place|Pl|Parkway|Pkwy|Square|Sq|Terrace|Ter|Path|Run|Crossing|Creek|Point|Pointe)\b(?:\s+(?:East|West|North|South|E|W|N|S))?/i;
@@ -302,8 +320,10 @@ function isCustomPowerwash(raw,builder){const low=normTask(raw); const b=builder
 function classifyTask(taskText,builder){const raw=String(taskText||'').trim(); const low=normTask(raw); const b=builderKey(builder); let task='Other', notes='', reason='', forceGarageNote=false;
  // IMPORTANT: p/w comes first so it does not fall through to Other.
  if(isPW(raw)){
+   const barePw=/^\s*(?:p\s*\/\s*w|pw|power\s*wash|powerwash)\s*$/i.test(raw);
    const customPw=isCustomPowerwash(raw,b);
-   if(customPw){ task='Other'; notes=stripIgnored(raw); reason='Custom powerwash needs review'; }
+   if(barePw){ task='Other'; notes='CLARIFY POWERWASH TYPE: '+stripIgnored(raw); reason='Bare powerwash needs clarification'; }
+   else if(customPw){ task='Other'; notes=stripIgnored(raw); reason='Custom powerwash needs review'; }
    else {
      if(b==='Pulte') task='p/w basement/garage/porch';
      else if(b==='Epcon') task='p/w gar/drives/walks/porch/back courtyard';
@@ -311,7 +331,8 @@ function classifyTask(taskText,builder){const raw=String(taskText||'').trim(); c
      else if(b==='MI Homes'){
        if(/\bint\b|interior|basement|bsmt/.test(low)) task='Power Wash Interior- basement/garage';
        else if(/low|siding|foundation|around|exterior|\bext\b|curb|walk|drive|porch|patio/.test(low)) task='Powerwash exterior/low siding around';
-       else task='Powerwash Garage';
+       else if(/\bgar\b|garage/.test(low)) task='Powerwash Garage';
+       else { task='Other'; notes='CLARIFY POWERWASH TYPE: '+stripIgnored(raw); reason='Bare powerwash needs clarification'; }
      } else task='Powerwash Garage';
      task=exactTaskName(task,b); notes=extractExtra(raw,/p\s*\/\s*w|\bpw\b|power\s*wash|powerwash/i); if(b==='MI Homes' && /Powerwash exterior/i.test(task) && /\bgar(age)?\b/.test(low)){ notes=appendNote(notes,'garage'); forceGarageNote=true; }
    }
@@ -346,48 +367,64 @@ function splitLotGroup(str){
 function expandCondensedJobs(line){
   const original=String(line||'').trim();
   if(!original.includes('/')) return [{line:original,original}];
-  // Do not split normal p/w descriptions like drive/walks/porch unless another lot-task segment exists.
-  const slashParts=original.split('/').slice(1);
-  const hasLaterLotTask=slashParts.some(p=>/^\s*[A-Za-z]?\d+[A-Za-z]?\s*(?:-|$)/i.test(p.trim()) || /^\s*[A-Za-z]?\d+[A-Za-z]?\s*$/i.test(p.trim()));
-  if(!hasLaterLotTask) return [{line:original,original}];
+
   const shiftMatch=original.match(/\b(PM|AM)\b/i);
-  const shiftSuffix=shiftMatch?` **${shiftMatch[1].toUpperCase()}`:'';
-  const cleaned=original.replace(/\*\*\s*(AM|PM)\b/ig,'').trim();
-  const first=cleaned.match(/^\s*((?:[A-Za-z]?\d+[A-Za-z]?\s*\/\s*)*[A-Za-z]?\d+[A-Za-z]?)\s+(.+?)\s*-\s*([^/]+)(?:\/(.*))?$/i);
+  const shiftSuffix=shiftMatch?` **${shiftMatch[1].toUpperCase()}**`:'';
+  const cleaned=original.replace(/\*\*\s*(AM|PM)\b\*\*/ig,'').replace(/\b(AM|PM)\b/ig,'').trim();
+
+  // Patterns:
+  // 547 Miller-relay/499-car/498/567-2nd roll/627-insul
+  // 264/350 Darby-scrap/264-p/w int
+  const first=cleaned.match(/^\s*((?:[A-Za-z]?\d+[A-Za-z]?\s*\/\s*)*[A-Za-z]?\d+[A-Za-z]?)\s+(.+?)\s*-\s*(.+)$/i);
   if(!first) return [{line:original,original}];
-  const firstLots=splitLotGroup(first[1]);
+
+  const leadLotsText=first[1].trim();
+  const firstLots=splitLotGroup(leadLotsText);
   const subText=first[2].trim();
-  const firstTask=first[3].trim();
-  const rest=String(first[4]||'').trim();
+  const afterDash=first[3].trim();
+
+  // Only expand when it is truly condensed: either the first lot group has slashes
+  // or a later slash segment starts with a lot number. This avoids splitting p/w garage/porch/drive.
+  const leadHasMultipleLots=leadLotsText.includes('/');
+  const laterHasLotSegment=/(?:^|\/)\s*[A-Za-z]?\d+[A-Za-z]?\s*(?:-|\/|$)/i.test(afterDash);
+  if(!leadHasMultipleLots && !laterHasLotSegment) return [{line:original,original}];
+
+  const parts=afterDash.split('/').map(p=>p.trim()).filter(Boolean);
+  if(!parts.length) return [{line:original,original}];
+
   const expanded=[];
   const pushRows=(lots,task)=>{
     task=String(task||'').trim();
+    lots=(lots||[]).filter(Boolean);
     if(!lots.length || !task)return;
     for(const lot of lots){ expanded.push({line:`${lot} ${subText}-${task}${shiftSuffix}`, original}); }
   };
-  pushRows(firstLots,firstTask);
-  if(rest){
-    let pending=[];
-    for(const rawPart of rest.split('/')){
-      const part=rawPart.trim();
-      if(!part)continue;
-      const m=part.match(/^((?:[A-Za-z]?\d+[A-Za-z]?\s*\/\s*)*[A-Za-z]?\d+[A-Za-z]?)\s*-\s*(.+)$/i);
-      if(m){
-        const lots=[...pending,...splitLotGroup(m[1])];
-        pending=[];
-        pushRows(lots,m[2]);
-      } else if(/^[A-Za-z]?\d+[A-Za-z]?$/.test(part)){
-        pending.push(part);
-      } else {
-        // If it is not a new lot segment, it belongs to the previous task notes.
-        if(expanded.length){ expanded[expanded.length-1].line += '/' + part; }
-        else return [{line:original,original}];
-      }
+
+  // First task applies to the lot(s) before the subdivision.
+  pushRows(firstLots,parts[0]);
+
+  let pendingLots=[];
+  for(let i=1;i<parts.length;i++){
+    const part=parts[i];
+    const lotTask=part.match(/^((?:[A-Za-z]?\d+[A-Za-z]?\s*\/\s*)*[A-Za-z]?\d+[A-Za-z]?)\s*-\s*(.+)$/i);
+    if(lotTask){
+      const lots=[...pendingLots,...splitLotGroup(lotTask[1])];
+      pendingLots=[];
+      pushRows(lots,lotTask[2]);
+      continue;
     }
-    if(pending.length){ return [{line:original,original}]; }
+    if(/^[A-Za-z]?\d+[A-Za-z]?$/.test(part)){
+      pendingLots.push(part);
+      continue;
+    }
+    // Non-lot slash text means it is probably a real task description, not condensed data.
+    return [{line:original,original}];
   }
+
+  if(pendingLots.length) return [{line:original,original}];
   return expanded.length>1?expanded:[{line:original,original}];
 }
+
 function prependNote(notes,item){notes=String(notes||'').trim(); if(!item)return notes; return notes?item+' '+notes:item;}
 function parseAll(){
   const rawLines=document.getElementById('rawInput').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
