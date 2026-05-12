@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Labor Parser v1.15</title>
+<title>VIP Labor Parser v1.16</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#090f1d;--card:#111827;--card2:#162033;--line:#2a3650;--ink:#f8fafc;--muted:#9ca3af;--blue:#2563eb;--green:#16a34a;--red:#ef4444;--orange:#f59e0b}
@@ -11,7 +11,7 @@
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.15</button></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
+<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.16</button></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
 <main class="wrap grid">
 <section class="card"><h2>1) Files + Paste Box</h2><div class="body">
 <div class="statusLine" id="loadStatus">Subdivisions: loading… | Task Types: loading…</div>
@@ -39,7 +39,7 @@
   </div>
   <div class="settingsBlock"><b>Tools</b><div class="row" style="margin-top:8px"><button class="btn" id="openAliasFromSettings">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div>
 </div></div>
-<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor Parser v1.15 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
+<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor Parser v1.16 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
 <ul style="line-height:1.7;color:#cbd5e1">
 <li>Moved optional uploads, server paths, Alias Manager, and Clear Saved Files into the gear settings panel.</li>
 <li>Removed the large green loaded popup and replaced it with a compact loaded-status line.</li>
@@ -98,7 +98,7 @@ function cleanAliasBase(s){return norm(String(s||'').split('*')[0]).replace(/\b(
 function builderKey(s){s=norm(s); if(!s)return''; if(/\bmi\b|mi homes/.test(s))return'MI Homes'; if(/\bdr\b|horton/.test(s))return'DR Horton'; if(/pulte/.test(s))return'Pulte'; if(/ryan/.test(s))return'Ryan'; if(/rockford/.test(s))return'Rockford'; if(/epcon/.test(s))return'Epcon'; if(/schott|schottenstein/.test(s))return'Schottenstein'; if(/arbor/.test(s))return'Arbor Homes'; if(/manor/.test(s))return'Manor'; if(/fischer/.test(s))return'Fischer Homes'; return s.replace(/\b\w/g,m=>m.toUpperCase())}
 function builderFromExact(s){const m=String(s).match(/\*\s*([^*]+?)\s*\*/); return builderKey(m?m[1]:'')}
 const defaultAliases=[
- ['MD','Madison Meadows *DR *Plain City','DR Horton'],['Hyatts','Hyatts Meadows *MI *Delaware','MI Homes'],['JV','Jerome Village *Manor *Plain City','Manor'],['LH','Longview Highlands *DR *Pickerington','DR Horton'],['Darby','Darby Station *MI *Plain City','MI Homes'],['Pioneer','Pioneer *Pulte *Plain City','Pulte'],['Hyatts*MI','Hyatts Meadows *MI *Delaware','MI Homes'],['Hyatts Village','Hyatts Village *Epcon *Powell','Epcon'],['Towns Parkway','Towns on the Parkway *Pulte *Dublin','Pulte'],['Towns Greenway','Towns on the Greenway *Pulte *Westerville','Pulte'],['JV*Manor','Jerome Village *Manor *Plain City','Manor'],['Ridge at Glacier','Glacier Pointe *MI *Plain City','MI Homes'],['Leasure Farms','Leasure Farms *Ryan *Delaware','Ryan'],['Lansdowne','Lansdowne *DR *Canal Winchester','DR Horton'],['Wagnalls','Wagnalls *DR *Lithopolis','DR Horton'],['Sugar Farms','Sugar Farms *Pulte *Hilliard','Pulte'],['Price Ponds','Price Ponds *Pulte *Sunbury','Pulte'],['Slate','Slate *Pulte *Lewis Center','Pulte'],['Buckstone','Buckstone Bend *Pulte *Lockbourne','Pulte'],['Clarkshaw *MI','Clarkshaw Crossing *MI *Powell','MI Homes'],['Johnsons Creek','Johnson\'s Creek *DR *London','DR Horton'],['Glenross','Glenross *Ryan *Delaware','Ryan'],['Hyland','Hyland *Epcon *Plain City','Epcon'],['Woodcrest','Woodcrest *MI *Delaware','MI Homes'],['Rutherford','Rutherford *Ryan *Delaware','Ryan'],['Miller','Miller Farm *MI *Galena','MI Homes'],['London*Arbor','London Landing *Arbor *London','Arbor Homes'],['London Arbor','London Landing *Arbor *London','Arbor Homes'],['London Landing','London Landing *Arbor *London','Arbor Homes'],['Liberty Crossing','Liberty Crossing *DR *Mt Vernon','DR Horton'],['Berlin','Berlin Farm *MI *Delaware','MI Homes'],['Foxfire','Foxfire *MI *Commercial Point','MI Homes'],['Clarkshaw Pulte','Clarkshaw *Pulte *Powell','Pulte'],['Clarkshaw Crossing','Clarkshaw Crossing *MI *Powell','MI Homes']
+ ['MD','Madison Meadows *DR *Plain City','DR Horton'],['Hyatts','Hyatts Meadows *MI *Delaware','MI Homes'],['JV','Jerome Village *Manor *Plain City','Manor'],['LH','Longview Highlands *DR *Pickerington','DR Horton'],['Darby','Darby Station *MI *Plain City','MI Homes'],['Pioneer','Pioneer *Pulte *Plain City','Pulte'],['Hyatts*MI','Hyatts Meadows *MI *Delaware','MI Homes'],['Hyatts Village','Hyatts Village *Epcon *Powell','Epcon'],['Towns Parkway','Towns on the Parkway *Pulte *Dublin','Pulte'],['Towns Greenway','Towns on the Greenway *Pulte *Westerville','Pulte'],['JV*Manor','Jerome Village *Manor *Plain City','Manor'],['Ridge at Glacier','Glacier Pointe *MI *Plain City','MI Homes'],['Ridge at Glacier Pointe','Glacier Pointe *MI *Plain City','MI Homes'],['Glacier','Glacier Pointe *MI *Plain City','MI Homes'],['Leasure Farms','Leasure Farms *Ryan *Delaware','Ryan'],['Lansdowne','Lansdowne *DR *Canal Winchester','DR Horton'],['Wagnalls','Wagnalls *DR *Lithopolis','DR Horton'],['Sugar Farms','Sugar Farms *Pulte *Hilliard','Pulte'],['Price Ponds','Price Ponds *Pulte *Sunbury','Pulte'],['Slate','Slate *Pulte *Lewis Center','Pulte'],['Buckstone','Buckstone Bend *Pulte *Lockbourne','Pulte'],['Clarkshaw *MI','Clarkshaw Crossing *MI *Powell','MI Homes'],['Johnsons Creek','Johnson\'s Creek *DR *London','DR Horton'],['Glenross','Glenross *Ryan *Delaware','Ryan'],['Hyland','Hyland *Epcon *Plain City','Epcon'],['Woodcrest','Woodcrest *MI *Delaware','MI Homes'],['Rutherford','Rutherford *Ryan *Delaware','Ryan'],['Miller','Miller Farm *MI *Galena','MI Homes'],['London*Arbor','London Landing *Arbor *London','Arbor Homes'],['London Arbor','London Landing *Arbor *London','Arbor Homes'],['London Landing','London Landing *Arbor *London','Arbor Homes'],['Liberty Crossing','Liberty Crossing *DR *Mt Vernon','DR Horton'],['Berlin','Berlin Farm *MI *Delaware','MI Homes'],['Foxfire','Foxfire *MI *Commercial Point','MI Homes'],['Clarkshaw Pulte','Clarkshaw *Pulte *Powell','Pulte'],['Clarkshaw Crossing','Clarkshaw Crossing *MI *Powell','MI Homes']
 ];
 
 async function readWorkbook(file){return new Promise((resolve,reject)=>{const r=new FileReader(); r.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; resolve(XLSX.utils.sheet_to_json(ws,{defval:''}))}catch(err){reject(err)}}; r.onerror=reject; r.readAsArrayBuffer(file)})}
@@ -211,7 +211,7 @@ function pullEmbeddedTaskFromSubdivision(subText, taskText){
 
   // Handles condensed text like: Glacier**MI p/w int- do NOT throw cabinet away
   // It pulls "p/w int" out of the subdivision side and puts it back into the task side.
-  const taskRx=/\b(?:p\s*\/\s*w|pw|power\s*wash|powerwash|car\b|carpet\b|2nd\s*roll|relay\b|bolts?\b|anchor\b|remove\s+bracing|bracing\b|insul\w*\b|insulation\b|laq\w*\b|laquer\b|lacquer\b|install\b|set\b|sweep\b|transfer\b|scrap\b)\b/i;
+  const taskRx=/\b(?:p\s*\/\s*w|pw|power\s*wash|powerwash|car\b|carpet\b|2nd\s*roll|relay\b|bolts?\b|anchor\b|remove\s+bracing|bracing\b|insul\w*\b|insulation\b|laq\w*\b|laquer\b|lacquer\b|install\b|set\b|sweep\b|transfer\b|scrap\b|crawl\b)\b/i;
   const m=subText.match(taskRx);
   if(!m || m.index===0) return {subText, taskText};
   const before=subText.slice(0,m.index).trim();
@@ -243,7 +243,7 @@ function splitLine(line){let s=line.trim(); let shift=''; if(/\bAM\b/i.test(s))s
  }
  if(/\bAM\b/i.test(taskText)){shift='AM'; taskText=taskText.replace(/\bAM\b/ig,'').replace(/\s+/g,' ').trim()} if(/\bPM\b/i.test(taskText)){shift=shift||'PM'; taskText=taskText.replace(/\bPM\b/ig,'').replace(/\s+/g,' ').trim()}
  return {lots:expandLots(lotPart),subText,taskText,shift}}
-function looksLikeTaskStart(t){return /^(p\/?w|pw|power|car|2nd|relay|bolts?|bracing|remove|insul|laq|laquer|lacquer|install|set|sweep|transfer)$/i.test(t)}
+function looksLikeTaskStart(t){return /^(p\/?w|pw|power|car|2nd|relay|bolts?|bracing|remove|insul|laq|laquer|lacquer|install|set|sweep|transfer|scrap|crawl)$/i.test(t)}
 function expandLots(lotPart){lotPart=String(lotPart||'').trim(); const m=lotPart.match(/^(\d+)\s+to\s+(\d+)$/i); if(m){let a=+m[1],b=+m[2]; const out=[]; for(let i=Math.min(a,b);i<=Math.max(a,b);i++)out.push(String(i)); return out} return lotPart?[lotPart]:['']}
 
 function displaySubName(r){return r?.subdivision||''}
@@ -261,7 +261,7 @@ function detectBuilderCue(raw){
 function specialSubdivisionDefault(cleanRaw,bOver){
   const n=norm(cleanRaw);
   // Hard defaults from Noah: these short names are MI unless the competing builder is explicitly typed.
-  if(n==='ridge at glacier' || n==='ridge glacier' || n==='glacier ridge') return {exact:'Glacier Pointe *MI *Plain City', builder:'MI Homes'};
+  if(n==='ridge at glacier' || n==='ridge at glacier pointe' || n==='ridge glacier' || n==='glacier ridge' || n.includes('ridge at glacier')) return {exact:'Glacier Pointe *MI *Plain City', builder:'MI Homes'};
   if(n==='berlin' && builderKey(bOver)!=='Pulte') return {exact:'Berlin Farm *MI *Delaware', builder:'MI Homes'};
   if(n==='berlin farm') return {exact:'Berlin Farm *MI *Delaware', builder:'MI Homes'};
   if(n==='foxfire' && builderKey(bOver)!=='Rockford') return {exact:'Foxfire *MI *Commercial Point', builder:'MI Homes'};
@@ -273,10 +273,10 @@ function resolveSubdivision(raw, lot){
   let cleanRaw=detected.cleaned || raw;
   let bOver=detected.builder;
   const rows=subdivisions.length?subdivisions:[];
-  const directAlias=aliases.find(a=>norm(a.alias)===norm(raw) || norm(a.alias)===norm(cleanRaw));
-  if(directAlias){const r=findExact(directAlias.exact,directAlias.builder); return {...r,method:'alias',needsReview:false,message:''}}
   const special=specialSubdivisionDefault(cleanRaw,bOver);
   if(special){const r=findExact(special.exact,special.builder); return {...r,method:'default',needsReview:false,message:''}}
+  const directAlias=aliases.find(a=>norm(a.alias)===norm(raw) || norm(a.alias)===norm(cleanRaw));
+  if(directAlias){const r=findExact(directAlias.exact,directAlias.builder); return {...r,method:'alias',needsReview:false,message:''}}
   const nraw=norm(cleanRaw), craw=cleanAliasBase(cleanRaw);
   const eligible=rows.filter(r=>!bOver || builderKey(r.builder)===bOver);
   // 1) Exact full/base match wins immediately. This prevents Liberty Crossing from fighting Liberty Bluff.
@@ -355,9 +355,11 @@ function classifyTask(taskText,builder){const raw=String(taskText||'').trim(); c
  else if(/\bbolts?\b|anchor/.test(low)){task=exactTaskName('bolts',b); notes=extractExtra(raw,/\bbolts?\b|anchor\s*bolts?/i)}
  else if(/remove\s+bracing/.test(low)){task=exactTaskName('Remove Bracing',b); notes=extractExtra(raw,/remove\s+bracing/i)}
  else if(/\bbracing\b/.test(low)){task=exactTaskName('Bracing',b); notes=extractExtra(raw,/\bbracing\b/i)}
+ else if(/\bscrap\b/.test(low)){task=exactTaskName('Scrap',b); notes=extractExtra(raw,/\bscrap\b/i)}
+ else if(/\bcrawl\b/.test(low)){task=exactTaskName('Crawl',b); notes=extractExtra(raw,/\bcrawl\b/i)}
  else {task='Other'; notes=stripIgnored(raw); reason='Unknown task'}
  if(task!=='Other' && !hasMeaningfulExtra(notes)) notes=''; if(forceGarageNote) notes=appendNote(notes,'garage'); if(task==='Other') notes=stripIgnored(raw); const basementWarn=isPW(raw)&&/basement|bsmt/i.test(task+' '+raw); return {task,notes,hours:'',reason,basementWarn}}
-function stripIgnored(raw){return String(raw||'').replace(/\bP\.?\s*O\.?\s*#?\s*(?:[?\dA-Z-]+|needed)?/ig,'').replace(/\bPO\s*#?\s*[^\s,;|)]*/ig,'').replace(/\binv\s*#?\s*[?\dA-Z-]+/ig,'').replace(/\$\s*\d+(?:\.\d{2})?/g,'').replace(/\*/g,' ').replace(/\s+([,;|)])/g,'$1').replace(/([(/])\s+/g,'$1').replace(/\s+/g,' ').trim()}
+function stripIgnored(raw){return String(raw||'').replace(/\bP\.?\s*O\.?\s*#?\s*(?:[?\dA-Z-]+|needed)?/ig,'').replace(/\bPO\s*#?\s*[^\s,;|)]*/ig,'').replace(/\binv\s*#?\s*[?\dA-Z-]+/ig,'').replace(/\$\s*\d+(?:\.\d{2})?/g,'').replace(/\*/g,' ').replace(/\s+([,;|)])/g,'$1').replace(/([(/])\s+/g,'$1').replace(/\s+/g,' ').replace(/[\/\s,;|.-]+$/g,'').trim()}
 function appendNote(notes,item){notes=String(notes||'').trim(); if(!item)return notes; if(new RegExp('\\b'+item.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i').test(notes))return notes; return notes?notes+' | '+item:item}
 function extractExtra(raw,rx){let cleaned=stripIgnored(raw); let extra=cleaned.replace(rx,'').replace(/^\s*[-:]+\s*/,'').trim(); const keep=[]; const p=cleaned.match(/\([^)]*\)/g); if(p)keep.push(...p); if(keep.length)return Array.from(new Set(keep)).join(' | '); return extra.replace(/\b(bsmt|basement|garage|gar|porch|drive|drives|walks|walk|approach|patio|back courtyard|int|interior|exterior|ext|low siding|low|siding|around|foundation|curb)\b/ig,' ').replace(/[\/]+/g,' ').replace(/\s+/g,' ').trim()}
 function hasMeaningfulExtra(s){s=String(s||'').trim(); return !!s && !/^(gar|garage|basement|bsmt|porch|drive|drives|walks|walk|approach|patio|int|interior|exterior|low|siding|around|foundation|curb)+$/i.test(s.replace(/[\/]/g,' ').trim())}
