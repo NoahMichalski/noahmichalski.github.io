@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Labor Parser v1.16</title>
+<title>VIP Labor Parser v1.17</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#090f1d;--card:#111827;--card2:#162033;--line:#2a3650;--ink:#f8fafc;--muted:#9ca3af;--blue:#2563eb;--green:#16a34a;--red:#ef4444;--orange:#f59e0b}
@@ -11,7 +11,7 @@
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.16</button></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
+<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.17</button></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
 <main class="wrap grid">
 <section class="card"><h2>1) Files + Paste Box</h2><div class="body">
 <div class="statusLine" id="loadStatus">Subdivisions: loading… | Task Types: loading…</div>
@@ -39,7 +39,7 @@
   </div>
   <div class="settingsBlock"><b>Tools</b><div class="row" style="margin-top:8px"><button class="btn" id="openAliasFromSettings">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div>
 </div></div>
-<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor Parser v1.16 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
+<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor Parser v1.17 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
 <ul style="line-height:1.7;color:#cbd5e1">
 <li>Moved optional uploads, server paths, Alias Manager, and Clear Saved Files into the gear settings panel.</li>
 <li>Removed the large green loaded popup and replaced it with a compact loaded-status line.</li>
@@ -51,6 +51,9 @@
 <li><b>v1.11:</b> Fixed condensed lines where the task appears before the dash, like <b>371 Glacier**MI p/w int- note</b>. The parser now moves <b>p/w int</b> out of the subdivision and classifies it as the task.</li>
 <li><b>v1.12:</b> Added condensed MI splitting, PM handling, and alias exact lookups that prefer the loaded subdivision row.</li>
 <li><b>v1.13:</b> Rebuilt the condensed MI splitter so slash-compressed lines expand reliably. Bare <b>p/w</b> now becomes <b>Other</b> with a clarification note instead of guessing <b>Powerwash Garage</b>.</li>
+<li><b>v1.17:</b> Condensed same-lot double tasks now split correctly, like <b>/392-scrap/p/w int</b> becoming two rows for lot 392: Scrap and Power Wash Interior.</li>
+<li><b>v1.17:</b> <b>Scrap</b> maps to <b>Scrap- inside house/floor coverings/garage</b> and <b>Crawl</b> maps to <b>Cover Crawl</b>, using the task sheet names instead of outputting plain shorthand.</li>
+<li><b>v1.17:</b> <b>Ridge at Glacier</b> is hard-locked to <b>Glacier Pointe *MI *Plain City</b> so it cannot fall back to Schottenstein.</li>
 </ul></div></div>
 <div id="aliasModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">Alias Manager</h2><button class="btn" id="closeAlias">Close</button></div><p class="small">Use this for shorthand names like <b>MD</b>, <b>LH</b>, <b>Darby</b>, <b>JV*Manor</b>. Alias maps to the exact subdivision string from your uploaded sheet.</p><div class="aliasGrid"><input id="aliasName" placeholder="Alias, example: MD"><input id="aliasExact" list="subChoices" placeholder="Exact subdivision, example: Madison Meadows *DR *Plain City"><input id="aliasBuilder" placeholder="Builder"><button class="btn primary" id="addAlias">Add</button></div><datalist id="subChoices"></datalist><p id="aliasSubCount" class="small">Upload or load subdivisions from server to fill this list.</p><div id="aliasList" style="margin-top:14px"></div></div></div>
 <script>
@@ -261,7 +264,7 @@ function detectBuilderCue(raw){
 function specialSubdivisionDefault(cleanRaw,bOver){
   const n=norm(cleanRaw);
   // Hard defaults from Noah: these short names are MI unless the competing builder is explicitly typed.
-  if(n==='ridge at glacier' || n==='ridge at glacier pointe' || n==='ridge glacier' || n==='glacier ridge' || n.includes('ridge at glacier')) return {exact:'Glacier Pointe *MI *Plain City', builder:'MI Homes'};
+  if(n==='ridge at glacier' || n==='ridge at glacier pointe' || n==='ridge glacier' || n==='glacier ridge' || (n.includes('ridge') && n.includes('glacier')) || n.includes('ridge at glacier')) return {exact:'Glacier Pointe *MI *Plain City', builder:'MI Homes'};
   if(n==='berlin' && builderKey(bOver)!=='Pulte') return {exact:'Berlin Farm *MI *Delaware', builder:'MI Homes'};
   if(n==='berlin farm') return {exact:'Berlin Farm *MI *Delaware', builder:'MI Homes'};
   if(n==='foxfire' && builderKey(bOver)!=='Rockford') return {exact:'Foxfire *MI *Commercial Point', builder:'MI Homes'};
@@ -274,7 +277,7 @@ function resolveSubdivision(raw, lot){
   let bOver=detected.builder;
   const rows=subdivisions.length?subdivisions:[];
   const special=specialSubdivisionDefault(cleanRaw,bOver);
-  if(special){const r=findExact(special.exact,special.builder); return {...r,method:'default',needsReview:false,message:''}}
+  if(special){return {builder:special.builder,subdivision:special.exact,address:'',method:'hard-default',needsReview:false,message:''}}
   const directAlias=aliases.find(a=>norm(a.alias)===norm(raw) || norm(a.alias)===norm(cleanRaw));
   if(directAlias){const r=findExact(directAlias.exact,directAlias.builder); return {...r,method:'alias',needsReview:false,message:''}}
   const nraw=norm(cleanRaw), craw=cleanAliasBase(cleanRaw);
@@ -324,6 +327,14 @@ function findExact(exact,builder){
   if(hit) return hit;
   return {builder:b,subdivision:exact,address:''};
 }
+function taskPreferredName(shortName, raw){
+  const low=normTask(raw||shortName);
+  if(/scrap\s*lot/.test(low)) return 'Scrap Lot';
+  if(/scrap\s*gar/.test(low)) return 'Scrap Garage';
+  if(/^scrap$|\bscrap\b/.test(low)) return 'Scrap- inside house/floor coverings/garage';
+  if(/crawl/.test(low)) return 'Cover Crawl';
+  return shortName;
+}
 function exactTaskName(preferred,builder){const b=builderKey(builder); const p=normTask(preferred); let hit=taskTypes.find(t=>normTask(t.task)===p && (builderKey(t.builder)===b || norm(t.builder)==='any')); if(!hit)hit=taskTypes.find(t=>normTask(t.task)===p); return hit?hit.task:preferred}
 function getHours(task,builder){return ''} // Hours are intentionally left blank for all tasks; Other gets manual hours later.
 function isPW(raw){return /p\s*\/\s*w|\bpw\b|power\s*wash|powerwash/i.test(raw)}
@@ -355,8 +366,8 @@ function classifyTask(taskText,builder){const raw=String(taskText||'').trim(); c
  else if(/\bbolts?\b|anchor/.test(low)){task=exactTaskName('bolts',b); notes=extractExtra(raw,/\bbolts?\b|anchor\s*bolts?/i)}
  else if(/remove\s+bracing/.test(low)){task=exactTaskName('Remove Bracing',b); notes=extractExtra(raw,/remove\s+bracing/i)}
  else if(/\bbracing\b/.test(low)){task=exactTaskName('Bracing',b); notes=extractExtra(raw,/\bbracing\b/i)}
- else if(/\bscrap\b/.test(low)){task=exactTaskName('Scrap',b); notes=extractExtra(raw,/\bscrap\b/i)}
- else if(/\bcrawl\b/.test(low)){task=exactTaskName('Crawl',b); notes=extractExtra(raw,/\bcrawl\b/i)}
+ else if(/\bscrap\b/.test(low)){task=exactTaskName(taskPreferredName('Scrap',raw),b); notes=extractExtra(raw,/\bscrap\b/i)}
+ else if(/\bcrawl\b/.test(low)){task=exactTaskName(taskPreferredName('Cover Crawl',raw),b); notes=extractExtra(raw,/\bcrawl\b/i)}
  else {task='Other'; notes=stripIgnored(raw); reason='Unknown task'}
  if(task!=='Other' && !hasMeaningfulExtra(notes)) notes=''; if(forceGarageNote) notes=appendNote(notes,'garage'); if(task==='Other') notes=stripIgnored(raw); const basementWarn=isPW(raw)&&/basement|bsmt/i.test(task+' '+raw); return {task,notes,hours:'',reason,basementWarn}}
 function stripIgnored(raw){return String(raw||'').replace(/\bP\.?\s*O\.?\s*#?\s*(?:[?\dA-Z-]+|needed)?/ig,'').replace(/\bPO\s*#?\s*[^\s,;|)]*/ig,'').replace(/\binv\s*#?\s*[?\dA-Z-]+/ig,'').replace(/\$\s*\d+(?:\.\d{2})?/g,'').replace(/\*/g,' ').replace(/\s+([,;|)])/g,'$1').replace(/([(/])\s+/g,'$1').replace(/\s+/g,' ').replace(/[\/\s,;|.-]+$/g,'').trim()}
@@ -384,6 +395,19 @@ function cleanCondensedTask(task){
     .replace(/\s+/g,' ')
     .trim());
 }
+
+function splitCondensedTaskSequence(task){
+  let t=String(task||'').trim();
+  if(!t)return[];
+  // Protect p/w so the slash inside p/w is not treated as a task separator.
+  t=t.replace(/p\s*\/\s*w/ig,'P_W');
+  // Split only when the next slash clearly begins another task shorthand.
+  const pieces=t.split(/\s*\/\s*(?=(?:P_W|pw\b|power\b|car\b|2nd\b|relay\b|insul\b|laq\b|laquer\b|lacquer\b|scrap\b|crawl\b|bracing\b|bolts?\b|pump\b|flood\b|prime\b|floor\b|sweep\b|cover\b|punch\b|drywall\b))/i)
+    .map(x=>x.replace(/P_W/ig,'p/w').trim())
+    .filter(Boolean);
+  return pieces.length?pieces:[String(task||'').trim()];
+}
+
 function findLotMarkers(body){
   const markers=[];
   const rx=/(^|[\s\/])((?:[A-Za-z]?\d+[A-Za-z]?\s*\/\s*)*[A-Za-z]?\d+[A-Za-z]?)(\s*-\s*)?/g;
@@ -426,10 +450,13 @@ function expandCondensedJobs(line){
 
   const expanded=[];
   const pushRows=(lots,task)=>{
-    task=cleanCondensedTask(task);
     lots=(lots||[]).filter(Boolean);
-    if(!lots.length || !task)return;
-    for(const lot of lots){ expanded.push({line:`${lot} ${subText}-${task}${shiftSuffix}`, original}); }
+    if(!lots.length)return;
+    const taskPieces=splitCondensedTaskSequence(task).map(cleanCondensedTask).filter(Boolean);
+    if(!taskPieces.length)return;
+    for(const piece of taskPieces){
+      for(const lot of lots){ expanded.push({line:`${lot} ${subText}-${piece}${shiftSuffix}`, original}); }
+    }
   };
 
   const firstTask=markers.length?afterDash.slice(0,markers[0].start).trim():afterDash;
