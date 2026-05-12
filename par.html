@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Labor Parser v1.08</title>
+<title>VIP Labor Parser v1.10</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#090f1d;--card:#111827;--card2:#162033;--line:#2a3650;--ink:#f8fafc;--muted:#9ca3af;--blue:#2563eb;--green:#16a34a;--red:#ef4444;--orange:#f59e0b}
@@ -11,7 +11,7 @@
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.08</button></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
+<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.10</button></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
 <main class="wrap grid">
 <section class="card"><h2>1) Files + Paste Box</h2><div class="body">
 <div class="statusLine" id="loadStatus">Subdivisions: loading… | Task Types: loading…</div>
@@ -39,14 +39,14 @@
   </div>
   <div class="settingsBlock"><b>Tools</b><div class="row" style="margin-top:8px"><button class="btn" id="openAliasFromSettings">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div>
 </div></div>
-<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor Parser v1.08 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
+<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor Parser v1.10 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
 <ul style="line-height:1.7;color:#cbd5e1">
 <li>Moved optional uploads, server paths, Alias Manager, and Clear Saved Files into the gear settings panel.</li>
 <li>Removed the large green loaded popup and replaced it with a compact loaded-status line.</li>
 <li>Custom powerwash descriptions that do not cleanly match approved task types now become <b>Other</b> with the raw task in Notes.</li>
 <li>Addresses in raw lines are preserved in Notes for warranty/lived-in jobs.</li>
-<li><b>Scrap Subdiv</b> lines become lot <b>0</b>, task <b>Other</b>, with the original text in Notes.</li>
-<li>PO/invoice/price junk, including <b>PO#??????</b>, is stripped from Notes.</li>
+<li><b>Scrap Subdiv</b> lines now split correctly: <b>Miller</b> is the subdivision, <b>scrap subdiv</b> goes to Notes, Lot is <b>0</b>, and Task is <b>Other</b>.</li>
+<li>PO/invoice/price junk, including <b>PO#??????</b> and unknown PO placeholders, is stripped from Notes more aggressively.</li>
 <li>Hours stay blank for every row.</li>
 </ul></div></div>
 <div id="aliasModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">Alias Manager</h2><button class="btn" id="closeAlias">Close</button></div><p class="small">Use this for shorthand names like <b>MD</b>, <b>LH</b>, <b>Darby</b>, <b>JV*Manor</b>. Alias maps to the exact subdivision string from your uploaded sheet.</p><div class="aliasGrid"><input id="aliasName" placeholder="Alias, example: MD"><input id="aliasExact" list="subChoices" placeholder="Exact subdivision, example: Madison Meadows *DR *Plain City"><input id="aliasBuilder" placeholder="Builder"><button class="btn primary" id="addAlias">Add</button></div><datalist id="subChoices"></datalist><p id="aliasSubCount" class="small">Upload or load subdivisions from server to fill this list.</p><div id="aliasList" style="margin-top:14px"></div></div></div>
@@ -206,7 +206,17 @@ function detectAddressInText(text){
 function splitLine(line){let s=line.trim(); let shift=''; if(/\bAM\b/i.test(s))shift='AM'; if(/\bPM\b/i.test(s))shift=shift||'PM'; s=s.replace(/\*\*\s*AM\b/ig,'').replace(/\*\*\s*PM\b/ig,'').trim(); let lotPart='', rest=s; const range=s.match(/^([A-Za-z]?\d+[A-Za-z]?)\s*(?:to|-)\s*([A-Za-z]?\d+[A-Za-z]?)\s+(.+)$/i); if(range){lotPart=`${range[1]} to ${range[2]}`; rest=range[3].trim()} else {const m=s.match(/^([A-Za-z]?\d+[A-Za-z]?)\s+(.+)$/i); if(m){lotPart=m[1]; rest=m[2].trim()}}
  let idx=rest.search(/\s[-–—]\s|[-–—]/); let subText='', taskText=''; if(idx>=0){subText=rest.slice(0,idx).trim(); taskText=rest.slice(idx+1).replace(/^[-–—]\s*/,'').trim()} else {const toks=rest.split(/\s+/); let taskStart=toks.findIndex(t=>looksLikeTaskStart(t)); if(taskStart>0){subText=toks.slice(0,taskStart).join(' '); taskText=toks.slice(taskStart).join(' ')} else {subText=rest; taskText=''}}
  const address=detectAddressInText(subText); if(address){subText=subText.replace(address,' ').replace(/\s+/g,' ').trim(); taskText=(address+' '+taskText).trim();}
- if(/scrap\s+subdiv/i.test(subText)){ lotPart='0'; taskText=stripIgnored((subText+' '+taskText).replace(/miller\s+scrap\s+subdiv/i,'').trim()) || 'scrap subdiv'; subText='Miller Scrap Subdiv'; }
+ if(/scrap\s+subdiv(?:ision)?/i.test(subText)){
+   lotPart='0';
+   const sm=subText.match(/^(.*?)(scrap\s+subdiv(?:ision)?\b.*)$/i);
+   if(sm){
+     subText=sm[1].trim();
+     taskText=stripIgnored((sm[2]+' '+taskText).trim());
+   }else{
+     taskText=stripIgnored((subText+' '+taskText).trim());
+     subText='';
+   }
+ }
  if(/\bAM\b/i.test(taskText)){shift='AM'; taskText=taskText.replace(/\bAM\b/ig,'').replace(/\s+/g,' ').trim()} if(/\bPM\b/i.test(taskText)){shift=shift||'PM'; taskText=taskText.replace(/\bPM\b/ig,'').replace(/\s+/g,' ').trim()}
  return {lots:expandLots(lotPart),subText,taskText,shift}}
 function looksLikeTaskStart(t){return /^(p\/?w|pw|power|car|2nd|relay|bolts?|bracing|remove|insul|laq|laquer|lacquer|install|set|sweep|transfer)$/i.test(t)}
@@ -298,7 +308,7 @@ function classifyTask(taskText,builder){const raw=String(taskText||'').trim(); c
  else if(/\bbracing\b/.test(low)){task=exactTaskName('Bracing',b); notes=extractExtra(raw,/\bbracing\b/i)}
  else {task='Other'; notes=stripIgnored(raw); reason='Unknown task'}
  if(task!=='Other' && !hasMeaningfulExtra(notes)) notes=''; if(forceGarageNote) notes=appendNote(notes,'garage'); if(task==='Other') notes=stripIgnored(raw); const basementWarn=isPW(raw)&&/basement|bsmt/i.test(task+' '+raw); return {task,notes,hours:'',reason,basementWarn}}
-function stripIgnored(raw){return String(raw||'').replace(/\bPO\s*#?\s*[?\d-]+\b/ig,'').replace(/\binv\s*#?\s*[?\d-]+\b/ig,'').replace(/\$\s*\d+(?:\.\d{2})?/g,'').replace(/\*/g,' ').replace(/\s+/g,' ').trim()}
+function stripIgnored(raw){return String(raw||'').replace(/\bP\.?\s*O\.?\s*#?\s*(?:[?\dA-Z-]+|needed)?/ig,'').replace(/\bPO\s*#?\s*[^\s,;|)]*/ig,'').replace(/\binv\s*#?\s*[?\dA-Z-]+/ig,'').replace(/\$\s*\d+(?:\.\d{2})?/g,'').replace(/\*/g,' ').replace(/\s+([,;|)])/g,'$1').replace(/([(/])\s+/g,'$1').replace(/\s+/g,' ').trim()}
 function appendNote(notes,item){notes=String(notes||'').trim(); if(!item)return notes; if(new RegExp('\\b'+item.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i').test(notes))return notes; return notes?notes+' | '+item:item}
 function extractExtra(raw,rx){let cleaned=stripIgnored(raw); let extra=cleaned.replace(rx,'').replace(/^\s*[-:]+\s*/,'').trim(); const keep=[]; const p=cleaned.match(/\([^)]*\)/g); if(p)keep.push(...p); if(keep.length)return Array.from(new Set(keep)).join(' | '); return extra.replace(/\b(bsmt|basement|garage|gar|porch|drive|drives|walks|walk|approach|patio|back courtyard|int|interior|exterior|ext|low siding|low|siding|around|foundation|curb)\b/ig,' ').replace(/[\/]+/g,' ').replace(/\s+/g,' ').trim()}
 function hasMeaningfulExtra(s){s=String(s||'').trim(); return !!s && !/^(gar|garage|basement|bsmt|porch|drive|drives|walks|walk|approach|patio|int|interior|exterior|low|siding|around|foundation|curb)+$/i.test(s.replace(/[\/]/g,' ').trim())}
