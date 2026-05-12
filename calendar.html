@@ -353,7 +353,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.40</div>
+      <div class="version">v1.41</div>
     </div>
   </header>
 
@@ -414,7 +414,7 @@
               <label for="windowsText">Windows Section</label>
               <span class="pill" id="windowsCount">0 jobs</span>
             </div>
-            <textarea id="windowsText" placeholder="Paste windows here...&#10;Example:&#10;206 MD**PM&#10;102 LH (screens in garage)"></textarea>
+            <textarea id="windowsText" placeholder="Paste windows here...&#10;Example:&#10;206 MD**PM&#10;102 LH (screens in garage)&#10;&#10;Windows exports WITHOUT adding the word Windows to the subject."></textarea>
 
             <div class="btns">
               <button onclick="parseAndRender()">Parse / Preview</button>
@@ -635,7 +635,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const lookup = findLotRecord(lot, typedSub, lookupSub);
 
       const typeLabel = type === 'original' ? 'Original' : type === 'reclean' ? 'Reclean' : 'Windows';
-      let subjectCore = `${raw} ${typeLabel}`.replace(/\s+/g, ' ').trim();
+      const subjectTypeLabel = type === 'windows' ? '' : ` ${typeLabel}`;
+      let subjectCore = `${raw}${subjectTypeLabel}`.replace(/\s+/g, ' ').trim();
 
       if (byId('appendFloorplan')?.checked && lookup?.floorplan) {
         subjectCore += ` - ${lookup.floorplan}`;
