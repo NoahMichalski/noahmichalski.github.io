@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Labor Parser v1.05</title>
+<title>VIP Labor Parser v1.06</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#090f1d;--card:#111827;--card2:#162033;--line:#2a3650;--ink:#f8fafc;--muted:#9ca3af;--blue:#2563eb;--green:#16a34a;--red:#ef4444;--orange:#f59e0b}
@@ -11,16 +11,16 @@
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <span class="pill">v1.05</span></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="btn" id="aliasBtn">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div></div></header>
+<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <span class="pill">v1.06</span></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="btn" id="aliasBtn">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div></div></header>
 <main class="wrap grid">
 <section class="card"><h2>1) Files + Paste Box</h2><div class="body">
 <label>Subdivisions sheet (.xlsx) — saved to this browser</label><input id="subFile" type="file" accept=".xlsx,.xls,.csv" />
 <div class="row" style="margin-top:8px"><input id="serverSubUrl" value="Subdivisions.xlsx" title="Server file name, GitHub Pages URL, raw GitHub URL, or GitHub blob URL" style="flex:1;min-width:180px"><button class="btn blue" id="serverSubBtn">Load Subdivisions From Server</button></div>
 <div id="subStatus" class="small">No subdivision file loaded yet.</div><div id="fullListBadge" class="subLoaded" style="display:none">Full subdivision list loaded.</div>
-<label>Task Types sheet (.xlsx) — optional, used for hours/exact names</label><input id="taskFile" type="file" accept=".xlsx,.xls,.csv" /><div id="taskStatus" class="small">Built-in task rules are active.</div>
+<label>Task Types sheet (.xlsx) — optional, used for hours/exact names</label><input id="taskFile" type="file" accept=".xlsx,.xls,.csv" /><div class="row" style="margin-top:8px"><input id="serverTaskUrl" value="Task Types.xlsx" title="Server task type file name, GitHub Pages URL, raw GitHub URL, or GitHub blob URL" style="flex:1;min-width:180px"><button class="btn blue" id="serverTaskBtn">Load Task Types From Server</button></div><div id="taskStatus" class="small">Built-in task rules are active.</div>
 <label>Raw labor lines</label><textarea id="rawInput" spellcheck="false"></textarea>
 <div class="row" style="margin-top:10px"><button class="btn primary" id="parseBtn">Parse Jobs</button><button class="btn" id="sampleBtn">Load Sample</button><button class="btn" id="clearBtn">Clear Text</button></div>
-<div class="hint" style="margin-top:12px"><b>Powerwash rules:</b><br>• Pulte <b>p/w</b> → <b>p/w basement/garage/porch</b><br>• Ryan/DR/Rockford <b>p/w</b> → <b>p/w Basement/Garage/drive/walks/porch</b><br>• Epcon <b>p/w</b> → <b>p/w gar/drives/walks/porch/back courtyard</b><br>• MI <b>p/w int</b> → <b>Power Wash Interior- basement/garage</b><br>• MI exterior/low/foundation/siding/ext → <b>Powerwash exterior/low siding around</b><br>• MI <b>p/w gar/ext</b> → <b>Powerwash exterior/low siding around</b> with <b>garage</b> in Notes<br>• MI garage-only p/w → <b>Powerwash Garage</b><br>• Invoice numbers, PO numbers, and prices are ignored<br>• AM anywhere in the task marks <b>AM Job = Yes</b><br><br><b>Carpet rules:</b><br>• DR car → <b>Carpet Prep/Trash house/gar/lot</b><br>• Non-DR car → <b>Carpet Prep</b><br><br>Unknown tasks become <b>Other</b>, and full job text goes in Notes.</div>
+<div class="hint" style="margin-top:12px"><b>Powerwash rules:</b><br>• Pulte <b>p/w</b> → <b>p/w basement/garage/porch</b><br>• Ryan/DR/Rockford <b>p/w</b> → <b>p/w Basement/Garage/drive/walks/porch</b><br>• Epcon <b>p/w</b> → <b>p/w gar/drives/walks/porch/back courtyard</b><br>• MI <b>p/w int</b> → <b>Power Wash Interior- basement/garage</b><br>• MI exterior/low/foundation/siding/ext → <b>Powerwash exterior/low siding around</b><br>• MI <b>p/w gar/ext</b> → <b>Powerwash exterior/low siding around</b> with <b>garage</b> in Notes<br>• MI garage-only p/w → <b>Powerwash Garage</b><br>• Invoice numbers, PO numbers, and prices are ignored<br>• AM anywhere in the task marks <b>AM Job = Yes</b><br>• Task Types can load from server too, for exact task names/hours like <b>Remove Bracing</b><br><br><b>Carpet rules:</b><br>• DR car → <b>Carpet Prep/Trash house/gar/lot</b><br>• Non-DR car → <b>Carpet Prep</b><br><br>Unknown tasks become <b>Other</b>, and full job text goes in Notes.</div>
 </div></section>
 <section class="card"><h2>2) Output</h2><div class="body">
 <div class="stats"><div class="stat"><b id="totalStat">0</b><span>Parsed rows</span></div><div class="stat"><b id="readyStat">0</b><span>Ready</span></div><div class="stat"><b id="reviewStat">0</b><span>Needs review</span></div><div class="stat"><b id="otherStat">0</b><span>Other tasks</span></div><div class="stat"><b id="amStat">0</b><span>AM / PM jobs</span></div></div>
@@ -30,7 +30,7 @@
 </main>
 <div id="aliasModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">Alias Manager</h2><button class="btn" id="closeAlias">Close</button></div><p class="small">Use this for shorthand names like <b>MD</b>, <b>LH</b>, <b>Darby</b>, <b>JV*Manor</b>. Alias maps to the exact subdivision string from your uploaded sheet.</p><div class="aliasGrid"><input id="aliasName" placeholder="Alias, example: MD"><input id="aliasExact" list="subChoices" placeholder="Exact subdivision, example: Madison Meadows *DR *Plain City"><input id="aliasBuilder" placeholder="Builder"><button class="btn primary" id="addAlias">Add</button></div><datalist id="subChoices"></datalist><p id="aliasSubCount" class="small">Upload or load subdivisions from server to fill this list.</p><div id="aliasList" style="margin-top:14px"></div></div></div>
 <script>
-const LS_SUB='vipLaborParser.subdivisions.v3', LS_TASK='vipLaborParser.tasks.v3', LS_ALIAS='vipLaborParser.aliases.v3';
+const LS_SUB='vipLaborParser.subdivisions.v4', LS_TASK='vipLaborParser.tasks.v4', LS_ALIAS='vipLaborParser.aliases.v4';
 let subdivisions=[], taskTypes=[], aliases=[], parsed=[], view='labor';
 const sample=`235 Darby- install sprinklers
 343 Darby- p/w int
@@ -82,8 +82,9 @@ function loadSaved(){try{subdivisions=JSON.parse(localStorage.getItem(LS_SUB)||'
 
 document.getElementById('subFile').onchange=async e=>{const f=e.target.files[0]; if(!f)return; const rows=await readWorkbook(f); applySubdivisionRows(rows,`Loaded from uploaded file: ${f.name}`)}
 document.getElementById('serverSubBtn').onclick=loadSubdivisionsFromServer;
-document.getElementById('taskFile').onchange=async e=>{const f=e.target.files[0]; if(!f)return; const rows=await readWorkbook(f); taskTypes=parseTaskRows(rows); localStorage.setItem(LS_TASK,JSON.stringify(taskTypes)); document.getElementById('taskStatus').textContent=`${taskTypes.length} task types loaded and saved.`}
+document.getElementById('taskFile').onchange=async e=>{const f=e.target.files[0]; if(!f)return; const rows=await readWorkbook(f); applyTaskRows(rows,'Loaded from upload: '+f.name)}
 function applySubdivisionRows(rows,sourceLabel){subdivisions=parseSubRows(rows); localStorage.setItem(LS_SUB,JSON.stringify(subdivisions)); updateSubStatus(`${subdivisions.length} subdivisions loaded and saved. ${sourceLabel||''}`); mergeDefaultAliases(); renderSubdivisionChoices(); renderAliases()}
+function applyTaskRows(rows,sourceLabel){taskTypes=parseTaskRows(rows); localStorage.setItem(LS_TASK,JSON.stringify(taskTypes)); document.getElementById('taskStatus').textContent=`✅ ${taskTypes.length} task types loaded and saved. ${sourceLabel||''}`; if(parsed.length){parseAll()}}
 function updateSubStatus(msg){document.getElementById('subStatus').textContent=msg; const badge=document.getElementById('fullListBadge'); if(subdivisions.length){badge.style.display='block'; badge.textContent=`✅ Full subdivision list loaded — ${subdivisions.length} subdivisions ready. Alias Manager updated.`} else {badge.style.display='none'}}
 function githubBlobToRaw(url){
   try{
@@ -136,6 +137,38 @@ async function loadSubdivisionsFromServer(){
   updateSubStatus(subdivisions.length?`${subdivisions.length} saved subdivisions loaded from this browser.`:'No subdivision file loaded yet.');
   alert('Could not load the subdivision list from the server/GitHub. If you are opening the HTML directly from your computer, same-folder fetch may be blocked by the browser, so the GitHub raw fallback is included too. Last error: '+lastErr);
 }
+
+function taskServerUrlCandidates(input){
+  const raw=String(input||'').trim()||'Task Types.xlsx';
+  const enc=raw.replace(/ /g,'%20');
+  const out=[];
+  [raw, enc, './'+raw, './'+enc].forEach(u=>{if(!out.includes(u))out.push(u)});
+  out.push('https://noahmichalski.github.io/Task%20Types.xlsx');
+  out.push('https://raw.githubusercontent.com/NoahMichalski/noahmichalski.github.io/main/Task%20Types.xlsx');
+  if(/github\.com\/[^/]+\/[^/]+\/blob\//i.test(raw)) out.unshift(githubBlobToRaw(raw));
+  return Array.from(new Set(out));
+}
+async function loadTaskTypesFromServer(){
+ const btn=document.getElementById('serverTaskBtn'); const original=btn.textContent; btn.disabled=true; btn.textContent='Loading...';
+ const input=document.getElementById('serverTaskUrl').value;
+ let lastErr='';
+ for(const url of taskServerUrlCandidates(input)){
+   try{
+     const res=await fetch(url,{cache:'no-store'});
+     if(!res.ok) throw new Error('HTTP '+res.status);
+     const buf=await res.arrayBuffer();
+     const wb=XLSX.read(new Uint8Array(buf),{type:'array'});
+     const ws=wb.Sheets[wb.SheetNames[0]];
+     const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+     applyTaskRows(rows,'Loaded from server: '+url);
+     btn.textContent=original; btn.disabled=false; return;
+   }catch(err){ lastErr=url+' — '+err.message; }
+ }
+ document.getElementById('taskStatus').textContent='Could not load task types from server. Last try: '+lastErr;
+ btn.textContent=original; btn.disabled=false;
+}
+document.getElementById('serverTaskBtn').onclick=loadTaskTypesFromServer;
+
 function renderSubdivisionChoices(){const dl=document.getElementById('subChoices'); if(dl){dl.innerHTML=subdivisions.map(s=>`<option value="${esc(s.subdivision)}">${esc(s.builder||'')}</option>`).join('')} const c=document.getElementById('aliasSubCount'); if(c)c.textContent=subdivisions.length?`${subdivisions.length} subdivisions are available in the Alias Manager dropdown.`:'Upload or load subdivisions from server to fill this list.'}
 function mergeDefaultAliases(){const existing=new Set(aliases.map(a=>norm(a.alias))); for(const a of defaultAliases){if(!existing.has(norm(a[0]))){aliases.push({alias:a[0],exact:a[1],builder:a[2]}); existing.add(norm(a[0]))}} localStorage.setItem(LS_ALIAS,JSON.stringify(aliases))}
 document.getElementById('clearSavedBtn').onclick=()=>{if(confirm('Clear saved subdivisions, task types, and aliases from this browser?')){localStorage.removeItem(LS_SUB);localStorage.removeItem(LS_TASK);localStorage.removeItem(LS_ALIAS);subdivisions=[];taskTypes=[];aliases=defaultAliases.map(a=>({alias:a[0],exact:a[1],builder:a[2]}));loadSaved();alert('Saved parser files cleared.')}};
@@ -146,7 +179,7 @@ function splitLine(line){let s=line.trim(); let shift=''; if(/\bAM\b/i.test(s))s
  let idx=rest.search(/\s[-–—]\s|[-–—]/); let subText='', taskText=''; if(idx>=0){subText=rest.slice(0,idx).trim(); taskText=rest.slice(idx+1).replace(/^[-–—]\s*/,'').trim()} else {const toks=rest.split(/\s+/); let taskStart=toks.findIndex(t=>looksLikeTaskStart(t)); if(taskStart>0){subText=toks.slice(0,taskStart).join(' '); taskText=toks.slice(taskStart).join(' ')} else {subText=rest; taskText=''}}
  if(/\bAM\b/i.test(taskText)){shift='AM'; taskText=taskText.replace(/\bAM\b/ig,'').replace(/\s+/g,' ').trim()} if(/\bPM\b/i.test(taskText)){shift=shift||'PM'; taskText=taskText.replace(/\bPM\b/ig,'').replace(/\s+/g,' ').trim()}
  return {lots:expandLots(lotPart),subText,taskText,shift}}
-function looksLikeTaskStart(t){return /^(p\/?w|pw|power|car|2nd|relay|bolts?|bracing|insul|laq|laquer|lacquer|install|set|sweep|transfer)$/i.test(t)}
+function looksLikeTaskStart(t){return /^(p\/?w|pw|power|car|2nd|relay|bolts?|bracing|remove|insul|laq|laquer|lacquer|install|set|sweep|transfer)$/i.test(t)}
 function expandLots(lotPart){lotPart=String(lotPart||'').trim(); const m=lotPart.match(/^(\d+)\s+to\s+(\d+)$/i); if(m){let a=+m[1],b=+m[2]; const out=[]; for(let i=Math.min(a,b);i<=Math.max(a,b);i++)out.push(String(i)); return out} return lotPart?[lotPart]:['']}
 
 function resolveSubdivision(raw, lot){raw=String(raw||'').trim(); const bToken=raw.match(/\*\s*([^*]+)\s*$/); let bOver=''; if(bToken){bOver=builderKey(bToken[1]); raw=raw.replace(/\*\s*[^*]+\s*$/,'').trim()} const directAlias=aliases.find(a=>norm(a.alias)===norm(raw)); if(directAlias){const r=findExact(directAlias.exact,directAlias.builder); return {...r,method:'alias',needsReview:false,message:''}} const rows=subdivisions.length?subdivisions:[]; const nraw=norm(raw), craw=cleanAliasBase(raw); let candidates=rows.filter(r=>{if(bOver&&builderKey(r.builder)!==bOver)return false; const exact=norm(r.subdivision), base=norm(String(r.subdivision).split('*')[0]), cbase=cleanAliasBase(r.subdivision); return exact===nraw||base===nraw||cbase===craw||base.startsWith(nraw)||nraw.startsWith(base)}); if(!candidates.length){candidates=rows.filter(r=>{if(bOver&&builderKey(r.builder)!==bOver)return false; const base=norm(String(r.subdivision).split('*')[0]); return base.includes(nraw)||nraw.includes(base)||cleanAliasBase(r.subdivision)===craw})}
@@ -177,7 +210,7 @@ function classifyTask(taskText,builder){const raw=String(taskText||'').trim(); c
  else if(/\bbracing\b/.test(low)){task=exactTaskName('Bracing',b); notes=extractExtra(raw,/\bbracing\b/i)}
  else {task='Other'; notes=stripIgnored(raw); reason='Unknown task'}
  if(task!=='Other' && !hasMeaningfulExtra(notes)) notes=''; if(task==='Other') notes=stripIgnored(raw); const basementWarn=isPW(raw)&&/basement|bsmt/i.test(task+' '+raw); return {task,notes,hours:getHours(task,b),reason,basementWarn}}
-function stripIgnored(raw){return String(raw||'').replace(/\bPO\s*#?\s*\d+\b/ig,'').replace(/\binv\s*#?\s*\d+\b/ig,'').replace(/\$\s*\d+(?:\.\d{2})?/g,'').replace(/\s+/g,' ').trim()}
+function stripIgnored(raw){return String(raw||'').replace(/\bPO\s*#?\s*\d+\b/ig,'').replace(/\binv\s*#?\s*\d+\b/ig,'').replace(/\$\s*\d+(?:\.\d{2})?/g,'').replace(/\*/g,' ').replace(/\s+/g,' ').trim()}
 function appendNote(notes,item){notes=String(notes||'').trim(); if(!item)return notes; if(new RegExp('\\b'+item.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i').test(notes))return notes; return notes?notes+' | '+item:item}
 function extractExtra(raw,rx){let cleaned=stripIgnored(raw); let extra=cleaned.replace(rx,'').replace(/^\s*[-:]+\s*/,'').trim(); const keep=[]; const p=cleaned.match(/\([^)]*\)/g); if(p)keep.push(...p); if(keep.length)return Array.from(new Set(keep)).join(' | '); return extra.replace(/\b(bsmt|basement|garage|gar|porch|drive|drives|walks|walk|approach|patio|back courtyard|int|interior|exterior|ext|low siding|low|siding|around|foundation|curb)\b/ig,' ').replace(/[\/]+/g,' ').replace(/\s+/g,' ').trim()}
 function hasMeaningfulExtra(s){s=String(s||'').trim(); return !!s && !/^(gar|garage|basement|bsmt|porch|drive|drives|walks|walk|approach|patio|int|interior|exterior|low|siding|around|foundation|curb)+$/i.test(s.replace(/[\/]/g,' ').trim())}
