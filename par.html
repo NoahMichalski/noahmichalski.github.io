@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Labor Parser v1.06</title>
+<title>VIP Labor Parser v1.07</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#090f1d;--card:#111827;--card2:#162033;--line:#2a3650;--ink:#f8fafc;--muted:#9ca3af;--blue:#2563eb;--green:#16a34a;--red:#ef4444;--orange:#f59e0b}
-*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#07111f,#111827 45%,#1e1b4b);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif} header{position:sticky;top:0;z-index:20;background:rgba(9,15,29,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)} .wrap{max-width:1540px;margin:auto;padding:16px} h1{margin:0;font-size:26px;letter-spacing:-.04em}.sub{color:var(--muted);font-size:13px;margin-top:4px}.pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:#0f172a;color:#cbd5e1;padding:5px 10px;font-size:12px;margin-left:8px}.grid{display:grid;grid-template-columns:390px 1fr;gap:16px}.card{background:rgba(17,24,39,.92);border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.24);overflow:hidden}.card h2{font-size:15px;margin:0;padding:12px 15px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--line)}.body{padding:14px 15px} label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px} input,textarea,select{width:100%;background:#0f172a;border:1px solid #334155;border-radius:12px;color:var(--ink);padding:10px} textarea{min-height:430px;font-family:Consolas,monospace;line-height:1.38;resize:vertical}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.btn{border:0;border-radius:12px;padding:10px 12px;background:#334155;color:#fff;cursor:pointer;font-weight:750}.btn.primary{background:linear-gradient(135deg,#0284c7,#7c3aed)}.btn.good{background:#15803d}.btn.bad{background:#991b1b}.btn.blue{background:#1d4ed8}.small{font-size:12px;color:var(--muted)}.hint{background:#0f172a;border:1px dashed #334155;border-radius:14px;padding:10px;color:#cbd5e1;font-size:12px;line-height:1.4}.stats{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:10px;margin:14px 0}.stat{background:#0f172a;border:1px solid var(--line);border-radius:14px;padding:12px}.stat b{font-size:22px}.stat span{display:block;color:var(--muted);font-size:12px;margin-top:3px}.toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:10px 0;flex-wrap:wrap}.tabs{display:flex;gap:8px}.tab{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#0f172a;color:#cbd5e1;cursor:pointer}.tab.active{background:#1d4ed8;color:#fff;border-color:#60a5fa}.tableWrap{overflow:auto;max-height:66vh;border:1px solid var(--line);border-radius:14px} table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px} th{position:sticky;top:0;z-index:3;background:#1f2937;color:#fff;text-align:left;padding:10px;border-bottom:1px solid #475569;white-space:nowrap}td{padding:9px 10px;border-bottom:1px solid #1f2937;vertical-align:top} tr:nth-child(even) td{background:rgba(255,255,255,.018)} .ok{color:#22c55e;font-weight:800}.warnText{color:var(--orange);font-weight:800}.badText{color:var(--red);font-weight:800}.dangerRow td{background:rgba(239,68,68,.085)!important}.reviewRow td{background:rgba(245,158,11,.075)!important}.readyRow td{background:rgba(22,163,74,.02)!important}.basementWarn td{background:rgba(250,204,21,.28)!important;color:#fff}.subLoaded{margin-top:8px;padding:8px 10px;border-radius:12px;border:1px solid #14532d;background:rgba(22,163,74,.15);color:#bbf7d0;font-weight:800}.selectMini{min-width:270px;padding:7px;border-radius:9px;background:#0f172a;color:#fff;border:1px solid #64748b}.modal{position:fixed;inset:0;background:rgba(0,0,0,.68);display:none;align-items:center;justify-content:center;z-index:50}.modal.show{display:flex}.modalBox{width:min(950px,94vw);max-height:88vh;overflow:auto;background:#111827;border:1px solid var(--line);border-radius:18px;padding:16px}.aliasGrid{display:grid;grid-template-columns:1fr 1.4fr 130px 80px;gap:8px;margin-top:10px}@media(max-width:1050px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#07111f,#111827 45%,#1e1b4b);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif} header{position:sticky;top:0;z-index:20;background:rgba(9,15,29,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)} .wrap{max-width:1540px;margin:auto;padding:16px} h1{margin:0;font-size:26px;letter-spacing:-.04em}.sub{color:var(--muted);font-size:13px;margin-top:4px}.pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:#0f172a;color:#cbd5e1;padding:5px 10px;font-size:12px;margin-left:8px}.grid{display:grid;grid-template-columns:390px 1fr;gap:16px}.card{background:rgba(17,24,39,.92);border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.24);overflow:hidden}.card h2{font-size:15px;margin:0;padding:12px 15px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--line)}.body{padding:14px 15px} label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px} input,textarea,select{width:100%;background:#0f172a;border:1px solid #334155;border-radius:12px;color:var(--ink);padding:10px} textarea{min-height:430px;font-family:Consolas,monospace;line-height:1.38;resize:vertical}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.btn{border:0;border-radius:12px;padding:10px 12px;background:#334155;color:#fff;cursor:pointer;font-weight:750}.btn.primary{background:linear-gradient(135deg,#0284c7,#7c3aed)}.btn.good{background:#15803d}.btn.bad{background:#991b1b}.btn.blue{background:#1d4ed8}.small{font-size:12px;color:var(--muted)}.hint{background:#0f172a;border:1px dashed #334155;border-radius:14px;padding:10px;color:#cbd5e1;font-size:12px;line-height:1.4}.stats{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:10px;margin:14px 0}.stat{background:#0f172a;border:1px solid var(--line);border-radius:14px;padding:12px}.stat b{font-size:22px}.stat span{display:block;color:var(--muted);font-size:12px;margin-top:3px}.toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:10px 0;flex-wrap:wrap}.tabs{display:flex;gap:8px}.tab{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#0f172a;color:#cbd5e1;cursor:pointer}.tab.active{background:#1d4ed8;color:#fff;border-color:#60a5fa}.tableWrap{overflow:auto;max-height:66vh;border:1px solid var(--line);border-radius:14px} table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px} th{position:sticky;top:0;z-index:3;background:#1f2937;color:#fff;text-align:left;padding:10px;border-bottom:1px solid #475569;white-space:nowrap}td{padding:9px 10px;border-bottom:1px solid #1f2937;vertical-align:top} tr:nth-child(even) td{background:rgba(255,255,255,.018)} .ok{color:#22c55e;font-weight:800}.warnText{color:var(--orange);font-weight:800}.badText{color:var(--red);font-weight:800}.dangerRow td{background:rgba(239,68,68,.085)!important}.reviewRow td{background:rgba(245,158,11,.075)!important}.readyRow td{background:rgba(22,163,74,.02)!important}.basementWarn td{background:rgba(250,204,21,.28)!important;color:#fff}.subLoaded{margin-top:8px;padding:8px 10px;border-radius:12px;border:1px solid #14532d;background:rgba(22,163,74,.15);color:#bbf7d0;font-weight:800}.selectMini{min-width:270px;padding:7px;border-radius:9px;background:#0f172a;color:#fff;border:1px solid #64748b}.rawHint{margin-top:5px;color:#fbbf24;font-size:11px;line-height:1.25}.chosenSub{font-weight:700}.miniNote{display:block;color:#93c5fd;font-size:11px;margin-top:3px}.modal{position:fixed;inset:0;background:rgba(0,0,0,.68);display:none;align-items:center;justify-content:center;z-index:50}.modal.show{display:flex}.modalBox{width:min(950px,94vw);max-height:88vh;overflow:auto;background:#111827;border:1px solid var(--line);border-radius:18px;padding:16px}.aliasGrid{display:grid;grid-template-columns:1fr 1.4fr 130px 80px;gap:8px;margin-top:10px}@media(max-width:1050px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <span class="pill">v1.06</span></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="btn" id="aliasBtn">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div></div></header>
+<header><div class="wrap"><div class="row between"><div><h1>VIP Labor Parser <span class="pill">v1.07</span></h1><div class="sub">Paste rough labor lines → exact subdivision match → labor jobs sheet table/export.</div></div><div class="row"><button class="btn" id="aliasBtn">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div></div></header>
 <main class="wrap grid">
 <section class="card"><h2>1) Files + Paste Box</h2><div class="body">
 <label>Subdivisions sheet (.xlsx) — saved to this browser</label><input id="subFile" type="file" accept=".xlsx,.xls,.csv" />
@@ -20,7 +20,7 @@
 <label>Task Types sheet (.xlsx) — optional, used for hours/exact names</label><input id="taskFile" type="file" accept=".xlsx,.xls,.csv" /><div class="row" style="margin-top:8px"><input id="serverTaskUrl" value="Task Types.xlsx" title="Server task type file name, GitHub Pages URL, raw GitHub URL, or GitHub blob URL" style="flex:1;min-width:180px"><button class="btn blue" id="serverTaskBtn">Load Task Types From Server</button></div><div id="taskStatus" class="small">Built-in task rules are active.</div>
 <label>Raw labor lines</label><textarea id="rawInput" spellcheck="false"></textarea>
 <div class="row" style="margin-top:10px"><button class="btn primary" id="parseBtn">Parse Jobs</button><button class="btn" id="sampleBtn">Load Sample</button><button class="btn" id="clearBtn">Clear Text</button></div>
-<div class="hint" style="margin-top:12px"><b>Powerwash rules:</b><br>• Pulte <b>p/w</b> → <b>p/w basement/garage/porch</b><br>• Ryan/DR/Rockford <b>p/w</b> → <b>p/w Basement/Garage/drive/walks/porch</b><br>• Epcon <b>p/w</b> → <b>p/w gar/drives/walks/porch/back courtyard</b><br>• MI <b>p/w int</b> → <b>Power Wash Interior- basement/garage</b><br>• MI exterior/low/foundation/siding/ext → <b>Powerwash exterior/low siding around</b><br>• MI <b>p/w gar/ext</b> → <b>Powerwash exterior/low siding around</b> with <b>garage</b> in Notes<br>• MI garage-only p/w → <b>Powerwash Garage</b><br>• Invoice numbers, PO numbers, and prices are ignored<br>• AM anywhere in the task marks <b>AM Job = Yes</b><br>• Task Types can load from server too, for exact task names/hours like <b>Remove Bracing</b><br><br><b>Carpet rules:</b><br>• DR car → <b>Carpet Prep/Trash house/gar/lot</b><br>• Non-DR car → <b>Carpet Prep</b><br><br>Unknown tasks become <b>Other</b>, and full job text goes in Notes.</div>
+<div class="hint" style="margin-top:12px"><b>Powerwash rules:</b><br>• Pulte <b>p/w</b> → <b>p/w basement/garage/porch</b><br>• Ryan/DR/Rockford <b>p/w</b> → <b>p/w Basement/Garage/drive/walks/porch</b><br>• Epcon <b>p/w</b> → <b>p/w gar/drives/walks/porch/back courtyard</b><br>• MI <b>p/w int</b> → <b>Power Wash Interior- basement/garage</b><br>• MI exterior/low/foundation/siding/ext → <b>Powerwash exterior/low siding around</b><br>• MI <b>p/w gar/ext</b> → <b>Powerwash exterior/low siding around</b> with <b>garage</b> in Notes<br>• MI garage-only p/w → <b>Powerwash Garage</b><br>• Invoice numbers, PO numbers, and prices are ignored<br>• AM anywhere in the task marks <b>AM Job = Yes</b><br>• Task Types autoload from server too, for exact task names like <b>Remove Bracing</b>; hours stay blank<br><br><b>Carpet rules:</b><br>• DR car → <b>Carpet Prep/Trash house/gar/lot</b><br>• Non-DR car → <b>Carpet Prep</b><br><br>Unknown tasks become <b>Other</b>, and full job text goes in Notes.</div>
 </div></section>
 <section class="card"><h2>2) Output</h2><div class="body">
 <div class="stats"><div class="stat"><b id="totalStat">0</b><span>Parsed rows</span></div><div class="stat"><b id="readyStat">0</b><span>Ready</span></div><div class="stat"><b id="reviewStat">0</b><span>Needs review</span></div><div class="stat"><b id="otherStat">0</b><span>Other tasks</span></div><div class="stat"><b id="amStat">0</b><span>AM / PM jobs</span></div></div>
@@ -30,7 +30,7 @@
 </main>
 <div id="aliasModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">Alias Manager</h2><button class="btn" id="closeAlias">Close</button></div><p class="small">Use this for shorthand names like <b>MD</b>, <b>LH</b>, <b>Darby</b>, <b>JV*Manor</b>. Alias maps to the exact subdivision string from your uploaded sheet.</p><div class="aliasGrid"><input id="aliasName" placeholder="Alias, example: MD"><input id="aliasExact" list="subChoices" placeholder="Exact subdivision, example: Madison Meadows *DR *Plain City"><input id="aliasBuilder" placeholder="Builder"><button class="btn primary" id="addAlias">Add</button></div><datalist id="subChoices"></datalist><p id="aliasSubCount" class="small">Upload or load subdivisions from server to fill this list.</p><div id="aliasList" style="margin-top:14px"></div></div></div>
 <script>
-const LS_SUB='vipLaborParser.subdivisions.v4', LS_TASK='vipLaborParser.tasks.v4', LS_ALIAS='vipLaborParser.aliases.v4';
+const LS_SUB='vipLaborParser.subdivisions.v5', LS_TASK='vipLaborParser.tasks.v5', LS_ALIAS='vipLaborParser.aliases.v5';
 let subdivisions=[], taskTypes=[], aliases=[], parsed=[], view='labor';
 const sample=`235 Darby- install sprinklers
 343 Darby- p/w int
@@ -68,10 +68,10 @@ const sample=`235 Darby- install sprinklers
 function norm(s){return String(s||'').toLowerCase().replace(/&/g,' and ').replace(/[’']/g,'').replace(/\*/g,' ').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ')}
 function normTask(s){return String(s||'').toLowerCase().replace(/p\s*\/\s*w/g,'pw').replace(/power\s*wash/g,'powerwash').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ')}
 function cleanAliasBase(s){return norm(String(s||'').split('*')[0]).replace(/\b(farms|farm|crossing|meadows|meadow|bend|trace|park|bluffs|bluff|village|highlands|highland|station|run|at|on|the|courtyards|homes|reserve|preserve|pointe|point|hills|hill|creek)\b/g,' ').replace(/\s+/g,' ').trim()}
-function builderKey(s){s=norm(s); if(!s)return''; if(/\bmi\b|mi homes/.test(s))return'MI Homes'; if(/\bdr\b|horton/.test(s))return'DR Horton'; if(/pulte/.test(s))return'Pulte'; if(/ryan/.test(s))return'Ryan'; if(/rockford/.test(s))return'Rockford'; if(/epcon/.test(s))return'Epcon'; if(/schott|schottenstein/.test(s))return'Schottenstein'; if(/manor/.test(s))return'Manor'; if(/fischer/.test(s))return'Fischer Homes'; return s.replace(/\b\w/g,m=>m.toUpperCase())}
+function builderKey(s){s=norm(s); if(!s)return''; if(/\bmi\b|mi homes/.test(s))return'MI Homes'; if(/\bdr\b|horton/.test(s))return'DR Horton'; if(/pulte/.test(s))return'Pulte'; if(/ryan/.test(s))return'Ryan'; if(/rockford/.test(s))return'Rockford'; if(/epcon/.test(s))return'Epcon'; if(/schott|schottenstein/.test(s))return'Schottenstein'; if(/arbor/.test(s))return'Arbor Homes'; if(/manor/.test(s))return'Manor'; if(/fischer/.test(s))return'Fischer Homes'; return s.replace(/\b\w/g,m=>m.toUpperCase())}
 function builderFromExact(s){const m=String(s).match(/\*\s*([^*]+?)\s*\*/); return builderKey(m?m[1]:'')}
 const defaultAliases=[
- ['MD','Madison Meadows *DR *Plain City','DR Horton'],['Hyatts','Hyatts Meadows *MI *Delaware','MI Homes'],['JV','Jerome Village *Manor *Plain City','Manor'],['LH','Longview Highlands *DR *Pickerington','DR Horton'],['Darby','Darby Station *MI *Plain City','MI Homes'],['Pioneer','Pioneer *Pulte *Plain City','Pulte'],['Hyatts*MI','Hyatts Meadows *MI *Delaware','MI Homes'],['Hyatts Village','Hyatts Village *Epcon *Powell','Epcon'],['Towns Parkway','Towns on the Parkway *Pulte *Dublin','Pulte'],['Towns Greenway','Towns on the Greenway *Pulte *Westerville','Pulte'],['JV*Manor','Jerome Village *Manor *Plain City','Manor'],['Ridge at Glacier','Ridge at Glacier Pointe *Schottenstein *Plain City','Schottenstein'],['Leasure Farms','Leasure Farms *Ryan *Delaware','Ryan'],['Lansdowne','Lansdowne *DR *Canal Winchester','DR Horton'],['Wagnalls','Wagnalls *DR *Lithopolis','DR Horton'],['Sugar Farms','Sugar Farms *Pulte *Hilliard','Pulte'],['Price Ponds','Price Ponds *Pulte *Sunbury','Pulte'],['Slate','Slate *Pulte *Lewis Center','Pulte'],['Buckstone','Buckstone Bend *Pulte *Lockbourne','Pulte'],['Clarkshaw *MI','Clarkshaw Crossing *MI *Powell','MI Homes'],['Johnsons Creek','Johnson\'s Creek *DR *London','DR Horton'],['Glenross','Glenross *Ryan *Delaware','Ryan'],['Hyland','Hyland *Epcon *Plain City','Epcon'],['Woodcrest','Woodcrest *MI *Delaware','MI Homes'],['Rutherford','Rutherford *Ryan *Delaware','Ryan'],['Miller','Miller Farm *MI *Galena','MI Homes']
+ ['MD','Madison Meadows *DR *Plain City','DR Horton'],['Hyatts','Hyatts Meadows *MI *Delaware','MI Homes'],['JV','Jerome Village *Manor *Plain City','Manor'],['LH','Longview Highlands *DR *Pickerington','DR Horton'],['Darby','Darby Station *MI *Plain City','MI Homes'],['Pioneer','Pioneer *Pulte *Plain City','Pulte'],['Hyatts*MI','Hyatts Meadows *MI *Delaware','MI Homes'],['Hyatts Village','Hyatts Village *Epcon *Powell','Epcon'],['Towns Parkway','Towns on the Parkway *Pulte *Dublin','Pulte'],['Towns Greenway','Towns on the Greenway *Pulte *Westerville','Pulte'],['JV*Manor','Jerome Village *Manor *Plain City','Manor'],['Ridge at Glacier','Ridge at Glacier Pointe *Schottenstein *Plain City','Schottenstein'],['Leasure Farms','Leasure Farms *Ryan *Delaware','Ryan'],['Lansdowne','Lansdowne *DR *Canal Winchester','DR Horton'],['Wagnalls','Wagnalls *DR *Lithopolis','DR Horton'],['Sugar Farms','Sugar Farms *Pulte *Hilliard','Pulte'],['Price Ponds','Price Ponds *Pulte *Sunbury','Pulte'],['Slate','Slate *Pulte *Lewis Center','Pulte'],['Buckstone','Buckstone Bend *Pulte *Lockbourne','Pulte'],['Clarkshaw *MI','Clarkshaw Crossing *MI *Powell','MI Homes'],['Johnsons Creek','Johnson\'s Creek *DR *London','DR Horton'],['Glenross','Glenross *Ryan *Delaware','Ryan'],['Hyland','Hyland *Epcon *Plain City','Epcon'],['Woodcrest','Woodcrest *MI *Delaware','MI Homes'],['Rutherford','Rutherford *Ryan *Delaware','Ryan'],['Miller','Miller Farm *MI *Galena','MI Homes'],['London*Arbor','London Landing *Arbor *London','Arbor Homes'],['London Arbor','London Landing *Arbor *London','Arbor Homes'],['London Landing','London Landing *Arbor *London','Arbor Homes'],['Liberty Crossing','Liberty Crossing *DR *Mt Vernon','DR Horton'],['Clarkshaw Pulte','Clarkshaw *Pulte *Powell','Pulte'],['Clarkshaw Crossing','Clarkshaw Crossing *MI *Powell','MI Homes']
 ];
 
 async function readWorkbook(file){return new Promise((resolve,reject)=>{const r=new FileReader(); r.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; resolve(XLSX.utils.sheet_to_json(ws,{defval:''}))}catch(err){reject(err)}}; r.onerror=reject; r.readAsArrayBuffer(file)})}
@@ -114,7 +114,7 @@ function serverUrlCandidates(input){
   add('./subdivisions.json');
   return c;
 }
-async function loadSubdivisionsFromServer(){
+async function loadSubdivisionsFromServer(silent=false){
   const input=(document.getElementById('serverSubUrl').value||'Subdivisions.xlsx').trim();
   updateSubStatus('Loading subdivision list from server/GitHub...');
   let lastErr='';
@@ -135,7 +135,7 @@ async function loadSubdivisionsFromServer(){
     }catch(err){lastErr=`${url}: ${err.message}`}
   }
   updateSubStatus(subdivisions.length?`${subdivisions.length} saved subdivisions loaded from this browser.`:'No subdivision file loaded yet.');
-  alert('Could not load the subdivision list from the server/GitHub. If you are opening the HTML directly from your computer, same-folder fetch may be blocked by the browser, so the GitHub raw fallback is included too. Last error: '+lastErr);
+  if(!silent) alert('Could not load the subdivision list from the server/GitHub. If you are opening the HTML directly from your computer, same-folder fetch may be blocked by the browser, so the GitHub raw fallback is included too. Last error: '+lastErr);
 }
 
 function taskServerUrlCandidates(input){
@@ -148,8 +148,8 @@ function taskServerUrlCandidates(input){
   if(/github\.com\/[^/]+\/[^/]+\/blob\//i.test(raw)) out.unshift(githubBlobToRaw(raw));
   return Array.from(new Set(out));
 }
-async function loadTaskTypesFromServer(){
- const btn=document.getElementById('serverTaskBtn'); const original=btn.textContent; btn.disabled=true; btn.textContent='Loading...';
+async function loadTaskTypesFromServer(silent=false){
+ const btn=document.getElementById('serverTaskBtn'); const original=btn.textContent; if(btn){btn.disabled=true; btn.textContent='Loading...';}
  const input=document.getElementById('serverTaskUrl').value;
  let lastErr='';
  for(const url of taskServerUrlCandidates(input)){
@@ -161,11 +161,11 @@ async function loadTaskTypesFromServer(){
      const ws=wb.Sheets[wb.SheetNames[0]];
      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
      applyTaskRows(rows,'Loaded from server: '+url);
-     btn.textContent=original; btn.disabled=false; return;
+     if(btn){btn.textContent=original; btn.disabled=false;} return;
    }catch(err){ lastErr=url+' — '+err.message; }
  }
  document.getElementById('taskStatus').textContent='Could not load task types from server. Last try: '+lastErr;
- btn.textContent=original; btn.disabled=false;
+ if(btn){btn.textContent=original; btn.disabled=false;}
 }
 document.getElementById('serverTaskBtn').onclick=loadTaskTypesFromServer;
 
@@ -182,13 +182,66 @@ function splitLine(line){let s=line.trim(); let shift=''; if(/\bAM\b/i.test(s))s
 function looksLikeTaskStart(t){return /^(p\/?w|pw|power|car|2nd|relay|bolts?|bracing|remove|insul|laq|laquer|lacquer|install|set|sweep|transfer)$/i.test(t)}
 function expandLots(lotPart){lotPart=String(lotPart||'').trim(); const m=lotPart.match(/^(\d+)\s+to\s+(\d+)$/i); if(m){let a=+m[1],b=+m[2]; const out=[]; for(let i=Math.min(a,b);i<=Math.max(a,b);i++)out.push(String(i)); return out} return lotPart?[lotPart]:['']}
 
-function resolveSubdivision(raw, lot){raw=String(raw||'').trim(); const bToken=raw.match(/\*\s*([^*]+)\s*$/); let bOver=''; if(bToken){bOver=builderKey(bToken[1]); raw=raw.replace(/\*\s*[^*]+\s*$/,'').trim()} const directAlias=aliases.find(a=>norm(a.alias)===norm(raw)); if(directAlias){const r=findExact(directAlias.exact,directAlias.builder); return {...r,method:'alias',needsReview:false,message:''}} const rows=subdivisions.length?subdivisions:[]; const nraw=norm(raw), craw=cleanAliasBase(raw); let candidates=rows.filter(r=>{if(bOver&&builderKey(r.builder)!==bOver)return false; const exact=norm(r.subdivision), base=norm(String(r.subdivision).split('*')[0]), cbase=cleanAliasBase(r.subdivision); return exact===nraw||base===nraw||cbase===craw||base.startsWith(nraw)||nraw.startsWith(base)}); if(!candidates.length){candidates=rows.filter(r=>{if(bOver&&builderKey(r.builder)!==bOver)return false; const base=norm(String(r.subdivision).split('*')[0]); return base.includes(nraw)||nraw.includes(base)||cleanAliasBase(r.subdivision)===craw})}
- if(candidates.length===1)return {...candidates[0],method:bOver?'builder+match':'match',needsReview:false,message:''}; if(candidates.length>1)return {builder:bOver||'',subdivision:raw,address:'',method:'ambiguous',needsReview:true,message:'Multiple subdivision matches: '+candidates.slice(0,4).map(c=>c.subdivision).join(' | '),candidates}; return {builder:bOver||'',subdivision:raw,address:'',method:'missing',needsReview:true,message:'No exact subdivision match found'}}
+function displaySubName(r){return r?.subdivision||''}
+function detectBuilderCue(raw){
+  const original=String(raw||'');
+  let bOver='';
+  let cleaned=original;
+  const starTokens=[...original.matchAll(/\*\s*([^*\-]+)\s*/g)].map(m=>m[1].trim());
+  for(const tok of starTokens){const bk=builderKey(tok); if(bk){bOver=bk; break}}
+  cleaned=cleaned.replace(/\*\s*([^*\-]+)\s*/g,' ').trim();
+  const builders=[['Pulte',/\bpulte\b/i],['DR Horton',/\bdr\b|horton/i],['MI Homes',/\bmi\b|mi homes/i],['Ryan',/ryan/i],['Rockford',/rockford/i],['Epcon',/epcon/i],['Schottenstein',/schott|schottenstein/i],['Arbor Homes',/arbor/i],['Manor',/manor/i],['Fischer Homes',/fischer/i]];
+  for(const [name,rx] of builders){ if(rx.test(cleaned)){ bOver=name; cleaned=cleaned.replace(rx,' ').trim(); break; } }
+  return {cleaned:cleaned.replace(/\s+/g,' ').trim(), builder:bOver};
+}
+function resolveSubdivision(raw, lot){
+  raw=String(raw||'').trim();
+  const detected=detectBuilderCue(raw);
+  let cleanRaw=detected.cleaned || raw;
+  let bOver=detected.builder;
+  const rows=subdivisions.length?subdivisions:[];
+  const directAlias=aliases.find(a=>norm(a.alias)===norm(raw) || norm(a.alias)===norm(cleanRaw));
+  if(directAlias){const r=findExact(directAlias.exact,directAlias.builder); return {...r,method:'alias',needsReview:false,message:''}}
+  const nraw=norm(cleanRaw), craw=cleanAliasBase(cleanRaw);
+  const eligible=rows.filter(r=>!bOver || builderKey(r.builder)===bOver);
+  // 1) Exact full/base match wins immediately. This prevents Liberty Crossing from fighting Liberty Bluff.
+  let exacts=eligible.filter(r=>norm(r.subdivision)===nraw || norm(String(r.subdivision).split('*')[0])===nraw);
+  if(exacts.length===1){
+    if(!bOver){
+      const exactBase=norm(String(exacts[0].subdivision).split('*')[0]);
+      const siblings=eligible.filter(r=>{
+        const base=norm(String(r.subdivision).split('*')[0]);
+        return base!==exactBase && (base.startsWith(nraw) || nraw.startsWith(base));
+      });
+      if(siblings.length){
+        const candidates=[exacts[0],...siblings];
+        return {builder:'',subdivision:cleanRaw,address:'',method:'ambiguous',needsReview:true,message:'Multiple subdivision matches. Use dropdown.',candidates};
+      }
+    }
+    return {...exacts[0],method:bOver?'builder+exact':'exact',needsReview:false,message:''};
+  }
+  if(exacts.length>1 && bOver){return {...exacts[0],method:'builder+exact',needsReview:false,message:''}}
+  // 2) Builder clue plus partial/base match can auto-pick when it narrows to one.
+  let candidates=eligible.filter(r=>{
+    const base=norm(String(r.subdivision).split('*')[0]);
+    const cbase=cleanAliasBase(r.subdivision);
+    return cbase===craw || base.startsWith(nraw) || nraw.startsWith(base) || base.includes(nraw) || nraw.includes(base);
+  });
+  candidates=[...new Map(candidates.map(c=>[norm(c.subdivision)+'|'+builderKey(c.builder),c])).values()];
+  if(candidates.length===1)return {...candidates[0],method:bOver?'builder+match':'match',needsReview:false,message:''};
+  if(candidates.length>1){
+    // If the typed text contains one full candidate base, prefer it over looser similar names.
+    const fullContained=candidates.filter(c=>nraw.includes(norm(String(c.subdivision).split('*')[0])) || norm(String(c.subdivision).split('*')[0]).includes(nraw));
+    const narrowed=fullContained.length?fullContained:candidates;
+    return {builder:bOver||'',subdivision:cleanRaw,address:'',method:'ambiguous',needsReview:true,message:'Multiple subdivision matches. Use dropdown.',candidates:narrowed};
+  }
+  return {builder:bOver||'',subdivision:cleanRaw,address:'',method:'missing',needsReview:true,message:'No exact subdivision match found'}
+}
 function findExact(exact,builder){return subdivisions.find(r=>norm(r.subdivision)===norm(exact)&&(builder?builderKey(r.builder)===builderKey(builder):true)) || {builder:builderKey(builder)||builderFromExact(exact),subdivision:exact,address:''}}
 function exactTaskName(preferred,builder){const b=builderKey(builder); const p=normTask(preferred); let hit=taskTypes.find(t=>normTask(t.task)===p && (builderKey(t.builder)===b || norm(t.builder)==='any')); if(!hit)hit=taskTypes.find(t=>normTask(t.task)===p); return hit?hit.task:preferred}
-function getHours(task,builder){const b=builderKey(builder); let hit=taskTypes.find(t=>normTask(t.task)===normTask(task)&&(builderKey(t.builder)===b||norm(t.builder)==='any')); if(!hit)hit=taskTypes.find(t=>normTask(t.task)===normTask(task)); return hit&&hit.hours?hit.hours:''}
+function getHours(task,builder){return ''} // Hours are intentionally left blank for all tasks; Other gets manual hours later.
 function isPW(raw){return /p\s*\/\s*w|\bpw\b|power\s*wash|powerwash/i.test(raw)}
-function classifyTask(taskText,builder){const raw=String(taskText||'').trim(); const low=normTask(raw); const b=builderKey(builder); let task='Other', notes='', reason='';
+function classifyTask(taskText,builder){const raw=String(taskText||'').trim(); const low=normTask(raw); const b=builderKey(builder); let task='Other', notes='', reason='', forceGarageNote=false;
  // IMPORTANT: p/w comes first so it does not fall through to Other.
  if(isPW(raw)){
    if(b==='Pulte') task='p/w basement/garage/porch';
@@ -199,7 +252,7 @@ function classifyTask(taskText,builder){const raw=String(taskText||'').trim(); c
      else if(/low|siding|foundation|around|exterior|\bext\b|curb|walk|drive|porch|patio/.test(low)) task='Powerwash exterior/low siding around';
      else task='Powerwash Garage';
    } else task='Powerwash Garage';
-   task=exactTaskName(task,b); notes=extractExtra(raw,/p\s*\/\s*w|\bpw\b|power\s*wash|powerwash/i); if(b==='MI Homes' && /Powerwash exterior/i.test(task) && /\bgar(age)?\b/.test(low)) notes=appendNote(notes,'garage');
+   task=exactTaskName(task,b); notes=extractExtra(raw,/p\s*\/\s*w|\bpw\b|power\s*wash|powerwash/i); if(b==='MI Homes' && /Powerwash exterior/i.test(task) && /\bgar(age)?\b/.test(low)){ notes=appendNote(notes,'garage'); forceGarageNote=true; }
  } else if(/\bcar\b|carpet/.test(low)){task=(b==='DR Horton')?'Carpet Prep/Trash house/gar/lot':'Carpet Prep'; task=exactTaskName(task,b); notes=extractExtra(raw,/\b(car|carpet\s*prep)\b/i)}
  else if(/2nd\s*roll|\b2nd\b/.test(low)){task=exactTaskName('2nd Roll',b); notes=extractExtra(raw,/2nd\s*roll|\b2nd\b/i)}
  else if(/\brelay\b/.test(low)){task=exactTaskName('Relay',b); notes=extractExtra(raw,/\brelay\b/i)}
@@ -209,7 +262,7 @@ function classifyTask(taskText,builder){const raw=String(taskText||'').trim(); c
  else if(/remove\s+bracing/.test(low)){task=exactTaskName('Remove Bracing',b); notes=extractExtra(raw,/remove\s+bracing/i)}
  else if(/\bbracing\b/.test(low)){task=exactTaskName('Bracing',b); notes=extractExtra(raw,/\bbracing\b/i)}
  else {task='Other'; notes=stripIgnored(raw); reason='Unknown task'}
- if(task!=='Other' && !hasMeaningfulExtra(notes)) notes=''; if(task==='Other') notes=stripIgnored(raw); const basementWarn=isPW(raw)&&/basement|bsmt/i.test(task+' '+raw); return {task,notes,hours:getHours(task,b),reason,basementWarn}}
+ if(task!=='Other' && !hasMeaningfulExtra(notes)) notes=''; if(forceGarageNote) notes=appendNote(notes,'garage'); if(task==='Other') notes=stripIgnored(raw); const basementWarn=isPW(raw)&&/basement|bsmt/i.test(task+' '+raw); return {task,notes,hours:'',reason,basementWarn}}
 function stripIgnored(raw){return String(raw||'').replace(/\bPO\s*#?\s*\d+\b/ig,'').replace(/\binv\s*#?\s*\d+\b/ig,'').replace(/\$\s*\d+(?:\.\d{2})?/g,'').replace(/\*/g,' ').replace(/\s+/g,' ').trim()}
 function appendNote(notes,item){notes=String(notes||'').trim(); if(!item)return notes; if(new RegExp('\\b'+item.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i').test(notes))return notes; return notes?notes+' | '+item:item}
 function extractExtra(raw,rx){let cleaned=stripIgnored(raw); let extra=cleaned.replace(rx,'').replace(/^\s*[-:]+\s*/,'').trim(); const keep=[]; const p=cleaned.match(/\([^)]*\)/g); if(p)keep.push(...p); if(keep.length)return Array.from(new Set(keep)).join(' | '); return extra.replace(/\b(bsmt|basement|garage|gar|porch|drive|drives|walks|walk|approach|patio|back courtyard|int|interior|exterior|ext|low siding|low|siding|around|foundation|curb)\b/ig,' ').replace(/[\/]+/g,' ').replace(/\s+/g,' ').trim()}
@@ -219,8 +272,8 @@ function updateStats(){document.getElementById('totalStat').textContent=parsed.l
 function laborRows(){return parsed.map(r=>({Builder:r.Builder,Subdivision:r.Subdivision,Lot:r.Lot,Task:r.Task,'AM Job':r['AM Job'],Notes:r.Notes,Hours:r.Hours}))}
 function reviewRows(){return parsed.map(r=>({Status:r.Status,Message:r.Message,Builder:r.Builder,Subdivision:r.Subdivision,Lot:r.Lot,Task:r.Task,'AM Job':r['AM Job'],'PM Job':r['PM Job'],Notes:r.Notes,Hours:r.Hours,Match:r.Match,Original:r.Original}))}
 function renderTable(){const rows=view==='labor'?laborRows():reviewRows(); if(!rows.length){document.getElementById('tableOut').innerHTML='<div class="body small">No parsed output yet.</div>';return} const heads=Object.keys(rows[0]); let html='<table><thead><tr>'+heads.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr></thead><tbody>'; rows.forEach((r,i)=>{let cls=parsed[i]?.Status==='Ready'?'readyRow':(parsed[i]?.Task==='Other'?'dangerRow':'reviewRow'); if(parsed[i]?.BasementWarn)cls+=' basementWarn'; html+=`<tr class="${cls}">`+heads.map(h=>`<td>${formatCell(h,r[h],i)}</td>`).join('')+'</tr>'}); html+='</tbody></table>'; document.getElementById('tableOut').innerHTML=html}
-function formatCell(h,v,i){if(h==='Subdivision'&&parsed[i]?.Candidates?.length>1){return `<select class="selectMini" onchange="chooseSubdivision(${i},this.value)"><option value="">Choose subdivision match...</option>`+parsed[i].Candidates.map((c,idx)=>`<option value="${idx}">${esc(c.subdivision)} — ${esc(c.builder)}</option>`).join('')+`</select>`} if(h==='Status')return v==='Ready'?`<span class="ok">Ready</span>`:`<span class="warnText">Review</span>`; if(h==='Message'&&v)return `<span class="warnText">${esc(v)}</span>`; if(h==='Task'&&v==='Other')return `<span class="badText">Other</span>`; return esc(v)}
-window.chooseSubdivision=(rowIndex,candidateIndex)=>{const r=parsed[rowIndex], c=r?.Candidates?.[Number(candidateIndex)]; if(!r||!c)return; r.Builder=c.builder; r.Subdivision=c.subdivision; r.Match='manual dropdown'; const t=classifyTask(r.RawTask,r.Builder); r.Task=t.task; r.Notes=t.notes; r.Hours=t.hours; r.BasementWarn=t.basementWarn; r.Status=t.task==='Other'?'Review':'Ready'; r.Message=t.reason||''; updateStats(); renderTable()}
+function formatCell(h,v,i){if(h==='Subdivision'&&parsed[i]?.Candidates?.length>1){return `<select class="selectMini" onchange="chooseSubdivision(${i},this.value)"><option value="">Choose subdivision match...</option>`+parsed[i].Candidates.map((c,idx)=>`<option value="${idx}">${esc(c.subdivision)} — ${esc(c.builder)}</option>`).join('')+`</select><div class="rawHint">Raw: ${esc(parsed[i].Original)}<br>Read as: ${esc(parsed[i].RawSubdivision)}</div>`} if(h==='Subdivision'&&parsed[i]?.Match==='manual dropdown')return `<span class="chosenSub">${esc(v)}</span><span class="miniNote">selected from dropdown</span>`; if(h==='Status')return v==='Ready'?`<span class="ok">Ready</span>`:`<span class="warnText">Review</span>`; if(h==='Message'&&v)return `<span class="warnText">${esc(v)}</span>`; if(h==='Task'&&v==='Other')return `<span class="badText">Other</span>`; return esc(v)}
+window.chooseSubdivision=(rowIndex,candidateIndex)=>{const r=parsed[rowIndex], c=r?.Candidates?.[Number(candidateIndex)]; if(!r||!c)return; r.Builder=c.builder; r.Subdivision=c.subdivision; r.Match='manual dropdown'; const t=classifyTask(r.RawTask,r.Builder); r.Task=t.task; r.Notes=t.notes; r.Hours=t.hours; r.BasementWarn=t.basementWarn; r.Status=t.task==='Other'?'Review':'Ready'; r.Message=t.reason||''; r.Candidates=[]; updateStats(); renderTable()}
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function rowsForExport(){return view==='labor'?laborRows():reviewRows()}
 document.getElementById('copyBtn').onclick=async()=>{const rows=rowsForExport(); if(!rows.length)return; const heads=Object.keys(rows[0]); const txt=[heads.join('\t'),...rows.map(r=>heads.map(h=>String(r[h]??'').replace(/\t/g,' ')).join('\t'))].join('\n'); await navigator.clipboard.writeText(txt); alert('Copied table to clipboard. Paste into Excel.')}
@@ -228,7 +281,11 @@ document.getElementById('csvBtn').onclick=()=>downloadText('labor_parser_output.
 function toCSV(rows){if(!rows.length)return'';const heads=Object.keys(rows[0]);return [heads,...rows.map(r=>heads.map(h=>r[h]??''))].map(row=>row.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n')} function downloadText(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href)}
 document.getElementById('aliasBtn').onclick=()=>document.getElementById('aliasModal').classList.add('show'); document.getElementById('closeAlias').onclick=()=>document.getElementById('aliasModal').classList.remove('show'); document.getElementById('addAlias').onclick=()=>{const alias=document.getElementById('aliasName').value.trim(), exact=document.getElementById('aliasExact').value.trim(), builder=document.getElementById('aliasBuilder').value.trim(); if(!alias||!exact)return alert('Alias and exact subdivision are required.'); aliases=aliases.filter(a=>norm(a.alias)!==norm(alias)); aliases.push({alias,exact,builder}); localStorage.setItem(LS_ALIAS,JSON.stringify(aliases)); document.getElementById('aliasName').value='';document.getElementById('aliasExact').value='';document.getElementById('aliasBuilder').value=''; renderAliases()}
 function renderAliases(){const box=document.getElementById('aliasList'); if(!box)return; let html='<table><thead><tr><th>Alias</th><th>Exact Subdivision</th><th>Builder</th><th></th></tr></thead><tbody>'; aliases.forEach((a,i)=>html+=`<tr><td>${esc(a.alias)}</td><td>${esc(a.exact)}</td><td>${esc(a.builder)}</td><td><button class="btn bad" onclick="delAlias(${i})">Delete</button></td></tr>`); html+='</tbody></table>'; box.innerHTML=html} window.delAlias=i=>{aliases.splice(i,1);localStorage.setItem(LS_ALIAS,JSON.stringify(aliases));renderAliases()}
-loadSaved(); document.getElementById('rawInput').value=sample;
+async function autoloadServerFiles(){
+  try{await loadSubdivisionsFromServer(true)}catch(err){}
+  try{await loadTaskTypesFromServer(true)}catch(err){}
+}
+loadSaved(); document.getElementById('rawInput').value=sample; setTimeout(autoloadServerFiles,250);
 </script>
 </body>
 </html>
