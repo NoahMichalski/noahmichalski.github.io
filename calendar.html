@@ -206,7 +206,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(6, minmax(110px, 1fr));
+      grid-template-columns: repeat(7, minmax(105px, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -276,6 +276,7 @@
 
     .tag.original { background: rgba(96,165,250,.15); color: #bfdbfe; border: 1px solid rgba(96,165,250,.32); }
     .tag.reclean { background: rgba(34,197,94,.14); color: #bbf7d0; border: 1px solid rgba(34,197,94,.30); }
+    .tag.windows { background: rgba(14,165,233,.14); color: #bae6fd; border: 1px solid rgba(14,165,233,.34); }
     .tag.am { background: rgba(251,191,36,.14); color: #fde68a; border: 1px solid rgba(251,191,36,.35); }
     .tag.pm { background: rgba(168,85,247,.14); color: #e9d5ff; border: 1px solid rgba(168,85,247,.35); }
     .tag.miss { background: rgba(251,113,133,.12); color: #fecdd3; border: 1px solid rgba(251,113,133,.30); }
@@ -350,9 +351,9 @@
     <div class="wrap topbar">
       <div>
         <h1>Google Calendar Cleaning CSV Parser</h1>
-        <div class="sub">Paste originals/recleans → pull saved shortcut/address data → export Google Calendar CSV.</div>
+        <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.32</div>
+      <div class="version">v1.40</div>
     </div>
   </header>
 
@@ -409,6 +410,12 @@
             </div>
             <textarea id="recleanText" placeholder="Paste recleans here...&#10;Example:&#10;2750 Piatts (atn to bsmt)&#10;AM 4158 Glenross"></textarea>
 
+            <div class="sectionLabel">
+              <label for="windowsText">Windows Section</label>
+              <span class="pill" id="windowsCount">0 jobs</span>
+            </div>
+            <textarea id="windowsText" placeholder="Paste windows here...&#10;Example:&#10;206 MD**PM&#10;102 LH (screens in garage)"></textarea>
+
             <div class="btns">
               <button onclick="parseAndRender()">Parse / Preview</button>
               <button class="blue" onclick="downloadCSV()">Export CSV</button>
@@ -417,7 +424,7 @@
             </div>
 
             <p class="help">
-              Originals start at <b>1:00 AM</b>. After the last Original hour, it leaves <b>one blank hour</b>, then schedules Recleans.
+              Originals start at <b>1:00 AM</b>. It leaves <b>one blank hour</b> between each filled section: Originals → Recleans → Windows.
             </p>
 
             <div class="sampleBox">Shortcut file format supported:
@@ -493,6 +500,10 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
               <div class="txt">Recleans</div>
             </div>
             <div class="stat">
+              <div class="num" id="windowsJobs">0</div>
+              <div class="txt">Windows</div>
+            </div>
+            <div class="stat">
               <div class="num" id="hourBlocks">0</div>
               <div class="txt">Hour Blocks</div>
             </div>
@@ -537,7 +548,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
     byId('eventDate').value = todayISO();
 
-    ['eventDate','startTime','jobsPerHour','duration','originalText','recleanText','appendFloorplan'].forEach(id => {
+    ['eventDate','startTime','jobsPerHour','duration','originalText','recleanText','windowsText','appendFloorplan'].forEach(id => {
       byId(id).addEventListener('input', parseAndRender);
       byId(id).addEventListener('change', parseAndRender);
     });
@@ -623,7 +634,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const lookupSub = shortcutMatch ? shortcutMatch.subdivision : typedSub;
       const lookup = findLotRecord(lot, typedSub, lookupSub);
 
-      const typeLabel = type === 'original' ? 'Original' : 'Reclean';
+      const typeLabel = type === 'original' ? 'Original' : type === 'reclean' ? 'Reclean' : 'Windows';
       let subjectCore = `${raw} ${typeLabel}`.replace(/\s+/g, ' ').trim();
 
       if (byId('appendFloorplan')?.checked && lookup?.floorplan) {
@@ -686,6 +697,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     function buildRows() {
       const originalRows = parseSection(byId('originalText').value, 'original', 0);
       const recleanRows = parseSection(byId('recleanText').value, 'reclean', 1);
+      const windowsRows = parseSection(byId('windowsText').value, 'windows', 2);
 
       const date = byId('eventDate').value || todayISO();
       const startTime = byId('startTime').value || '01:00';
@@ -712,18 +724,32 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       }
 
       const originalBlocks = originalRows.length ? Math.ceil(originalRows.length / jobsPerHour) : 0;
-      const blankHourGap = originalRows.length && recleanRows.length ? 1 : 0;
-      const recleanStartTime = addMinutes(startTime, (originalBlocks + blankHourGap) * 60);
+      const recleanBlocks = recleanRows.length ? Math.ceil(recleanRows.length / jobsPerHour) : 0;
+
+      const hasAfterOriginals = recleanRows.length || windowsRows.length;
+      const gapAfterOriginals = originalRows.length && hasAfterOriginals ? 1 : 0;
+
+      const hasWindowsAfterRecleans = windowsRows.length && recleanRows.length;
+      const gapAfterRecleans = hasWindowsAfterRecleans ? 1 : 0;
+
+      const recleanStartTime = addMinutes(startTime, (originalBlocks + gapAfterOriginals) * 60);
+      const windowsStartTime = addMinutes(startTime, (originalBlocks + gapAfterOriginals + recleanBlocks + gapAfterRecleans) * 60);
 
       const scheduledOriginals = scheduleSection(originalRows, startTime, 1, 1);
       const scheduledRecleans = scheduleSection(
         recleanRows,
         recleanStartTime,
         scheduledOriginals.length + 1,
-        originalBlocks + blankHourGap + 1
+        originalBlocks + gapAfterOriginals + 1
+      );
+      const scheduledWindows = scheduleSection(
+        windowsRows,
+        windowsStartTime,
+        scheduledOriginals.length + scheduledRecleans.length + 1,
+        originalBlocks + gapAfterOriginals + recleanBlocks + gapAfterRecleans + 1
       );
 
-      return [...scheduledOriginals, ...scheduledRecleans];
+      return [...scheduledOriginals, ...scheduledRecleans, ...scheduledWindows];
     }
 
     function parseAndRender() {
@@ -731,6 +757,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
       const originalCount = parsedRows.filter(r => r.type === 'original').length;
       const recleanCount = parsedRows.filter(r => r.type === 'reclean').length;
+      const windowsCount = parsedRows.filter(r => r.type === 'windows').length;
       const amCount = parsedRows.filter(r => r.isAM).length;
       const pmCount = parsedRows.filter(r => r.isPM).length;
       const matchedCount = parsedRows.filter(r => r.matched).length;
@@ -738,13 +765,18 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const jobsPerHour = Math.max(1, Number(byId('jobsPerHour').value) || 3);
       const originalBlocks = originalCount ? Math.ceil(originalCount / jobsPerHour) : 0;
       const recleanBlocks = recleanCount ? Math.ceil(recleanCount / jobsPerHour) : 0;
-      const blocks = originalBlocks + recleanBlocks + (originalCount && recleanCount ? 1 : 0);
+      const windowsBlocks = windowsCount ? Math.ceil(windowsCount / jobsPerHour) : 0;
+      const gapAfterOriginals = originalCount && (recleanCount || windowsCount) ? 1 : 0;
+      const gapAfterRecleans = recleanCount && windowsCount ? 1 : 0;
+      const blocks = originalBlocks + recleanBlocks + windowsBlocks + gapAfterOriginals + gapAfterRecleans;
 
       byId('originalCount').textContent = `${originalCount} job${originalCount === 1 ? '' : 's'}`;
       byId('recleanCount').textContent = `${recleanCount} job${recleanCount === 1 ? '' : 's'}`;
+      byId('windowsCount').textContent = `${windowsCount} job${windowsCount === 1 ? '' : 's'}`;
       byId('totalJobs').textContent = parsedRows.length;
       byId('originalJobs').textContent = originalCount;
       byId('recleanJobs').textContent = recleanCount;
+      byId('windowsJobs').textContent = windowsCount;
       byId('hourBlocks').textContent = blocks;
       byId('matchedJobs').textContent = matchedCount;
       byId('missingJobs').textContent = missingCount;
