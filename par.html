@@ -3,15 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Labor + Cleaning Parser v1.23</title>
+<title>VIP Labor + Cleaning Parser v1.25</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#090f1d;--card:#111827;--card2:#162033;--line:#2a3650;--ink:#f8fafc;--muted:#9ca3af;--blue:#2563eb;--green:#16a34a;--red:#ef4444;--orange:#f59e0b}
 *{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#07111f,#111827 45%,#1e1b4b);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif} header{position:sticky;top:0;z-index:20;background:rgba(9,15,29,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)} .wrap{max-width:1540px;margin:auto;padding:16px} h1{margin:0;font-size:26px;letter-spacing:-.04em}.sub{color:var(--muted);font-size:13px;margin-top:4px}.pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:#0f172a;color:#cbd5e1;padding:5px 10px;font-size:12px;margin-left:8px}.grid{display:grid;grid-template-columns:390px 1fr;gap:16px}.card{background:rgba(17,24,39,.92);border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.24);overflow:hidden}.card h2{font-size:15px;margin:0;padding:12px 15px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--line)}.body{padding:14px 15px} label{display:block;color:var(--muted);font-size:12px;margin:10px 0 6px} input,textarea,select{width:100%;background:#0f172a;border:1px solid #334155;border-radius:12px;color:var(--ink);padding:10px} textarea{min-height:430px;font-family:Consolas,monospace;line-height:1.38;resize:vertical}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.btn{border:0;border-radius:12px;padding:10px 12px;background:#334155;color:#fff;cursor:pointer;font-weight:750}.btn.primary{background:linear-gradient(135deg,#0284c7,#7c3aed)}.btn.good{background:#15803d}.btn.bad{background:#991b1b}.btn.blue{background:#1d4ed8}.small{font-size:12px;color:var(--muted)}.hint{background:#0f172a;border:1px dashed #334155;border-radius:14px;padding:10px;color:#cbd5e1;font-size:12px;line-height:1.4}.stats{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:10px;margin:14px 0}.stat{background:#0f172a;border:1px solid var(--line);border-radius:14px;padding:12px}.stat b{font-size:22px}.stat span{display:block;color:var(--muted);font-size:12px;margin-top:3px}.toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:10px 0;flex-wrap:wrap}.tabs{display:flex;gap:8px}.tab{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#0f172a;color:#cbd5e1;cursor:pointer}.tab.active{background:#1d4ed8;color:#fff;border-color:#60a5fa}.tableWrap{overflow:auto;max-height:66vh;border:1px solid var(--line);border-radius:14px} table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px} th{position:sticky;top:0;z-index:3;background:#1f2937;color:#fff;text-align:left;padding:10px;border-bottom:1px solid #475569;white-space:nowrap}td{padding:9px 10px;border-bottom:1px solid #1f2937;vertical-align:top} tr:nth-child(even) td{background:rgba(255,255,255,.018)} .ok{color:#22c55e;font-weight:800}.warnText{color:var(--orange);font-weight:800}.badText{color:var(--red);font-weight:800}.dangerRow td{background:rgba(239,68,68,.085)!important}.reviewRow td{background:rgba(245,158,11,.075)!important}.readyRow td{background:rgba(22,163,74,.02)!important}.basementWarn td{background:rgba(250,204,21,.28)!important;color:#fff}.subLoaded{margin-top:8px;padding:8px 10px;border-radius:12px;border:1px solid #14532d;background:rgba(22,163,74,.15);color:#bbf7d0;font-weight:800}.selectMini{min-width:270px;padding:7px;border-radius:9px;background:#0f172a;color:#fff;border:1px solid #64748b}.rawHint{margin-top:5px;color:#fbbf24;font-size:11px;line-height:1.25}.chosenSub{font-weight:700}.miniNote{display:block;color:#93c5fd;font-size:11px;margin-top:3px}.modal{position:fixed;inset:0;background:rgba(0,0,0,.68);display:none;align-items:center;justify-content:center;z-index:50}.modal.show{display:flex}.modalBox{width:min(950px,94vw);max-height:88vh;overflow:auto;background:#111827;border:1px solid var(--line);border-radius:18px;padding:16px}.aliasGrid{display:grid;grid-template-columns:1fr 1.4fr 130px 80px;gap:8px;margin-top:10px}.iconBtn{border:1px solid var(--line);background:#0f172a;color:#fff;border-radius:12px;padding:10px 12px;cursor:pointer;font-size:18px}.statusLine{font-size:12px;color:#cbd5e1;line-height:1.5;margin:6px 0 10px}.statusLine b{color:#bbf7d0}.settingsBlock{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px;background:#0f172a}.versionBtn{cursor:pointer;font-weight:800}.topTabs{max-width:1540px;margin:12px auto 0;padding:0 16px;display:flex;gap:8px}.topTab{border:1px solid var(--line);background:#0f172a;color:#cbd5e1;border-radius:999px;padding:10px 16px;font-weight:800;cursor:pointer}.topTab.active{background:#2563eb;color:#fff;border-color:#60a5fa}.hidden{display:none!important}.cleanWrap{max-width:1540px;margin:auto;padding:16px}.cleanGrid{display:grid;grid-template-columns:repeat(4,minmax(230px,1fr));gap:12px}.cleanGrid textarea{min-height:235px}.cleanActions{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0}.cleanTableWrap{overflow:auto;max-height:55vh;border:1px solid var(--line);border-radius:14px}.editSelect,.editInput{width:100%;min-width:130px;background:#0f172a;border:1px solid #334155;border-radius:9px;color:#fff;padding:6px}.editNote{min-width:220px;white-space:pre-wrap;outline:0;border:1px dashed transparent;border-radius:8px;padding:5px}.editNote:focus{border-color:#60a5fa;background:#0f172a}.rawJobCell{color:#cbd5e1;font-size:12px;max-width:420px}.exactWarn{color:#fbbf24;font-size:11px;display:block;margin-top:3px}@media(max-width:1200px){.cleanGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:720px){.cleanGrid{grid-template-columns:1fr}}@media(max-width:1050px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* v1.25 layout: use the full page width and make editable dropdowns readable */
+.wrap,.topTabs,.cleanWrap{max-width:none;width:100%;margin:0;padding-left:12px;padding-right:12px}
+.grid{grid-template-columns:360px minmax(0,1fr);max-width:none;width:100%}
+.tableWrap,.cleanTableWrap{max-height:72vh;width:100%}
+.tableWrap table,.cleanTableWrap table{min-width:1800px}
+th:nth-child(2),td:nth-child(2){min-width:360px}
+th:nth-child(4),td:nth-child(4){min-width:280px}
+th:nth-child(6),td:nth-child(6){min-width:340px}
+th:last-child,td:last-child{min-width:420px}
+.editSelect{min-width:240px}
+td:nth-child(2) .editSelect{min-width:340px}
+td:nth-child(4) .editSelect{min-width:280px}
+.rawJobCell{max-width:560px}
+@media(max-width:1050px){.grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="row between"><div><h1>VIP Labor + Cleaning Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.23</button></h1><div class="sub">Paste rough labor or cleaning lines → exact subdivision match → sheet-ready table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
+<header><div class="wrap"><div class="row between"><div><h1>VIP Labor + Cleaning Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.25</button></h1><div class="sub">Paste rough labor or cleaning lines → exact subdivision match → sheet-ready table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
 <div class="topTabs"><button class="topTab active" id="appLaborTab">Labor Parser</button><button class="topTab" id="appCleaningTab">Cleaning Parser</button></div>
 <main id="laborApp" class="wrap grid">
 <section class="card"><h2>1) Files + Paste Box</h2><div class="body">
@@ -75,8 +91,9 @@ Example:
   </div>
   <div class="settingsBlock"><b>Tools</b><div class="row" style="margin-top:8px"><button class="btn" id="openAliasFromSettings">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div>
 </div></div>
-<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor + Cleaning Parser v1.23 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
+<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor + Cleaning Parser v1.25 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
 <ul style="line-height:1.7;color:#cbd5e1">
+<li><b>v1.25:</b> Matched tasks now preserve the rest of the instruction text in Notes instead of dropping wording after parentheses, so lines like Sugar Farms scrap garage keep the wipe-down porch/siding instructions.</li>
 <li><b>v1.23:</b> Tables are editable before copy/export. Subdivision cells use exact values from the loaded Subdivisions sheet, task cells use exact values from Task Types / cleaning task choices, and Notes/AM/Hours/Lot can be adjusted directly.</li>
 <li><b>v1.23:</b> Fixed parenthetical cleaning notes like Miller remove-floor-covering notes, fixed AM text being pulled into subdivision names, preserved full Other notes like porch/drive wording, and kept exact loaded subdivision/task spelling.</li>
 <li>Moved optional uploads, server paths, Alias Manager, and Clear Saved Files into the gear settings panel.</li>
@@ -100,41 +117,7 @@ Example:
 <script>
 const LS_SUB='vipLaborParser.subdivisions.v5', LS_TASK='vipLaborParser.tasks.v5', LS_ALIAS='vipLaborParser.aliases.v5';
 let subdivisions=[], taskTypes=[], aliases=[], parsed=[], view='labor';
-const sample=`235 Darby- install sprinklers
-343 Darby- p/w int
-162 Pioneer-p/w
-7208 Hyatts-2nd roll
-2483 Price Ponds-p/w gar/porch/approach/drive    PO#14259098
-7211 Hyatts*MI-relay**AM
-33 Slate-bolts
-123 Buckstone-bracing 
-435 Sugar Farms-p/w
-47 Hyatts Village-car (move trim to gar)
-7430 Clarkshaw *MI-Set hinge pins in laundry
-374 Wagnalls p/w
-372 wagnalls p/w
-599 to 600 Miller- transfer doors & trim
-1206 Towns Parkway-car
-21 Johnsons Creek-p/w
-23 Johnsons Creek-p/w
-1203 Towns Parkway-car
-24 Johnsons Creek-p/w
-14047 Glenross-bracing
-203 Towns Greenway-p/w
-348 Ridge at Glacier-laq
-98 Hyland-p/w gar/porch/patio/drive
-7403 Woodcrest-insul
-1088 JV*Manor- p/w around low foundation/walks/drive/porches/curb
-353 Sugar Farms sweep and scrap garage (except window wells)  & wipe down front porch area siding dirt and white spots on siding *  $130 inv#24426 
-5375 Rutherford-p/w
-3 Leasure Farms-p/w
-27 Lansdowne-car
-34 Lansdowne-p/w
-32 Lansdowne-p/w
-29 Lansdowne-car
-547 Miller-relay/499-car/498/567-2nd roll/627-insul
-264/350 Darby-scrap/264-p/w int
-7211 Hyatts*MI-relay**PM`;
+const sample=``;
 
 function norm(s){return String(s||'').toLowerCase().replace(/&/g,' and ').replace(/[’']/g,'').replace(/\*/g,' ').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ')}
 function normTask(s){return String(s||'').toLowerCase().replace(/p\s*\/\s*w/g,'pw').replace(/power\s*wash/g,'powerwash').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ')}
@@ -142,7 +125,7 @@ function cleanAliasBase(s){return norm(String(s||'').split('*')[0]).replace(/\b(
 function builderKey(s){s=norm(s); if(!s)return''; if(/\bmi\b|mi homes/.test(s))return'MI Homes'; if(/\bdr\b|horton/.test(s))return'DR Horton'; if(/pulte/.test(s))return'Pulte'; if(/ryan/.test(s))return'Ryan'; if(/rockford/.test(s))return'Rockford'; if(/epcon/.test(s))return'Epcon'; if(/schott|schottenstein/.test(s))return'Schottenstein'; if(/arbor/.test(s))return'Arbor Homes'; if(/manor/.test(s))return'Manor'; if(/fischer/.test(s))return'Fischer Homes'; if(/^bw$|bob webb/.test(s))return'Bob Webb'; return s.replace(/\b\w/g,m=>m.toUpperCase())}
 function builderFromExact(s){const m=String(s).match(/\*\s*([^*]+?)\s*\*/); return builderKey(m?m[1]:'')}
 const defaultAliases=[
- ['MD','Madison Meadows *DR *Plain City','DR Horton'],['Hyatts','Hyatts Meadows *MI *Delaware','MI Homes'],['JV','Jerome Village *Manor *Plain City','Manor'],['JV Applewood','Jerome Village Applewood *MI *Plain City','MI Homes'],['JV*Applewood','Jerome Village Applewood *MI *Plain City','MI Homes'],['LH','Longview Highlands *DR *Pickerington','DR Horton'],['Darby','Darby Station *MI *Plain City','MI Homes'],['Pioneer','Pioneer *Pulte *Plain City','Pulte'],['Hyatts*MI','Hyatts Meadows *MI *Delaware','MI Homes'],['Hyatts Village','Hyatts Village *Epcon *Powell','Epcon'],['Towns Parkway','Towns on the Parkway *Pulte *Dublin','Pulte'],['Towns Greenway','Towns on the Greenway *Pulte *Westerville','Pulte'],['JV*Manor','Jerome Village *Manor *Plain City','Manor'],['Ridge at Glacier','Glacier Pointe *MI *Plain City','MI Homes'],['Ridge at Glacier Pointe','Glacier Pointe *MI *Plain City','MI Homes'],['Glacier','Glacier Pointe *MI *Plain City','MI Homes'],['Leasure Farms','Leasure Farms *DR *Zanesville','DR Horton'],['Leisure Farms','Leasure Farms *DR *Zanesville','DR Horton'],['Lansdowne','Lansdowne *DR *Canal Winchester','DR Horton'],['Wagnalls','Wagnalls *DR *Lithopolis','DR Horton'],['Sugar Farms','Sugar Farms *Pulte *Hilliard','Pulte'],['Price Ponds','Price Ponds *Pulte *Sunbury','Pulte'],['Slate','Slate *Pulte *Lewis Center','Pulte'],['Buckstone','Buckstone Bend *Pulte *Lockbourne','Pulte'],['Clarkshaw *MI','Clarkshaw Crossing *MI *Powell','MI Homes'],['Johnsons Creek','Johnson\'s Creek *DR *London','DR Horton'],['Glenross','Glenross *Ryan *Delaware','Ryan'],['Hyland','Hyland *Epcon *Plain City','Epcon'],['Woodcrest','Woodcrest *MI *Delaware','MI Homes'],['Rutherford','Rutherford *Ryan *Delaware','Ryan'],['Miller','Miller Farm *MI *Galena','MI Homes'],['London*Arbor','London Landing *Arbor *London','Arbor Homes'],['London Arbor','London Landing *Arbor *London','Arbor Homes'],['London Landing','London Landing *Arbor *London','Arbor Homes'],['Woodhaven*BW','Woodhaven *Bob Webb *New Albany','Bob Webb'],['Woodhaven BW','Woodhaven *Bob Webb *New Albany','Bob Webb'],['Liberty Crossing','Liberty Crossing *DR *Mt Vernon','DR Horton'],['Berlin','Berlin Farm *MI *Delaware','MI Homes'],['Foxfire','Foxfire *MI *Commercial Point','MI Homes'],['Clarkshaw Pulte','Clarkshaw *Pulte *Powell','Pulte'],['Clarkshaw Crossing','Clarkshaw Crossing *MI *Powell','MI Homes']
+ ['MD','Madison Meadows *DR *Plain City','DR Horton'],['Hyatts','Hyatts Meadows *MI *Delaware','MI Homes'],['JV','Jerome Village *Manor *Plain City','Manor'],['JV Applewood','Jerome Village Applewood *MI *Plain City','MI Homes'],['JV*Applewood','Jerome Village Applewood *MI *Plain City','MI Homes'],['LH','Longview Highlands *DR *Pickerington','DR Horton'],['Darby','Darby Station *MI *Plain City','MI Homes'],['Pioneer','Pioneer *Pulte *Plain City','Pulte'],['Hyatts*MI','Hyatts Meadows *MI *Delaware','MI Homes'],['Hyatts Village','Hyatts Village *Epcon *Powell','Epcon'],['Towns Parkway','Towns on the Parkway *Pulte *Dublin','Pulte'],['Towns Greenway','Towns on the Greenway *Pulte *Westerville','Pulte'],['JV*Manor','Jerome Village *Manor *Plain City','Manor'],['Ridge at Glacier','Glacier Pointe *MI *Plain City','MI Homes'],['Ridge at Glacier Pointe','Glacier Pointe *MI *Plain City','MI Homes'],['Glacier','Glacier Pointe *MI *Plain City','MI Homes'],['Leasure Farms','Leasure Farms *DR *Zanesville','DR Horton'],['Leisure Farms','Leasure Farms *DR *Zanesville','DR Horton'],['Lansdowne','Lansdowne *DR *Canal Winchester','DR Horton'],['Wagnalls','Wagnalls *DR *Lithopolis','DR Horton'],['Sugar Farms','Sugar Farms *Pulte *Hilliard','Pulte'],['Price Ponds','Price Ponds *Pulte *Sunbury','Pulte'],['Slate','Slate *Pulte *Lewis Center','Pulte'],['Buckstone','Buckstone Bend *Pulte *Lockbourne','Pulte'],['Clarkshaw *MI','Clarkshaw Crossing *MI *Powell','MI Homes'],['Johnsons Creek','Johnson\'s Creek *DR *London','DR Horton'],['Glenross','Glenross *Ryan *Delaware','Ryan'],['Hyland','Hyland Meadows *Epcon *Plain City','Epcon'],['Woodcrest','Woodcrest *MI *Delaware','MI Homes'],['Rutherford','Rutherford *Ryan *Delaware','Ryan'],['Miller','Miller Farm *MI *Galena','MI Homes'],['London*Arbor','London Landing *Arbor *London','Arbor Homes'],['London Arbor','London Landing *Arbor *London','Arbor Homes'],['London Landing','London Landing *Arbor *London','Arbor Homes'],['Woodhaven*BW','Woodhaven *Bob Webb *New Albany','Bob Webb'],['Woodhaven BW','Woodhaven *Bob Webb *New Albany','Bob Webb'],['Liberty Crossing','Liberty Crossing *DR *Mt Vernon','DR Horton'],['Berlin','Berlin Farm *MI *Delaware','MI Homes'],['Foxfire','Foxfire *MI *Commercial Point','MI Homes'],['Clarkshaw Pulte','Clarkshaw *Pulte *Powell','Pulte'],['Clarkshaw Crossing','Clarkshaw Crossing *MI *Powell','MI Homes'],['Piatts','Piatt Preserve *DR *Delaware','DR Horton'],['Piatt','Piatt Preserve *DR *Delaware','DR Horton'],['Piatt Preserve','Piatt Preserve *DR *Delaware','DR Horton'],['Abberley','Abberley Park *Pulte *New Albany','Pulte'],['Abberley Park','Abberley Park *Pulte *New Albany','Pulte'],['Miller NHO','Miller Farm *MI *Galena','MI Homes']
 ];
 
 async function readWorkbook(file){return new Promise((resolve,reject)=>{const r=new FileReader(); r.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; resolve(XLSX.utils.sheet_to_json(ws,{defval:''}))}catch(err){reject(err)}}; r.onerror=reject; r.readAsArrayBuffer(file)})}
@@ -270,6 +253,38 @@ function detectAddressInText(text){
   const m=s.match(rx);
   return m?m[0].trim():'';
 }
+
+function pullLookupJunkFromSubdivision(subText, taskText){
+  let sub=String(subText||'');
+  let task=String(taskText||'');
+  const notes=[];
+  // Things like inv#/Req#/NHO are job-note metadata, not subdivision names.
+  sub=sub.replace(/\b(?:inv|invoice)\s*#?\s*[A-Za-z0-9?-]+/ig,m=>{notes.push(m.trim()); return ' ';});
+  sub=sub.replace(/\bReq\s*#?\s*[A-Za-z0-9?-]+/ig,m=>{notes.push(m.trim()); return ' ';});
+  sub=sub.replace(/(?:^|\s)#\s*\d{3,}\b/g,m=>{notes.push(m.trim()); return ' ';});
+  sub=sub.replace(/\bNHO\b/ig,m=>{notes.push(m.trim()); return ' ';});
+  // Cleaning warranty/lived-in descriptions after a subdivision should move to notes.
+  const extraRx=/\b(lived\s+in|warranty|surface\s+clean|hardwood\s*&?\s*carpet\s*only|hardwood\s+and\s+carpet\s+only)\b/i;
+  const em=sub.match(extraRx);
+  if(em && em.index>0){
+    notes.push(sub.slice(em.index).trim());
+    sub=sub.slice(0,em.index).trim();
+  }
+  if(notes.length) task=(notes.join(' ')+' '+task).trim();
+  return {subText:sub.replace(/\s+/g,' ').trim(), taskText:task.replace(/\s+/g,' ').trim()};
+}
+function aliasPrefixMatch(cleanRaw){
+  const n=norm(cleanRaw);
+  if(!n) return null;
+  const sorted=[...aliases].sort((a,b)=>norm(b.alias).length-norm(a.alias).length);
+  for(const a of sorted){
+    const an=norm(a.alias);
+    if(!an) continue;
+    if(n===an || n.startsWith(an+' ')) return a;
+  }
+  return null;
+}
+
 function splitLine(line){let s=line.trim(); let shift=''; if(/\bAM\b/i.test(s))shift='AM'; if(/\bPM\b/i.test(s))shift=shift||'PM'; s=s.replace(/\*\*\s*AM\b\*\*/ig,'').replace(/\*\*\s*PM\b\*\*/ig,'').replace(/\*\*\s*AM\b/ig,'').replace(/\*\*\s*PM\b/ig,'').trim(); let lotPart='', rest=s; const range=s.match(/^([A-Za-z]?\d+[A-Za-z]?)\s*(?:to|-)\s*([A-Za-z]?\d+[A-Za-z]?)\s+(.+)$/i); if(range){lotPart=`${range[1]} to ${range[2]}`; rest=range[3].trim()} else {const m=s.match(/^([A-Za-z]?\d+[A-Za-z]?)\s+(.+)$/i); if(m){lotPart=m[1]; rest=m[2].trim()}}
  let idx=rest.search(/\s[-–—]\s|[-–—]/); let subText='', taskText=''; if(idx>=0){subText=rest.slice(0,idx).trim(); taskText=rest.slice(idx+1).replace(/^[-–—]\s*/,'').trim()} else {const toks=rest.split(/\s+/); let taskStart=toks.findIndex(t=>looksLikeTaskStart(t)); if(taskStart>0){subText=toks.slice(0,taskStart).join(' '); taskText=toks.slice(taskStart).join(' ')} else {subText=rest; taskText=''}}
  const pulled=pullEmbeddedTaskFromSubdivision(subText,taskText); subText=pulled.subText; taskText=pulled.taskText;
@@ -286,6 +301,7 @@ function splitLine(line){let s=line.trim(); let shift=''; if(/\bAM\b/i.test(s))s
    if(afterShift) taskText=(afterShift+' '+taskText).trim();
  }
  const address=detectAddressInText(subText); if(address){subText=subText.replace(address,' ').replace(/\s+/g,' ').trim(); taskText=(address+' '+taskText).trim();}
+ const lookupClean=pullLookupJunkFromSubdivision(subText,taskText); subText=lookupClean.subText; taskText=lookupClean.taskText;
  if(/scrap\s+subdiv(?:ision)?/i.test(subText)){
    lotPart='0';
    const sm=subText.match(/^(.*?)(scrap\s+subdiv(?:ision)?\b.*)$/i);
@@ -318,6 +334,8 @@ function specialSubdivisionDefault(cleanRaw,bOver){
   const n=norm(cleanRaw);
   // Hard defaults from Noah: these short names are MI unless the competing builder is explicitly typed.
   if(n==='jv applewood' || n==='jerome village applewood') return {exact:'Jerome Village Applewood *MI *Plain City', builder:'MI Homes'};
+  if(n==='piatts' || n==='piatt' || n==='piatt preserve') return {exact:'Piatt Preserve *DR *Delaware', builder:'DR Horton'};
+  if(n==='hyland') return {exact:'Hyland Meadows *Epcon *Plain City', builder:'Epcon'};
   if(n==='ridge at glacier' || n==='ridge at glacier pointe' || n==='ridge glacier' || n==='glacier ridge' || (n.includes('ridge') && n.includes('glacier')) || n.includes('ridge at glacier')) return {exact:'Glacier Pointe *MI *Plain City', builder:'MI Homes'};
   if(n==='berlin' && builderKey(bOver)!=='Pulte') return {exact:'Berlin Farm *MI *Delaware', builder:'MI Homes'};
   if(n==='berlin farm') return {exact:'Berlin Farm *MI *Delaware', builder:'MI Homes'};
@@ -333,7 +351,7 @@ function resolveSubdivision(raw, lot){
   const rows=subdivisions.length?subdivisions:[];
   const special=specialSubdivisionDefault(cleanRaw,bOver);
   if(special){const r=findExact(special.exact,special.builder); return {...r,method:'hard-default',needsReview:false,message:''}}
-  const directAlias=aliases.find(a=>norm(a.alias)===norm(raw) || norm(a.alias)===norm(cleanRaw));
+  const directAlias=aliases.find(a=>norm(a.alias)===norm(raw) || norm(a.alias)===norm(cleanRaw)) || aliasPrefixMatch(cleanRaw);
   if(directAlias){const r=findExact(directAlias.exact,directAlias.builder); return {...r,method:'alias',needsReview:false,message:''}}
   const nraw=norm(cleanRaw), craw=cleanAliasBase(cleanRaw);
   const eligible=rows.filter(r=>!bOver || builderKey(r.builder)===bOver);
@@ -380,6 +398,20 @@ function findExact(exact,builder){
   const aliasBase=norm(String(exact||'').split('*')[0]);
   hit=subdivisions.find(r=>norm(String(r.subdivision||'').split('*')[0])===aliasBase&&(b?builderKey(r.builder)===b:true));
   if(hit) return hit;
+  // Final safety: aliases are allowed to be shortcuts, but the export value must be an exact loaded sheet row.
+  // Find a loaded row whose base starts with or contains the alias base, within the same builder when possible.
+  if(aliasBase){
+    const fuzzy=subdivisions.filter(r=>{
+      if(b && builderKey(r.builder)!==b) return false;
+      const base=norm(String(r.subdivision||'').split('*')[0]);
+      return base===aliasBase || base.startsWith(aliasBase+' ') || aliasBase.startsWith(base+' ') || base.includes(aliasBase) || aliasBase.includes(base);
+    });
+    if(fuzzy.length===1) return fuzzy[0];
+    if(fuzzy.length>1){
+      fuzzy.sort((a,b)=>String(a.subdivision).localeCompare(String(b.subdivision)));
+      return fuzzy[0];
+    }
+  }
   return {builder:b,subdivision:exact,address:''};
 }
 function taskPreferredName(shortName, raw){
@@ -592,7 +624,8 @@ function reviewRows(){return parsed.map(r=>({Status:r.Status,Message:r.Message,B
 function allSubdivisionOptions(current){
   const seen=new Set(), opts=[];
   if(current && !subdivisions.some(r=>r.subdivision===current)) opts.push({subdivision:current,builder:''});
-  for(const r of subdivisions){const key=r.subdivision+'|'+r.builder; if(!seen.has(key)){seen.add(key); opts.push(r)}}
+  const sorted=[...subdivisions].sort((a,b)=>String(a.subdivision||'').localeCompare(String(b.subdivision||''),undefined,{sensitivity:'base'}));
+  for(const r of sorted){const key=r.subdivision+'|'+r.builder; if(!seen.has(key)){seen.add(key); opts.push(r)}}
   return opts;
 }
 function allLaborTaskOptions(current){
@@ -606,7 +639,7 @@ function editLaborField(i,field,value){const r=parsed[i]; if(!r)return; r[field]
 function editLaborSubdivision(i,value){const r=parsed[i]; if(!r)return; const hit=subdivisions.find(s=>s.subdivision===value); r.Subdivision=value; if(hit) r.Builder=hit.builder; r.Candidates=[]; r.Match='manual edit'; r.Status=(r.Task==='Other')?'Review':'Ready'; updateStats(); renderTable();}
 function formatCell(h,v,i){
   if(h==='Subdivision'){
-    if(parsed[i]?.Candidates?.length>1){return `<select class="selectMini" onchange="chooseSubdivision(${i},this.value)"><option value="">Choose subdivision match...</option>`+parsed[i].Candidates.map((c,idx)=>`<option value="${idx}">${esc(c.subdivision)} — ${esc(c.builder)}</option>`).join('')+`</select><div class="rawHint">Raw: ${esc(parsed[i].Original)}<br>Read as: ${esc(parsed[i].RawSubdivision)}</div>`}
+    if(parsed[i]?.Candidates?.length>1){return `<select class="selectMini" onchange="chooseSubdivision(${i},this.value)"><option value="">Choose subdivision match...</option>`+[...parsed[i].Candidates].sort((a,b)=>String(a.subdivision).localeCompare(String(b.subdivision),undefined,{sensitivity:'base'})).map((c,idx)=>`<option value="${parsed[i].Candidates.indexOf(c)}">${esc(c.subdivision)} — ${esc(c.builder)}</option>`).join('')+`</select><div class="rawHint">Raw: ${esc(parsed[i].Original)}<br>Read as: ${esc(parsed[i].RawSubdivision)}</div>`}
     const opts=allSubdivisionOptions(v);
     return `<select class="editSelect" onchange="editLaborSubdivision(${i},this.value)">`+opts.map(o=>`<option value="${esc(o.subdivision)}" ${o.subdivision===v?'selected':''}>${esc(o.subdivision)}${o.builder?' — '+esc(o.builder):''}</option>`).join('')+`</select><span class="exactWarn">exact subdivision value</span>`;
   }
@@ -693,7 +726,7 @@ function editCleaningField(i,field,value){const r=cleaningParsed[i]; if(!r)retur
 function editCleaningSubdivision(i,value){const r=cleaningParsed[i]; if(!r)return; const hit=subdivisions.find(s=>s.subdivision===value); r.Subdivision=value; if(hit) r.Builder=hit.builder; r.Candidates=[]; r.Match='manual edit'; r.Status=(r.Task==='Other')?'Review':'Ready'; updateCleaningStats(); renderCleaningTable();}
 function formatCleaningCell(h,v,i){
   if(h==='Subdivision'){
-    if(cleaningParsed[i]?.Candidates?.length>1){return `<select class="selectMini" onchange="chooseCleaningSubdivision(${i},this.value)"><option value="">Choose subdivision match...</option>`+cleaningParsed[i].Candidates.map((c,idx)=>`<option value="${idx}">${esc(c.subdivision)} — ${esc(c.builder)}</option>`).join('')+`</select><div class="rawHint">Raw: ${esc(cleaningParsed[i].Original)}<br>Read as: ${esc(cleaningParsed[i].RawSubdivision)}</div>`}
+    if(cleaningParsed[i]?.Candidates?.length>1){return `<select class="selectMini" onchange="chooseCleaningSubdivision(${i},this.value)"><option value="">Choose subdivision match...</option>`+[...cleaningParsed[i].Candidates].sort((a,b)=>String(a.subdivision).localeCompare(String(b.subdivision),undefined,{sensitivity:'base'})).map((c,idx)=>`<option value="${cleaningParsed[i].Candidates.indexOf(c)}">${esc(c.subdivision)} — ${esc(c.builder)}</option>`).join('')+`</select><div class="rawHint">Raw: ${esc(cleaningParsed[i].Original)}<br>Read as: ${esc(cleaningParsed[i].RawSubdivision)}</div>`}
     const opts=allSubdivisionOptions(v);
     return `<select class="editSelect" onchange="editCleaningSubdivision(${i},this.value)">`+opts.map(o=>`<option value="${esc(o.subdivision)}" ${o.subdivision===v?'selected':''}>${esc(o.subdivision)}${o.builder?' — '+esc(o.builder):''}</option>`).join('')+`</select><span class="exactWarn">exact subdivision value</span>`;
   }
@@ -712,7 +745,7 @@ document.getElementById('copyCleaningBtn').onclick=async()=>{const rows=cleanOut
 document.getElementById('csvCleaningBtn').onclick=()=>downloadText('cleaning_parser_output.csv',toCSV(cleanOutputRows()),'text/csv');
 document.getElementById('xlsxCleaningBtn').onclick=()=>{const wb=XLSX.utils.book_new(); const ws=XLSX.utils.json_to_sheet(cleanOutputRows()); XLSX.utils.book_append_sheet(wb,ws,'Cleaning Jobs'); XLSX.writeFile(wb,'cleaning_parser_output.xlsx')};
 
-loadSaved(); document.getElementById('rawInput').value=sample; setTimeout(autoloadServerFiles,250);
+loadSaved(); document.getElementById('rawInput').value=''; setTimeout(autoloadServerFiles,250);
 </script>
 </body>
 </html>
