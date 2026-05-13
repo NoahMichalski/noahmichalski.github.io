@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Labor + Cleaning Parser v1.20</title>
+<title>VIP Labor + Cleaning Parser v1.21</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#090f1d;--card:#111827;--card2:#162033;--line:#2a3650;--ink:#f8fafc;--muted:#9ca3af;--blue:#2563eb;--green:#16a34a;--red:#ef4444;--orange:#f59e0b}
@@ -11,7 +11,7 @@
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="row between"><div><h1>VIP Labor + Cleaning Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.20</button></h1><div class="sub">Paste rough labor or cleaning lines → exact subdivision match → sheet-ready table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
+<header><div class="wrap"><div class="row between"><div><h1>VIP Labor + Cleaning Parser <button class="pill versionBtn" id="versionBtn" title="Click to view revision notes">v1.21</button></h1><div class="sub">Paste rough labor or cleaning lines → exact subdivision match → sheet-ready table/export.</div></div><div class="row"><button class="iconBtn" id="settingsBtn" title="Settings">⚙️</button></div></div></div></header>
 <div class="topTabs"><button class="topTab active" id="appLaborTab">Labor Parser</button><button class="topTab" id="appCleaningTab">Cleaning Parser</button></div>
 <main id="laborApp" class="wrap grid">
 <section class="card"><h2>1) Files + Paste Box</h2><div class="body">
@@ -28,6 +28,41 @@
 </div></section>
 </main>
 
+
+<main id="cleaningApp" class="cleanWrap hidden">
+  <section class="card"><h2>Cleaning Parser</h2><div class="body">
+    <div class="statusLine" id="cleanLoadStatus">Uses the same loaded subdivision list and aliases as Labor.</div>
+    <div class="cleanGrid">
+      <div><label>Originals</label><textarea id="cleanOriginal" spellcheck="false" placeholder="Paste original/full/first clean jobs here...
+Example:
+162 Pioneer
+235 Darby AM"></textarea></div>
+      <div><label>Recleans</label><textarea id="cleanReclean" spellcheck="false" placeholder="Paste reclean/QC/buff/closing jobs here..."></textarea></div>
+      <div><label>Windows</label><textarea id="cleanWindows" spellcheck="false" placeholder="Paste window jobs here..."></textarea></div>
+      <div><label>Other</label><textarea id="cleanOther" spellcheck="false" placeholder="Paste anything that does not fit originals/recleans/windows here..."></textarea></div>
+    </div>
+    <div class="cleanActions">
+      <div class="row">
+        <button class="btn primary" id="parseCleaningBtn">Parse Cleaning</button>
+        <button class="btn" id="clearCleaningBtn">Clear Cleaning</button>
+      </div>
+      <div class="row">
+        <button class="btn good" id="copyCleaningBtn">Copy Cleaning Table</button>
+        <button class="btn good" id="xlsxCleaningBtn">Export Cleaning XLSX</button>
+        <button class="btn" id="csvCleaningBtn">Export CSV</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="cleanTotalStat">0</b><span>Total rows</span></div>
+      <div class="stat"><b id="cleanOriginalStat">0</b><span>Originals</span></div>
+      <div class="stat"><b id="cleanRecleanStat">0</b><span>Recleans</span></div>
+      <div class="stat"><b id="cleanWindowsStat">0</b><span>Windows</span></div>
+      <div class="stat"><b id="cleanOtherStat">0</b><span>Other</span></div>
+    </div>
+    <div id="cleaningTableOut" class="cleanTableWrap"><div class="body small">No cleaning output yet.</div></div>
+  </div></section>
+</main>
+
 <div id="settingsModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">Settings</h2><button class="btn" id="closeSettings">Close</button></div>
   <div class="settingsBlock"><b>Server files</b><p class="small">These autoload on page open. Manual buttons are backups.</p>
     <label>Subdivisions server path / URL</label><div class="row"><input id="settingsSubUrl" value="Subdivisions.xlsx" style="flex:1"><button class="btn blue" id="settingsLoadSub">Load</button></div>
@@ -40,7 +75,7 @@
   </div>
   <div class="settingsBlock"><b>Tools</b><div class="row" style="margin-top:8px"><button class="btn" id="openAliasFromSettings">Alias Manager</button><button class="btn bad" id="clearSavedBtn">Clear Saved Files</button></div></div>
 </div></div>
-<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor + Cleaning Parser v1.20 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
+<div id="versionModal" class="modal"><div class="modalBox"><div class="row between"><h2 style="margin:0">VIP Labor + Cleaning Parser v1.21 revisions</h2><button class="btn" id="closeVersion">Close</button></div>
 <ul style="line-height:1.7;color:#cbd5e1">
 <li>Moved optional uploads, server paths, Alias Manager, and Clear Saved Files into the gear settings panel.</li>
 <li>Removed the large green loaded popup and replaced it with a compact loaded-status line.</li>
@@ -537,7 +572,7 @@ function parseAll(){
   updateStats(); renderTable()
 }
 function updateStats(){document.getElementById('totalStat').textContent=parsed.length;document.getElementById('readyStat').textContent=parsed.filter(r=>r.Status==='Ready').length;document.getElementById('reviewStat').textContent=parsed.filter(r=>r.Status!=='Ready').length;document.getElementById('otherStat').textContent=parsed.filter(r=>r.Task==='Other').length;document.getElementById('amStat').textContent=parsed.filter(r=>r['AM Job']||r['PM Job']).length}
-function laborRows(){return parsed.map(r=>({Builder:r.Builder,Subdivision:r.Subdivision,Lot:r.Lot,Task:r.Task,'AM Job':r['AM Job'],Notes:r.Notes,Hours:r.Hours}))}
+function laborRows(){return parsed.map(r=>({Builder:r.Builder,Subdivision:r.Subdivision,Lot:r.Lot,Task:r.Task,'AM Job':r['AM Job'],Notes:r.Notes,Hours:r.Hours,'Raw Job':r.Original}))}
 function reviewRows(){return parsed.map(r=>({Status:r.Status,Message:r.Message,Builder:r.Builder,Subdivision:r.Subdivision,Lot:r.Lot,Task:r.Task,'AM Job':r['AM Job'],'PM Job':r['PM Job'],Notes:r.Notes,Hours:r.Hours,Match:r.Match,Original:r.Original}))}
 function renderTable(){const rows=view==='labor'?laborRows():reviewRows(); if(!rows.length){document.getElementById('tableOut').innerHTML='<div class="body small">No parsed output yet.</div>';return} const heads=Object.keys(rows[0]); let html='<table><thead><tr>'+heads.map(h=>`<th>${esc(h)}</th>`).join('')+'</tr></thead><tbody>'; rows.forEach((r,i)=>{let cls=parsed[i]?.Status==='Ready'?'readyRow':(parsed[i]?.Task==='Other'?'dangerRow':'reviewRow'); if(parsed[i]?.BasementWarn)cls+=' basementWarn'; html+=`<tr class="${cls}">`+heads.map(h=>`<td>${formatCell(h,r[h],i)}</td>`).join('')+'</tr>'}); html+='</tbody></table>'; document.getElementById('tableOut').innerHTML=html}
 function formatCell(h,v,i){if(h==='Subdivision'&&parsed[i]?.Candidates?.length>1){return `<select class="selectMini" onchange="chooseSubdivision(${i},this.value)"><option value="">Choose subdivision match...</option>`+parsed[i].Candidates.map((c,idx)=>`<option value="${idx}">${esc(c.subdivision)} — ${esc(c.builder)}</option>`).join('')+`</select><div class="rawHint">Raw: ${esc(parsed[i].Original)}<br>Read as: ${esc(parsed[i].RawSubdivision)}</div>`} if(h==='Subdivision'&&parsed[i]?.Match==='manual dropdown')return `<span class="chosenSub">${esc(v)}</span><span class="miniNote">selected from dropdown</span>`; if(h==='Status')return v==='Ready'?`<span class="ok">Ready</span>`:`<span class="warnText">Review</span>`; if(h==='Message'&&v)return `<span class="warnText">${esc(v)}</span>`; if(h==='Task'&&v==='Other')return `<span class="badText">Other</span>`; return esc(v)}
@@ -575,7 +610,7 @@ function cleaningCategoryInputs(){
     {id:'cleanOther',task:'Other'}
   ];
 }
-function cleanOutputRows(){return cleaningParsed.map(r=>({Builder:r.Builder,Subdivision:r.Subdivision,Lot:r.Lot,Task:r.Task,'AM Job':r['AM Job'],Hours:'',Notes:r.Notes}))}
+function cleanOutputRows(){return cleaningParsed.map(r=>({Builder:r.Builder,Subdivision:r.Subdivision,Lot:r.Lot,Task:r.Task,'AM Job':r['AM Job'],Hours:'',Notes:r.Notes,'Raw Job':r.Original}))}
 function parseCleaningAll(){
   cleaningParsed=[];
   for(const group of cleaningCategoryInputs()){
