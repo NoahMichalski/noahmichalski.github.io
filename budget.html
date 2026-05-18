@@ -82,7 +82,7 @@ th{position:sticky;top:0;background:#ececec;z-index:2;font-weight:700;text-align
 <body>
 <header>
   <div class="wrap">
-    <h1>VIP Schedule → Budget Excel Exporter <span style="font-size:12px;color:#9fb0c7">v2.07</span></h1>
+    <h1>VIP Schedule → Budget Excel Exporter <span style="font-size:12px;color:#9fb0c7">v2.08</span></h1>
     <div class="sub">Paste schedule, upload Floor Plans sheet, fill budgets, then export a clean Excel file or copy-ready table.</div>
   </div>
 </header>
@@ -675,7 +675,7 @@ function fillBudgets(overwrite=false, quiet=false){
     } else if (m.flag) flagged++;
   });
   if(!quiet) {
-    renderPreview();
+    renderPreviewPreserveScroll();
     document.getElementById('status').textContent = `Budget fill complete: ${filled} filled, ${flagged} flagged. Sheet rows loaded: ${sheetRowsLoaded}.`;
   }
 }
@@ -761,12 +761,12 @@ function renderPreview(){
       body.insertAdjacentHTML('beforeend',`<tr>
         <td class="${cls}" title="${esc(r.budgetSource||'')}">${esc(jobText(r))}</td>
         <td class="num">${r.people}</td>
-        <td><input class="mini" value="${esc(r.inTime)}" oninput="setRow(${idx},'inTime',this.value)"></td>
-        <td><input class="mini" value="${esc(r.outTime)}" oninput="setRow(${idx},'outTime',this.value)"></td>
+        <td><input class="mini" data-idx="${idx}" data-field="inTime" value="${esc(r.inTime)}" oninput="setRow(${idx},'inTime',this.value)"></td>
+        <td><input class="mini" data-idx="${idx}" data-field="outTime" value="${esc(r.outTime)}" oninput="setRow(${idx},'outTime',this.value)"></td>
         <td class="mh">${mh===''?'':mh.toFixed(1)}</td>
-        <td><input class="mini" type="number" step="0.1" value="${esc(r.budget)}" oninput="setRow(${idx},'budget',this.value)"></td>
+        <td><input class="mini" data-idx="${idx}" data-field="budget" type="number" step="0.1" value="${esc(r.budget)}" oninput="setRow(${idx},'budget',this.value)"></td>
         <td>${esc(est)}</td>
-        <td><input class="notesInput" placeholder="${r.budgetFlag?'Budget not found':''}" value="${esc(r.note||'')}" oninput="setRow(${idx},'note',this.value)"></td>
+        <td><input class="notesInput" data-idx="${idx}" data-field="note" placeholder="${r.budgetFlag?'Budget not found':''}" value="${esc(r.note||'')}" oninput="setRow(${idx},'note',this.value)"></td>
       </tr>`);
     }
   });
@@ -776,7 +776,51 @@ function renderPreview(){
   document.getElementById('flagCount').textContent=flags;
   renderDebug();
 }
-function setRow(idx,field,val){ parsed[idx][field]=val; if(field==='budget'){parsed[idx].budgetFlag = (val==='');} renderPreview(); }
+function setRow(idx,field,val){
+  const wrap = document.querySelector('.previewWrap');
+  const scrollTop = wrap ? wrap.scrollTop : 0;
+  const scrollLeft = wrap ? wrap.scrollLeft : 0;
+  const active = document.activeElement;
+  const cursorStart = active && typeof active.selectionStart === 'number' ? active.selectionStart : null;
+  const cursorEnd = active && typeof active.selectionEnd === 'number' ? active.selectionEnd : null;
+
+  parsed[idx][field] = val;
+  if(field === 'budget'){
+    parsed[idx].budgetFlag = (val === '');
+  }
+
+  renderPreview();
+
+  requestAnimationFrame(() => {
+    const newWrap = document.querySelector('.previewWrap');
+    if (newWrap) {
+      newWrap.scrollTop = scrollTop;
+      newWrap.scrollLeft = scrollLeft;
+    }
+
+    const nextInput = document.querySelector(`[data-idx="${idx}"][data-field="${field}"]`);
+    if (nextInput) {
+      nextInput.focus({preventScroll:true});
+      if (cursorStart !== null && cursorEnd !== null && typeof nextInput.setSelectionRange === 'function') {
+        try { nextInput.setSelectionRange(cursorStart, cursorEnd); } catch(e) {}
+      }
+    }
+  });
+}
+
+function renderPreviewPreserveScroll(){
+  const wrap = document.querySelector('.previewWrap');
+  const scrollTop = wrap ? wrap.scrollTop : 0;
+  const scrollLeft = wrap ? wrap.scrollLeft : 0;
+  renderPreview();
+  requestAnimationFrame(() => {
+    const newWrap = document.querySelector('.previewWrap');
+    if (newWrap) {
+      newWrap.scrollTop = scrollTop;
+      newWrap.scrollLeft = scrollLeft;
+    }
+  });
+}
 function jobText(r){return `${r.am?'AM ':''}${r.lot? r.lot+' ':''}${r.task||''}${r.address?' - '+r.address:''}`;}
 function timeMin(v){
   if(!v) return null; const s=clean(v).toUpperCase();
