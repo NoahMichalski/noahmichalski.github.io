@@ -123,6 +123,19 @@
 
     input[type="file"] { padding: 10px; font-size: 13px; }
 
+    .editInput {
+      width: 100%;
+      min-width: 140px;
+      padding: 8px 9px;
+      border-radius: 10px;
+      font-size: 13px;
+      background: rgba(7, 11, 24, .72);
+    }
+
+    .editInput.subjectEdit { min-width: 260px; }
+    .editInput.locationEdit { min-width: 260px; }
+    .editInput.timeEdit { min-width: 92px; }
+
     input:focus, textarea:focus, select:focus {
       border-color: rgba(94,234,212,.7);
       box-shadow: 0 0 0 4px rgba(94,234,212,.08);
@@ -353,7 +366,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.41</div>
+      <div class="version">v1.50</div>
     </div>
   </header>
 
@@ -424,7 +437,7 @@
             </div>
 
             <p class="help">
-              Originals start at <b>1:00 AM</b>. It leaves <b>one blank hour</b> between each filled section: Originals → Recleans → Windows.
+              Originals start at <b>1:00 AM</b>. It leaves <b>one blank hour</b> between each filled section: Originals → Recleans → Windows. The preview rows are editable before export.
             </p>
 
             <div class="sampleBox">Shortcut file format supported:
@@ -753,6 +766,31 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       return [...scheduledOriginals, ...scheduledRecleans, ...scheduledWindows];
     }
 
+
+    function updateParsedRow(index, field, value) {
+      if (!parsedRows[index]) return;
+      parsedRows[index][field] = value;
+      if (field === 'start') parsedRows[index].googleStart = toGoogleTime(value);
+      if (field === 'end') parsedRows[index].googleEnd = toGoogleTime(value);
+      if (field === 'locationOverride') parsedRows[index].locationOverride = value;
+    }
+
+    function getRowLocation(row) {
+      if (row.locationOverride !== undefined) return row.locationOverride;
+      if (typeof addressFloorplanLocation === 'function') return addressFloorplanLocation(row);
+      return row.address || '';
+    }
+
+    function collectPreviewEdits() {
+      document.querySelectorAll('[data-edit-row]').forEach(input => {
+        const index = Number(input.dataset.editRow);
+        const field = input.dataset.editField;
+        if (!Number.isNaN(index) && field && parsedRows[index]) {
+          updateParsedRow(index, field, input.value);
+        }
+      });
+    }
+
     function parseAndRender() {
       parsedRows = buildRows();
 
@@ -811,7 +849,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
             </tr>
           </thead>
           <tbody>
-            ${parsedRows.map(row => `
+            ${parsedRows.map((row, idx) => `
               <tr>
                 <td>${escapeHTML(row.rowNum)}</td>
                 <td>${escapeHTML(row.hourBlock)}</td>
@@ -819,13 +857,13 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
                   <span class="tag ${row.type}">${escapeHTML(row.typeLabel)}</span>
                   ${row.isAM ? '<span class="tag am">AM</span>' : ''}${row.isPM ? '<span class="tag pm">PM</span>' : ''}
                 </td>
-                <td>${escapeHTML(row.googleStart)}</td>
-                <td>${escapeHTML(row.googleEnd)}</td>
-                <td><b>${escapeHTML(row.subject)}</b></td>
+                <td><input class="editInput timeEdit" data-edit-row="${idx}" data-edit-field="start" value="${escapeHTML(row.start)}" oninput="updateParsedRow(${idx}, 'start', this.value)" /></td>
+                <td><input class="editInput timeEdit" data-edit-row="${idx}" data-edit-field="end" value="${escapeHTML(row.end)}" oninput="updateParsedRow(${idx}, 'end', this.value)" /></td>
+                <td><input class="editInput subjectEdit" data-edit-row="${idx}" data-edit-field="subject" value="${escapeHTML(row.subject)}" oninput="updateParsedRow(${idx}, 'subject', this.value)" /></td>
                 <td>${escapeHTML(row.typedSub || '')}</td>
                 <td>${escapeHTML(row.shortcutSubdivision || '')}</td>
                 <td>${escapeHTML(row.floorplan || '')}</td>
-                <td>${escapeHTML(addressFloorplanLocation(row))}</td>
+                <td><input class="editInput locationEdit" data-edit-row="${idx}" data-edit-field="locationOverride" value="${escapeHTML(getRowLocation(row))}" oninput="updateParsedRow(${idx}, 'locationOverride', this.value)" /></td>
                 <td>${row.matched ? '<span class="tag original">Matched</span>' : '<span class="tag miss">' + escapeHTML(row.matchStatus) + '</span>'}</td>
                 <td>${escapeHTML(row.originalLine)}</td>
               </tr>
@@ -882,7 +920,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           row.googleDate,
           row.googleEnd,
           'False',
-          addressFloorplanLocation(row),
+          getRowLocation(row),
           'False'
         ].map(csvEscape).join(','));
       });
@@ -891,7 +929,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     }
 
     function downloadCSV() {
-      parseAndRender();
+      if (!parsedRows.length) parseAndRender();
+      collectPreviewEdits();
       if (!parsedRows.length) {
         showToast('No jobs to export yet.');
         return;
@@ -902,7 +941,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     }
 
     async function copyCSV() {
-      parseAndRender();
+      if (!parsedRows.length) parseAndRender();
+      collectPreviewEdits();
       if (!parsedRows.length) {
         showToast('No jobs to copy yet.');
         return;
