@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Google Calendar Cleaning CSV Parser</title>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     :root {
       --bg: #0b1020;
@@ -44,7 +46,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .wrap { width: min(1520px, calc(100% - 28px)); margin: 0 auto; }
+    .wrap { width: min(1920px, calc(100% - 18px)); margin: 0 auto; }
 
     .topbar {
       display: flex;
@@ -71,7 +73,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: 470px minmax(0, 1fr);
+      grid-template-columns: 390px minmax(0, 1fr);
       gap: 18px;
       align-items: start;
     }
@@ -132,9 +134,26 @@
       background: rgba(7, 11, 24, .72);
     }
 
-    .editInput.subjectEdit { min-width: 260px; }
-    .editInput.locationEdit { min-width: 260px; }
-    .editInput.timeEdit { min-width: 92px; }
+    .editInput.subjectEdit { min-width: 0; }
+    .editInput.locationEdit { min-width: 0; }
+    .editInput.timeEdit { min-width: 0; }
+    .tableWrap th:nth-child(1), .tableWrap td:nth-child(1) { width: 40px; }
+    .tableWrap th:nth-child(2), .tableWrap td:nth-child(2) { width: 58px; }
+    .tableWrap th:nth-child(3), .tableWrap td:nth-child(3) { width: 82px; }
+    .tableWrap th:nth-child(4), .tableWrap td:nth-child(4),
+    .tableWrap th:nth-child(5), .tableWrap td:nth-child(5) { width: 90px; }
+    .tableWrap th:nth-child(6), .tableWrap td:nth-child(6) { width: 28%; }
+    .tableWrap th:nth-child(7), .tableWrap td:nth-child(7) { width: 11%; }
+    .tableWrap th:nth-child(8), .tableWrap td:nth-child(8) { width: 15%; }
+    .tableWrap th:nth-child(9), .tableWrap td:nth-child(9) { width: 10%; }
+    .tableWrap th:nth-child(10), .tableWrap td:nth-child(10) { width: 26%; }
+    .tableWrap th:nth-child(11), .tableWrap td:nth-child(11),
+    .tableWrap th:nth-child(12), .tableWrap td:nth-child(12) { display: none; }
+    th, td { overflow-wrap: anywhere; }
+    @media (max-width: 1250px) {
+      .grid { grid-template-columns: 1fr; }
+      .tableWrap { max-height: none; }
+    }
 
     input:focus, textarea:focus, select:focus {
       border-color: rgba(94,234,212,.7);
@@ -248,10 +267,10 @@
       overflow: auto;
       border: 1px solid var(--border);
       border-radius: 16px;
-      max-height: 720px;
+      max-height: calc(100vh - 245px);
     }
 
-    table { width: 100%; border-collapse: collapse; min-width: 1120px; font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; min-width: 0; table-layout: fixed; font-size: 12px; }
 
     th {
       position: sticky;
@@ -366,7 +385,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.50</div>
+      <div class="version">v1.60</div>
     </div>
   </header>
 
@@ -491,6 +510,38 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
             </div>
           </div>
         </div>
+
+        <div class="card">
+          <div class="cardHead">
+            <h2>Google Calendar Direct Import</h2>
+            <span class="pill" id="googleStatusPill">Not signed in</span>
+          </div>
+          <div class="cardBody">
+            <label for="googleClientId">Google OAuth Client ID</label>
+            <input id="googleClientId" type="text" placeholder="Paste your Google OAuth web client ID here" />
+            <p class="help">Set this once, then use Sign In. CSV export stays as the backup option.</p>
+
+            <div class="btns">
+              <button class="blue" onclick="saveGoogleClientId()">Save Client ID</button>
+              <button onclick="googleSignIn()">Sign In</button>
+            </div>
+
+            <div style="height:14px"></div>
+
+            <label for="calendarSelect">Import To Calendar</label>
+            <select id="calendarSelect">
+              <option value="">Sign in to load calendars...</option>
+            </select>
+
+            <div class="btns">
+              <button class="blue" onclick="importToGoogleCalendar()">Import Preview</button>
+              <button class="secondary" onclick="loadGoogleCalendars()">Reload Calendars</button>
+            </div>
+
+            <p class="help">Google import uses the editable preview rows: Subject, Start, End, and Location.</p>
+          </div>
+        </div>
+
       </section>
 
       <section class="card">
@@ -544,12 +595,16 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     const STORAGE_KEYS = {
       shortcuts: 'gcal_cleaning_shortcuts_v130',
       lots: 'gcal_cleaning_lots_v130',
-      updated: 'gcal_cleaning_updated_v130'
+      updated: 'gcal_cleaning_updated_v130',
+      googleClientId: 'gcal_cleaning_google_client_id_v160'
     };
 
     let parsedRows = [];
     let shortcutRows = [];
     let lotRows = [];
+    let googleTokenClient = null;
+    let googleAccessToken = null;
+    let googleGapiReady = false;
 
     const byId = id => document.getElementById(id);
 
@@ -1104,6 +1159,157 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       return null;
     }
 
+
+    function isoDateTimeForGoogle(row, hhmm) {
+      const [y, m, d] = row.date.split('-').map(Number);
+      const [hh, mm] = String(hhmm || '00:00').split(':').map(Number);
+      const local = new Date(y, m - 1, d, hh || 0, mm || 0, 0);
+      return local.toISOString();
+    }
+
+    function saveGoogleClientId() {
+      const id = byId('googleClientId').value.trim();
+      if (!id) {
+        showToast('Paste your Google OAuth Client ID first.');
+        return;
+      }
+      localStorage.setItem(STORAGE_KEYS.googleClientId, id);
+      showToast('Saved Google Client ID.');
+    }
+
+    function setGoogleStatus(text, good = false) {
+      const pill = byId('googleStatusPill');
+      if (!pill) return;
+      pill.textContent = text;
+      pill.className = 'pill ' + (good ? 'good' : 'warn');
+    }
+
+    async function ensureGoogleReady() {
+      const clientId = byId('googleClientId').value.trim() || localStorage.getItem(STORAGE_KEYS.googleClientId) || '';
+      if (!clientId) throw new Error('Missing Google OAuth Client ID.');
+
+      if (!googleGapiReady) {
+        await new Promise((resolve, reject) => {
+          if (!window.gapi) return reject(new Error('Google API script did not load yet.'));
+          gapi.load('client', resolve);
+        });
+        await gapi.client.init({
+          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
+        });
+        googleGapiReady = true;
+      }
+
+      if (!googleTokenClient) {
+        if (!window.google?.accounts?.oauth2) throw new Error('Google Identity script did not load yet.');
+        googleTokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: clientId,
+          scope: 'https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.readonly',
+          callback: tokenResponse => {
+            if (tokenResponse.error) {
+              setGoogleStatus('Sign in failed');
+              showToast(tokenResponse.error);
+              return;
+            }
+            googleAccessToken = tokenResponse.access_token;
+            gapi.client.setToken(tokenResponse);
+            setGoogleStatus('Signed in', true);
+            loadGoogleCalendars();
+          }
+        });
+      }
+    }
+
+    async function googleSignIn() {
+      try {
+        saveGoogleClientId();
+        await ensureGoogleReady();
+        googleTokenClient.requestAccessToken({ prompt: googleAccessToken ? '' : 'consent' });
+      } catch (err) {
+        console.error(err);
+        showToast(err.message || 'Could not start Google sign in.');
+      }
+    }
+
+    async function loadGoogleCalendars() {
+      try {
+        await ensureGoogleReady();
+        if (!googleAccessToken && !gapi.client.getToken()) {
+          setGoogleStatus('Sign in needed');
+          return;
+        }
+
+        const res = await gapi.client.calendar.calendarList.list({
+          minAccessRole: 'writer',
+          showHidden: false
+        });
+
+        const calendars = res.result.items || [];
+        const select = byId('calendarSelect');
+        select.innerHTML = calendars.length
+          ? calendars.map(cal => `<option value="${escapeHTML(cal.id)}">${escapeHTML(cal.summary || cal.id)}</option>`).join('')
+          : '<option value="">No writable calendars found</option>';
+
+        showToast(`Loaded ${calendars.length} writable calendars.`);
+      } catch (err) {
+        console.error(err);
+        showToast(err.message || 'Could not load calendars.');
+      }
+    }
+
+    async function importToGoogleCalendar() {
+      try {
+        if (!parsedRows.length) parseAndRender();
+        collectPreviewEdits();
+
+        if (!parsedRows.length) {
+          showToast('No preview rows to import.');
+          return;
+        }
+
+        await ensureGoogleReady();
+        if (!googleAccessToken && !gapi.client.getToken()) {
+          googleTokenClient.requestAccessToken({ prompt: 'consent' });
+          showToast('Sign in first, then hit Import Preview again.');
+          return;
+        }
+
+        const calendarId = byId('calendarSelect').value;
+        if (!calendarId) {
+          showToast('Pick a calendar first.');
+          return;
+        }
+
+        let success = 0;
+        let failed = 0;
+
+        for (const row of parsedRows) {
+          const event = {
+            summary: row.subject,
+            location: getRowLocation(row),
+            start: { dateTime: isoDateTimeForGoogle(row, row.start) },
+            end: { dateTime: isoDateTimeForGoogle(row, row.end) }
+          };
+
+          try {
+            await gapi.client.calendar.events.insert({
+              calendarId,
+              resource: event
+            });
+            success++;
+          } catch (err) {
+            console.error('Import failed for row', row, err);
+            failed++;
+          }
+        }
+
+        showToast(`Google import complete: ${success} added${failed ? `, ${failed} failed` : ''}.`);
+      } catch (err) {
+        console.error(err);
+        showToast(err.message || 'Could not import to Google Calendar.');
+      }
+    }
+
+
     function loadSavedData() {
       try {
         shortcutRows = JSON.parse(localStorage.getItem(STORAGE_KEYS.shortcuts) || '[]');
@@ -1113,6 +1319,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         lotRows = [];
       }
       refreshStorageUI();
+      if (byId('googleClientId')) byId('googleClientId').value = localStorage.getItem(STORAGE_KEYS.googleClientId) || '';
     }
 
     function refreshStorageUI() {
