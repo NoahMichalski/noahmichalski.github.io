@@ -69,7 +69,46 @@
       font-size: 13px;
     }
 
-    main { padding: 22px 0 44px; }
+
+    .googleTopBar {
+      display: grid;
+      grid-template-columns: auto minmax(220px, 360px) auto auto auto auto auto;
+      gap: 10px;
+      align-items: center;
+      padding: 0 0 14px;
+    }
+
+    .googleTopBar .miniLabel {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+
+    .googleTopBar select {
+      height: 42px;
+      padding: 8px 11px;
+    }
+
+    .googleTopBar button {
+      height: 42px;
+      padding: 9px 14px;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 980px) {
+      .googleTopBar {
+        grid-template-columns: 1fr 1fr;
+      }
+      .googleTopBar .miniLabel,
+      .googleTopBar select {
+        grid-column: 1 / -1;
+      }
+    }
+
+    main { padding: 16px 0 44px; }
 
     .grid {
       display: grid;
@@ -267,7 +306,7 @@
       overflow: auto;
       border: 1px solid var(--border);
       border-radius: 16px;
-      max-height: calc(100vh - 245px);
+      max-height: calc(100vh - 230px);
     }
 
     table { width: 100%; border-collapse: collapse; min-width: 0; table-layout: fixed; font-size: 12px; }
@@ -383,9 +422,21 @@
     <div class="wrap topbar">
       <div>
         <h1>Google Calendar Cleaning CSV Parser</h1>
-        <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
+        <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export or direct-import to Google Calendar.</div>
       </div>
-      <div class="version">v1.70</div>
+      <div class="version">v1.63</div>
+    </div>
+
+    <div class="wrap googleTopBar">
+      <span class="miniLabel">Google Calendar</span>
+      <select id="calendarSelect">
+        <option value="">Sign in to load calendars...</option>
+      </select>
+      <button onclick="googleSignIn()">Sign In</button>
+      <button class="blue" onclick="importToGoogleCalendar()">Import Preview</button>
+      <button class="secondary" onclick="loadGoogleCalendars()">Reload</button>
+      <button class="secondary" onclick="googleSignOut()">Sign Out</button>
+      <span class="pill" id="googleStatusPill">Not signed in</span>
     </div>
   </header>
 
@@ -450,7 +501,7 @@
 
             <div class="btns">
               <button onclick="parseAndRender()">Parse / Preview</button>
-              <button class="blue" onclick="downloadCSV()">Export All CSV</button>
+              <button class="blue" onclick="downloadCSV()">Export CSV</button>
               <button class="secondary" onclick="copyCSV()">Copy CSV</button>
               <button class="danger" onclick="clearAll()">Clear Text</button>
             </div>
@@ -511,48 +562,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           </div>
         </div>
 
-        <div class="card">
-          <div class="cardHead">
-            <h2>Google Calendar Direct Import</h2>
-            <span class="pill" id="googleStatusPill">Not signed in</span>
-          </div>
-          <div class="cardBody">
-            <p class="help">
-              Google OAuth Client ID is built into this file. Coworkers should only need to click Sign In.
-              CSV export stays as the backup option.
-            </p>
 
-            <div class="btns">
-              <button onclick="googleSignIn()">Sign In</button>
-              <button class="secondary" onclick="googleSignOut()">Sign Out</button>
-            </div>
-
-            <div style="height:14px"></div>
-
-            <label for="generalCalendarSelect">General Calendar</label>
-            <select id="generalCalendarSelect" onchange="saveSelectedCalendars()">
-              <option value="">Sign in to load calendars...</option>
-            </select>
-            <p class="help">Originals and Recleans import here.</p>
-
-            <div style="height:12px"></div>
-
-            <label for="windowsCalendarSelect">Windows Calendar</label>
-            <select id="windowsCalendarSelect" onchange="saveSelectedCalendars()">
-              <option value="">Sign in to load calendars...</option>
-            </select>
-            <p class="help">Windows import here, while keeping the same preview times.</p>
-
-            <div class="btns">
-              <button class="blue" onclick="importToGoogleCalendar()">Import Preview</button>
-              <button class="secondary" onclick="loadGoogleCalendars()">Reload Calendars</button>
-              <button class="secondary" onclick="downloadGeneralCSV()">Export General CSV</button>
-              <button class="secondary" onclick="downloadWindowsCSV()">Export Windows CSV</button>
-            </div>
-
-            <p class="help">Google import uses the editable preview rows. Calendar choices save locally. CSV export still works as backup.</p>
-          </div>
-        </div>
 
       </section>
 
@@ -608,9 +618,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       shortcuts: 'gcal_cleaning_shortcuts_v130',
       lots: 'gcal_cleaning_lots_v130',
       updated: 'gcal_cleaning_updated_v130',
-      googleClientId: 'gcal_cleaning_google_client_id_v160',
-      generalCalendarId: 'gcal_cleaning_general_calendar_id_v170',
-      windowsCalendarId: 'gcal_cleaning_windows_calendar_id_v170'
+      googleClientId: 'gcal_cleaning_google_client_id_v160'
     };
 
     const GOOGLE_CLIENT_ID = '399565751863-oqbm7bq7trdl2m6lnkng10vvitl55mpc.apps.googleusercontent.com';
@@ -999,65 +1007,6 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       return lines.join('\r\n');
     }
 
-
-    function buildFilteredCSV(filterFn) {
-      if (!parsedRows.length) parsedRows = buildRows();
-      collectPreviewEdits();
-
-      const headers = [
-        'Subject',
-        'Start Date',
-        'Start Time',
-        'End Date',
-        'End Time',
-        'All Day Event',
-        'Location',
-        'Private'
-      ];
-
-      const rows = parsedRows.filter(filterFn);
-      const lines = [headers.join(',')];
-
-      rows.forEach(row => {
-        lines.push([
-          row.subject,
-          row.googleDate,
-          row.googleStart,
-          row.googleDate,
-          row.googleEnd,
-          'False',
-          getRowLocation(row),
-          'False'
-        ].map(csvEscape).join(','));
-      });
-
-      return { csv: lines.join('\r\n'), count: rows.length };
-    }
-
-    function downloadGeneralCSV() {
-      if (!parsedRows.length) parseAndRender();
-      const result = buildFilteredCSV(row => row.type === 'original' || row.type === 'reclean');
-      if (!result.count) {
-        showToast('No Original/Reclean rows for General CSV.');
-        return;
-      }
-      const date = byId('eventDate').value || todayISO();
-      downloadBlob(result.csv, `google-calendar-general-${date}.csv`, 'text/csv;charset=utf-8;');
-      showToast(`Exported ${result.count} General calendar rows.`);
-    }
-
-    function downloadWindowsCSV() {
-      if (!parsedRows.length) parseAndRender();
-      const result = buildFilteredCSV(row => row.type === 'windows');
-      if (!result.count) {
-        showToast('No Windows rows for Windows CSV.');
-        return;
-      }
-      const date = byId('eventDate').value || todayISO();
-      downloadBlob(result.csv, `google-calendar-windows-${date}.csv`, 'text/csv;charset=utf-8;');
-      showToast(`Exported ${result.count} Windows calendar rows.`);
-    }
-
     function downloadCSV() {
       if (!parsedRows.length) parseAndRender();
       collectPreviewEdits();
@@ -1066,7 +1015,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         return;
       }
       const csv = buildCSV();
-      downloadBlob(csv, `google-calendar-all-${byId('eventDate').value || todayISO()}.csv`, 'text/csv;charset=utf-8;');
+      downloadBlob(csv, `google-calendar-cleaning-${byId('eventDate').value || todayISO()}.csv`, 'text/csv;charset=utf-8;');
       showToast(`Exported ${parsedRows.length} calendar rows.`);
     }
 
@@ -1303,32 +1252,9 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       googleAccessToken = null;
       if (window.gapi?.client) gapi.client.setToken(null);
       setGoogleStatus('Signed out');
-      const general = byId('generalCalendarSelect');
-      const windows = byId('windowsCalendarSelect');
-      if (general) general.innerHTML = '<option value="">Sign in to load calendars...</option>';
-      if (windows) windows.innerHTML = '<option value="">Sign in to load calendars...</option>';
+      const select = byId('calendarSelect');
+      if (select) select.innerHTML = '<option value="">Sign in to load calendars...</option>';
       showToast('Signed out of Google for this page.');
-    }
-
-
-    function saveSelectedCalendars() {
-      const general = byId('generalCalendarSelect')?.value || '';
-      const windows = byId('windowsCalendarSelect')?.value || '';
-      if (general) localStorage.setItem(STORAGE_KEYS.generalCalendarId, general);
-      if (windows) localStorage.setItem(STORAGE_KEYS.windowsCalendarId, windows);
-    }
-
-    function fillCalendarSelect(selectId, calendars, savedId) {
-      const select = byId(selectId);
-      if (!select) return;
-
-      select.innerHTML = calendars.length
-        ? calendars.map(cal => `<option value="${escapeHTML(cal.id)}">${escapeHTML(cal.summary || cal.id)}</option>`).join('')
-        : '<option value="">No writable calendars found</option>';
-
-      if (savedId && calendars.some(cal => cal.id === savedId)) {
-        select.value = savedId;
-      }
     }
 
     async function loadGoogleCalendars() {
@@ -1357,13 +1283,10 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         }
 
         const calendars = data.items || [];
-        const savedGeneral = localStorage.getItem(STORAGE_KEYS.generalCalendarId) || '';
-        const savedWindows = localStorage.getItem(STORAGE_KEYS.windowsCalendarId) || '';
-
-        fillCalendarSelect('generalCalendarSelect', calendars, savedGeneral);
-        fillCalendarSelect('windowsCalendarSelect', calendars, savedWindows);
-
-        saveSelectedCalendars();
+        const select = byId('calendarSelect');
+        select.innerHTML = calendars.length
+          ? calendars.map(cal => `<option value="${escapeHTML(cal.id)}">${escapeHTML(cal.summary || cal.id)}</option>`).join('')
+          : '<option value="">No writable calendars found</option>';
 
         setGoogleStatus('Signed in', true);
         showToast(`Loaded ${calendars.length} writable calendars.`);
@@ -1391,21 +1314,9 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           return;
         }
 
-        saveSelectedCalendars();
-
-        const generalCalendarId = byId('generalCalendarSelect')?.value || '';
-        const windowsCalendarId = byId('windowsCalendarSelect')?.value || '';
-
-        const hasGeneralRows = parsedRows.some(row => row.type === 'original' || row.type === 'reclean');
-        const hasWindowsRows = parsedRows.some(row => row.type === 'windows');
-
-        if (hasGeneralRows && !generalCalendarId) {
-          showToast('Pick a General calendar for Originals/Recleans.');
-          return;
-        }
-
-        if (hasWindowsRows && !windowsCalendarId) {
-          showToast('Pick a Windows calendar.');
+        const calendarId = byId('calendarSelect').value;
+        if (!calendarId) {
+          showToast('Pick a calendar first.');
           return;
         }
 
@@ -1413,8 +1324,6 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         let failed = 0;
 
         for (const row of parsedRows) {
-          const calendarId = row.type === 'windows' ? windowsCalendarId : generalCalendarId;
-
           const event = {
             summary: row.subject,
             location: getRowLocation(row),
