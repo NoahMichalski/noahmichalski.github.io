@@ -385,7 +385,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.61</div>
+      <div class="version">v1.70</div>
     </div>
   </header>
 
@@ -450,7 +450,7 @@
 
             <div class="btns">
               <button onclick="parseAndRender()">Parse / Preview</button>
-              <button class="blue" onclick="downloadCSV()">Export CSV</button>
+              <button class="blue" onclick="downloadCSV()">Export All CSV</button>
               <button class="secondary" onclick="copyCSV()">Copy CSV</button>
               <button class="danger" onclick="clearAll()">Clear Text</button>
             </div>
@@ -529,17 +529,28 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
             <div style="height:14px"></div>
 
-            <label for="calendarSelect">Import To Calendar</label>
-            <select id="calendarSelect">
+            <label for="generalCalendarSelect">General Calendar</label>
+            <select id="generalCalendarSelect" onchange="saveSelectedCalendars()">
               <option value="">Sign in to load calendars...</option>
             </select>
+            <p class="help">Originals and Recleans import here.</p>
+
+            <div style="height:12px"></div>
+
+            <label for="windowsCalendarSelect">Windows Calendar</label>
+            <select id="windowsCalendarSelect" onchange="saveSelectedCalendars()">
+              <option value="">Sign in to load calendars...</option>
+            </select>
+            <p class="help">Windows import here, while keeping the same preview times.</p>
 
             <div class="btns">
               <button class="blue" onclick="importToGoogleCalendar()">Import Preview</button>
               <button class="secondary" onclick="loadGoogleCalendars()">Reload Calendars</button>
+              <button class="secondary" onclick="downloadGeneralCSV()">Export General CSV</button>
+              <button class="secondary" onclick="downloadWindowsCSV()">Export Windows CSV</button>
             </div>
 
-            <p class="help">Google import uses the editable preview rows: Subject, Start, End, and Location.</p>
+            <p class="help">Google import uses the editable preview rows. Calendar choices save locally. CSV export still works as backup.</p>
           </div>
         </div>
 
@@ -597,7 +608,9 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       shortcuts: 'gcal_cleaning_shortcuts_v130',
       lots: 'gcal_cleaning_lots_v130',
       updated: 'gcal_cleaning_updated_v130',
-      googleClientId: 'gcal_cleaning_google_client_id_v160'
+      googleClientId: 'gcal_cleaning_google_client_id_v160',
+      generalCalendarId: 'gcal_cleaning_general_calendar_id_v170',
+      windowsCalendarId: 'gcal_cleaning_windows_calendar_id_v170'
     };
 
     const GOOGLE_CLIENT_ID = '399565751863-oqbm7bq7trdl2m6lnkng10vvitl55mpc.apps.googleusercontent.com';
@@ -986,6 +999,65 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       return lines.join('\r\n');
     }
 
+
+    function buildFilteredCSV(filterFn) {
+      if (!parsedRows.length) parsedRows = buildRows();
+      collectPreviewEdits();
+
+      const headers = [
+        'Subject',
+        'Start Date',
+        'Start Time',
+        'End Date',
+        'End Time',
+        'All Day Event',
+        'Location',
+        'Private'
+      ];
+
+      const rows = parsedRows.filter(filterFn);
+      const lines = [headers.join(',')];
+
+      rows.forEach(row => {
+        lines.push([
+          row.subject,
+          row.googleDate,
+          row.googleStart,
+          row.googleDate,
+          row.googleEnd,
+          'False',
+          getRowLocation(row),
+          'False'
+        ].map(csvEscape).join(','));
+      });
+
+      return { csv: lines.join('\r\n'), count: rows.length };
+    }
+
+    function downloadGeneralCSV() {
+      if (!parsedRows.length) parseAndRender();
+      const result = buildFilteredCSV(row => row.type === 'original' || row.type === 'reclean');
+      if (!result.count) {
+        showToast('No Original/Reclean rows for General CSV.');
+        return;
+      }
+      const date = byId('eventDate').value || todayISO();
+      downloadBlob(result.csv, `google-calendar-general-${date}.csv`, 'text/csv;charset=utf-8;');
+      showToast(`Exported ${result.count} General calendar rows.`);
+    }
+
+    function downloadWindowsCSV() {
+      if (!parsedRows.length) parseAndRender();
+      const result = buildFilteredCSV(row => row.type === 'windows');
+      if (!result.count) {
+        showToast('No Windows rows for Windows CSV.');
+        return;
+      }
+      const date = byId('eventDate').value || todayISO();
+      downloadBlob(result.csv, `google-calendar-windows-${date}.csv`, 'text/csv;charset=utf-8;');
+      showToast(`Exported ${result.count} Windows calendar rows.`);
+    }
+
     function downloadCSV() {
       if (!parsedRows.length) parseAndRender();
       collectPreviewEdits();
@@ -994,7 +1066,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         return;
       }
       const csv = buildCSV();
-      downloadBlob(csv, `google-calendar-cleaning-${byId('eventDate').value || todayISO()}.csv`, 'text/csv;charset=utf-8;');
+      downloadBlob(csv, `google-calendar-all-${byId('eventDate').value || todayISO()}.csv`, 'text/csv;charset=utf-8;');
       showToast(`Exported ${parsedRows.length} calendar rows.`);
     }
 
@@ -1191,9 +1263,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           if (!window.gapi) return reject(new Error('Google API script did not load yet.'));
           gapi.load('client', resolve);
         });
-        await gapi.client.init({
-          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
-        });
+        await gapi.client.init({});
         googleGapiReady = true;
       }
 
@@ -1233,34 +1303,74 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       googleAccessToken = null;
       if (window.gapi?.client) gapi.client.setToken(null);
       setGoogleStatus('Signed out');
-      const select = byId('calendarSelect');
-      if (select) select.innerHTML = '<option value="">Sign in to load calendars...</option>';
+      const general = byId('generalCalendarSelect');
+      const windows = byId('windowsCalendarSelect');
+      if (general) general.innerHTML = '<option value="">Sign in to load calendars...</option>';
+      if (windows) windows.innerHTML = '<option value="">Sign in to load calendars...</option>';
       showToast('Signed out of Google for this page.');
+    }
+
+
+    function saveSelectedCalendars() {
+      const general = byId('generalCalendarSelect')?.value || '';
+      const windows = byId('windowsCalendarSelect')?.value || '';
+      if (general) localStorage.setItem(STORAGE_KEYS.generalCalendarId, general);
+      if (windows) localStorage.setItem(STORAGE_KEYS.windowsCalendarId, windows);
+    }
+
+    function fillCalendarSelect(selectId, calendars, savedId) {
+      const select = byId(selectId);
+      if (!select) return;
+
+      select.innerHTML = calendars.length
+        ? calendars.map(cal => `<option value="${escapeHTML(cal.id)}">${escapeHTML(cal.summary || cal.id)}</option>`).join('')
+        : '<option value="">No writable calendars found</option>';
+
+      if (savedId && calendars.some(cal => cal.id === savedId)) {
+        select.value = savedId;
+      }
     }
 
     async function loadGoogleCalendars() {
       try {
         await ensureGoogleReady();
-        if (!googleAccessToken && !gapi.client.getToken()) {
+
+        const tokenObj = googleAccessToken ? { access_token: googleAccessToken } : (window.gapi?.client?.getToken?.() || null);
+        const token = tokenObj?.access_token;
+
+        if (!token) {
           setGoogleStatus('Sign in needed');
+          showToast('Sign in first, then reload calendars.');
           return;
         }
 
-        const res = await gapi.client.calendar.calendarList.list({
-          minAccessRole: 'writer',
-          showHidden: false
+        const response = await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=writer&showHidden=false', {
+          headers: { Authorization: `Bearer ${token}` }
         });
 
-        const calendars = res.result.items || [];
-        const select = byId('calendarSelect');
-        select.innerHTML = calendars.length
-          ? calendars.map(cal => `<option value="${escapeHTML(cal.id)}">${escapeHTML(cal.summary || cal.id)}</option>`).join('')
-          : '<option value="">No writable calendars found</option>';
+        const data = await response.json().catch(() => ({}));
 
+        if (!response.ok) {
+          console.error('Calendar list error:', data);
+          const msg = data?.error?.message || `Google Calendar error ${response.status}`;
+          throw new Error(msg);
+        }
+
+        const calendars = data.items || [];
+        const savedGeneral = localStorage.getItem(STORAGE_KEYS.generalCalendarId) || '';
+        const savedWindows = localStorage.getItem(STORAGE_KEYS.windowsCalendarId) || '';
+
+        fillCalendarSelect('generalCalendarSelect', calendars, savedGeneral);
+        fillCalendarSelect('windowsCalendarSelect', calendars, savedWindows);
+
+        saveSelectedCalendars();
+
+        setGoogleStatus('Signed in', true);
         showToast(`Loaded ${calendars.length} writable calendars.`);
       } catch (err) {
         console.error(err);
-        showToast(err.message || 'Could not load calendars.');
+        setGoogleStatus('Calendar load failed');
+        showToast(err.message || 'Could not load calendars. Check that Google Calendar API is enabled.');
       }
     }
 
@@ -1281,9 +1391,21 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           return;
         }
 
-        const calendarId = byId('calendarSelect').value;
-        if (!calendarId) {
-          showToast('Pick a calendar first.');
+        saveSelectedCalendars();
+
+        const generalCalendarId = byId('generalCalendarSelect')?.value || '';
+        const windowsCalendarId = byId('windowsCalendarSelect')?.value || '';
+
+        const hasGeneralRows = parsedRows.some(row => row.type === 'original' || row.type === 'reclean');
+        const hasWindowsRows = parsedRows.some(row => row.type === 'windows');
+
+        if (hasGeneralRows && !generalCalendarId) {
+          showToast('Pick a General calendar for Originals/Recleans.');
+          return;
+        }
+
+        if (hasWindowsRows && !windowsCalendarId) {
+          showToast('Pick a Windows calendar.');
           return;
         }
 
@@ -1291,6 +1413,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         let failed = 0;
 
         for (const row of parsedRows) {
+          const calendarId = row.type === 'windows' ? windowsCalendarId : generalCalendarId;
+
           const event = {
             summary: row.subject,
             location: getRowLocation(row),
@@ -1299,10 +1423,24 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           };
 
           try {
-            await gapi.client.calendar.events.insert({
-              calendarId,
-              resource: event
+            const tokenObj = googleAccessToken ? { access_token: googleAccessToken } : (window.gapi?.client?.getToken?.() || null);
+            const token = tokenObj?.access_token;
+            if (!token) throw new Error('Missing Google access token.');
+
+            const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`, {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(event)
             });
+
+            if (!response.ok) {
+              const data = await response.json().catch(() => ({}));
+              throw new Error(data?.error?.message || `Import failed with ${response.status}`);
+            }
+
             success++;
           } catch (err) {
             console.error('Import failed for row', row, err);
