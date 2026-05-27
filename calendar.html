@@ -385,7 +385,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.60</div>
+      <div class="version">v1.61</div>
     </div>
   </header>
 
@@ -517,13 +517,14 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
             <span class="pill" id="googleStatusPill">Not signed in</span>
           </div>
           <div class="cardBody">
-            <label for="googleClientId">Google OAuth Client ID</label>
-            <input id="googleClientId" type="text" placeholder="Paste your Google OAuth web client ID here" />
-            <p class="help">Set this once, then use Sign In. CSV export stays as the backup option.</p>
+            <p class="help">
+              Google OAuth Client ID is built into this file. Coworkers should only need to click Sign In.
+              CSV export stays as the backup option.
+            </p>
 
             <div class="btns">
-              <button class="blue" onclick="saveGoogleClientId()">Save Client ID</button>
               <button onclick="googleSignIn()">Sign In</button>
+              <button class="secondary" onclick="googleSignOut()">Sign Out</button>
             </div>
 
             <div style="height:14px"></div>
@@ -598,6 +599,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       updated: 'gcal_cleaning_updated_v130',
       googleClientId: 'gcal_cleaning_google_client_id_v160'
     };
+
+    const GOOGLE_CLIENT_ID = '399565751863-oqbm7bq7trdl2m6lnkng10vvitl55mpc.apps.googleusercontent.com';
 
     let parsedRows = [];
     let shortcutRows = [];
@@ -1168,13 +1171,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     }
 
     function saveGoogleClientId() {
-      const id = byId('googleClientId').value.trim();
-      if (!id) {
-        showToast('Paste your Google OAuth Client ID first.');
-        return;
-      }
-      localStorage.setItem(STORAGE_KEYS.googleClientId, id);
-      showToast('Saved Google Client ID.');
+      localStorage.setItem(STORAGE_KEYS.googleClientId, GOOGLE_CLIENT_ID);
+      return GOOGLE_CLIENT_ID;
     }
 
     function setGoogleStatus(text, good = false) {
@@ -1185,7 +1183,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     }
 
     async function ensureGoogleReady() {
-      const clientId = byId('googleClientId').value.trim() || localStorage.getItem(STORAGE_KEYS.googleClientId) || '';
+      const clientId = GOOGLE_CLIENT_ID;
       if (!clientId) throw new Error('Missing Google OAuth Client ID.');
 
       if (!googleGapiReady) {
@@ -1228,6 +1226,16 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         console.error(err);
         showToast(err.message || 'Could not start Google sign in.');
       }
+    }
+
+
+    function googleSignOut() {
+      googleAccessToken = null;
+      if (window.gapi?.client) gapi.client.setToken(null);
+      setGoogleStatus('Signed out');
+      const select = byId('calendarSelect');
+      if (select) select.innerHTML = '<option value="">Sign in to load calendars...</option>';
+      showToast('Signed out of Google for this page.');
     }
 
     async function loadGoogleCalendars() {
@@ -1319,7 +1327,6 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         lotRows = [];
       }
       refreshStorageUI();
-      if (byId('googleClientId')) byId('googleClientId').value = localStorage.getItem(STORAGE_KEYS.googleClientId) || '';
     }
 
     function refreshStorageUI() {
