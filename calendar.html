@@ -730,6 +730,12 @@
       font-size: 12px;
     }
 
+  
+    .reportLibraryBar { display:flex; gap:10px; flex-wrap:wrap; margin:12px 0; padding:12px; border:1px solid var(--border); border-radius:16px; background:rgba(255,255,255,.025); }
+    .reportLibraryBar input { max-width:320px; }
+    .wideMiniTable { grid-column: 1 / -1; }
+    .wideMiniTable table { min-width: 1100px; }
+
   </style>
 </head>
 <body>
@@ -739,7 +745,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.93</div>
+      <div class="version">v1.94</div>
     </div>
   </header>
 
@@ -940,6 +946,12 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
               <div class="btns">
                 <button class="blue" onclick="pullCalendarReport()">Pull Calendar Report</button>
                 <button class="secondary" onclick="exportReportExcel()">Export Report Excel</button>
+              </div>
+
+              <div class="reportLibraryBar">
+                <input id="lotHistorySearch" type="text" placeholder="Lot history search, e.g. 206 MD" oninput="renderReport()" />
+                <button class="secondary" onclick="renderReport()">Search Lot History</button>
+                <button class="secondary" onclick="byId('lotHistorySearch').value=''; renderReport();">Clear Search</button>
               </div>
 
               <p class="help">
@@ -2620,6 +2632,81 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       return `${formatLongDate(iso)}`;
     }
 
+
+    function groupTaskBreakdown(rows, groupField) {
+      const map = new Map();
+      rows.forEach(row => {
+        const name = row[groupField] || 'Unknown';
+        if (!map.has(name)) map.set(name, { Name:name, Total:0, Original:0, DryClean:0, Reclean:0, Windows:0, FloorsOnly:0, Other:0, AM:0, PM:0 });
+        const item = map.get(name);
+        item.Total++;
+        if (row.TaskType === 'Original') item.Original++;
+        else if (row.TaskType === 'Dry Clean') { item.DryClean++; item.Original++; }
+        else if (row.TaskType === 'Reclean') item.Reclean++;
+        else if (row.TaskType === 'Windows') item.Windows++;
+        else if (row.TaskType === 'Floors Only') item.FloorsOnly++;
+        else item.Other++;
+        if (row.AM === 'Yes') item.AM++;
+        if (row.PM === 'Yes') item.PM++;
+      });
+      return Array.from(map.values()).sort((a,b)=>b.Total-a.Total || String(a.Name).localeCompare(String(b.Name)));
+    }
+
+    function recleanRatio(rows, groupField) {
+      return groupTaskBreakdown(rows, groupField)
+        .map(row => {
+          const ratio = row.Original ? row.Reclean / row.Original : (row.Reclean ? 999 : 0);
+          return { Name:row.Name, Originals:row.Original, Recleans:row.Reclean, Total:row.Total, RecleanRatio: ratio === 999 ? 'No originals' : ratio.toFixed(2) + 'x' };
+        })
+        .filter(row => row.Recleans > 0)
+        .sort((a,b) => {
+          const ar = a.RecleanRatio === 'No originals' ? 999 : parseFloat(a.RecleanRatio);
+          const br = b.RecleanRatio === 'No originals' ? 999 : parseFloat(b.RecleanRatio);
+          return br - ar || b.Recleans - a.Recleans;
+        });
+    }
+
+    function repeatLotReport(rows) {
+      const map = new Map();
+      rows.forEach(row => {
+        const lot = normalizeKey(row.Lot || '');
+        const sub = normalizeKey(row.Subdivision || row.SubdivisionShort || '');
+        if (!lot || !sub) return;
+        const key = lot + '|' + sub;
+        if (!map.has(key)) map.set(key, { Lot:row.Lot, Subdivision:row.Subdivision || row.SubdivisionShort || 'Unknown', Builder:row.Builder || 'Unknown', City:row.City || 'Unknown', Count:0, Originals:0, DryCleans:0, Recleans:0, Windows:0, FloorsOnly:0, Other:0, FirstDate:row.Date, LastDate:row.Date, Events:[] });
+        const item = map.get(key);
+        item.Count++;
+        item.Events.push(`${row.Date} ${row.TaskType} ${row.Subject}`);
+        if (row.TaskType === 'Original') item.Originals++;
+        else if (row.TaskType === 'Dry Clean') { item.DryCleans++; item.Originals++; }
+        else if (row.TaskType === 'Reclean') item.Recleans++;
+        else if (row.TaskType === 'Windows') item.Windows++;
+        else if (row.TaskType === 'Floors Only') item.FloorsOnly++;
+        else item.Other++;
+        if (row.Date < item.FirstDate) item.FirstDate = row.Date;
+        if (row.Date > item.LastDate) item.LastDate = row.Date;
+      });
+      return Array.from(map.values()).filter(row => row.Count > 1).map(row => ({...row, Events:row.Events.join(' | ')})).sort((a,b)=>b.Count-a.Count || String(a.Subdivision).localeCompare(String(b.Subdivision)));
+    }
+
+    function amPmByDay(rows) {
+      const map = new Map();
+      rows.forEach(row => {
+        const key = formatReportDateName(row.Date || 'Unknown');
+        if (!map.has(key)) map.set(key, { Name:key, AM:0, PM:0, Total:0 });
+        const item = map.get(key);
+        item.Total++;
+        if (row.AM === 'Yes') item.AM++;
+        if (row.PM === 'Yes') item.PM++;
+      });
+      return Array.from(map.values()).sort((a,b)=>(b.AM+b.PM)-(a.AM+a.PM) || String(a.Name).localeCompare(String(b.Name)));
+    }
+
+    function lotHistoryRows(rows) {
+      const q = normalizeText(byId('lotHistorySearch')?.value || '');
+      if (!q) return [];
+      return rows.filter(row => normalizeText(`${row.Lot} ${row.SubdivisionShort} ${row.Subdivision} ${row.Builder} ${row.City} ${row.Subject} ${row.Location}`).includes(q)).sort((a,b)=>`${a.Date} ${a.Start}`.localeCompare(`${b.Date} ${b.Start}`));
+    }
     function isUnknownReportRow(row) {
       return !row.Builder || row.Builder === 'Unknown' || !row.Subdivision || row.Subdivision === 'Unknown';
     }
@@ -2658,7 +2745,17 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         bySubdivision: countBy(rows, 'Subdivision'),
         byCity: countBy(rows, 'City'),
         dryBySubdivision: countBy(rows.filter(r => r.TaskType === 'Dry Clean'), 'Subdivision'),
-        floorsBySubdivision: countBy(rows.filter(r => r.TaskType === 'Floors Only'), 'Subdivision')
+        dryByBuilder: countBy(rows.filter(r => r.TaskType === 'Dry Clean'), 'Builder'),
+        floorsBySubdivision: countBy(rows.filter(r => r.TaskType === 'Floors Only'), 'Subdivision'),
+        floorsByBuilder: countBy(rows.filter(r => r.TaskType === 'Floors Only'), 'Builder'),
+        taskByBuilder: groupTaskBreakdown(rows, 'Builder'),
+        taskBySubdivision: groupTaskBreakdown(rows, 'Subdivision'),
+        taskByCity: groupTaskBreakdown(rows, 'City'),
+        recleanRatioSubdivision: recleanRatio(rows, 'Subdivision'),
+        recleanRatioBuilder: recleanRatio(rows, 'Builder'),
+        repeatLots: repeatLotReport(rows),
+        amPmByDay: amPmByDay(rows),
+        lotHistory: lotHistoryRows(rows)
       };
     }
 
@@ -2744,6 +2841,33 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       showToast(`Exported ${reportSummary.unknownRows.length} unknown rows.`);
     }
 
+
+    function renderBreakdownTable(title, rows, columns, limit = 15, wide = false) {
+      const shown = rows.slice(0, limit);
+      return `
+        <div class="miniTable ${wide ? 'wideMiniTable' : ''}">
+          <h3>${escapeHTML(title)}${rows.length > limit ? ` — Top ${limit} of ${rows.length}` : ''}</h3>
+          <table>
+            <thead><tr>${columns.map(c => `<th>${escapeHTML(c.label)}</th>`).join('')}</tr></thead>
+            <tbody>
+              ${shown.length ? shown.map(row => `<tr>${columns.map(c => `<td>${escapeHTML(row[c.key] ?? '')}</td>`).join('')}</tr>`).join('') : `<tr><td colspan="${columns.length}">No data</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderLotHistory() {
+      const rows = reportSummary?.lotHistory || [];
+      if (!byId('lotHistorySearch')?.value) {
+        return `<div class="miniTable wideMiniTable"><h3>Lot History Search</h3><table><tbody><tr><td>Type a lot/subdivision above, like 206 MD, to search pulled calendar history.</td></tr></tbody></table></div>`;
+      }
+      return renderBreakdownTable('Lot History Search Results', rows, [
+        { key:'Date', label:'Date' }, { key:'Calendar', label:'Calendar' }, { key:'TaskType', label:'Task' }, { key:'Subject', label:'Subject' },
+        { key:'Subdivision', label:'Subdivision' }, { key:'Builder', label:'Builder' }, { key:'City', label:'City' }, { key:'Location', label:'Location' }
+      ], 75, true);
+    }
+
     function renderReport() {
       const out = byId('reportOutput');
       if (!reportSummary) {
@@ -2796,6 +2920,27 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           ${renderMiniTable('Jobs by City', reportSummary.byCity)}
           ${renderMiniTable('Dry Cleans by Subdivision', reportSummary.dryBySubdivision)}
           ${renderMiniTable('Floors Only by Subdivision', reportSummary.floorsBySubdivision)}
+          ${renderMiniTable('Dry Cleans by Builder', reportSummary.dryByBuilder)}
+          ${renderMiniTable('Floors Only by Builder', reportSummary.floorsByBuilder)}
+          ${renderBreakdownTable('Reclean Ratio by Subdivision', reportSummary.recleanRatioSubdivision, [
+            { key:'Name', label:'Subdivision' }, { key:'Originals', label:'Originals' }, { key:'Recleans', label:'Recleans' }, { key:'RecleanRatio', label:'Ratio' }
+          ])}
+          ${renderBreakdownTable('Reclean Ratio by Builder', reportSummary.recleanRatioBuilder, [
+            { key:'Name', label:'Builder' }, { key:'Originals', label:'Originals' }, { key:'Recleans', label:'Recleans' }, { key:'RecleanRatio', label:'Ratio' }
+          ])}
+          ${renderBreakdownTable('Task Type by Builder', reportSummary.taskByBuilder, [
+            { key:'Name', label:'Builder' }, { key:'Total', label:'Total' }, { key:'Original', label:'Originals' }, { key:'Reclean', label:'Recleans' }, { key:'Windows', label:'Windows' }, { key:'DryClean', label:'Dry' }, { key:'FloorsOnly', label:'Floors' }
+          ], 20, true)}
+          ${renderBreakdownTable('Task Type by Subdivision', reportSummary.taskBySubdivision, [
+            { key:'Name', label:'Subdivision' }, { key:'Total', label:'Total' }, { key:'Original', label:'Originals' }, { key:'Reclean', label:'Recleans' }, { key:'Windows', label:'Windows' }, { key:'DryClean', label:'Dry' }, { key:'FloorsOnly', label:'Floors' }
+          ], 25, true)}
+          ${renderBreakdownTable('AM / PM by Day', reportSummary.amPmByDay, [
+            { key:'Name', label:'Day' }, { key:'AM', label:'AM' }, { key:'PM', label:'PM' }, { key:'Total', label:'Total' }
+          ])}
+          ${renderBreakdownTable('Repeat Lot Report', reportSummary.repeatLots, [
+            { key:'Lot', label:'Lot' }, { key:'Subdivision', label:'Subdivision' }, { key:'Builder', label:'Builder' }, { key:'Count', label:'Count' }, { key:'Originals', label:'Originals' }, { key:'Recleans', label:'Recleans' }, { key:'Windows', label:'Windows' }, { key:'DryCleans', label:'Dry' }, { key:'FirstDate', label:'First' }, { key:'LastDate', label:'Last' }
+          ], 50, true)}
+          ${renderLotHistory()}
           ${renderMiniTable('Unknown Reasons', reportSummary.unknownReasons)}
           ${renderUnknownDetails(reportSummary.unknownRows)}
         </div>
@@ -2899,6 +3044,16 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.byCity), 'By City');
       XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.dryBySubdivision), 'Dry Cleans');
       XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.floorsBySubdivision), 'Floors Only');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.dryByBuilder), 'Dry by Builder');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.floorsByBuilder), 'Floors by Builder');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.recleanRatioSubdivision), 'Reclean Ratio Subs');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.recleanRatioBuilder), 'Reclean Ratio Builder');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.taskByBuilder), 'Task by Builder');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.taskBySubdivision), 'Task by Subdivision');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.taskByCity), 'Task by City');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.amPmByDay), 'AM PM by Day');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.repeatLots), 'Repeat Lots');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.lotHistory), 'Lot History Search');
       XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.unknownRows), 'Unknown Matches');
       XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.unknownReasons), 'Unknown Reasons');
 
