@@ -533,6 +533,91 @@
       margin-top: 10px;
     }
     .checkline input { width: auto; }
+  
+    .reportControls {
+      display: grid;
+      gap: 10px;
+    }
+
+    .reportPresetGrid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .reportPresetGrid button {
+      padding: 9px 8px;
+      font-size: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .reportGrid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(130px, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    @media (max-width: 950px) { .reportGrid { grid-template-columns: 1fr 1fr; } }
+
+    .reportBox {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .reportBox .big {
+      font-size: 25px;
+      font-weight: 950;
+      letter-spacing: -.04em;
+    }
+
+    .reportBox .label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+
+    .reportTables {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 1100px) { .reportTables { grid-template-columns: 1fr; } }
+
+    .miniTable {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: auto;
+      background: rgba(255,255,255,.025);
+    }
+
+    .miniTable h3 {
+      margin: 0;
+      padding: 11px 12px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.035);
+    }
+
+    .miniTable table {
+      min-width: 0;
+      table-layout: auto;
+      font-size: 12px;
+    }
+
+    .miniTable th, .miniTable td {
+      padding: 8px 9px;
+    }
+
   </style>
 </head>
 <body>
@@ -542,7 +627,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.80</div>
+      <div class="version">v1.90</div>
     </div>
   </header>
 
@@ -713,6 +798,50 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           </div>
         </div>
 
+        <div class="card">
+          <div class="cardHead">
+            <h2>Calendar Reports</h2>
+            <span class="pill" id="reportStatusPill">Not pulled</span>
+          </div>
+          <div class="cardBody">
+            <div class="reportControls">
+              <label>Report Range</label>
+              <div class="reportPresetGrid">
+                <button type="button" onclick="setReportRange('single')">Single Day</button>
+                <button type="button" onclick="setReportRange('thisWeek')">This Week</button>
+                <button type="button" onclick="setReportRange('lastWeek')">Last Week</button>
+                <button type="button" onclick="setReportRange('month')">This Month</button>
+                <button type="button" onclick="setReportRange('custom')">Custom</button>
+              </div>
+
+              <div class="fields">
+                <div>
+                  <label for="reportStartDate">Start Date</label>
+                  <input id="reportStartDate" type="date" />
+                </div>
+                <div>
+                  <label for="reportEndDate">End Date</label>
+                  <input id="reportEndDate" type="date" />
+                </div>
+              </div>
+
+              <div class="btns">
+                <button class="blue" onclick="pullCalendarReport()">Pull Calendar Report</button>
+                <button class="secondary" onclick="exportReportExcel()">Export Report Excel</button>
+              </div>
+
+              <p class="help">
+                Pulls from the selected General and Windows calendars. Weeks are Monday through Friday.
+                Dry Clean counts in its own report and also inside Original totals. Floors Only is separate.
+              </p>
+            </div>
+
+            <div id="reportOutput">
+              <div class="empty">Choose a range and pull a report.</div>
+            </div>
+          </div>
+        </div>
+
       </section>
 
       <section class="card">
@@ -800,6 +929,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     let googleAccessToken = null;
     let googleGapiReady = false;
     let pendingImportScope = 'all';
+    let reportRows = [];
+    let reportSummary = null;
 
     const byId = id => document.getElementById(id);
 
@@ -2038,6 +2169,374 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     }
 
 
+
+    function pad2(n) {
+      return String(n).padStart(2, '0');
+    }
+
+    function dateToISO(date) {
+      return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+    }
+
+    function parseISODateLocal(iso) {
+      const [y, m, d] = String(iso || '').split('-').map(Number);
+      return new Date(y, (m || 1) - 1, d || 1);
+    }
+
+    function mondayOfWeek(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      d.setDate(d.getDate() + diff);
+      return d;
+    }
+
+    function setReportRange(mode) {
+      const today = new Date();
+      let start = new Date(today);
+      let end = new Date(today);
+
+      if (mode === 'single') {
+        // Use selected calendar date if one is picked, otherwise today.
+        const selected = selectedDateValue();
+        start = selected ? parseISODateLocal(selected) : today;
+        end = new Date(start);
+      } else if (mode === 'thisWeek') {
+        start = mondayOfWeek(today);
+        end = new Date(start);
+        end.setDate(start.getDate() + 4);
+      } else if (mode === 'lastWeek') {
+        start = mondayOfWeek(today);
+        start.setDate(start.getDate() - 7);
+        end = new Date(start);
+        end.setDate(start.getDate() + 4);
+      } else if (mode === 'month') {
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+        end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      }
+
+      byId('reportStartDate').value = dateToISO(start);
+      byId('reportEndDate').value = dateToISO(end);
+      showToast(`Report range set: ${formatLongDate(byId('reportStartDate').value)} - ${formatLongDate(byId('reportEndDate').value)}`);
+    }
+
+    function reportTaskType(event, calendarKind) {
+      const title = String(event.summary || '');
+      const lower = title.toLowerCase();
+
+      if (calendarKind === 'windows') return 'Windows';
+      if (/\bfloors?\s*only\b/i.test(title)) return 'Floors Only';
+      if (/\bdry\s*clean\b|\bdryclean\b|\bdry-clean\b|\bdry\b/i.test(title)) return 'Dry Clean';
+      if (/\breclean\b/i.test(title)) return 'Reclean';
+      if (/\boriginal\b/i.test(title)) return 'Original';
+      return 'Other';
+    }
+
+    function parseEventSubjectParts(subject) {
+      let s = String(subject || '').trim();
+      const am = /^\*?AM\*?/i.test(s) || /\bAM\b/i.test(s);
+      const pm = /^\*?PM\*?/i.test(s) || /\bPM\b/i.test(s);
+
+      s = s
+        .replace(/^\*?(AM|PM)\*?\s*/i, '')
+        .replace(/\b(Original|Reclean|Windows|Floors?\s*Only|Dry\s*Clean|Dryclean|Dry-Clean)\b/ig, '')
+        .replace(/\s+-\s+.*$/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const lotMatch = s.match(/^([A-Za-z]?\d+[A-Za-z]?)/);
+      const lot = lotMatch ? cleanLot(lotMatch[1]) : '';
+      const typedSub = lotMatch ? s.slice(lotMatch[0].length).trim() : '';
+
+      return { lot, typedSub, am, pm };
+    }
+
+    function shortcutDetails(typedSub) {
+      const match = resolveShortcut(typedSub);
+      if (!match) return { subdivision: typedSub || '', builder: '', city: '' };
+
+      const rawSub = match.subdivision || typedSub || '';
+      const pieces = rawSub.split('*').map(x => x.trim()).filter(Boolean);
+      const subdivision = pieces[0] || rawSub;
+      const builder = match.builder || pieces[1] || '';
+      const city = pieces[2] || '';
+      return { subdivision, builder, city };
+    }
+
+    function calendarEventDateTime(event, field) {
+      const obj = event[field] || {};
+      return obj.dateTime || obj.date || '';
+    }
+
+    function eventDateISO(event) {
+      const start = calendarEventDateTime(event, 'start');
+      if (!start) return '';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(start)) return start;
+      const d = new Date(start);
+      return dateToISO(d);
+    }
+
+    function eventTime(event, field) {
+      const dt = calendarEventDateTime(event, field);
+      if (!dt) return '';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dt)) return '';
+      return toGoogleTime(`${pad2(new Date(dt).getHours())}:${pad2(new Date(dt).getMinutes())}`);
+    }
+
+    async function fetchCalendarEvents(calendarId, calendarName, calendarKind, startDate, endDate) {
+      const tokenObj = googleAccessToken ? { access_token: googleAccessToken } : (window.gapi?.client?.getToken?.() || null);
+      const token = tokenObj?.access_token;
+      if (!token) throw new Error('Missing Google access token.');
+
+      const start = `${startDate}T00:00:00`;
+      const endObj = parseISODateLocal(endDate);
+      endObj.setDate(endObj.getDate() + 1);
+      const end = `${dateToISO(endObj)}T00:00:00`;
+
+      const params = new URLSearchParams({
+        timeMin: new Date(start).toISOString(),
+        timeMax: new Date(end).toISOString(),
+        singleEvents: 'true',
+        orderBy: 'startTime',
+        maxResults: '2500'
+      });
+
+      const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?${params.toString()}`;
+      const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        console.error('Report fetch error:', data);
+        throw new Error(data?.error?.message || `Could not pull ${calendarName}`);
+      }
+
+      return (data.items || [])
+        .filter(ev => ev.status !== 'cancelled')
+        .map(ev => normalizeReportEvent(ev, calendarName, calendarKind));
+    }
+
+    function normalizeReportEvent(event, calendarName, calendarKind) {
+      const subject = event.summary || '';
+      const taskType = reportTaskType(event, calendarKind);
+      const parts = parseEventSubjectParts(subject);
+      const details = shortcutDetails(parts.typedSub);
+
+      const location = event.location || '';
+      let address = location;
+      let floorplan = '';
+      if (location.includes('/')) {
+        const split = location.split('/');
+        address = split[0].trim();
+        floorplan = split.slice(1).join('/').trim();
+      }
+
+      const isOriginalCount = taskType === 'Original' || taskType === 'Dry Clean';
+
+      return {
+        Date: eventDateISO(event),
+        Day: eventDateISO(event) ? parseISODateLocal(eventDateISO(event)).toLocaleDateString(undefined, { weekday: 'long' }) : '',
+        Start: eventTime(event, 'start'),
+        End: eventTime(event, 'end'),
+        Calendar: calendarName,
+        CalendarType: calendarKind === 'windows' ? 'Windows' : 'General',
+        Subject: subject,
+        TaskType: taskType,
+        CountsAsOriginal: isOriginalCount ? 'Yes' : 'No',
+        Lot: parts.lot,
+        SubdivisionShort: parts.typedSub,
+        Subdivision: details.subdivision,
+        Builder: details.builder,
+        City: details.city,
+        AM: parts.am ? 'Yes' : 'No',
+        PM: parts.pm ? 'Yes' : 'No',
+        Address: address,
+        Floorplan: floorplan,
+        Location: location
+      };
+    }
+
+    function countBy(rows, field) {
+      const map = new Map();
+      rows.forEach(row => {
+        const key = row[field] || 'Unknown';
+        map.set(key, (map.get(key) || 0) + 1);
+      });
+      return Array.from(map.entries())
+        .map(([Name, Count]) => ({ Name, Count }))
+        .sort((a, b) => b.Count - a.Count || String(a.Name).localeCompare(String(b.Name)));
+    }
+
+    function buildReportSummary(rows) {
+      const total = rows.length;
+      const dryClean = rows.filter(r => r.TaskType === 'Dry Clean').length;
+      const originals = rows.filter(r => r.TaskType === 'Original' || r.TaskType === 'Dry Clean').length;
+      const recleans = rows.filter(r => r.TaskType === 'Reclean').length;
+      const windows = rows.filter(r => r.TaskType === 'Windows').length;
+      const floorsOnly = rows.filter(r => r.TaskType === 'Floors Only').length;
+      const am = rows.filter(r => r.AM === 'Yes').length;
+      const pm = rows.filter(r => r.PM === 'Yes').length;
+      const other = rows.filter(r => r.TaskType === 'Other').length;
+
+      return {
+        total,
+        originals,
+        dryClean,
+        recleans,
+        windows,
+        floorsOnly,
+        am,
+        pm,
+        other,
+        byDay: countBy(rows, 'Date'),
+        byBuilder: countBy(rows, 'Builder'),
+        bySubdivision: countBy(rows, 'Subdivision'),
+        byCity: countBy(rows, 'City'),
+        dryBySubdivision: countBy(rows.filter(r => r.TaskType === 'Dry Clean'), 'Subdivision'),
+        floorsBySubdivision: countBy(rows.filter(r => r.TaskType === 'Floors Only'), 'Subdivision')
+      };
+    }
+
+    function renderMiniTable(title, rows, limit = 10) {
+      const shown = rows.slice(0, limit);
+      return `
+        <div class="miniTable">
+          <h3>${escapeHTML(title)}</h3>
+          <table>
+            <thead><tr><th>Name</th><th>Count</th></tr></thead>
+            <tbody>
+              ${shown.length ? shown.map(r => `<tr><td>${escapeHTML(r.Name)}</td><td>${escapeHTML(r.Count)}</td></tr>`).join('') : '<tr><td colspan="2">No data</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderReport() {
+      const out = byId('reportOutput');
+      if (!reportSummary) {
+        out.innerHTML = '<div class="empty">Choose a range and pull a report.</div>';
+        return;
+      }
+
+      out.innerHTML = `
+        <div class="reportGrid">
+          <div class="reportBox"><div class="big">${reportSummary.total}</div><div class="label">Total Jobs</div></div>
+          <div class="reportBox"><div class="big">${reportSummary.originals}</div><div class="label">Originals</div></div>
+          <div class="reportBox"><div class="big">${reportSummary.dryClean}</div><div class="label">Dry Cleans</div></div>
+          <div class="reportBox"><div class="big">${reportSummary.recleans}</div><div class="label">Recleans</div></div>
+          <div class="reportBox"><div class="big">${reportSummary.windows}</div><div class="label">Windows</div></div>
+          <div class="reportBox"><div class="big">${reportSummary.floorsOnly}</div><div class="label">Floors Only</div></div>
+          <div class="reportBox"><div class="big">${reportSummary.am}</div><div class="label">AM Jobs</div></div>
+          <div class="reportBox"><div class="big">${reportSummary.pm}</div><div class="label">PM Jobs</div></div>
+        </div>
+        <div class="reportTables">
+          ${renderMiniTable('Jobs by Day', reportSummary.byDay)}
+          ${renderMiniTable('Jobs by Builder', reportSummary.byBuilder)}
+          ${renderMiniTable('Jobs by Subdivision', reportSummary.bySubdivision)}
+          ${renderMiniTable('Jobs by City', reportSummary.byCity)}
+          ${renderMiniTable('Dry Cleans by Subdivision', reportSummary.dryBySubdivision)}
+          ${renderMiniTable('Floors Only by Subdivision', reportSummary.floorsBySubdivision)}
+        </div>
+      `;
+    }
+
+    async function pullCalendarReport() {
+      try {
+        const startDate = byId('reportStartDate').value;
+        const endDate = byId('reportEndDate').value;
+
+        if (!startDate || !endDate) {
+          showToast('Pick a report start and end date first.');
+          return;
+        }
+
+        if (endDate < startDate) {
+          showToast('Report end date cannot be before start date.');
+          return;
+        }
+
+        await ensureGoogleReady();
+        if (!googleAccessToken && !gapi.client.getToken()) {
+          googleTokenClient.requestAccessToken({ prompt: 'consent' });
+          showToast('Sign in first, then pull the report again.');
+          return;
+        }
+
+        const generalCalendarId = byId('generalCalendarSelect')?.value || '';
+        const windowsCalendarId = byId('windowsCalendarSelect')?.value || '';
+
+        if (!generalCalendarId && !windowsCalendarId) {
+          showToast('Select at least one calendar first.');
+          return;
+        }
+
+        byId('reportStatusPill').textContent = 'Pulling...';
+
+        const all = [];
+        if (generalCalendarId) {
+          const generalName = byId('generalCalendarSelect').selectedOptions[0]?.textContent || 'General';
+          all.push(...await fetchCalendarEvents(generalCalendarId, generalName, 'general', startDate, endDate));
+        }
+        if (windowsCalendarId) {
+          const windowsName = byId('windowsCalendarSelect').selectedOptions[0]?.textContent || 'Windows';
+          all.push(...await fetchCalendarEvents(windowsCalendarId, windowsName, 'windows', startDate, endDate));
+        }
+
+        reportRows = all.sort((a, b) => `${a.Date} ${a.Start}`.localeCompare(`${b.Date} ${b.Start}`));
+        reportSummary = buildReportSummary(reportRows);
+        renderReport();
+
+        byId('reportStatusPill').textContent = `${reportRows.length} events`;
+        byId('reportStatusPill').className = 'pill good';
+        showToast(`Pulled ${reportRows.length} calendar events.`);
+      } catch (err) {
+        console.error(err);
+        byId('reportStatusPill').textContent = 'Report failed';
+        byId('reportStatusPill').className = 'pill warn';
+        showToast(err.message || 'Could not pull calendar report.');
+      }
+    }
+
+    function sheetFromObjects(rows) {
+      return XLSX.utils.json_to_sheet(rows.length ? rows : [{ Name: 'No data', Count: 0 }]);
+    }
+
+    function exportReportExcel() {
+      if (!reportRows.length || !reportSummary) {
+        showToast('Pull a report before exporting Excel.');
+        return;
+      }
+
+      const wb = XLSX.utils.book_new();
+
+      const summaryRows = [
+        { Metric: 'Total Jobs', Count: reportSummary.total },
+        { Metric: 'Originals', Count: reportSummary.originals },
+        { Metric: 'Dry Cleans', Count: reportSummary.dryClean },
+        { Metric: 'Recleans', Count: reportSummary.recleans },
+        { Metric: 'Windows', Count: reportSummary.windows },
+        { Metric: 'Floors Only', Count: reportSummary.floorsOnly },
+        { Metric: 'AM Jobs', Count: reportSummary.am },
+        { Metric: 'PM Jobs', Count: reportSummary.pm },
+        { Metric: 'Other', Count: reportSummary.other }
+      ];
+
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(summaryRows), 'Summary');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportRows), 'All Events');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.byDay), 'By Day');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.byBuilder), 'By Builder');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.bySubdivision), 'By Subdivision');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.byCity), 'By City');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.dryBySubdivision), 'Dry Cleans');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.floorsBySubdivision), 'Floors Only');
+
+      const start = byId('reportStartDate').value || 'start';
+      const end = byId('reportEndDate').value || 'end';
+      XLSX.writeFile(wb, `calendar-report-${start}-to-${end}.xlsx`);
+      showToast('Exported report Excel workbook.');
+    }
+
+
     function loadSavedData() {
       try {
         shortcutRows = JSON.parse(localStorage.getItem(STORAGE_KEYS.shortcuts) || '[]');
@@ -2087,6 +2586,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
     loadSavedData();
     updateDateBanner();
+    setReportRange('thisWeek');
     parseAndRender();
   </script>
 </body>
