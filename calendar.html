@@ -736,6 +736,71 @@
     .wideMiniTable { grid-column: 1 / -1; }
     .wideMiniTable table { min-width: 1100px; }
 
+  
+    /* v1.95 preview rescue: keep the editable preview compact and usable */
+    .previewTableWrap {
+      max-height: calc(100vh - 260px);
+      overflow: auto;
+    }
+
+    .previewTable {
+      width: 100%;
+      min-width: 980px;
+      table-layout: fixed;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .previewTable th,
+    .previewTable td {
+      padding: 8px 8px;
+      vertical-align: middle;
+    }
+
+    .previewTable th:nth-child(1), .previewTable td:nth-child(1) { width: 76px; }
+    .previewTable th:nth-child(2), .previewTable td:nth-child(2) { width: 42px; }
+    .previewTable th:nth-child(3), .previewTable td:nth-child(3) { width: 118px; }
+    .previewTable th:nth-child(4), .previewTable td:nth-child(4) { width: 170px; }
+    .previewTable th:nth-child(5), .previewTable td:nth-child(5) { width: 32%; }
+    .previewTable th:nth-child(6), .previewTable td:nth-child(6) { width: 34%; }
+    .previewTable th:nth-child(7), .previewTable td:nth-child(7) { width: 130px; }
+
+    .previewMeta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .previewMeta b {
+      color: #dbeafe;
+    }
+
+    .previewTimeGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .previewTable .editInput {
+      min-width: 0 !important;
+      width: 100%;
+      padding: 7px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .previewTable .typeSelect {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .previewTable .smallBtn {
+      padding: 7px 8px;
+      line-height: 1;
+    }
+
   </style>
 </head>
 <body>
@@ -745,7 +810,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.94</div>
+      <div class="version">v1.95</div>
     </div>
   </header>
 
@@ -1590,48 +1655,57 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const last = parsedRows[parsedRows.length - 1];
       byId('rangePill').textContent = `${selectedDateValue() ? formatLongDate(selectedDateValue()) : 'No date selected'} • ${first.googleStart} - ${last.googleEnd} • ${amCount} AM • ${pmCount} PM${duplicateCount ? ' • Duplicates: ' + duplicateCount : ''}`;
 
+      byId('tableWrap').classList.add('previewTableWrap');
       byId('tableWrap').innerHTML = `
-        <table>
+        <table class="previewTable">
           <thead>
             <tr>
               <th>Actions</th>
               <th>#</th>
-              <th>Hour Block</th>
               <th>Type</th>
-              <th>Start</th>
-              <th>End</th>
-              <th>Google Calendar Subject</th>
-              <th>Typed Sub</th>
-              <th>Resolved Subdivision</th>
-              <th>Floorplan</th>
-              <th>Location / Address</th>
+              <th>Time</th>
+              <th>Subject</th>
+              <th>Location</th>
               <th>Status</th>
-              <th>Original Line</th>
             </tr>
           </thead>
           <tbody>
             ${parsedRows.map((row, idx) => `
               <tr class="${row.duplicate ? 'duplicateRow' : ''}">
-                <td><div class="rowActions"><button class="smallBtn danger" onclick="deleteParsedRow(${idx})">Delete</button></div></td>
+                <td>
+                  <button class="smallBtn danger" onclick="deleteParsedRow(${idx})">Delete</button>
+                </td>
                 <td>${escapeHTML(row.rowNum)}</td>
-                <td>${escapeHTML(row.hourBlock)}</td>
                 <td>
                   <select class="typeSelect" onchange="updateRowType(${idx}, this.value)">
                     <option value="original" ${row.type === 'original' ? 'selected' : ''}>Original</option>
                     <option value="reclean" ${row.type === 'reclean' ? 'selected' : ''}>Reclean</option>
                     <option value="windows" ${row.type === 'windows' ? 'selected' : ''}>Windows</option>
                   </select>
-                  ${row.isAM ? '<span class="tag am">AM</span>' : ''}${row.isPM ? '<span class="tag pm">PM</span>' : ''}${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : ''}
+                  <div class="previewMeta">
+                    ${row.isAM ? '<span class="tag am">AM</span>' : ''}${row.isPM ? '<span class="tag pm">PM</span>' : ''}${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : ''}
+                  </div>
                 </td>
-                <td><input class="editInput timeEdit" data-edit-row="${idx}" data-edit-field="start" value="${escapeHTML(row.start)}" oninput="updateParsedRow(${idx}, 'start', this.value)" /></td>
-                <td><input class="editInput timeEdit" data-edit-row="${idx}" data-edit-field="end" value="${escapeHTML(row.end)}" oninput="updateParsedRow(${idx}, 'end', this.value)" /></td>
-                <td><input class="editInput subjectEdit" data-edit-row="${idx}" data-edit-field="subject" value="${escapeHTML(row.subject)}" oninput="updateParsedRow(${idx}, 'subject', this.value)" /></td>
-                <td>${escapeHTML(row.typedSub || '')}</td>
-                <td>${escapeHTML(row.shortcutSubdivision || '')}</td>
-                <td>${escapeHTML(row.floorplan || '')}</td>
-                <td><input class="editInput locationEdit" data-edit-row="${idx}" data-edit-field="locationOverride" value="${escapeHTML(getRowLocation(row))}" oninput="updateParsedRow(${idx}, 'locationOverride', this.value)" /></td>
-                <td>${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : (row.matched ? '<span class="tag original">Matched</span>' : '<span class="tag miss">' + escapeHTML(row.matchStatus) + '</span>')}</td>
-                <td>${escapeHTML(row.originalLine)}</td>
+                <td>
+                  <div class="previewTimeGrid">
+                    <input class="editInput timeEdit" data-edit-row="${idx}" data-edit-field="start" value="${escapeHTML(row.start)}" oninput="updateParsedRow(${idx}, 'start', this.value)" />
+                    <input class="editInput timeEdit" data-edit-row="${idx}" data-edit-field="end" value="${escapeHTML(row.end)}" oninput="updateParsedRow(${idx}, 'end', this.value)" />
+                  </div>
+                </td>
+                <td>
+                  <input class="editInput subjectEdit" data-edit-row="${idx}" data-edit-field="subject" value="${escapeHTML(row.subject)}" oninput="updateParsedRow(${idx}, 'subject', this.value)" />
+                  <div class="previewMeta">
+                    <b>Typed:</b> ${escapeHTML(row.typedSub || '')}
+                    ${row.shortcutSubdivision ? `<br><b>Resolved:</b> ${escapeHTML(row.shortcutSubdivision)}` : ''}
+                    ${row.floorplan ? `<br><b>Floorplan:</b> ${escapeHTML(row.floorplan)}` : ''}
+                  </div>
+                </td>
+                <td>
+                  <input class="editInput locationEdit" data-edit-row="${idx}" data-edit-field="locationOverride" value="${escapeHTML(getRowLocation(row))}" oninput="updateParsedRow(${idx}, 'locationOverride', this.value)" />
+                </td>
+                <td>
+                  ${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : (row.matched ? '<span class="tag original">Matched</span>' : '<span class="tag miss">' + escapeHTML(row.matchStatus) + '</span>')}
+                </td>
               </tr>
             `).join('')}
           </tbody>
