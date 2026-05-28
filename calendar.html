@@ -618,6 +618,79 @@
       padding: 8px 9px;
     }
 
+  
+    .reportResultsCard {
+      margin-top: 18px;
+    }
+
+    .reportHeaderRow {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 950px) {
+      .reportHeaderRow { grid-template-columns: 1fr; }
+    }
+
+    .reportNotice {
+      border: 1px solid rgba(251,191,36,.35);
+      background: rgba(251,191,36,.10);
+      color: #fde68a;
+      border-radius: 16px;
+      padding: 12px;
+      line-height: 1.45;
+    }
+
+    .reportNotice.good {
+      border-color: rgba(34,197,94,.35);
+      background: rgba(34,197,94,.10);
+      color: #bbf7d0;
+    }
+
+    .reportGrid {
+      grid-template-columns: repeat(8, minmax(115px, 1fr));
+    }
+
+    @media (max-width: 1400px) {
+      .reportGrid { grid-template-columns: repeat(4, minmax(130px, 1fr)); }
+    }
+
+    @media (max-width: 700px) {
+      .reportGrid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+    }
+
+    .reportTables {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @media (max-width: 1300px) {
+      .reportTables { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 850px) {
+      .reportTables { grid-template-columns: 1fr; }
+    }
+
+    .miniTable {
+      max-height: 420px;
+    }
+
+    .miniTable table {
+      width: 100%;
+    }
+
+    .miniTable th:last-child,
+    .miniTable td:last-child {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .miniTable td:first-child {
+      word-break: break-word;
+    }
+
   </style>
 </head>
 <body>
@@ -627,7 +700,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.90</div>
+      <div class="version">v1.91</div>
     </div>
   </header>
 
@@ -836,9 +909,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
               </p>
             </div>
 
-            <div id="reportOutput">
-              <div class="empty">Choose a range and pull a report.</div>
-            </div>
+            <div id="reportMiniStatus" class="sampleBox">Report results will open in the full-width dashboard below.</div>
           </div>
         </div>
 
@@ -890,7 +961,21 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           </div>
         </div>
       </section>
+
     </div>
+
+    <section class="card reportResultsCard">
+      <div class="cardHead">
+        <h2>Report Dashboard</h2>
+        <span class="pill" id="reportDashboardPill">No report pulled</span>
+      </div>
+      <div class="cardBody">
+        <div id="reportOutput">
+          <div class="empty">Choose a range and pull a report.</div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
 
@@ -2251,16 +2336,51 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       return { lot, typedSub, am, pm };
     }
 
-    function shortcutDetails(typedSub) {
-      const match = resolveShortcut(typedSub);
-      if (!match) return { subdivision: typedSub || '', builder: '', city: '' };
+    function parseSubdivisionParts(rawSub, builderFallback = '') {
+      const raw = String(rawSub || '').trim();
+      const pieces = raw.split('*').map(x => x.trim()).filter(Boolean);
+      return {
+        subdivision: pieces[0] || raw || 'Unknown',
+        builder: builderFallback || pieces[1] || '',
+        city: pieces[2] || ''
+      };
+    }
 
-      const rawSub = match.subdivision || typedSub || '';
-      const pieces = rawSub.split('*').map(x => x.trim()).filter(Boolean);
-      const subdivision = pieces[0] || rawSub;
-      const builder = match.builder || pieces[1] || '';
-      const city = pieces[2] || '';
-      return { subdivision, builder, city };
+    function reportDetails(lot, typedSub) {
+      const shortcutMatch = resolveShortcut(typedSub);
+      const shortcutParsed = shortcutMatch ? parseSubdivisionParts(shortcutMatch.subdivision || typedSub, shortcutMatch.builder || '') : null;
+
+      const lookup = lot ? findLotRecord(lot, typedSub, shortcutMatch?.subdivision || typedSub) : null;
+      if (lookup) {
+        const lookupParsed = parseSubdivisionParts(lookup.subdivision || shortcutMatch?.subdivision || typedSub, lookup.builder || shortcutParsed?.builder || '');
+        return {
+          subdivision: shortcutParsed?.subdivision || lookupParsed.subdivision || typedSub || 'Unknown',
+          builder: lookupParsed.builder || shortcutParsed?.builder || 'Unknown',
+          city: shortcutParsed?.city || lookupParsed.city || cityFromAddress(lookup.address || '') || 'Unknown'
+        };
+      }
+
+      if (shortcutParsed) {
+        return {
+          subdivision: shortcutParsed.subdivision || typedSub || 'Unknown',
+          builder: shortcutParsed.builder || 'Unknown',
+          city: shortcutParsed.city || 'Unknown'
+        };
+      }
+
+      return { subdivision: typedSub || 'Unknown', builder: 'Unknown', city: 'Unknown' };
+    }
+
+    function cityFromAddress(address) {
+      const str = String(address || '').trim();
+      // Best-effort Ohio style: "123 Main St Plain City, OH 43064"
+      const m = str.match(/,\s*([A-Za-z .'-]+),?\s*OH\b/i);
+      if (m) return m[1].trim();
+      return '';
+    }
+
+    function shortcutDetails(typedSub) {
+      return reportDetails('', typedSub);
     }
 
     function calendarEventDateTime(event, field) {
@@ -2319,7 +2439,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const subject = event.summary || '';
       const taskType = reportTaskType(event, calendarKind);
       const parts = parseEventSubjectParts(subject);
-      const details = shortcutDetails(parts.typedSub);
+      const details = reportDetails(parts.lot, parts.typedSub);
 
       const location = event.location || '';
       let address = location;
@@ -2355,15 +2475,21 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       };
     }
 
-    function countBy(rows, field) {
+    function countBy(rows, field, formatter = null) {
       const map = new Map();
       rows.forEach(row => {
-        const key = row[field] || 'Unknown';
+        const rawKey = row[field] || 'Unknown';
+        const key = formatter ? formatter(rawKey, row) : rawKey;
         map.set(key, (map.get(key) || 0) + 1);
       });
       return Array.from(map.entries())
         .map(([Name, Count]) => ({ Name, Count }))
         .sort((a, b) => b.Count - a.Count || String(a.Name).localeCompare(String(b.Name)));
+    }
+
+    function formatReportDateName(iso) {
+      if (!iso || iso === 'Unknown') return 'Unknown';
+      return `${formatLongDate(iso)}`;
     }
 
     function buildReportSummary(rows) {
@@ -2387,7 +2513,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         am,
         pm,
         other,
-        byDay: countBy(rows, 'Date'),
+        byDay: countBy(rows, 'Date', key => formatReportDateName(key)),
         byBuilder: countBy(rows, 'Builder'),
         bySubdivision: countBy(rows, 'Subdivision'),
         byCity: countBy(rows, 'City'),
@@ -2396,15 +2522,19 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       };
     }
 
-    function renderMiniTable(title, rows, limit = 10) {
+    function renderMiniTable(title, rows, limit = 15) {
       const shown = rows.slice(0, limit);
+      const total = rows.reduce((sum, r) => sum + Number(r.Count || 0), 0);
       return `
         <div class="miniTable">
           <h3>${escapeHTML(title)}</h3>
           <table>
-            <thead><tr><th>Name</th><th>Count</th></tr></thead>
+            <thead><tr><th>Name</th><th>Count</th><th>%</th></tr></thead>
             <tbody>
-              ${shown.length ? shown.map(r => `<tr><td>${escapeHTML(r.Name)}</td><td>${escapeHTML(r.Count)}</td></tr>`).join('') : '<tr><td colspan="2">No data</td></tr>'}
+              ${shown.length ? shown.map(r => {
+                const pct = total ? Math.round((Number(r.Count || 0) / total) * 100) : 0;
+                return `<tr><td>${escapeHTML(r.Name)}</td><td>${escapeHTML(r.Count)}</td><td>${pct}%</td></tr>`;
+              }).join('') : '<tr><td colspan="3">No data</td></tr>'}
             </tbody>
           </table>
         </div>
@@ -2418,7 +2548,21 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         return;
       }
 
+      const unknownBuilders = reportRows.filter(r => !r.Builder || r.Builder === 'Unknown').length;
+      const unknownCities = reportRows.filter(r => !r.City || r.City === 'Unknown').length;
+      const dataNotice = unknownBuilders || unknownCities
+        ? `<div class="reportNotice">Some rows are showing as Unknown. Usually this means the Shortened.xlsx file is not loaded on this browser, or the abbreviation in the calendar title is not in the shortcut file. Shortcuts loaded: <b>${shortcutRows.length}</b>. Floorplan/address rows loaded: <b>${lotRows.length}</b>.</div>`
+        : `<div class="reportNotice good">Shortcut matching looks good. Shortcuts loaded: <b>${shortcutRows.length}</b>. Floorplan/address rows loaded: <b>${lotRows.length}</b>.</div>`;
+
       out.innerHTML = `
+        <div class="reportHeaderRow">
+          <div class="reportNotice good">
+            <b>Report range:</b> ${escapeHTML(formatLongDate(byId('reportStartDate').value))} - ${escapeHTML(formatLongDate(byId('reportEndDate').value))}
+            <br><b>Events pulled:</b> ${reportRows.length}
+          </div>
+          ${dataNotice}
+        </div>
+
         <div class="reportGrid">
           <div class="reportBox"><div class="big">${reportSummary.total}</div><div class="label">Total Jobs</div></div>
           <div class="reportBox"><div class="big">${reportSummary.originals}</div><div class="label">Originals</div></div>
@@ -2429,6 +2573,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           <div class="reportBox"><div class="big">${reportSummary.am}</div><div class="label">AM Jobs</div></div>
           <div class="reportBox"><div class="big">${reportSummary.pm}</div><div class="label">PM Jobs</div></div>
         </div>
+
         <div class="reportTables">
           ${renderMiniTable('Jobs by Day', reportSummary.byDay)}
           ${renderMiniTable('Jobs by Builder', reportSummary.byBuilder)}
@@ -2438,6 +2583,12 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           ${renderMiniTable('Floors Only by Subdivision', reportSummary.floorsBySubdivision)}
         </div>
       `;
+
+      const dashPill = byId('reportDashboardPill');
+      if (dashPill) {
+        dashPill.textContent = `${reportRows.length} events`;
+        dashPill.className = 'pill good';
+      }
     }
 
     async function pullCalendarReport() {
@@ -2487,7 +2638,9 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         renderReport();
 
         byId('reportStatusPill').textContent = `${reportRows.length} events`;
+        if (byId('reportDashboardPill')) byId('reportDashboardPill').textContent = `${reportRows.length} events`;
         byId('reportStatusPill').className = 'pill good';
+        if (byId('reportDashboardPill')) byId('reportDashboardPill').className = 'pill good';
         showToast(`Pulled ${reportRows.length} calendar events.`);
       } catch (err) {
         console.error(err);
