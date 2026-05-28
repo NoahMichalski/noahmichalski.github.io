@@ -739,7 +739,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.92</div>
+      <div class="version">v1.93</div>
     </div>
   </header>
 
@@ -2361,16 +2361,30 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const am = /^\*?AM\*?/i.test(s) || /\bAM\b/i.test(s);
       const pm = /^\*?PM\*?/i.test(s) || /\bPM\b/i.test(s);
 
+      // Older calendar entries often start with crew/name, like:
+      // "Israel-7103 Nelson", "Veronica - 187 Nottingham", "Maria - 25A Terra Alta reclean"
+      // Strip everything before the dash ONLY when the text after the dash starts with a lot number.
+      s = s
+        .replace(/^\s*[^-–—]+?\s*[-–—]\s*(?=[A-Za-z]?\d+[A-Za-z]?\b)/i, '')
+        .trim();
+
       s = s
         .replace(/^\*?(AM|PM)\*?\s*/i, '')
-        .replace(/\b(Original|Reclean|Windows|Floors?\s*Only|Dry\s*Clean|Dryclean|Dry-Clean)\b/ig, '')
+        .replace(/\b(Original|Reclean|Windows?|Window|Floors?\s*Only|Dry\s*Clean|Dryclean|Dry-Clean)\b/ig, '')
         .replace(/\s+-\s+.*$/g, '')
+        .replace(/[&]+/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
 
       const lotMatch = s.match(/^([A-Za-z]?\d+[A-Za-z]?)/);
       const lot = lotMatch ? cleanLot(lotMatch[1]) : '';
-      const typedSub = lotMatch ? s.slice(lotMatch[0].length).trim() : '';
+      let typedSub = lotMatch ? s.slice(lotMatch[0].length).trim() : '';
+
+      // Clean leftover separators from titles like "74 Deer Run Windows & reclean"
+      typedSub = typedSub
+        .replace(/^[\s*\/\-–—&]+|[\s*\/\-–—&]+$/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
 
       return { lot, typedSub, am, pm };
     }
@@ -2458,6 +2472,17 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           city: shortcutParsed.city || cityFromAddress(location || '') || 'Unknown',
           matchMethod: shortcutLoose?.method || 'shortcut',
           unknownReason: ''
+        };
+      }
+
+      if (typedSub && typedSub.includes('*')) {
+        const parsed = parseSubdivisionParts(typedSub, '');
+        return {
+          subdivision: parsed.subdivision || typedSub || 'Unknown',
+          builder: parsed.builder || 'Unknown',
+          city: parsed.city || cityFromAddress(location || '') || 'Unknown',
+          matchMethod: 'title subdivision parts',
+          unknownReason: parsed.builder ? '' : `Shortcut not found for "${typedSub}"`
         };
       }
 
