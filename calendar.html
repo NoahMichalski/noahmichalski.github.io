@@ -691,6 +691,45 @@
       word-break: break-word;
     }
 
+  
+    .matchGrid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    @media (max-width: 900px) {
+      .matchGrid { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+    }
+
+    .unknownTable {
+      grid-column: 1 / -1;
+      max-height: 520px;
+    }
+
+    .unknownTable table {
+      min-width: 1050px;
+    }
+
+    .reasonText {
+      color: #fde68a;
+      font-size: 12px;
+    }
+
+    .reportActionRow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 12px 0;
+    }
+
+    .reportActionRow button {
+      padding: 9px 11px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+
   </style>
 </head>
 <body>
@@ -700,7 +739,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.91</div>
+      <div class="version">v1.92</div>
     </div>
   </header>
 
@@ -2346,8 +2385,46 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       };
     }
 
-    function reportDetails(lot, typedSub) {
-      const shortcutMatch = resolveShortcut(typedSub);
+    function findShortcutLoose(typedSub) {
+      const typedKey = normalizeKey(typedSub);
+      if (!typedKey) return null;
+
+      let found = resolveShortcut(typedSub);
+      if (found) return { row: found, method: 'shortcut exact' };
+
+      found = shortcutRows.find(r => r.subdivisionKey && (r.subdivisionKey.includes(typedKey) || typedKey.includes(r.subdivisionKey)));
+      if (found) return { row: found, method: 'subdivision partial' };
+
+      found = shortcutRows.find(r => {
+        const subdivisionName = normalizeKey(String(r.subdivision || '').split('*')[0] || '');
+        return subdivisionName && (subdivisionName.includes(typedKey) || typedKey.includes(subdivisionName));
+      });
+      if (found) return { row: found, method: 'subdivision name partial' };
+
+      return null;
+    }
+
+    function findLotByLocation(location) {
+      const loc = normalizeKey(String(location || '').split('/')[0] || location || '');
+      if (!loc) return null;
+
+      // Exact or near-exact address match first.
+      let found = lotRows.find(r => normalizeKey(r.address || '') === loc);
+      if (found) return { row: found, method: 'address exact' };
+
+      // Loose address containment fallback.
+      found = lotRows.find(r => {
+        const addr = normalizeKey(r.address || '');
+        return addr && loc && (addr.includes(loc) || loc.includes(addr));
+      });
+      if (found) return { row: found, method: 'address partial' };
+
+      return null;
+    }
+
+    function reportDetails(lot, typedSub, location = '') {
+      const shortcutLoose = findShortcutLoose(typedSub);
+      const shortcutMatch = shortcutLoose?.row || null;
       const shortcutParsed = shortcutMatch ? parseSubdivisionParts(shortcutMatch.subdivision || typedSub, shortcutMatch.builder || '') : null;
 
       const lookup = lot ? findLotRecord(lot, typedSub, shortcutMatch?.subdivision || typedSub) : null;
@@ -2356,7 +2433,21 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         return {
           subdivision: shortcutParsed?.subdivision || lookupParsed.subdivision || typedSub || 'Unknown',
           builder: lookupParsed.builder || shortcutParsed?.builder || 'Unknown',
-          city: shortcutParsed?.city || lookupParsed.city || cityFromAddress(lookup.address || '') || 'Unknown'
+          city: shortcutParsed?.city || lookupParsed.city || cityFromAddress(lookup.address || location || '') || 'Unknown',
+          matchMethod: lookupParsed.builder ? 'lot + subdivision' : 'lot fallback',
+          unknownReason: ''
+        };
+      }
+
+      const locMatch = findLotByLocation(location);
+      if (locMatch?.row) {
+        const locParsed = parseSubdivisionParts(locMatch.row.subdivision || typedSub, locMatch.row.builder || shortcutParsed?.builder || '');
+        return {
+          subdivision: shortcutParsed?.subdivision || locParsed.subdivision || typedSub || 'Unknown',
+          builder: locParsed.builder || shortcutParsed?.builder || 'Unknown',
+          city: shortcutParsed?.city || locParsed.city || cityFromAddress(locMatch.row.address || location || '') || 'Unknown',
+          matchMethod: locMatch.method,
+          unknownReason: ''
         };
       }
 
@@ -2364,11 +2455,21 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         return {
           subdivision: shortcutParsed.subdivision || typedSub || 'Unknown',
           builder: shortcutParsed.builder || 'Unknown',
-          city: shortcutParsed.city || 'Unknown'
+          city: shortcutParsed.city || cityFromAddress(location || '') || 'Unknown',
+          matchMethod: shortcutLoose?.method || 'shortcut',
+          unknownReason: ''
         };
       }
 
-      return { subdivision: typedSub || 'Unknown', builder: 'Unknown', city: 'Unknown' };
+      return {
+        subdivision: typedSub || 'Unknown',
+        builder: 'Unknown',
+        city: cityFromAddress(location || '') || 'Unknown',
+        matchMethod: 'unmatched',
+        unknownReason: !typedSub
+          ? 'No subdivision/shortcut parsed from title'
+          : `Shortcut not found for "${typedSub}"`
+      };
     }
 
     function cityFromAddress(address) {
@@ -2439,7 +2540,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const subject = event.summary || '';
       const taskType = reportTaskType(event, calendarKind);
       const parts = parseEventSubjectParts(subject);
-      const details = reportDetails(parts.lot, parts.typedSub);
+      const details = reportDetails(parts.lot, parts.typedSub, event.location || '');
 
       const location = event.location || '';
       let address = location;
@@ -2467,6 +2568,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         Subdivision: details.subdivision,
         Builder: details.builder,
         City: details.city,
+        MatchMethod: details.matchMethod || '',
+        UnknownReason: details.unknownReason || '',
         AM: parts.am ? 'Yes' : 'No',
         PM: parts.pm ? 'Yes' : 'No',
         Address: address,
@@ -2492,6 +2595,10 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       return `${formatLongDate(iso)}`;
     }
 
+    function isUnknownReportRow(row) {
+      return !row.Builder || row.Builder === 'Unknown' || !row.Subdivision || row.Subdivision === 'Unknown';
+    }
+
     function buildReportSummary(rows) {
       const total = rows.length;
       const dryClean = rows.filter(r => r.TaskType === 'Dry Clean').length;
@@ -2502,6 +2609,9 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const am = rows.filter(r => r.AM === 'Yes').length;
       const pm = rows.filter(r => r.PM === 'Yes').length;
       const other = rows.filter(r => r.TaskType === 'Other').length;
+      const unknownRows = rows.filter(isUnknownReportRow);
+      const matched = total - unknownRows.length;
+      const matchRate = total ? Math.round((matched / total) * 100) : 0;
 
       return {
         total,
@@ -2513,6 +2623,11 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         am,
         pm,
         other,
+        matched,
+        unknown: unknownRows.length,
+        matchRate,
+        unknownRows,
+        unknownReasons: countBy(unknownRows, 'UnknownReason'),
         byDay: countBy(rows, 'Date', key => formatReportDateName(key)),
         byBuilder: countBy(rows, 'Builder'),
         bySubdivision: countBy(rows, 'Subdivision'),
@@ -2541,6 +2656,69 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       `;
     }
 
+
+    function renderUnknownDetails(rows, limit = 50) {
+      const shown = rows.slice(0, limit);
+      return `
+        <div class="miniTable unknownTable">
+          <h3>Unknown Match Details ${rows.length > limit ? `(showing first ${limit} of ${rows.length})` : ''}</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Calendar</th>
+                <th>Subject</th>
+                <th>Parsed Lot</th>
+                <th>Parsed Subdivision</th>
+                <th>Location</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${shown.length ? shown.map(r => `
+                <tr>
+                  <td>${escapeHTML(r.Date)}</td>
+                  <td>${escapeHTML(r.Calendar)}</td>
+                  <td>${escapeHTML(r.Subject)}</td>
+                  <td>${escapeHTML(r.Lot)}</td>
+                  <td>${escapeHTML(r.SubdivisionShort)}</td>
+                  <td>${escapeHTML(r.Location)}</td>
+                  <td><span class="reasonText">${escapeHTML(r.UnknownReason || 'Unknown builder/subdivision')}</span></td>
+                </tr>
+              `).join('') : '<tr><td colspan="7">No unknown rows</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function exportUnknownReportCSV() {
+      if (!reportSummary?.unknownRows?.length) {
+        showToast('No unknown rows to export.');
+        return;
+      }
+
+      const headers = ['Date','Calendar','Subject','Lot','Parsed Subdivision','Location','Reason'];
+      const lines = [headers.join(',')];
+
+      reportSummary.unknownRows.forEach(row => {
+        lines.push([
+          row.Date,
+          row.Calendar,
+          row.Subject,
+          row.Lot,
+          row.SubdivisionShort,
+          row.Location,
+          row.UnknownReason || 'Unknown builder/subdivision'
+        ].map(csvEscape).join(','));
+      });
+
+      const start = byId('reportStartDate').value || 'start';
+      const end = byId('reportEndDate').value || 'end';
+      downloadBlob(lines.join('\r\n'), `calendar-report-unknowns-${start}-to-${end}.csv`, 'text/csv;charset=utf-8;');
+      showToast(`Exported ${reportSummary.unknownRows.length} unknown rows.`);
+    }
+
     function renderReport() {
       const out = byId('reportOutput');
       if (!reportSummary) {
@@ -2563,6 +2741,13 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           ${dataNotice}
         </div>
 
+        <div class="matchGrid">
+          <div class="reportBox"><div class="big">${reportSummary.matchRate}%</div><div class="label">Match Rate</div></div>
+          <div class="reportBox"><div class="big">${reportSummary.matched}</div><div class="label">Matched</div></div>
+          <div class="reportBox"><div class="big">${reportSummary.unknown}</div><div class="label">Unknown</div></div>
+          <div class="reportBox"><div class="big">${shortcutRows.length}</div><div class="label">Shortcuts Loaded</div></div>
+        </div>
+
         <div class="reportGrid">
           <div class="reportBox"><div class="big">${reportSummary.total}</div><div class="label">Total Jobs</div></div>
           <div class="reportBox"><div class="big">${reportSummary.originals}</div><div class="label">Originals</div></div>
@@ -2574,6 +2759,11 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           <div class="reportBox"><div class="big">${reportSummary.pm}</div><div class="label">PM Jobs</div></div>
         </div>
 
+        <div class="reportActionRow">
+          <button class="secondary" onclick="exportUnknownReportCSV()">Export Unknown Fix List</button>
+          <button class="secondary" onclick="exportReportExcel()">Export Full Report Excel</button>
+        </div>
+
         <div class="reportTables">
           ${renderMiniTable('Jobs by Day', reportSummary.byDay)}
           ${renderMiniTable('Jobs by Builder', reportSummary.byBuilder)}
@@ -2581,6 +2771,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           ${renderMiniTable('Jobs by City', reportSummary.byCity)}
           ${renderMiniTable('Dry Cleans by Subdivision', reportSummary.dryBySubdivision)}
           ${renderMiniTable('Floors Only by Subdivision', reportSummary.floorsBySubdivision)}
+          ${renderMiniTable('Unknown Reasons', reportSummary.unknownReasons)}
+          ${renderUnknownDetails(reportSummary.unknownRows)}
         </div>
       `;
 
@@ -2682,6 +2874,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.byCity), 'By City');
       XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.dryBySubdivision), 'Dry Cleans');
       XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.floorsBySubdivision), 'Floors Only');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.unknownRows), 'Unknown Matches');
+      XLSX.utils.book_append_sheet(wb, sheetFromObjects(reportSummary.unknownReasons), 'Unknown Reasons');
 
       const start = byId('reportStartDate').value || 'start';
       const end = byId('reportEndDate').value || 'end';
