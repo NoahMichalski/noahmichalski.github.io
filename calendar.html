@@ -69,46 +69,7 @@
       font-size: 13px;
     }
 
-
-    .googleTopBar {
-      display: grid;
-      grid-template-columns: auto minmax(220px, 360px) auto auto auto auto auto;
-      gap: 10px;
-      align-items: center;
-      padding: 0 0 14px;
-    }
-
-    .googleTopBar .miniLabel {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      white-space: nowrap;
-    }
-
-    .googleTopBar select {
-      height: 42px;
-      padding: 8px 11px;
-    }
-
-    .googleTopBar button {
-      height: 42px;
-      padding: 9px 14px;
-      white-space: nowrap;
-    }
-
-    @media (max-width: 980px) {
-      .googleTopBar {
-        grid-template-columns: 1fr 1fr;
-      }
-      .googleTopBar .miniLabel,
-      .googleTopBar select {
-        grid-column: 1 / -1;
-      }
-    }
-
-    main { padding: 16px 0 44px; }
+    main { padding: 22px 0 44px; }
 
     .grid {
       display: grid;
@@ -176,7 +137,8 @@
     .editInput.subjectEdit { min-width: 0; }
     .editInput.locationEdit { min-width: 0; }
     .editInput.timeEdit { min-width: 0; }
-    .tableWrap th:nth-child(1), .tableWrap td:nth-child(1) { width: 40px; }
+    .tableWrap th:nth-child(1), .tableWrap td:nth-child(1) { width: 76px; }
+    .tableWrap th:nth-child(2), .tableWrap td:nth-child(2) { width: 40px; }
     .tableWrap th:nth-child(2), .tableWrap td:nth-child(2) { width: 58px; }
     .tableWrap th:nth-child(3), .tableWrap td:nth-child(3) { width: 82px; }
     .tableWrap th:nth-child(4), .tableWrap td:nth-child(4),
@@ -306,7 +268,7 @@
       overflow: auto;
       border: 1px solid var(--border);
       border-radius: 16px;
-      max-height: calc(100vh - 230px);
+      max-height: calc(100vh - 245px);
     }
 
     table { width: 100%; border-collapse: collapse; min-width: 0; table-layout: fixed; font-size: 12px; }
@@ -350,6 +312,162 @@
     .tag.windows { background: rgba(14,165,233,.14); color: #bae6fd; border: 1px solid rgba(14,165,233,.34); }
     .tag.am { background: rgba(251,191,36,.14); color: #fde68a; border: 1px solid rgba(251,191,36,.35); }
     .tag.pm { background: rgba(168,85,247,.14); color: #e9d5ff; border: 1px solid rgba(168,85,247,.35); }
+    .tag.dupe { background: rgba(251,191,36,.14); color: #fde68a; border: 1px solid rgba(251,191,36,.35); }
+
+    .dateBanner {
+      margin: 0 0 14px;
+      padding: 12px 13px;
+      border-radius: 16px;
+      border: 1px solid rgba(251,191,36,.35);
+      background: rgba(251,191,36,.10);
+      color: #fde68a;
+      font-weight: 850;
+    }
+
+    .dateBanner.good {
+      border-color: rgba(34,197,94,.35);
+      background: rgba(34,197,94,.10);
+      color: #bbf7d0;
+    }
+
+    .dateBanner.danger {
+      border-color: rgba(251,113,133,.42);
+      background: rgba(251,113,133,.12);
+      color: #fecdd3;
+    }
+
+    .quickBtns {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: -4px 0 14px;
+    }
+
+    .quickBtns button {
+      padding: 9px 8px;
+      font-size: 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .rowActions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .smallBtn {
+      padding: 7px 8px;
+      font-size: 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .smallBtn.danger {
+      background: rgba(251,113,133,.14);
+      color: #fecdd3;
+      border: 1px solid rgba(251,113,133,.35);
+    }
+
+    .typeSelect {
+      min-width: 100px;
+      padding: 7px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    tr.duplicateRow td {
+      background: rgba(251,191,36,.08) !important;
+    }
+
+    .modalBackdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,.72);
+      backdrop-filter: blur(8px);
+      z-index: 120;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modalBackdrop.show { display: flex; }
+
+    .modal {
+      width: min(720px, 100%);
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .modalHead {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .modalHead h3 { margin: 0; font-size: 18px; }
+
+    .modalBody {
+      padding: 18px;
+      color: var(--text);
+      line-height: 1.5;
+      max-height: 65vh;
+      overflow: auto;
+    }
+
+    .modalGrid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .modalStat {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.035);
+      border-radius: 14px;
+      padding: 10px;
+    }
+
+    .modalWarn {
+      border: 1px solid rgba(251,191,36,.35);
+      background: rgba(251,191,36,.10);
+      color: #fde68a;
+      border-radius: 14px;
+      padding: 11px;
+      margin: 10px 0;
+    }
+
+    .modalDanger {
+      border: 1px solid rgba(251,113,133,.42);
+      background: rgba(251,113,133,.12);
+      color: #fecdd3;
+      border-radius: 14px;
+      padding: 11px;
+      margin: 10px 0;
+    }
+
+    .modalFoot {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
     .tag.miss { background: rgba(251,113,133,.12); color: #fecdd3; border: 1px solid rgba(251,113,133,.30); }
 
     .empty { color: var(--muted); text-align: center; padding: 44px 20px; }
@@ -422,21 +540,9 @@
     <div class="wrap topbar">
       <div>
         <h1>Google Calendar Cleaning CSV Parser</h1>
-        <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export or direct-import to Google Calendar.</div>
+        <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.63</div>
-    </div>
-
-    <div class="wrap googleTopBar">
-      <span class="miniLabel">Google Calendar</span>
-      <select id="calendarSelect">
-        <option value="">Sign in to load calendars...</option>
-      </select>
-      <button onclick="googleSignIn()">Sign In</button>
-      <button class="blue" onclick="importToGoogleCalendar()">Import Preview</button>
-      <button class="secondary" onclick="loadGoogleCalendars()">Reload</button>
-      <button class="secondary" onclick="googleSignOut()">Sign Out</button>
-      <span class="pill" id="googleStatusPill">Not signed in</span>
+      <div class="version">v1.80</div>
     </div>
   </header>
 
@@ -501,7 +607,7 @@
 
             <div class="btns">
               <button onclick="parseAndRender()">Parse / Preview</button>
-              <button class="blue" onclick="downloadCSV()">Export CSV</button>
+              <button class="blue" onclick="downloadCSV()">Export All CSV</button>
               <button class="secondary" onclick="copyCSV()">Copy CSV</button>
               <button class="danger" onclick="clearAll()">Clear Text</button>
             </div>
@@ -562,7 +668,50 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           </div>
         </div>
 
+        <div class="card">
+          <div class="cardHead">
+            <h2>Google Calendar Direct Import</h2>
+            <span class="pill" id="googleStatusPill">Not signed in</span>
+          </div>
+          <div class="cardBody">
+            <p class="help">
+              Google OAuth Client ID is built into this file. Coworkers should only need to click Sign In.
+              CSV export stays as the backup option.
+            </p>
 
+            <div class="btns">
+              <button onclick="googleSignIn()">Sign In</button>
+              <button class="secondary" onclick="googleSignOut()">Sign Out</button>
+            </div>
+
+            <div style="height:14px"></div>
+
+            <label for="generalCalendarSelect">General Calendar</label>
+            <select id="generalCalendarSelect" onchange="saveSelectedCalendars()">
+              <option value="">Sign in to load calendars...</option>
+            </select>
+            <p class="help">Originals and Recleans import here.</p>
+
+            <div style="height:12px"></div>
+
+            <label for="windowsCalendarSelect">Windows Calendar</label>
+            <select id="windowsCalendarSelect" onchange="saveSelectedCalendars()">
+              <option value="">Sign in to load calendars...</option>
+            </select>
+            <p class="help">Windows import here, while keeping the same preview times.</p>
+
+            <div class="btns">
+              <button class="blue" onclick="importToGoogleCalendar('all')">Import All</button>
+              <button class="secondary" onclick="importToGoogleCalendar('general')">Import General Only</button>
+              <button class="secondary" onclick="importToGoogleCalendar('windows')">Import Windows Only</button>
+              <button class="secondary" onclick="loadGoogleCalendars()">Reload Calendars</button>
+              <button class="secondary" onclick="downloadGeneralCSV()">Export General CSV</button>
+              <button class="secondary" onclick="downloadWindowsCSV()">Export Windows CSV</button>
+            </div>
+
+            <p class="help">Google import uses the editable preview rows. Calendar choices save locally. CSV export still works as backup.</p>
+          </div>
+        </div>
 
       </section>
 
@@ -601,6 +750,10 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
               <div class="num" id="missingJobs">0</div>
               <div class="txt">Missing</div>
             </div>
+            <div class="stat">
+              <div class="num" id="duplicateJobs">0</div>
+              <div class="txt">Duplicates</div>
+            </div>
           </div>
 
           <div class="tableWrap" id="tableWrap">
@@ -611,6 +764,21 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     </div>
   </main>
 
+
+  <div class="modalBackdrop" id="confirmModal">
+    <div class="modal">
+      <div class="modalHead">
+        <h3>Confirm Google Calendar Import</h3>
+        <span class="pill" id="confirmScopePill">Preview</span>
+      </div>
+      <div class="modalBody" id="confirmBody"></div>
+      <div class="modalFoot">
+        <button class="secondary" onclick="closeConfirmModal()">Cancel</button>
+        <button class="blue" id="confirmImportBtn" onclick="runConfirmedImport()">Yes, Import These Events</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
@@ -618,7 +786,9 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       shortcuts: 'gcal_cleaning_shortcuts_v130',
       lots: 'gcal_cleaning_lots_v130',
       updated: 'gcal_cleaning_updated_v130',
-      googleClientId: 'gcal_cleaning_google_client_id_v160'
+      googleClientId: 'gcal_cleaning_google_client_id_v160',
+      generalCalendarId: 'gcal_cleaning_general_calendar_id_v170',
+      windowsCalendarId: 'gcal_cleaning_windows_calendar_id_v170'
     };
 
     const GOOGLE_CLIENT_ID = '399565751863-oqbm7bq7trdl2m6lnkng10vvitl55mpc.apps.googleusercontent.com';
@@ -629,6 +799,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     let googleTokenClient = null;
     let googleAccessToken = null;
     let googleGapiReady = false;
+    let pendingImportScope = 'all';
 
     const byId = id => document.getElementById(id);
 
@@ -638,7 +809,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     }
 
-    byId('eventDate').value = todayISO();
+    byId('eventDate').value = '';
 
     ['eventDate','startTime','jobsPerHour','duration','originalText','recleanText','windowsText','appendFloorplan'].forEach(id => {
       byId(id).addEventListener('input', parseAndRender);
@@ -688,6 +859,160 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         .replace(/\b(original|reclean|windows?|window|p\/w|power\s*wash|pressure\s*wash)\b/ig, '')
         .replace(/\s+/g, ' ')
         .trim();
+    }
+
+
+    function formatLongDate(isoDate) {
+      if (!isoDate) return 'No date selected';
+      const [y, m, d] = isoDate.split('-').map(Number);
+      const date = new Date(y, m - 1, d);
+      return date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    function selectedDateValue() {
+      return byId('eventDate').value || '';
+    }
+
+    function selectedDateOrPreviewDate() {
+      return selectedDateValue() || todayISO();
+    }
+
+    function dateStatus() {
+      const selected = selectedDateValue();
+      if (!selected) return { level: 'missing', message: 'No calendar date selected. Preview works, but export/import is blocked until you pick a date.' };
+
+      const today = todayISO();
+      const long = formatLongDate(selected);
+      if (selected < today) return { level: 'past', message: `Selected date: ${long} — WARNING: this date is in the past.` };
+      if (selected === today) return { level: 'today', message: `Selected date: ${long} — WARNING: this is today.` };
+      return { level: 'future', message: `Selected date: ${long}` };
+    }
+
+    function updateDateBanner() {
+      const banner = byId('dateBanner');
+      if (!banner) return;
+      const status = dateStatus();
+      banner.textContent = status.message;
+      banner.className = 'dateBanner' + (status.level === 'future' ? ' good' : '') + ((status.level === 'today' || status.level === 'past') ? ' danger' : '');
+    }
+
+    function requireSelectedDate(actionName = 'continue') {
+      updateDateBanner();
+      if (!selectedDateValue()) {
+        showToast(`Pick a calendar date before you ${actionName}.`);
+        byId('eventDate').focus();
+        return false;
+      }
+      return true;
+    }
+
+    function setDateQuick(which) {
+      const d = new Date();
+      if (which === 'clear') {
+        byId('eventDate').value = '';
+        updateDateBanner();
+        parseAndRender();
+        return;
+      }
+      if (which === 'tomorrow') d.setDate(d.getDate() + 1);
+      if (which === 'nextBusiness') {
+        d.setDate(d.getDate() + 1);
+        while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+      }
+      const pad = n => String(n).padStart(2, '0');
+      byId('eventDate').value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      updateDateBanner();
+      parseAndRender();
+    }
+
+    function duplicateKey(row) {
+      if (!row || !row.lot) return '';
+      const sub = row.shortcutSubdivision || row.typedSub || '';
+      return `${normalizeKey(row.lot)}|${normalizeKey(sub)}|${row.type}`;
+    }
+
+    function markDuplicates(rows) {
+      const counts = new Map();
+      rows.forEach(row => {
+        const key = duplicateKey(row);
+        if (!key) return;
+        counts.set(key, (counts.get(key) || 0) + 1);
+      });
+      rows.forEach(row => {
+        const key = duplicateKey(row);
+        row.duplicate = Boolean(key && counts.get(key) > 1);
+      });
+      return rows;
+    }
+
+    function getDuplicateRows(rows = parsedRows) {
+      return rows.filter(row => row.duplicate);
+    }
+
+    function addManualRow() {
+      if (!parsedRows.length) parseAndRender();
+      const date = selectedDateOrPreviewDate();
+      const start = byId('startTime').value || '01:00';
+      const end = addMinutes(start, Number(byId('duration').value) || 60);
+      parsedRows.push({
+        type: 'reclean',
+        typeLabel: 'Reclean',
+        isAM: false,
+        isPM: false,
+        lot: '',
+        typedSub: '',
+        shortcutSubdivision: '',
+        shortcutBuilder: '',
+        baseJob: '',
+        note: '',
+        subject: 'Manual Job Reclean',
+        originalLine: 'Manual Job',
+        sourceSectionIndex: 99,
+        address: '',
+        floorplan: '',
+        matched: false,
+        matchStatus: 'Manual',
+        rowNum: parsedRows.length + 1,
+        hourBlock: '',
+        date,
+        start,
+        end,
+        googleDate: toGoogleDate(date),
+        googleStart: toGoogleTime(start),
+        googleEnd: toGoogleTime(end),
+        locationOverride: ''
+      });
+      markDuplicates(parsedRows);
+      parsePreviewFromRows();
+      showToast('Added manual row. Edit it in the preview.');
+    }
+
+    function deleteParsedRow(index) {
+      collectPreviewEdits();
+      parsedRows.splice(index, 1);
+      parsedRows.forEach((row, idx) => row.rowNum = idx + 1);
+      markDuplicates(parsedRows);
+      parsePreviewFromRows();
+    }
+
+    function updateRowType(index, newType) {
+      const row = parsedRows[index];
+      if (!row) return;
+      row.type = newType;
+      row.typeLabel = newType === 'original' ? 'Original' : newType === 'reclean' ? 'Reclean' : 'Windows';
+
+      const cleaned = row.subject
+        .replace(/\s+(Original|Reclean)$/i, '')
+        .replace(/\s+(Original|Reclean)\s+(\()/i, ' $2')
+        .trim();
+
+      const note = row.note ? ` ${row.note}` : '';
+      const prefix = row.isAM ? '*AM* ' : row.isPM ? '*PM* ' : '';
+      const base = cleaned.replace(/^\*AM\*\s*/i, '').replace(/^\*PM\*\s*/i, '').replace(/\s+\([^)]*\)\s*$/,'').trim();
+
+      row.subject = `${prefix}${base}${newType === 'windows' ? '' : ' ' + row.typeLabel}${note}`.replace(/\s+/g, ' ').trim();
+      markDuplicates(parsedRows);
+      parsePreviewFromRows();
     }
 
     function parseJobLine(line, type, sourceSectionIndex) {
@@ -792,7 +1117,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const recleanRows = parseSection(byId('recleanText').value, 'reclean', 1);
       const windowsRows = parseSection(byId('windowsText').value, 'windows', 2);
 
-      const date = byId('eventDate').value || todayISO();
+      const date = selectedDateOrPreviewDate();
       const startTime = byId('startTime').value || '01:00';
       const jobsPerHour = Math.max(1, Number(byId('jobsPerHour').value) || 3);
       const duration = Math.max(1, Number(byId('duration').value) || 60);
@@ -871,7 +1196,10 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     }
 
     function parseAndRender() {
-      parsedRows = buildRows();
+      parsedRows = markDuplicates(buildRows());
+      parsePreviewFromRows();
+      return;
+      updateDateBanner();
 
       const originalCount = parsedRows.filter(r => r.type === 'original').length;
       const recleanCount = parsedRows.filter(r => r.type === 'reclean').length;
@@ -880,6 +1208,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const pmCount = parsedRows.filter(r => r.isPM).length;
       const matchedCount = parsedRows.filter(r => r.matched).length;
       const missingCount = parsedRows.length - matchedCount;
+      const duplicateCount = parsedRows.filter(r => r.duplicate).length;
       const jobsPerHour = Math.max(1, Number(byId('jobsPerHour').value) || 3);
       const originalBlocks = originalCount ? Math.ceil(originalCount / jobsPerHour) : 0;
       const recleanBlocks = recleanCount ? Math.ceil(recleanCount / jobsPerHour) : 0;
@@ -898,6 +1227,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       byId('hourBlocks').textContent = blocks;
       byId('matchedJobs').textContent = matchedCount;
       byId('missingJobs').textContent = missingCount;
+      byId('duplicateJobs').textContent = duplicateCount;
 
       if (!parsedRows.length) {
         byId('rangePill').textContent = 'No export yet';
@@ -907,12 +1237,13 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
       const first = parsedRows[0];
       const last = parsedRows[parsedRows.length - 1];
-      byId('rangePill').textContent = `${first.googleDate} • ${first.googleStart} - ${last.googleEnd} • ${amCount} AM • ${pmCount} PM`;
+      byId('rangePill').textContent = `${selectedDateValue() ? formatLongDate(selectedDateValue()) : 'No date selected'} • ${first.googleStart} - ${last.googleEnd} • ${amCount} AM • ${pmCount} PM${duplicateCount ? ' • Duplicates: ' + duplicateCount : ''}`;
 
       byId('tableWrap').innerHTML = `
         <table>
           <thead>
             <tr>
+              <th>Actions</th>
               <th>#</th>
               <th>Hour Block</th>
               <th>Type</th>
@@ -929,12 +1260,17 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           </thead>
           <tbody>
             ${parsedRows.map((row, idx) => `
-              <tr>
+              <tr class="${row.duplicate ? 'duplicateRow' : ''}">
+                <td><div class="rowActions"><button class="smallBtn danger" onclick="deleteParsedRow(${idx})">Delete</button></div></td>
                 <td>${escapeHTML(row.rowNum)}</td>
                 <td>${escapeHTML(row.hourBlock)}</td>
                 <td>
-                  <span class="tag ${row.type}">${escapeHTML(row.typeLabel)}</span>
-                  ${row.isAM ? '<span class="tag am">AM</span>' : ''}${row.isPM ? '<span class="tag pm">PM</span>' : ''}
+                  <select class="typeSelect" onchange="updateRowType(${idx}, this.value)">
+                    <option value="original" ${row.type === 'original' ? 'selected' : ''}>Original</option>
+                    <option value="reclean" ${row.type === 'reclean' ? 'selected' : ''}>Reclean</option>
+                    <option value="windows" ${row.type === 'windows' ? 'selected' : ''}>Windows</option>
+                  </select>
+                  ${row.isAM ? '<span class="tag am">AM</span>' : ''}${row.isPM ? '<span class="tag pm">PM</span>' : ''}${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : ''}
                 </td>
                 <td><input class="editInput timeEdit" data-edit-row="${idx}" data-edit-field="start" value="${escapeHTML(row.start)}" oninput="updateParsedRow(${idx}, 'start', this.value)" /></td>
                 <td><input class="editInput timeEdit" data-edit-row="${idx}" data-edit-field="end" value="${escapeHTML(row.end)}" oninput="updateParsedRow(${idx}, 'end', this.value)" /></td>
@@ -944,6 +1280,90 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
                 <td>${escapeHTML(row.floorplan || '')}</td>
                 <td><input class="editInput locationEdit" data-edit-row="${idx}" data-edit-field="locationOverride" value="${escapeHTML(getRowLocation(row))}" oninput="updateParsedRow(${idx}, 'locationOverride', this.value)" /></td>
                 <td>${row.matched ? '<span class="tag original">Matched</span>' : '<span class="tag miss">' + escapeHTML(row.matchStatus) + '</span>'}</td>
+                <td>${escapeHTML(row.originalLine)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+
+    function parsePreviewFromRows() {
+      parsedRows = markDuplicates(parsedRows);
+      updateDateBanner();
+
+      const originalCount = parsedRows.filter(r => r.type === 'original').length;
+      const recleanCount = parsedRows.filter(r => r.type === 'reclean').length;
+      const windowsCount = parsedRows.filter(r => r.type === 'windows').length;
+      const amCount = parsedRows.filter(r => r.isAM).length;
+      const pmCount = parsedRows.filter(r => r.isPM).length;
+      const matchedCount = parsedRows.filter(r => r.matched).length;
+      const missingCount = parsedRows.length - matchedCount;
+      const duplicateCount = parsedRows.filter(r => r.duplicate).length;
+
+      byId('originalCount').textContent = `${originalCount} job${originalCount === 1 ? '' : 's'}`;
+      byId('recleanCount').textContent = `${recleanCount} job${recleanCount === 1 ? '' : 's'}`;
+      byId('windowsCount').textContent = `${windowsCount} job${windowsCount === 1 ? '' : 's'}`;
+      byId('totalJobs').textContent = parsedRows.length;
+      byId('originalJobs').textContent = originalCount;
+      byId('recleanJobs').textContent = recleanCount;
+      byId('windowsJobs').textContent = windowsCount;
+      byId('matchedJobs').textContent = matchedCount;
+      byId('missingJobs').textContent = missingCount;
+      byId('duplicateJobs').textContent = duplicateCount;
+
+      if (!parsedRows.length) {
+        byId('rangePill').textContent = 'No export yet';
+        byId('tableWrap').innerHTML = '<div class="empty">Paste jobs, pick a date, then hit Parse / Preview.</div>';
+        return;
+      }
+
+      const first = parsedRows[0];
+      const last = parsedRows[parsedRows.length - 1];
+      byId('rangePill').textContent = `${selectedDateValue() ? formatLongDate(selectedDateValue()) : 'No date selected'} • ${first.googleStart} - ${last.googleEnd} • ${amCount} AM • ${pmCount} PM${duplicateCount ? ' • Duplicates: ' + duplicateCount : ''}`;
+
+      byId('tableWrap').innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Actions</th>
+              <th>#</th>
+              <th>Hour Block</th>
+              <th>Type</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Google Calendar Subject</th>
+              <th>Typed Sub</th>
+              <th>Resolved Subdivision</th>
+              <th>Floorplan</th>
+              <th>Location / Address</th>
+              <th>Status</th>
+              <th>Original Line</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${parsedRows.map((row, idx) => `
+              <tr class="${row.duplicate ? 'duplicateRow' : ''}">
+                <td><div class="rowActions"><button class="smallBtn danger" onclick="deleteParsedRow(${idx})">Delete</button></div></td>
+                <td>${escapeHTML(row.rowNum)}</td>
+                <td>${escapeHTML(row.hourBlock)}</td>
+                <td>
+                  <select class="typeSelect" onchange="updateRowType(${idx}, this.value)">
+                    <option value="original" ${row.type === 'original' ? 'selected' : ''}>Original</option>
+                    <option value="reclean" ${row.type === 'reclean' ? 'selected' : ''}>Reclean</option>
+                    <option value="windows" ${row.type === 'windows' ? 'selected' : ''}>Windows</option>
+                  </select>
+                  ${row.isAM ? '<span class="tag am">AM</span>' : ''}${row.isPM ? '<span class="tag pm">PM</span>' : ''}${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : ''}
+                </td>
+                <td><input class="editInput timeEdit" data-edit-row="${idx}" data-edit-field="start" value="${escapeHTML(row.start)}" oninput="updateParsedRow(${idx}, 'start', this.value)" /></td>
+                <td><input class="editInput timeEdit" data-edit-row="${idx}" data-edit-field="end" value="${escapeHTML(row.end)}" oninput="updateParsedRow(${idx}, 'end', this.value)" /></td>
+                <td><input class="editInput subjectEdit" data-edit-row="${idx}" data-edit-field="subject" value="${escapeHTML(row.subject)}" oninput="updateParsedRow(${idx}, 'subject', this.value)" /></td>
+                <td>${escapeHTML(row.typedSub || '')}</td>
+                <td>${escapeHTML(row.shortcutSubdivision || '')}</td>
+                <td>${escapeHTML(row.floorplan || '')}</td>
+                <td><input class="editInput locationEdit" data-edit-row="${idx}" data-edit-field="locationOverride" value="${escapeHTML(getRowLocation(row))}" oninput="updateParsedRow(${idx}, 'locationOverride', this.value)" /></td>
+                <td>${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : (row.matched ? '<span class="tag original">Matched</span>' : '<span class="tag miss">' + escapeHTML(row.matchStatus) + '</span>')}</td>
                 <td>${escapeHTML(row.originalLine)}</td>
               </tr>
             `).join('')}
@@ -1007,7 +1427,69 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       return lines.join('\r\n');
     }
 
+
+    function buildFilteredCSV(filterFn) {
+      if (!parsedRows.length) parsedRows = buildRows();
+      collectPreviewEdits();
+
+      const headers = [
+        'Subject',
+        'Start Date',
+        'Start Time',
+        'End Date',
+        'End Time',
+        'All Day Event',
+        'Location',
+        'Private'
+      ];
+
+      const rows = parsedRows.filter(filterFn);
+      const lines = [headers.join(',')];
+
+      rows.forEach(row => {
+        lines.push([
+          row.subject,
+          row.googleDate,
+          row.googleStart,
+          row.googleDate,
+          row.googleEnd,
+          'False',
+          getRowLocation(row),
+          'False'
+        ].map(csvEscape).join(','));
+      });
+
+      return { csv: lines.join('\r\n'), count: rows.length };
+    }
+
+    function downloadGeneralCSV() {
+      if (!requireSelectedDate('export General CSV')) return;
+      if (!parsedRows.length) parseAndRender();
+      const result = buildFilteredCSV(row => row.type === 'original' || row.type === 'reclean');
+      if (!result.count) {
+        showToast('No Original/Reclean rows for General CSV.');
+        return;
+      }
+      const date = selectedDateOrPreviewDate();
+      downloadBlob(result.csv, `google-calendar-general-${date}.csv`, 'text/csv;charset=utf-8;');
+      showToast(`Exported ${result.count} General calendar rows.`);
+    }
+
+    function downloadWindowsCSV() {
+      if (!requireSelectedDate('export Windows CSV')) return;
+      if (!parsedRows.length) parseAndRender();
+      const result = buildFilteredCSV(row => row.type === 'windows');
+      if (!result.count) {
+        showToast('No Windows rows for Windows CSV.');
+        return;
+      }
+      const date = selectedDateOrPreviewDate();
+      downloadBlob(result.csv, `google-calendar-windows-${date}.csv`, 'text/csv;charset=utf-8;');
+      showToast(`Exported ${result.count} Windows calendar rows.`);
+    }
+
     function downloadCSV() {
+      if (!requireSelectedDate('export CSV')) return;
       if (!parsedRows.length) parseAndRender();
       collectPreviewEdits();
       if (!parsedRows.length) {
@@ -1015,11 +1497,12 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         return;
       }
       const csv = buildCSV();
-      downloadBlob(csv, `google-calendar-cleaning-${byId('eventDate').value || todayISO()}.csv`, 'text/csv;charset=utf-8;');
+      downloadBlob(csv, `google-calendar-all-${selectedDateValue() || todayISO()}.csv`, 'text/csv;charset=utf-8;');
       showToast(`Exported ${parsedRows.length} calendar rows.`);
     }
 
     async function copyCSV() {
+      if (!requireSelectedDate('copy CSV')) return;
       if (!parsedRows.length) parseAndRender();
       collectPreviewEdits();
       if (!parsedRows.length) {
@@ -1252,9 +1735,32 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       googleAccessToken = null;
       if (window.gapi?.client) gapi.client.setToken(null);
       setGoogleStatus('Signed out');
-      const select = byId('calendarSelect');
-      if (select) select.innerHTML = '<option value="">Sign in to load calendars...</option>';
+      const general = byId('generalCalendarSelect');
+      const windows = byId('windowsCalendarSelect');
+      if (general) general.innerHTML = '<option value="">Sign in to load calendars...</option>';
+      if (windows) windows.innerHTML = '<option value="">Sign in to load calendars...</option>';
       showToast('Signed out of Google for this page.');
+    }
+
+
+    function saveSelectedCalendars() {
+      const general = byId('generalCalendarSelect')?.value || '';
+      const windows = byId('windowsCalendarSelect')?.value || '';
+      if (general) localStorage.setItem(STORAGE_KEYS.generalCalendarId, general);
+      if (windows) localStorage.setItem(STORAGE_KEYS.windowsCalendarId, windows);
+    }
+
+    function fillCalendarSelect(selectId, calendars, savedId) {
+      const select = byId(selectId);
+      if (!select) return;
+
+      select.innerHTML = calendars.length
+        ? calendars.map(cal => `<option value="${escapeHTML(cal.id)}">${escapeHTML(cal.summary || cal.id)}</option>`).join('')
+        : '<option value="">No writable calendars found</option>';
+
+      if (savedId && calendars.some(cal => cal.id === savedId)) {
+        select.value = savedId;
+      }
     }
 
     async function loadGoogleCalendars() {
@@ -1283,10 +1789,13 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         }
 
         const calendars = data.items || [];
-        const select = byId('calendarSelect');
-        select.innerHTML = calendars.length
-          ? calendars.map(cal => `<option value="${escapeHTML(cal.id)}">${escapeHTML(cal.summary || cal.id)}</option>`).join('')
-          : '<option value="">No writable calendars found</option>';
+        const savedGeneral = localStorage.getItem(STORAGE_KEYS.generalCalendarId) || '';
+        const savedWindows = localStorage.getItem(STORAGE_KEYS.windowsCalendarId) || '';
+
+        fillCalendarSelect('generalCalendarSelect', calendars, savedGeneral);
+        fillCalendarSelect('windowsCalendarSelect', calendars, savedWindows);
+
+        saveSelectedCalendars();
 
         setGoogleStatus('Signed in', true);
         showToast(`Loaded ${calendars.length} writable calendars.`);
@@ -1297,15 +1806,165 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       }
     }
 
-    async function importToGoogleCalendar() {
+
+    function rowsForScope(scope) {
+      if (scope === 'general') return parsedRows.filter(row => row.type === 'original' || row.type === 'reclean');
+      if (scope === 'windows') return parsedRows.filter(row => row.type === 'windows');
+      return parsedRows;
+    }
+
+    function importSummary(scope) {
+      const rows = rowsForScope(scope);
+      const originals = rows.filter(r => r.type === 'original').length;
+      const recleans = rows.filter(r => r.type === 'reclean').length;
+      const windows = rows.filter(r => r.type === 'windows').length;
+      const duplicates = rows.filter(r => r.duplicate).length;
+      const first = rows[0];
+      const last = rows[rows.length - 1];
+      return { rows, originals, recleans, windows, duplicates, first, last };
+    }
+
+    function openConfirmModal(scope) {
+      const summary = importSummary(scope);
+      if (!summary.rows.length) {
+        showToast(`No ${scope === 'general' ? 'General' : scope === 'windows' ? 'Windows' : ''} rows to import.`);
+        return;
+      }
+
+      const status = dateStatus();
+      const risky = status.level === 'today' || status.level === 'past';
+      const body = byId('confirmBody');
+      byId('confirmScopePill').textContent = scope === 'general' ? 'General only' : scope === 'windows' ? 'Windows only' : 'All calendars';
+
+      const duplicateList = summary.rows
+        .filter(r => r.duplicate)
+        .slice(0, 8)
+        .map(r => `<li>${escapeHTML(r.subject)}</li>`)
+        .join('');
+
+      body.innerHTML = `
+        ${risky ? `<div class="${status.level === 'past' ? 'modalDanger' : 'modalWarn'}">${escapeHTML(status.message)}</div>` : ''}
+        <div class="modalGrid">
+          <div class="modalStat"><b>Date</b><br>${escapeHTML(formatLongDate(selectedDateValue()))}</div>
+          <div class="modalStat"><b>Time range</b><br>${escapeHTML(summary.first?.googleStart || '')} - ${escapeHTML(summary.last?.googleEnd || '')}</div>
+          <div class="modalStat"><b>General</b><br>Originals: ${summary.originals}<br>Recleans: ${summary.recleans}</div>
+          <div class="modalStat"><b>Windows</b><br>Windows: ${summary.windows}</div>
+        </div>
+        <div class="modalStat"><b>Total events:</b> ${summary.rows.length}</div>
+        ${summary.duplicates ? `<div class="modalWarn"><b>Duplicate warning:</b> ${summary.duplicates} duplicate row(s) found inside this schedule. This is warn-only, so you can still import.<ul>${duplicateList}</ul>${summary.duplicates > 8 ? '<div>...and more</div>' : ''}</div>` : ''}
+        <p class="help">This will create events on the selected Google Calendar(s). CSV export is still available as backup.</p>
+      `;
+
+      byId('confirmModal').classList.add('show');
+    }
+
+    function closeConfirmModal() {
+      byId('confirmModal').classList.remove('show');
+    }
+
+    async function runConfirmedImport() {
+      closeConfirmModal();
+      await executeGoogleImport(pendingImportScope || 'all');
+    }
+
+    async function executeGoogleImport(scope = 'all') {
       try {
+        if (!requireSelectedDate('import to Google Calendar')) return;
+        collectPreviewEdits();
+        markDuplicates(parsedRows);
+
+        const rowsToImport = rowsForScope(scope);
+        if (!rowsToImport.length) {
+          showToast('No rows to import for that option.');
+          return;
+        }
+
+        await ensureGoogleReady();
+        if (!googleAccessToken && !gapi.client.getToken()) {
+          googleTokenClient.requestAccessToken({ prompt: 'consent' });
+          showToast('Sign in first, then hit Import again.');
+          return;
+        }
+
+        saveSelectedCalendars();
+
+        const generalCalendarId = byId('generalCalendarSelect')?.value || '';
+        const windowsCalendarId = byId('windowsCalendarSelect')?.value || '';
+
+        const hasGeneralRows = rowsToImport.some(row => row.type === 'original' || row.type === 'reclean');
+        const hasWindowsRows = rowsToImport.some(row => row.type === 'windows');
+
+        if (hasGeneralRows && !generalCalendarId) {
+          showToast('Pick a General calendar for Originals/Recleans.');
+          return;
+        }
+
+        if (hasWindowsRows && !windowsCalendarId) {
+          showToast('Pick a Windows calendar.');
+          return;
+        }
+
+        let success = 0;
+        let failed = 0;
+
+        for (const row of rowsToImport) {
+          const calendarId = row.type === 'windows' ? windowsCalendarId : generalCalendarId;
+          const event = {
+            summary: row.subject,
+            location: getRowLocation(row),
+            start: { dateTime: isoDateTimeForGoogle(row, row.start) },
+            end: { dateTime: isoDateTimeForGoogle(row, row.end) }
+          };
+
+          try {
+            const tokenObj = googleAccessToken ? { access_token: googleAccessToken } : (window.gapi?.client?.getToken?.() || null);
+            const token = tokenObj?.access_token;
+            if (!token) throw new Error('Missing Google access token.');
+
+            const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`, {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(event)
+            });
+
+            if (!response.ok) {
+              const data = await response.json().catch(() => ({}));
+              throw new Error(data?.error?.message || `Import failed with ${response.status}`);
+            }
+
+            success++;
+          } catch (err) {
+            console.error('Import failed for row', row, err);
+            failed++;
+          }
+        }
+
+        showToast(`Google import complete: ${success} added${failed ? `, ${failed} failed` : ''}.`);
+      } catch (err) {
+        console.error(err);
+        showToast(err.message || 'Could not import to Google Calendar.');
+      }
+    }
+
+
+    async function importToGoogleCalendar(scope = 'all') {
+      try {
+        if (!requireSelectedDate('import to Google Calendar')) return;
         if (!parsedRows.length) parseAndRender();
         collectPreviewEdits();
+        markDuplicates(parsedRows);
 
         if (!parsedRows.length) {
           showToast('No preview rows to import.');
           return;
         }
+
+        pendingImportScope = scope;
+        openConfirmModal(scope);
+        return;
 
         await ensureGoogleReady();
         if (!googleAccessToken && !gapi.client.getToken()) {
@@ -1314,9 +1973,21 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           return;
         }
 
-        const calendarId = byId('calendarSelect').value;
-        if (!calendarId) {
-          showToast('Pick a calendar first.');
+        saveSelectedCalendars();
+
+        const generalCalendarId = byId('generalCalendarSelect')?.value || '';
+        const windowsCalendarId = byId('windowsCalendarSelect')?.value || '';
+
+        const hasGeneralRows = parsedRows.some(row => row.type === 'original' || row.type === 'reclean');
+        const hasWindowsRows = parsedRows.some(row => row.type === 'windows');
+
+        if (hasGeneralRows && !generalCalendarId) {
+          showToast('Pick a General calendar for Originals/Recleans.');
+          return;
+        }
+
+        if (hasWindowsRows && !windowsCalendarId) {
+          showToast('Pick a Windows calendar.');
           return;
         }
 
@@ -1324,6 +1995,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         let failed = 0;
 
         for (const row of parsedRows) {
+          const calendarId = row.type === 'windows' ? windowsCalendarId : generalCalendarId;
+
           const event = {
             summary: row.subject,
             location: getRowLocation(row),
@@ -1413,6 +2086,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     }
 
     loadSavedData();
+    updateDateBanner();
     parseAndRender();
   </script>
 </body>
