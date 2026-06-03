@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Immich VM Setup & Update Guide</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background-color: #111;
+  color: #eee;
+  margin: 0;
+  padding: 0;
+}
+header {
+  background: #1f1f1f;
+  padding: 20px;
+  text-align: center;
+}
+h1 { margin: 0; }
+section {
+  padding: 20px;
+  border-bottom: 1px solid #333;
+}
+code, pre {
+  background: #222;
+  padding: 10px;
+  display: block;
+  overflow-x: auto;
+  border-radius: 6px;
+  color: #0f0;
+}
+h2 { color: #4da3ff; }
+.step { margin-bottom: 20px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Immich VM Setup & Update Guide</h1>
+  <p>Proxmox + Ubuntu + Docker Deployment</p>
+</header>
+
+<section>
+  <h2>Part 1 — Creating the Immich VM</h2>
+
+  <div class="step">
+    <h3>1. Create VM in Proxmox</h3>
+    <ul>
+      <li>Allocate 8GB+ RAM</li>
+      <li>Allocate 4 CPU cores</li>
+      <li>Set CPU type to <strong>host</strong></li>
+      <li>Create disk (1TB+ recommended)</li>
+      <li>Install Ubuntu Server</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h3>2. Install Docker</h3>
+    <pre>
+sudo apt update
+sudo apt install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu noble stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker $USER
+    </pre>
+  </div>
+
+  <div class="step">
+    <h3>3. Deploy Immich</h3>
+    <pre>
+mkdir ~/immich
+cd ~/immich
+
+git clone https://github.com/immich-app/immich.git
+cd immich/docker
+
+cp example.env .env
+
+docker compose up -d
+    </pre>
+    <p>Access Immich at: http://VM_IP:2283</p>
+  </div>
+
+  <div class="step">
+    <h3>4. Expanding Disk Later</h3>
+    <pre>
+sudo growpart /dev/sda 3
+sudo pvresize /dev/sda3
+sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+sudo resize2fs /dev/ubuntu-vg/ubuntu-lv
+    </pre>
+  </div>
+</section>
+
+<section>
+  <h2>Part 2 — Updating Immich</h2>
+
+  <div class="step">
+    <h3>1. Navigate to Immich Folder</h3>
+    <pre>
+cd ~/immich/immich/docker
+    </pre>
+  </div>
+
+  <div class="step">
+    <h3>2. Pull Latest Images</h3>
+    <pre>
+docker compose pull
+    </pre>
+  </div>
+
+  <div class="step">
+    <h3>3. Restart With Updated Containers</h3>
+    <pre>
+docker compose up -d
+    </pre>
+  </div>
+
+  <div class="step">
+    <h3>4. Optional: Clean Old Images</h3>
+    <pre>
+docker image prune -f
+    </pre>
+  </div>
+
+  <div class="step">
+    <h3>5. Verify Containers</h3>
+    <pre>
+docker ps
+    </pre>
+  </div>
+
+</section>
+
+<section>
+  <h2>Recommended Maintenance</h2>
+  <ul>
+    <li>Back up Immich database regularly</li>
+    <li>Back up library directory separately</li>
+    <li>Keep VM RAM at 8GB+</li>
+    <li>Monitor disk usage with: df -h</li>
+  </ul>
+</section>
+
+<footer style="text-align:center; padding:20px; background:#1f1f1f;">
+  <p>Generated Immich Deployment Guide</p>
+</footer>
+
+</body>
+</html>
