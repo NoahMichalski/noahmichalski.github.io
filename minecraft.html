@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minecraft Forge 1.20.1 Server Guide</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --panel-2: #1f2937;
+      --text: #e6edf3;
+      --muted: #9ca3af;
+      --border: #30363d;
+      --accent: #4ade80;
+      --accent-2: #60a5fa;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --code: #0b1220;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top, #172033 0, var(--bg) 42%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 48px 24px 28px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(74,222,128,0.12), rgba(96,165,250,0.08));
+    }
+
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 22px 48px;
+    }
+
+    h1, h2, h3 { line-height: 1.2; }
+    h1 { margin: 0 0 12px; font-size: clamp(2rem, 4vw, 3.5rem); }
+    h2 { margin-top: 42px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    h3 { margin-top: 26px; color: #dbeafe; }
+
+    .subtitle {
+      color: var(--muted);
+      max-width: 860px;
+      font-size: 1.08rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .card, .callout {
+      background: rgba(22, 27, 34, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+    }
+
+    .card strong {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .callout {
+      border-left: 4px solid var(--accent-2);
+      margin: 20px 0;
+    }
+
+    .callout.warn { border-left-color: var(--warn); }
+    .callout.danger { border-left-color: var(--danger); }
+    .callout.good { border-left-color: var(--accent); }
+
+    code, pre {
+      font-family: Consolas, Monaco, "Courier New", monospace;
+    }
+
+    pre {
+      background: var(--code);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      color: #d1d5db;
+    }
+
+    code {
+      color: #bfdbfe;
+      background: rgba(96,165,250,0.10);
+      border: 1px solid rgba(96,165,250,0.18);
+      padding: 2px 5px;
+      border-radius: 6px;
+    }
+
+    pre code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      color: inherit;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      background: rgba(22, 27, 34, 0.75);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th { background: rgba(96,165,250,0.10); color: #dbeafe; }
+    tr:last-child td { border-bottom: 0; }
+
+    .step {
+      display: inline-block;
+      color: #0d1117;
+      background: var(--accent);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    .toc {
+      background: rgba(31, 41, 55, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 24px;
+    }
+
+    .toc a {
+      color: #bfdbfe;
+      text-decoration: none;
+      display: inline-block;
+      margin: 4px 12px 4px 0;
+    }
+
+    .toc a:hover { text-decoration: underline; }
+
+    .footer {
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 22px;
+      margin-top: 44px;
+    }
+
+    .pill {
+      display: inline-block;
+      border: 1px solid var(--border);
+      background: rgba(74,222,128,0.1);
+      color: #bbf7d0;
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin: 3px;
+      font-size: 0.9rem;
+    }
+
+    @media print {
+      body { background: white; color: black; }
+      header, .card, .callout, pre, table, .toc { box-shadow: none; }
+      pre { white-space: pre-wrap; }
+      a { color: black; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Minecraft Forge 1.20.1 Server Guide</h1>
+      <p class="subtitle">How we created Noah’s Forge Minecraft server on a Proxmox Ubuntu VM, installed the Wonderland + GeckoLib mods, set it up as a systemd service, and prepared it for LAN/external access.</p>
+      <div class="grid">
+        <div class="card"><strong>Minecraft</strong>Java Edition 1.20.1</div>
+        <div class="card"><strong>Mod Loader</strong>Forge 47.4.20</div>
+        <div class="card"><strong>OS</strong>Ubuntu Server 22.04.5</div>
+        <div class="card"><strong>VM Specs</strong>4 cores, 12 GB RAM, 200 GB disk</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="toc">
+      <strong>Quick navigation:</strong><br />
+      <a href="#summary">Summary</a>
+      <a href="#vm">VM Setup</a>
+      <a href="#ubuntu">Ubuntu Setup</a>
+      <a href="#forge">Forge Server</a>
+      <a href="#mods">Mods</a>
+      <a href="#systemd">Auto Start Service</a>
+      <a href="#client">Client Setup</a>
+      <a href="#external">External Access</a>
+      <a href="#ops">OP / Moderators</a>
+      <a href="#commands">Common Commands</a>
+      <a href="#troubleshooting">Troubleshooting</a>
+    </div>
+
+    <section id="summary">
+      <h2>Final Server Summary</h2>
+      <table>
+        <tr><th>Item</th><th>Value</th></tr>
+        <tr><td>VM hostname</td><td><code>forgeminecraft</code></td></tr>
+        <tr><td>Local VM IP used</td><td><code>192.168.1.191</code></td></tr>
+        <tr><td>Server folder</td><td><code>/opt/minecraft</code></td></tr>
+        <tr><td>Minecraft version</td><td><code>1.20.1</code></td></tr>
+        <tr><td>Forge version</td><td><code>1.20.1-47.4.20</code></td></tr>
+        <tr><td>Java version</td><td><code>Java 17</code></td></tr>
+        <tr><td>Server RAM</td><td><code>-Xms4G</code> and <code>-Xmx8G</code></td></tr>
+        <tr><td>Mods</td><td><code>the_wonderland-2.1.4-1.20.1.jar</code><br /><code>geckolib-forge-1.20.1-4.8.3.jar</code></td></tr>
+        <tr><td>Port</td><td><code>25565/tcp</code></td></tr>
+        <tr><td>Service name</td><td><code>minecraft.service</code></td></tr>
+      </table>
+    </section>
+
+    <section id="vm">
+      <h2><span class="step">1</span>Proxmox VM Setup</h2>
+      <p>Create a new VM in Proxmox using the Ubuntu Server ISO.</p>
+      <table>
+        <tr><th>Setting</th><th>Value</th></tr>
+        <tr><td>ISO</td><td><code>ubuntu-22.04.5-live-server-amd64.iso</code></td></tr>
+        <tr><td>CPU</td><td>4 cores</td></tr>
+        <tr><td>RAM</td><td>12 GB</td></tr>
+        <tr><td>Disk</td><td>200 GB</td></tr>
+        <tr><td>Network</td><td>Default bridge, usually <code>vmbr0</code></td></tr>
+        <tr><td>Network adapter</td><td>VirtIO</td></tr>
+        <tr><td>OpenSSH Server</td><td>Install during Ubuntu setup</td></tr>
+      </table>
+      <div class="callout good">
+        <strong>Proxmox auto-start:</strong> In Proxmox, go to the VM → <strong>Options</strong> → <strong>Start at boot</strong> → set to <strong>Yes</strong>. Optional: set startup delay to 30 seconds.
+      </div>
+    </section>
+
+    <section id="ubuntu">
+      <h2><span class="step">2</span>Ubuntu Setup</h2>
+      <p>After installing Ubuntu, SSH into the VM and update it.</p>
+      <pre><code>ssh noah@192.168.1.191</code></pre>
+      <pre><code>sudo apt update &amp;&amp; sudo apt upgrade -y
+sudo reboot</code></pre>
+      <p>After reboot, reconnect and install Java 17 plus basic tools.</p>
+      <pre><code>sudo apt install -y openjdk-17-jre-headless wget curl screen unzip nano
+java -version</code></pre>
+      <p>The server showed Java 17 correctly:</p>
+      <pre><code>openjdk version "17.0.19"</code></pre>
+    </section>
+
+    <section id="forge">
+      <h2><span class="step">3</span>Create the Server Folder and Install Forge</h2>
+      <p>Create a dedicated <code>minecraft</code> system user and server directory.</p>
+      <pre><code>sudo adduser --system --home /opt/minecraft --group minecraft
+sudo mkdir -p /opt/minecraft
+sudo chown -R minecraft:minecraft /opt/minecraft</code></pre>
+      <p>Give your user access to work in the folder:</p>
+      <pre><code>sudo usermod -aG minecraft noah
+sudo chmod -R 775 /opt/minecraft</code></pre>
+      <p>Log out and back in after adding yourself to the group.</p>
+      <pre><code>exit
+ssh noah@192.168.1.191</code></pre>
+
+      <h3>Download Forge Installer</h3>
+      <pre><code>cd /opt/minecraft
+wget -O forge-installer.jar https://maven.minecraftforge.net/net/minecraftforge/forge/1.20.1-47.4.20/forge-1.20.1-47.4.20-installer.jar</code></pre>
+
+      <h3>Install Forge Server</h3>
+      <pre><code>java -jar forge-installer.jar --installServer</code></pre>
+      <p>After install, the folder should contain:</p>
+      <pre><code>libraries/
+run.sh
+user_jvm_args.txt
+forge-installer.jar</code></pre>
+
+      <h3>Fix Ownership</h3>
+      <pre><code>sudo chown -R minecraft:minecraft /opt/minecraft
+sudo chmod -R 775 /opt/minecraft</code></pre>
+
+      <h3>Set Server RAM</h3>
+      <p>Edit:</p>
+      <pre><code>sudo nano /opt/minecraft/user_jvm_args.txt</code></pre>
+      <p>Add this at the bottom:</p>
+      <pre><code>-Xms4G
+-Xmx8G</code></pre>
+    </section>
+
+    <section id="mods">
+      <h2><span class="step">4</span>First Launch, EULA, and Mods</h2>
+      <h3>First Launch</h3>
+      <p>Run once to generate files and the EULA.</p>
+      <pre><code>cd /opt/minecraft
+sudo -u minecraft ./run.sh nogui</code></pre>
+      <p>It stops with the EULA message. Edit the EULA file:</p>
+      <pre><code>sudo nano /opt/minecraft/eula.txt</code></pre>
+      <p>Change:</p>
+      <pre><code>eula=false</code></pre>
+      <p>to:</p>
+      <pre><code>eula=true</code></pre>
+
+      <h3>Test Forge Without Mods</h3>
+      <pre><code>cd /opt/minecraft
+sudo -u minecraft ./run.sh nogui</code></pre>
+      <p>Wait for:</p>
+      <pre><code>Done (...)! For help, type "help"</code></pre>
+      <p>Then stop it cleanly:</p>
+      <pre><code>stop</code></pre>
+
+      <h3>Create Mods Folder</h3>
+      <pre><code>cd /opt/minecraft
+sudo -u minecraft mkdir -p mods</code></pre>
+
+      <h3>Upload Mods from Windows</h3>
+      <p>The mod files were stored on Windows at:</p>
+      <pre><code>\\arctic\h\ArcticPC\DownloadsMini</code></pre>
+      <p>PowerShell upload commands:</p>
+      <pre><code>cd "\\arctic\h\ArcticPC\DownloadsMini"
+scp ".\the_wonderland-2.1.4-1.20.1.jar" noah@192.168.1.191:/tmp/
+scp ".\geckolib-forge-1.20.1-4.8.3.jar" noah@192.168.1.191:/tmp/</code></pre>
+      <p>Move them into the server mods folder:</p>
+      <pre><code>sudo mv /tmp/the_wonderland-2.1.4-1.20.1.jar /opt/minecraft/mods/
+sudo mv /tmp/geckolib-forge-1.20.1-4.8.3.jar /opt/minecraft/mods/
+sudo chown -R minecraft:minecraft /opt/minecraft/mods
+sudo chmod -R 775 /opt/minecraft/mods</code></pre>
+
+      <h3>Test Modded Server</h3>
+      <pre><code>cd /opt/minecraft
+sudo -u minecraft ./run.sh nogui</code></pre>
+      <p>The server successfully reached:</p>
+      <pre><code>Done (12.232s)! For help, type "help"</code></pre>
+      <p>Then stop cleanly:</p>
+      <pre><code>stop</code></pre>
+    </section>
+
+    <section id="properties">
+      <h2><span class="step">5</span>Server Properties</h2>
+      <p>We edited <code>/opt/minecraft/server.properties</code> and set these values:</p>
+      <pre><code>difficulty=normal
+force-gamemode=false
+gamemode=survival
+max-players=10
+motd=Noah's Forge 1.20.1 Server
+online-mode=true
+pvp=true
+simulation-distance=8
+spawn-protection=0
+view-distance=12</code></pre>
+      <p>Useful command to confirm later:</p>
+      <pre><code>grep -E "online-mode|max-players|view-distance|simulation-distance|motd|spawn-protection|difficulty|gamemode|pvp" /opt/minecraft/server.properties</code></pre>
+    </section>
+
+    <section id="systemd">
+      <h2><span class="step">6</span>systemd Service / Auto Start</h2>
+      <p>Create the service file:</p>
+      <pre><code>sudo nano /etc/systemd/system/minecraft.service</code></pre>
+      <p>Paste:</p>
+      <pre><code>[Unit]
+Description=Minecraft Forge 1.20.1 Server
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/minecraft
+User=minecraft
+Group=minecraft
+Type=simple
+Restart=on-failure
+RestartSec=10
+
+ExecStart=/bin/bash /opt/minecraft/run.sh nogui
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+      <p>Enable and start:</p>
+      <pre><code>sudo systemctl daemon-reload
+sudo systemctl enable minecraft
+sudo systemctl start minecraft</code></pre>
+      <p>Check status:</p>
+      <pre><code>sudo systemctl status minecraft</code></pre>
+      <p>Confirm it loaded:</p>
+      <pre><code>sudo journalctl -u minecraft -n 80 --no-pager</code></pre>
+      <p>We confirmed:</p>
+      <pre><code>Done (6.436s)! For help, type "help"</code></pre>
+    </section>
+
+    <section id="firewall">
+      <h2><span class="step">7</span>Ubuntu Firewall</h2>
+      <pre><code>sudo ufw allow OpenSSH
+sudo ufw allow 25565/tcp
+sudo ufw enable
+sudo ufw status</code></pre>
+      <p>Final firewall output included:</p>
+      <pre><code>OpenSSH     ALLOW Anywhere
+25565/tcp  ALLOW Anywhere</code></pre>
+    </section>
+
+    <section id="client">
+      <h2><span class="step">8</span>Main PC Client Setup Without CurseForge Launcher</h2>
+      <p>Install Java 17 on the main PC. The issue we hit was that PowerShell still showed Java 8:</p>
+      <pre><code>java version "1.8.0_491"</code></pre>
+      <p>We installed Java 17 and launched Forge directly with Java 17.</p>
+      <div class="callout warn">
+        <strong>Important:</strong> Running the Forge installer from the network path caused this error: <code>URI has an authority component</code>. The fix was copying the Forge installer to the local Downloads folder first.
+      </div>
+      <h3>Copy Forge Installer Local</h3>
+      <pre><code>Copy-Item "\\arctic\h\ArcticPC\DownloadsMini\forge-1.20.1-47.4.20-installer.jar" "$env:USERPROFILE\Downloads\forge-1.20.1-47.4.20-installer.jar"</code></pre>
+      <h3>Run Forge Installer with Java 17</h3>
+      <pre><code>cd "$env:USERPROFILE\Downloads"
+&amp; "C:\Program Files\Java\jdk-17\bin\java.exe" -jar ".\forge-1.20.1-47.4.20-installer.jar"</code></pre>
+      <p>Choose <strong>Install client</strong>. Then open the normal Minecraft Launcher and select:</p>
+      <pre><code>forge 1.20.1-forge-47.4.20</code></pre>
+      <p>Launch Forge once, quit Minecraft, then open the client mods folder:</p>
+      <pre><code>explorer "$env:APPDATA\.minecraft\mods"</code></pre>
+      <p>Place these two mod files in the client mods folder:</p>
+      <pre><code>geckolib-forge-1.20.1-4.8.3.jar
+the_wonderland-2.1.4-1.20.1.jar</code></pre>
+      <p>Join locally with:</p>
+      <pre><code>192.168.1.191:25565</code></pre>
+    </section>
+
+    <section id="external">
+      <h2><span class="step">9</span>External Access</h2>
+      <p>Since local access worked, the server was good. External access needs a router port forward.</p>
+      <table>
+        <tr><th>Field</th><th>Value</th></tr>
+        <tr><td>Name</td><td>Minecraft</td></tr>
+        <tr><td>Protocol</td><td>TCP</td></tr>
+        <tr><td>External Port</td><td>25565</td></tr>
+        <tr><td>Internal Port</td><td>25565</td></tr>
+        <tr><td>Internal IP</td><td>192.168.1.191</td></tr>
+      </table>
+      <p>Friends join using:</p>
+      <pre><code>YOUR_PUBLIC_IP:25565</code></pre>
+      <div class="callout warn">
+        <strong>Note:</strong> Testing your public IP from inside your own network can fail if the router does not support NAT loopback. Test from a friend’s connection or phone hotspot.
+      </div>
+    </section>
+
+    <section id="ops">
+      <h2><span class="step">10</span>OP / Moderator Setup</h2>
+      <p>Once you are OP, you can OP friends inside the game:</p>
+      <pre><code>/op FriendUsername</code></pre>
+      <p>To remove OP:</p>
+      <pre><code>/deop FriendUsername</code></pre>
+      <p>If nobody is OP yet, stop the service and start the server manually once:</p>
+      <pre><code>sudo systemctl stop minecraft
+cd /opt/minecraft
+sudo -u minecraft ./run.sh nogui</code></pre>
+      <p>Wait for <code>Done</code>, then type in the server console:</p>
+      <pre><code>op YourMinecraftUsername</code></pre>
+      <p>Then stop and restart the service:</p>
+      <pre><code>stop
+sudo systemctl start minecraft</code></pre>
+      <div class="callout warn">
+        <strong>Do not start two copies of the server.</strong> If the service is running and you start manually, Minecraft will throw a <code>session.lock</code> error.
+      </div>
+    </section>
+
+    <section id="commands">
+      <h2>Common Commands</h2>
+      <table>
+        <tr><th>Task</th><th>Command</th></tr>
+        <tr><td>Start server</td><td><code>sudo systemctl start minecraft</code></td></tr>
+        <tr><td>Stop server</td><td><code>sudo systemctl stop minecraft</code></td></tr>
+        <tr><td>Restart server</td><td><code>sudo systemctl restart minecraft</code></td></tr>
+        <tr><td>Check status</td><td><code>sudo systemctl status minecraft</code></td></tr>
+        <tr><td>Live logs</td><td><code>sudo journalctl -u minecraft -f</code></td></tr>
+        <tr><td>Last 100 log lines</td><td><code>sudo journalctl -u minecraft -n 100 --no-pager</code></td></tr>
+        <tr><td>Check service auto-start</td><td><code>sudo systemctl is-enabled minecraft</code></td></tr>
+        <tr><td>Enable auto-start</td><td><code>sudo systemctl enable minecraft</code></td></tr>
+        <tr><td>Check Java</td><td><code>java -version</code></td></tr>
+        <tr><td>Check mods</td><td><code>ls -lah /opt/minecraft/mods</code></td></tr>
+      </table>
+    </section>
+
+    <section id="backups">
+      <h2>Manual Backup Before Changing Mods</h2>
+      <p>Stop the server, backup the world, then start the server again.</p>
+      <pre><code>sudo systemctl stop minecraft
+sudo mkdir -p /opt/minecraft-backups
+sudo tar -czvf /opt/minecraft-backups/world-$(date +%F-%H%M).tar.gz -C /opt/minecraft world
+sudo systemctl start minecraft</code></pre>
+      <p>List backups:</p>
+      <pre><code>ls -lah /opt/minecraft-backups</code></pre>
+    </section>
+
+    <section id="troubleshooting">
+      <h2>Troubleshooting Notes We Hit</h2>
+      <h3>Java on Windows Still Shows Java 8</h3>
+      <p>PowerShell showed:</p>
+      <pre><code>java version "1.8.0_491"</code></pre>
+      <p>The workaround was launching Forge with Java 17 directly:</p>
+      <pre><code>&amp; "C:\Program Files\Java\jdk-17\bin\java.exe" -jar ".\forge-1.20.1-47.4.20-installer.jar"</code></pre>
+
+      <h3>Forge Installer Error from Network Path</h3>
+      <pre><code>java.lang.IllegalArgumentException: URI has an authority component</code></pre>
+      <p>Fix: copy the installer to local Downloads before running it.</p>
+
+      <h3>Wrong GeckoLib File</h3>
+      <p>Do not use:</p>
+      <pre><code>geckolib-neoforge-26.1.2-5.5.1.jar</code></pre>
+      <p>Use the Forge 1.20.1 file:</p>
+      <pre><code>geckolib-forge-1.20.1-4.8.3.jar</code></pre>
+
+      <h3>session.lock Error</h3>
+      <p>Error:</p>
+      <pre><code>/opt/minecraft/./world/session.lock: already locked</code></pre>
+      <p>Cause: the Minecraft service was already running, and another manual server was started.</p>
+      <p>Fix:</p>
+      <pre><code>sudo systemctl stop minecraft
+sudo systemctl status minecraft</code></pre>
+      <p>Then start manually only if needed:</p>
+      <pre><code>cd /opt/minecraft
+sudo -u minecraft ./run.sh nogui</code></pre>
+    </section>
+
+    <section>
+      <h2>Files That Should Match on Server and Client</h2>
+      <p>Server folder:</p>
+      <pre><code>/opt/minecraft/mods</code></pre>
+      <p>Client folder:</p>
+      <pre><code>C:\Users\Noah\AppData\Roaming\.minecraft\mods</code></pre>
+      <p>Both should contain:</p>
+      <div>
+        <span class="pill">geckolib-forge-1.20.1-4.8.3.jar</span>
+        <span class="pill">the_wonderland-2.1.4-1.20.1.jar</span>
+      </div>
+    </section>
+
+    <p class="footer">Created as a reference guide for the Forge 1.20.1 Minecraft server built on Proxmox + Ubuntu Server 22.04.5.</p>
+  </main>
+</body>
+</html>
