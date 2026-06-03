@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zipline VM Setup + Update Guide</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --code: #020617;
+      --border: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0%, var(--bg) 42%, #020617 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 42px 22px 28px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      background: rgba(2, 6, 23, 0.72);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      letter-spacing: -0.04em;
+    }
+
+    header p {
+      margin: 0 auto;
+      max-width: 850px;
+      color: var(--muted);
+      font-size: 1.02rem;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+    }
+
+    nav a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    main {
+      width: min(1120px, calc(100% - 28px));
+      margin: 28px auto 70px;
+    }
+
+    section {
+      background: rgba(17, 24, 39, 0.88);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin: 18px 0;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #f8fafc;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      color: #f8fafc;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: rgba(31, 41, 55, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .card strong {
+      display: block;
+      color: #f8fafc;
+      margin-bottom: 5px;
+    }
+
+    .good {
+      border-left: 4px solid var(--accent-2);
+    }
+
+    .warn {
+      border-left: 4px solid var(--warn);
+    }
+
+    .danger {
+      border-left: 4px solid var(--danger);
+    }
+
+    .info {
+      border-left: 4px solid var(--accent);
+    }
+
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    pre {
+      background: var(--code);
+      color: #dbeafe;
+      padding: 15px;
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+      position: relative;
+      margin: 12px 0 18px;
+    }
+
+    code {
+      color: #bfdbfe;
+    }
+
+    .copy-row {
+      position: relative;
+    }
+
+    button.copy {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--text);
+      border-radius: 8px;
+      padding: 5px 9px;
+      cursor: pointer;
+      font-size: 0.78rem;
+    }
+
+    button.copy:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    ol li, ul li {
+      margin-bottom: 8px;
+    }
+
+    .step {
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+      margin-top: 18px;
+    }
+
+    .step:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 3px 10px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #bae6fd;
+      font-size: 0.85rem;
+      margin: 2px 4px 2px 0;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 24px;
+      font-size: 0.9rem;
+    }
+
+    .checklist label {
+      display: block;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.55);
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.15);
+      margin-right: 8px;
+      accent-color: var(--accent-2);
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media print {
+      header {
+        position: static;
+      }
+
+      body {
+        background: white;
+        color: black;
+      }
+
+      section {
+        box-shadow: none;
+        border-color: #bbb;
+        background: white;
+      }
+
+      pre {
+        background: #f4f4f5;
+        color: black;
+      }
+
+      nav, button.copy {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Zipline VM Setup + Update Guide</h1>
+    <p>A quick repeatable guide for rebuilding or updating Noah’s Zipline server on Proxmox using Ubuntu Server, Docker Compose, PostgreSQL, and Nginx Proxy Manager.</p>
+    <nav>
+      <a href="#current">Current Setup</a>
+      <a href="#install">Fresh Install</a>
+      <a href="#zipline">Zipline Compose</a>
+      <a href="#reverse-proxy">Reverse Proxy</a>
+      <a href="#updates">Updates</a>
+      <a href="#maintenance">Maintenance</a>
+      <a href="#troubleshooting">Troubleshooting</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="current">
+      <h2>Current Working Setup</h2>
+      <div class="grid">
+        <div class="card good">
+          <strong>VM Resources</strong>
+          <span class="pill">2 vCPU</span>
+          <span class="pill">4 GB RAM</span>
+          <span class="pill">500 GB disk</span>
+        </div>
+        <div class="card good">
+          <strong>Operating System</strong>
+          Ubuntu Server
+        </div>
+        <div class="card good">
+          <strong>Zipline URL</strong>
+          <code>https://zip.arcticmatrix.com</code>
+        </div>
+        <div class="card good">
+          <strong>Install Path</strong>
+          <code>/opt/zipline</code>
+        </div>
+        <div class="card good">
+          <strong>Upload Storage</strong>
+          <code>/opt/zipline/uploads</code>
+        </div>
+        <div class="card good">
+          <strong>Reverse Proxy</strong>
+          Nginx Proxy Manager → HTTP backend on port <code>3000</code>
+        </div>
+      </div>
+
+      <div class="card warn" style="margin-top: 14px;">
+        <strong>Important</strong>
+        Do not lose the <code>.env</code> file. It contains the database password and <code>CORE_SECRET</code>. Back up the whole <code>/opt/zipline</code> folder before major updates.
+      </div>
+    </section>
+
+    <section id="install">
+      <h2>Fresh Install Steps</h2>
+      <p>Use these steps if you ever rebuild the VM from scratch.</p>
+
+      <div class="step">
+        <h3>1. Update Ubuntu</h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>sudo apt update && sudo apt upgrade -y
+sudo apt install -y curl wget git nano htop qemu-guest-agent ca-certificates
+sudo systemctl enable --now qemu-guest-agent</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>2. Install Docker + Compose</h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>sudo apt update
+sudo apt install -y ca-certificates curl
+
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+sudo tee /etc/apt/sources.list.d/docker.sources &gt; /dev/null &lt;&lt;EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>3. Enable Docker and test it</h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>sudo systemctl enable --now docker
+sudo docker run hello-world</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>4. Let your user run Docker without sudo</h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>sudo usermod -aG docker $USER
+newgrp docker
+docker ps</code></pre>
+        </div>
+        <p class="small">If <code>docker ps</code> works without a permission error, Docker is ready.</p>
+      </div>
+    </section>
+
+    <section id="zipline">
+      <h2>Zipline Folder + Docker Compose</h2>
+
+      <div class="step">
+        <h3>1. Create the Zipline folder</h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>sudo mkdir -p /opt/zipline
+sudo chown -R $USER:$USER /opt/zipline
+cd /opt/zipline
+
+mkdir -p uploads public themes postgres</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>2. Generate secrets</h3>
+        <p>Run these and save the outputs somewhere safe.</p>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>openssl rand -hex 32
+openssl rand -hex 24</code></pre>
+        </div>
+        <p class="small">First one = <code>CORE_SECRET</code>. Second one = PostgreSQL password.</p>
+      </div>
+
+      <div class="step">
+        <h3>3. Create <code>.env</code></h3>
+        <p>Replace the example values with your generated values.</p>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>nano .env</code></pre>
+        </div>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>POSTGRESQL_USER=zipline
+POSTGRESQL_PASSWORD=PASTE_POSTGRES_PASSWORD_HERE
+POSTGRESQL_DB=zipline
+
+CORE_SECRET=PASTE_CORE_SECRET_HERE</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>4. Create <code>docker-compose.yml</code></h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>nano docker-compose.yml</code></pre>
+        </div>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>services:
+  zipline:
+    image: ghcr.io/diced/zipline:latest
+    container_name: zipline
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - CORE_SECRET=${CORE_SECRET}
+      - DATABASE_URL=postgres://${POSTGRESQL_USER}:${POSTGRESQL_PASSWORD}@postgres:5432/${POSTGRESQL_DB}
+      - DATASOURCE_TYPE=local
+      - DATASOURCE_LOCAL_DIRECTORY=/zipline/uploads
+    volumes:
+      - ./uploads:/zipline/uploads
+      - ./public:/zipline/public
+      - ./themes:/zipline/themes
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    container_name: zipline-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRESQL_USER}
+      - POSTGRES_PASSWORD=${POSTGRESQL_PASSWORD}
+      - POSTGRES_DB=${POSTGRESQL_DB}
+    volumes:
+      - ./postgres:/var/lib/postgresql/data</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>5. Start Zipline</h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>cd /opt/zipline
+docker compose up -d
+docker ps</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>6. Check logs</h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>docker logs zipline --tail=100</code></pre>
+        </div>
+        <p>You want to see the server start on port <code>3000</code> without errors.</p>
+      </div>
+
+      <div class="step">
+        <h3>7. First browser setup</h3>
+        <ol>
+          <li>Open <code>http://VM-IP:3000</code>.</li>
+          <li>Create your super-admin user.</li>
+          <li>Upload a small test file.</li>
+          <li>Confirm it appears in <code>/opt/zipline/uploads</code>.</li>
+        </ol>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>ls -lah /opt/zipline/uploads</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="reverse-proxy">
+      <h2>Reverse Proxy Setup</h2>
+      <p>This is the setup that fixed the 502 issue.</p>
+
+      <div class="card info">
+        <strong>Nginx Proxy Manager host settings</strong>
+        <ul>
+          <li>Domain Name: <code>zip.arcticmatrix.com</code></li>
+          <li>Scheme: <code>http</code></li>
+          <li>Forward Hostname / IP: <code>Zipline VM IP</code></li>
+          <li>Forward Port: <code>3000</code></li>
+          <li>SSL: Request/enable certificate for <code>zip.arcticmatrix.com</code></li>
+        </ul>
+      </div>
+
+      <h3>Zipline Core Settings</h3>
+      <ol>
+        <li>Go to <code>Administrator → Settings → Core</code>.</li>
+        <li>Set <strong>Default Domain</strong> to <code>zip.arcticmatrix.com</code>.</li>
+        <li>Turn on <strong>Return HTTPS URLs</strong>.</li>
+        <li>Turn on <strong>Trust Proxies</strong>.</li>
+        <li>Save settings.</li>
+      </ol>
+
+      <h3>Optional upload size fix</h3>
+      <p>If large uploads fail through the domain, check Zipline’s own file limit first. If it still fails, add this in Nginx Proxy Manager → Advanced:</p>
+      <div class="copy-row">
+        <button class="copy" onclick="copyCode(this)">Copy</button>
+        <pre><code>client_max_body_size 5G;</code></pre>
+      </div>
+    </section>
+
+    <section id="updates">
+      <h2>How to Update Zipline</h2>
+
+      <div class="card warn">
+        <strong>Before updating</strong>
+        Make a backup first. Do not skip this if you care about your uploaded files and database.
+      </div>
+
+      <div class="step">
+        <h3>1. Go to the Zipline folder</h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>cd /opt/zipline</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>2. Quick backup</h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>mkdir -p ~/zipline-backups
+tar -czf ~/zipline-backups/zipline-backup-$(date +%F-%H%M).tar.gz /opt/zipline</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>3. Pull the newest image</h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>docker compose pull</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>4. Recreate containers</h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>docker compose up -d</code></pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <h3>5. Confirm it worked</h3>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>docker ps
+docker logs zipline --tail=100</code></pre>
+        </div>
+        <p>Then open <code>https://zip.arcticmatrix.com</code> and test an upload.</p>
+      </div>
+
+      <div class="step">
+        <h3>One-line update command</h3>
+        <p>Use this only after you are comfortable with the process:</p>
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>cd /opt/zipline && docker compose pull && docker compose up -d && docker logs zipline --tail=80</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="maintenance">
+      <h2>Maintenance Commands</h2>
+
+      <div class="grid">
+        <div class="card">
+          <strong>Check containers</strong>
+          <pre><code>cd /opt/zipline
+docker compose ps</code></pre>
+        </div>
+
+        <div class="card">
+          <strong>Restart Zipline only</strong>
+          <pre><code>cd /opt/zipline
+docker compose restart zipline</code></pre>
+        </div>
+
+        <div class="card">
+          <strong>Restart everything</strong>
+          <pre><code>cd /opt/zipline
+docker compose restart</code></pre>
+        </div>
+
+        <div class="card">
+          <strong>View logs</strong>
+          <pre><code>docker logs zipline --tail=100</code></pre>
+        </div>
+
+        <div class="card">
+          <strong>Live logs</strong>
+          <pre><code>docker logs -f zipline</code></pre>
+        </div>
+
+        <div class="card">
+          <strong>Check disk space</strong>
+          <pre><code>df -h
+du -sh /opt/zipline/uploads</code></pre>
+        </div>
+
+        <div class="card">
+          <strong>Stop Zipline</strong>
+          <pre><code>cd /opt/zipline
+docker compose down</code></pre>
+        </div>
+
+        <div class="card">
+          <strong>Start Zipline</strong>
+          <pre><code>cd /opt/zipline
+docker compose up -d</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="troubleshooting">
+      <h2>Troubleshooting</h2>
+
+      <div class="card danger">
+        <strong>502 Bad Gateway / openresty</strong>
+        Usually the reverse proxy cannot reach Zipline. In Nginx Proxy Manager, make sure:
+        <ul>
+          <li>Scheme is <code>http</code>, not <code>https</code>.</li>
+          <li>Forward IP is the Zipline VM IP.</li>
+          <li>Forward port is <code>3000</code>.</li>
+          <li>Zipline container is running.</li>
+        </ul>
+      </div>
+
+      <div class="copy-row">
+        <button class="copy" onclick="copyCode(this)">Copy</button>
+        <pre><code>hostname -I
+docker ps
+docker logs zipline --tail=100</code></pre>
+      </div>
+
+      <div class="card warn">
+        <strong>Uploads stop around 100 MB</strong>
+        Check Zipline first:
+        <ol>
+          <li>Go to <code>Administrator → Settings → Files</code>.</li>
+          <li>Raise the max upload size.</li>
+          <li>Save and test again.</li>
+        </ol>
+        If it still fails, add <code>client_max_body_size 5G;</code> to Nginx Proxy Manager → Advanced.
+      </div>
+
+      <div class="card info">
+        <strong>Links are showing HTTP instead of HTTPS</strong>
+        In Zipline:
+        <ol>
+          <li>Go to <code>Administrator → Settings → Core</code>.</li>
+          <li>Default Domain should be <code>zip.arcticmatrix.com</code>.</li>
+          <li>Enable <strong>Return HTTPS URLs</strong>.</li>
+          <li>Enable <strong>Trust Proxies</strong>.</li>
+        </ol>
+      </div>
+
+      <div class="card danger">
+        <strong>Postgres will not start</strong>
+        Check permissions and logs:
+        <div class="copy-row">
+          <button class="copy" onclick="copyCode(this)">Copy</button>
+          <pre><code>cd /opt/zipline
+docker logs zipline-postgres --tail=100
+ls -lah /opt/zipline/postgres</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="checklist">
+      <h2>Quick Checklist</h2>
+      <div class="checklist">
+        <label><input type="checkbox"> Ubuntu VM created with 2 CPU, 4 GB RAM, and 500 GB disk</label>
+        <label><input type="checkbox"> Docker installed and <code>docker ps</code> works</label>
+        <label><input type="checkbox"> Zipline files created in <code>/opt/zipline</code></label>
+        <label><input type="checkbox"> <code>.env</code> created and saved</label>
+        <label><input type="checkbox"> <code>docker-compose.yml</code> created</label>
+        <label><input type="checkbox"> <code>docker compose up -d</code> started both containers</label>
+        <label><input type="checkbox"> Admin account created</label>
+        <label><input type="checkbox"> Upload test worked locally</label>
+        <label><input type="checkbox"> Reverse proxy uses HTTP to VM IP on port 3000</label>
+        <label><input type="checkbox"> Domain works at <code>https://zip.arcticmatrix.com</code></label>
+        <label><input type="checkbox"> Upload limit adjusted in Zipline settings</label>
+      </div>
+    </section>
+
+    <p class="footer">Saved guide for Noah’s Zipline VM. Keep this file somewhere easy to find.</p>
+  </main>
+
+  <script>
+    function copyCode(button) {
+      const pre = button.parentElement.querySelector("pre");
+      const code = pre.innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const original = button.innerText;
+        button.innerText = "Copied";
+        setTimeout(() => button.innerText = original, 1200);
+      }).catch(() => {
+        button.innerText = "Failed";
+        setTimeout(() => button.innerText = "Copy", 1200);
+      });
+    }
+  </script>
+</body>
+</html>
