@@ -1,161 +1,494 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Immich VM Setup & Update Guide</title>
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background-color: #111;
-  color: #eee;
-  margin: 0;
-  padding: 0;
-}
-header {
-  background: #1f1f1f;
-  padding: 20px;
-  text-align: center;
-}
-h1 { margin: 0; }
-section {
-  padding: 20px;
-  border-bottom: 1px solid #333;
-}
-code, pre {
-  background: #222;
-  padding: 10px;
-  display: block;
-  overflow-x: auto;
-  border-radius: 6px;
-  color: #0f0;
-}
-h2 { color: #4da3ff; }
-.step { margin-bottom: 20px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Immich VM — Build + Update Playbook</title>
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --panel:#0f172a;
+      --panel2:#0b1224;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --brand:#60a5fa;
+      --ok:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+      --line:rgba(255,255,255,.08);
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background:
+        radial-gradient(1200px 600px at 20% 0%, rgba(96,165,250,.18), transparent 55%),
+        radial-gradient(900px 600px at 90% 10%, rgba(52,211,153,.12), transparent 55%),
+        radial-gradient(900px 600px at 50% 100%, rgba(251,191,36,.08), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.5;
+    }
+
+    .wrap{display:grid; grid-template-columns: 290px 1fr; gap:18px; max-width:1200px; margin:0 auto; padding:20px;}
+
+    header{
+      grid-column:1/-1;
+      background:linear-gradient(135deg, rgba(96,165,250,.18), rgba(52,211,153,.10));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px 18px 16px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    header .title{display:flex; align-items:center; gap:14px;}
+    .badge{
+      width:44px; height:44px; border-radius:14px;
+      background:linear-gradient(135deg, rgba(96,165,250,.35), rgba(52,211,153,.20));
+      border:1px solid rgba(255,255,255,.12);
+      display:grid; place-items:center;
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+    }
+    .badge svg{opacity:.95}
+
+    header h1{margin:0; font-size:20px; letter-spacing:.2px}
+    header p{margin:6px 0 0; color:var(--muted); font-size:13px}
+
+    .sidebar{
+      position:sticky; top:18px; align-self:start;
+      background:rgba(15,23,42,.72);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      backdrop-filter: blur(10px);
+      box-shadow:var(--shadow);
+    }
+
+    .sidebar h2{margin:2px 0 10px; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.12em}
+    .nav{display:flex; flex-direction:column; gap:8px;}
+    .nav a{
+      color:var(--text);
+      text-decoration:none;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid transparent;
+      background:rgba(11,18,36,.45);
+      transition:.15s;
+      font-size:14px;
+    }
+    .nav a:hover{border-color:rgba(96,165,250,.35); background:rgba(11,18,36,.75)}
+
+    .content{display:flex; flex-direction:column; gap:16px;}
+
+    .card{
+      background:rgba(15,23,42,.72);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      backdrop-filter: blur(10px);
+      box-shadow:var(--shadow);
+    }
+
+    .card h2{margin:0 0 10px; font-size:16px; letter-spacing:.2px}
+    .meta{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 0}
+    .pill{font-size:12px; color:var(--muted); border:1px solid var(--line); padding:6px 10px; border-radius:999px; background:rgba(11,18,36,.55)}
+
+    .grid{display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:12px}
+    @media (max-width: 980px){ .wrap{grid-template-columns:1fr} .sidebar{position:relative; top:auto} .grid{grid-template-columns:1fr}}
+
+    .note{border-left:3px solid rgba(96,165,250,.7); padding:10px 12px; background:rgba(11,18,36,.55); border-radius:12px; color:var(--muted); font-size:13px}
+    .warn{border-left-color:rgba(251,191,36,.85)}
+    .ok{border-left-color:rgba(52,211,153,.85)}
+    .bad{border-left-color:rgba(251,113,133,.85)}
+
+    .steps{display:flex; flex-direction:column; gap:10px; margin-top:10px}
+
+    .step{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      background:rgba(11,18,36,.45);
+    }
+
+    .step .head{display:flex; justify-content:space-between; gap:10px; align-items:flex-start}
+    .step .head strong{font-size:13.5px}
+    .step .head span{color:var(--muted); font-size:12px}
+
+    pre{
+      margin:10px 0 0;
+      padding:12px;
+      border-radius:14px;
+      background:rgba(0,0,0,.35);
+      border:1px solid rgba(255,255,255,.08);
+      overflow:auto;
+      font-family:var(--mono);
+      font-size:12.6px;
+      line-height:1.45;
+      position:relative;
+    }
+
+    code{font-family:var(--mono)}
+
+    .copy{
+      position:absolute;
+      top:10px;
+      right:10px;
+      font-size:12px;
+      padding:6px 9px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(15,23,42,.8);
+      color:var(--text);
+      cursor:pointer;
+      transition:.12s;
+    }
+    .copy:hover{border-color:rgba(96,165,250,.45)}
+
+    .kbd{font-family:var(--mono); font-size:12px; padding:2px 6px; border:1px solid rgba(255,255,255,.14); border-bottom-width:2px; border-radius:8px; background:rgba(11,18,36,.65)}
+
+    footer{
+      grid-column:1/-1;
+      color:var(--muted);
+      font-size:12px;
+      padding:8px 4px 22px;
+      text-align:center;
+    }
+
+    .mini{font-size:12px; color:var(--muted)}
+  </style>
 </head>
 <body>
 
-<header>
-  <h1>Immich VM Setup & Update Guide</h1>
-  <p>Proxmox + Ubuntu + Docker Deployment</p>
-</header>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <div class="badge" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7l10 5 10-5-10-5Z" stroke="white" stroke-opacity="0.9" stroke-width="1.6"/>
+            <path d="M2 17l10 5 10-5" stroke="white" stroke-opacity="0.7" stroke-width="1.6"/>
+            <path d="M2 12l10 5 10-5" stroke="white" stroke-opacity="0.8" stroke-width="1.6"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Immich VM — Build + Update Playbook</h1>
+          <p>Zipline-style layout, but for Immich: every command + every problem we hit (Docker repo/key, docker.sock perms, Immich .env 404, and disk expansion 1TB → 2TB).</p>
+          <div class="meta">
+            <span class="pill">Proxmox VM</span>
+            <span class="pill">Ubuntu Server</span>
+            <span class="pill">Docker</span>
+            <span class="pill">Compose</span>
+            <span class="pill">Immich</span>
+            <span class="pill">LVM</span>
+          </div>
+        </div>
+      </div>
+    </header>
 
-<section>
-  <h2>Part 1 — Creating the Immich VM</h2>
+    <aside class="sidebar">
+      <h2>Quick Nav</h2>
+      <div class="nav">
+        <a href="#overview">Overview</a>
+        <a href="#proxmox">1) Proxmox VM settings</a>
+        <a href="#docker">2) Install Docker (and fixes)</a>
+        <a href="#immich">3) Install Immich</a>
+        <a href="#fixes">4) Problems we hit (why + fixes)</a>
+        <a href="#expand">5) Expand disk (1TB → 2TB)</a>
+        <a href="#update">6) Update Immich</a>
+        <a href="#checks">7) Verify + troubleshoot</a>
+      </div>
+      <div class="note ok" style="margin-top:12px">
+        Tip: Click <span class="kbd">Copy</span> on any command block.
+      </div>
+    </aside>
 
-  <div class="step">
-    <h3>1. Create VM in Proxmox</h3>
-    <ul>
-      <li>Allocate 8GB+ RAM</li>
-      <li>Allocate 4 CPU cores</li>
-      <li>Set CPU type to <strong>host</strong></li>
-      <li>Create disk (1TB+ recommended)</li>
-      <li>Install Ubuntu Server</li>
-    </ul>
-  </div>
+    <main class="content">
 
-  <div class="step">
-    <h3>2. Install Docker</h3>
-    <pre>
-sudo apt update
-sudo apt install ca-certificates curl gnupg
+      <section id="overview" class="card">
+        <h2>Overview</h2>
+        <div class="grid">
+          <div class="note">
+            <strong>What you built</strong><br/>
+            • Proxmox VM running Ubuntu Server<br/>
+            • Docker + Docker Compose installed correctly<br/>
+            • Immich started via the official repo Docker files<br/>
+            • Storage expanded inside the VM using LVM<br/>
+            • Local LAN access at <code>http://VM_IP:2283</code>
+          </div>
+          <div class="note warn">
+            <strong>Local-only endpoint rules</strong><br/>
+            For the phone app use the full URL: <code>http://192.168.x.x:2283</code><br/>
+            Do not use <code>/24</code>, do not use <code>https</code> unless you set it up.
+          </div>
+        </div>
+      </section>
+
+      <section id="proxmox" class="card">
+        <h2>1) Proxmox VM settings</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="head"><strong>CPU</strong><span>Set to host</span></div>
+            <div class="mini">VM → Hardware → Processors → Type: <code>host</code>. Give enough cores (Immich benefits from more than 1).</div>
+          </div>
+          <div class="step">
+            <div class="head"><strong>RAM</strong><span>8GB+ recommended</span></div>
+            <div class="mini">Enough headroom for server + database + machine learning.</div>
+          </div>
+          <div class="step">
+            <div class="head"><strong>Disk</strong><span>Started 1TB then +1TB</span></div>
+            <div class="mini">We resized the disk in Proxmox, then expanded the Ubuntu partition + LVM + filesystem inside the VM.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="docker" class="card">
+        <h2>2) Install Docker (and the exact fixes we hit)</h2>
+
+        <div class="note">
+          We hit multiple Docker install problems: unsupported Ubuntu release repo mismatch, and a broken GPG keyring format that caused NO_PUBKEY errors.
+          This section is the clean, repeatable method.
+        </div>
+
+        <div class="step">
+          <div class="head"><strong>Clean install (Docker + Compose plugin)</strong><span>Ubuntu</span></div>
+          <pre><button class="copy" data-copy>Copy</button>
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y ca-certificates curl gnupg
 sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
-  https://download.docker.com/linux/ubuntu noble stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor --yes -o /etc/apt/keyrings/docker.gpg
+sudo chmod 644 /etc/apt/keyrings/docker.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 sudo apt update
-sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo usermod -aG docker $USER
-    </pre>
-  </div>
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl enable --now docker</pre>
+        </div>
 
-  <div class="step">
-    <h3>3. Deploy Immich</h3>
-    <pre>
-mkdir ~/immich
+        <div class="step">
+          <div class="head"><strong>Fix: docker.sock permission denied</strong><span>Add user to docker group</span></div>
+          <pre><button class="copy" data-copy>Copy</button>
+sudo usermod -aG docker $USER
+
+# IMPORTANT: log out and back in (or exit SSH and reconnect)
+
+groups
+docker ps</pre>
+        </div>
+      </section>
+
+      <section id="immich" class="card">
+        <h2>3) Install Immich (how we actually got it working)</h2>
+
+        <div class="note">
+          We tried release downloads for <code>.env</code> and got tiny files or <code>404: Not Found</code>. The reliable solution was cloning Immich and using <code>immich/docker</code> where the real compose files live.
+        </div>
+
+        <div class="step">
+          <div class="head"><strong>Clone Immich + start the stack</strong><span>Repo method (reliable)</span></div>
+          <pre><button class="copy" data-copy>Copy</button>
+sudo apt install -y git
+
+mkdir -p ~/immich
 cd ~/immich
 
 git clone https://github.com/immich-app/immich.git
 cd immich/docker
 
+# Immich uses example.env
 cp example.env .env
 
 docker compose up -d
-    </pre>
-    <p>Access Immich at: http://VM_IP:2283</p>
-  </div>
 
-  <div class="step">
-    <h3>4. Expanding Disk Later</h3>
-    <pre>
-sudo growpart /dev/sda 3
+docker ps</pre>
+        </div>
+
+        <div class="step">
+          <div class="head"><strong>Open Immich</strong><span>Local LAN</span></div>
+          <pre><button class="copy" data-copy>Copy</button>
+http://VM_IP:2283</pre>
+        </div>
+
+        <div class="step">
+          <div class="head"><strong>Containers you should see</strong><span>Healthy</span></div>
+          <pre><button class="copy" data-copy>Copy</button>
+docker ps
+# You should see immich_server, immich_postgres, immich_machine_learning, immich_redis/valkey</pre>
+        </div>
+      </section>
+
+      <section id="fixes" class="card">
+        <h2>4) Problems we hit (why + fixes)</h2>
+
+        <div class="steps">
+          <div class="step">
+            <div class="head"><strong>Docker packages not found</strong><span>Repo mismatch</span></div>
+            <div class="mini">Your Ubuntu release didn’t have Docker packages. Fix: add Docker’s repo for a supported release (we used <code>noble</code>).</div>
+          </div>
+
+          <div class="step">
+            <div class="head"><strong>GPG key ignored / NO_PUBKEY</strong><span>Keyring wrong format</span></div>
+            <div class="mini">Fix: regenerate <code>/etc/apt/keyrings/docker.gpg</code> using <code>gpg --dearmor</code> and set perms to 644.</div>
+          </div>
+
+          <div class="step">
+            <div class="head"><strong>.env file empty or “404: Not Found”</strong><span>Bad download URL</span></div>
+            <div class="mini">Fix: clone the repo and copy <code>example.env</code> to <code>.env</code>.</div>
+          </div>
+
+          <div class="step">
+            <div class="head"><strong>Docker permission denied</strong><span>User not applied</span></div>
+            <div class="mini">Fix: add user to docker group and reconnect your shell session.</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="expand" class="card">
+        <h2>5) Expand disk (1TB → 2TB) inside Ubuntu (LVM)</h2>
+
+        <div class="note ok">
+          After resizing in Proxmox, Ubuntu showed <code>sda</code> as 2T but <code>sda3</code> stayed 998G. We expanded the partition, then LVM, then filesystem.
+        </div>
+
+        <div class="step">
+          <div class="head"><strong>A) Resize disk in Proxmox</strong><span>UI step</span></div>
+          <div class="mini">VM → Hardware → select disk → Resize Disk → enter increment in GiB (example: add 1TB = 1024 GiB).</div>
+        </div>
+
+        <div class="step">
+          <div class="head"><strong>B) Confirm new disk size</strong><span>Inside VM</span></div>
+          <pre><button class="copy" data-copy>Copy</button>
+lsblk</pre>
+        </div>
+
+        <div class="step">
+          <div class="head"><strong>C) Expand partition 3 to fill disk</strong><span>growpart</span></div>
+          <pre><button class="copy" data-copy>Copy</button>
+sudo apt install -y cloud-guest-utils
+sudo growpart /dev/sda 3</pre>
+        </div>
+
+        <div class="step">
+          <div class="head"><strong>D) Expand LVM + filesystem</strong><span>pvresize → lvextend → resize2fs</span></div>
+          <pre><button class="copy" data-copy>Copy</button>
 sudo pvresize /dev/sda3
 sudo lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
 sudo resize2fs /dev/ubuntu-vg/ubuntu-lv
-    </pre>
-  </div>
-</section>
 
-<section>
-  <h2>Part 2 — Updating Immich</h2>
+df -h</pre>
+        </div>
+      </section>
 
-  <div class="step">
-    <h3>1. Navigate to Immich Folder</h3>
-    <pre>
-cd ~/immich/immich/docker
-    </pre>
-  </div>
+      <section id="update" class="card">
+        <h2>6) How to update Immich (walkthrough)</h2>
 
-  <div class="step">
-    <h3>2. Pull Latest Images</h3>
-    <pre>
-docker compose pull
-    </pre>
-  </div>
+        <div class="note">
+          Updating is simple: pull new images, then recreate containers. Your data stays in volumes and your upload library.
+        </div>
 
-  <div class="step">
-    <h3>3. Restart With Updated Containers</h3>
-    <pre>
-docker compose up -d
-    </pre>
-  </div>
+        <div class="step">
+          <div class="head"><strong>1) Go to the compose folder</strong><span>Important: correct path</span></div>
+          <pre><button class="copy" data-copy>Copy</button>
+cd ~/immich/immich/docker</pre>
+        </div>
 
-  <div class="step">
-    <h3>4. Optional: Clean Old Images</h3>
-    <pre>
-docker image prune -f
-    </pre>
-  </div>
+        <div class="step">
+          <div class="head"><strong>2) Pull new images</strong><span>Downloads updates</span></div>
+          <pre><button class="copy" data-copy>Copy</button>
+docker compose pull</pre>
+        </div>
 
-  <div class="step">
-    <h3>5. Verify Containers</h3>
-    <pre>
+        <div class="step">
+          <div class="head"><strong>3) Apply updates</strong><span>Recreate containers</span></div>
+          <pre><button class="copy" data-copy>Copy</button>
+docker compose up -d</pre>
+        </div>
+
+        <div class="step">
+          <div class="head"><strong>4) Verify health</strong><span>Healthy containers</span></div>
+          <pre><button class="copy" data-copy>Copy</button>
 docker ps
-    </pre>
+
+docker compose logs --tail=80</pre>
+        </div>
+
+        <div class="note warn">
+          If Immich ever fails after an update, grab logs: <code>docker compose logs --tail=200</code>.
+        </div>
+      </section>
+
+      <section id="checks" class="card">
+        <h2>7) Verify + troubleshoot (quick commands)</h2>
+
+        <div class="grid">
+          <div class="step">
+            <div class="head"><strong>Check disk usage</strong><span>Space left</span></div>
+            <pre><button class="copy" data-copy>Copy</button>
+df -h
+lsblk</pre>
+          </div>
+          <div class="step">
+            <div class="head"><strong>Confirm Immich port</strong><span>2283</span></div>
+            <pre><button class="copy" data-copy>Copy</button>
+sudo ss -tulpn | grep 2283</pre>
+          </div>
+          <div class="step">
+            <div class="head"><strong>Check containers</strong><span>Status</span></div>
+            <pre><button class="copy" data-copy>Copy</button>
+docker ps
+
+docker compose ps</pre>
+          </div>
+          <div class="step">
+            <div class="head"><strong>Restart the stack</strong><span>Last resort</span></div>
+            <pre><button class="copy" data-copy>Copy</button>
+cd ~/immich/immich/docker
+
+docker compose down
+
+docker compose up -d</pre>
+          </div>
+        </div>
+
+        <div class="note bad" style="margin-top:12px">
+          If the mobile app can’t connect, verify the endpoint is <code>http://VM_IP:2283</code> and your phone is on the same Wi‑Fi.
+        </div>
+      </section>
+
+    </main>
+
+    <footer>
+      Immich Playbook — styled like the Zipline guide. If you want, we can add a backup section (DB + library) next.
+    </footer>
+
   </div>
 
-</section>
-
-<section>
-  <h2>Recommended Maintenance</h2>
-  <ul>
-    <li>Back up Immich database regularly</li>
-    <li>Back up library directory separately</li>
-    <li>Keep VM RAM at 8GB+</li>
-    <li>Monitor disk usage with: df -h</li>
-  </ul>
-</section>
-
-<footer style="text-align:center; padding:20px; background:#1f1f1f;">
-  <p>Generated Immich Deployment Guide</p>
-</footer>
-
+  <script>
+    // Copy buttons for command blocks
+    const NL = String.fromCharCode(10);
+    document.querySelectorAll('[data-copy]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const pre = btn.parentElement;
+        const lines = pre.innerText.split(NL);
+        if (lines.length && lines[0].trim() === 'Copy') lines.shift();
+        const text = lines.join(NL);
+        await navigator.clipboard.writeText(text);
+        const old = btn.textContent;
+        btn.textContent = 'Copied';
+        btn.style.borderColor = 'rgba(52,211,153,.6)';
+        setTimeout(() => {
+          btn.textContent = old;
+          btn.style.borderColor = 'rgba(255,255,255,.14)';
+        }, 900);
+      });
+    });
+  </script>
 </body>
 </html>
