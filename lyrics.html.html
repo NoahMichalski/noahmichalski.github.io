@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Navidrome Album LRC Finder v4</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --panel2: #1f2630;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --border: #30363d;
+      --accent: #58a6ff;
+      --good: #3fb950;
+      --bad: #f85149;
+      --warn: #d29922;
+      --shadow: rgba(0,0,0,.35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(88,166,255,.15), transparent 30%),
+        radial-gradient(circle at top right, rgba(63,185,80,.08), transparent 25%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      padding: 28px 18px 12px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 { margin: 0 0 8px; font-size: clamp(1.7rem, 3vw, 2.6rem); }
+    .sub { color: var(--muted); max-width: 850px; line-height: 1.5; }
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 18px 60px;
+      display: grid;
+      gap: 16px;
+    }
+    .card {
+      background: rgba(22,27,34,.94);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 16px 50px var(--shadow);
+      padding: 18px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+      align-items: end;
+    }
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: .85rem;
+      margin-bottom: 6px;
+    }
+    input, textarea, select, button {
+      font: inherit;
+    }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: #0d1117;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 11px 12px;
+      outline: none;
+    }
+    textarea { min-height: 160px; resize: vertical; }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(88,166,255,.15);
+    }
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 14px;
+      cursor: pointer;
+      background: var(--accent);
+      color: #08111f;
+      font-weight: 700;
+    }
+    button.secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
+    button.good { background: var(--good); color: #041006; }
+    button.warn { background: var(--warn); color: #150f02; }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    .span-2 { grid-column: span 2; }
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-5 { grid-column: span 5; }
+    .span-6 { grid-column: span 6; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+    @media (max-width: 850px) {
+      .grid > * { grid-column: span 12 !important; }
+    }
+    .hint {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted);
+      background: #0d1117;
+      font-size: .78rem;
+      white-space: nowrap;
+    }
+    .albums {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .album {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: #0d1117;
+      padding: 10px;
+      border-radius: 14px;
+    }
+    .album img {
+      width: 64px; height: 64px; object-fit: cover; border-radius: 10px;
+      background: var(--panel2);
+    }
+    .album strong { display: block; margin-bottom: 3px; }
+    .album small { color: var(--muted); }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+    }
+    th {
+      color: var(--muted);
+      text-align: left;
+      font-size: .82rem;
+      font-weight: 600;
+      padding: 0 8px;
+    }
+    td {
+      background: #0d1117;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 8px;
+      vertical-align: middle;
+    }
+    td:first-child { border-left: 1px solid var(--border); border-radius: 12px 0 0 12px; }
+    td:last-child { border-right: 1px solid var(--border); border-radius: 0 12px 12px 0; }
+    .status-good { color: var(--good); font-weight: 700; }
+    .status-bad { color: var(--bad); font-weight: 700; }
+    .status-warn { color: var(--warn); font-weight: 700; }
+    .filebox {
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      background: rgba(13,17,23,.7);
+    }
+    .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .log {
+      background: #06090f;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      min-height: 70px;
+      max-height: 180px;
+      overflow: auto;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .82rem;
+      white-space: pre-wrap;
+    }
+    .smallinput { padding: 8px 9px; border-radius: 9px; }
+    .nowrap { white-space: nowrap; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Navidrome Album LRC Finder v4</h1>
+  <div class="sub">
+    Search an album, find synced <code>.lrc</code> files, and export them using either a normal pattern or your exact local audio filenames.
+    For Navidrome, exact audio filename matching is usually the difference between “lyrics found” and “no lyrics available.”
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <div class="grid">
+      <div class="span-4">
+        <label>Artist</label>
+        <input id="artist" placeholder="Sabrina Carpenter" />
+      </div>
+      <div class="span-4">
+        <label>Album</label>
+        <input id="album" placeholder="Man's Best Friend" />
+      </div>
+      <div class="span-2">
+        <button id="searchBtn" style="width:100%">Search Album</button>
+      </div>
+      <div class="span-2">
+        <button id="manualBtn" class="secondary" style="width:100%">Manual Mode</button>
+      </div>
+      <div class="span-12 hint">
+        Uses Apple/iTunes Search for album tracklists and LRCLIB for synced lyrics. No account needed.
+      </div>
+    </div>
+    <div id="albumResults" class="albums"></div>
+  </section>
+
+  <section class="card">
+    <h2 style="margin-top:0">Filename Matching</h2>
+    <div class="grid">
+      <div class="span-6">
+        <div class="filebox">
+          <label>Optional but recommended: select your actual album folder</label>
+          <input id="folderInput" type="file" webkitdirectory directory multiple />
+          <div style="height:10px"></div>
+          <label>Or select loose audio files</label>
+          <input id="fileInput" type="file" multiple accept=".mp3,.flac,.opus,.m4a,.ogg,.wav,.aac,.alac,.aiff,.wma" />
+          <div class="row-actions" style="margin-top:10px">
+            <button id="buildFromFilesBtn" class="secondary" type="button">Use Audio Files as Tracklist</button>
+          </div>
+          <div class="hint" style="margin-top:8px">
+            This reads filenames only. The app will export LRC files like
+            <code>04 - Sabrina Carpenter - Sugar Talking.lrc</code> when your audio file is
+            <code>04 - Sabrina Carpenter - Sugar Talking.opus</code>.
+            You can also build the whole tracklist from your selected files.
+          </div>
+        </div>
+      </div>
+      <div class="span-3">
+        <label>Export filename mode</label>
+        <select id="filenameMode">
+          <option value="exact">Exact local audio filename when matched</option>
+          <option value="track-title">01 Title.lrc</option>
+          <option value="track-artist-title">01 - Artist - Title.lrc</option>
+          <option value="artist-title">Artist - Title.lrc</option>
+          <option value="title">Title.lrc</option>
+        </select>
+      </div>
+      <div class="span-3">
+        <label>Lyrics type</label>
+        <select id="lyricsMode">
+          <option value="synced">Synced only</option>
+          <option value="synced_plain">Synced, fallback to plain</option>
+        </select>
+      </div>
+      <div class="span-3">
+        <label>Search speed</label>
+        <select id="concurrencyMode">
+          <option value="6">Fast batch search</option>
+          <option value="3">Safer slower search</option>
+          <option value="10">Very fast search</option>
+        </select>
+      </div>
+      <div class="span-12 row-actions">
+        <span class="pill" id="audioCount">0 audio files loaded</span>
+        <span class="pill" id="matchCount">0 tracks matched to local files</span>
+        <span class="pill">Audio supported: mp3, flac, opus, m4a, ogg, wav, aac, alac</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="manualCard" style="display:none">
+    <h2 style="margin-top:0">Manual Tracklist</h2>
+    <div class="grid">
+      <div class="span-4">
+        <label>Manual Artist</label>
+        <input id="manualArtist" placeholder="Artist used for every track" />
+      </div>
+      <div class="span-4">
+        <label>Manual Album Name</label>
+        <input id="manualAlbum" placeholder="Album name for ZIP" />
+      </div>
+      <div class="span-4">
+        <label>&nbsp;</label>
+        <button id="loadManualBtn" class="secondary" style="width:100%">Load Manual Tracks</button>
+      </div>
+      <div class="span-12">
+        <label>Tracklist, one per line. Track numbers are optional.</label>
+        <textarea id="manualTracks" placeholder="01 Manchild&#10;02 Tears&#10;03 My Man on Willpower"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="grid">
+      <div class="span-8">
+        <h2 style="margin:0">Tracks</h2>
+        <div class="hint">After loading tracks, click “Find Lyrics”. Review the output filename column before downloading.</div>
+      </div>
+      <div class="span-4 row-actions" style="justify-content:flex-end">
+        <button id="findBtn" class="warn" disabled>Find Lyrics</button>
+        <button id="zipBtn" class="good" disabled>Download ZIP</button>
+      </div>
+      <div class="span-12" style="overflow:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Title</th>
+              <th>Local audio match</th>
+              <th>Export LRC filename</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="trackBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 style="margin-top:0">Log</h2>
+    <div id="log" class="log">Ready.</div>
+  </section>
+</main>
+
+<script>
+const AUDIO_EXTS = new Set(["mp3","flac","opus","m4a","ogg","wav","aac","alac","aiff","wma"]);
+let tracks = [];
+let audioFiles = [];
+let chosenAlbumName = "lyrics";
+let chosenArtist = "";
+
+const $ = id => document.getElementById(id);
+
+function log(msg) {
+  const el = $("log");
+  const now = new Date().toLocaleTimeString();
+  el.textContent += `\n[${now}] ${msg}`;
+  el.scrollTop = el.scrollHeight;
+}
+
+function cleanName(s) {
+  return (s || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[’‘]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/&/g, "and")
+    .replace(/\b(feat|ft)\.?\b.*$/i, "")
+    .replace(/\([^)]*(remaster|explicit|clean|bonus|live|version)[^)]*\)/gi, "")
+    .replace(/\[[^\]]*(remaster|explicit|clean|bonus|live|version)[^\]]*\]/gi, "")
+    .replace(/[^a-z0-9]+/gi, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function stripExt(filename) {
+  return filename.replace(/\.[^.]+$/, "");
+}
+
+function extOf(filename) {
+  const m = filename.toLowerCase().match(/\.([^.]+)$/);
+  return m ? m[1] : "";
+}
+
+function safeFileName(name) {
+  return String(name || "lyrics")
+    .replace(/[\\/:*?"<>|]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 180);
+}
+
+function parseTrackNumberFromName(name) {
+  const base = stripExt(name).trim();
+  const m = base.match(/^(\d{1,3})(?:\s*[-_. ]|\b)/);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+function titleFromAudioName(name, artist) {
+  let base = stripExt(name);
+  base = base.replace(/^\d{1,3}\s*[-_. ]\s*/, "");
+  if (artist) {
+    const artistRe = new RegExp("^" + artist.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*-\\s*", "i");
+    base = base.replace(artistRe, "");
+  }
+  base = base.replace(/^\s*-\s*/, "");
+  return base.trim();
+}
+
+function inferArtistTitleFromAudio(fileInfo) {
+  const base = stripExt(fileInfo.name).trim();
+  const noNum = base.replace(/^\d{1,3}\s*[-_. ]\s*/, "").trim();
+
+  // Common pattern: 01 - Artist - Title
+  let parts = noNum.split(/\s+-\s+/).map(x => x.trim()).filter(Boolean);
+  if (parts.length >= 2) {
+    return {
+      artist: parts[0],
+      title: parts.slice(1).join(" - ")
+    };
+  }
+
+  // If the user already typed an artist, remove it from filename.
+  const knownArtist = chosenArtist || $("artist").value.trim() || $("manualArtist").value.trim();
+  if (knownArtist) {
+    return {
+      artist: knownArtist,
+      title: titleFromAudioName(fileInfo.name, knownArtist)
+    };
+  }
+
+  // Folder fallback: Artist/Album/01 Title.ext
+  const pathParts = (fileInfo.path || "").split(/[\\/]/).filter(Boolean);
+  const folderArtist = pathParts.length >= 3 ? pathParts[pathParts.length - 3] : "";
+  return {
+    artist: folderArtist,
+    title: noNum
+  };
+}
+
+function buildTracksFromAudioFiles() {
+  if (!audioFiles.length) return alert("Select an album folder or loose audio files first.");
+
+  tracks = audioFiles.map((af, i) => {
+    const inferred = inferArtistTitleFromAudio(af);
+    return {
+      trackNumber: af.trackNumber || i + 1,
+      title: inferred.title || stripExt(af.name),
+      artist: inferred.artist || chosenArtist || $("artist").value.trim(),
+      status: "idle",
+      statusText: "Not searched",
+      lrcText: "",
+      audioFile: af,
+      outputName: ""
+    };
+  }).sort((a,b) => (a.trackNumber || 999) - (b.trackNumber || 999) || a.title.localeCompare(b.title));
+
+  const firstArtist = tracks.find(t => t.artist)?.artist || "";
+  if (firstArtist) chosenArtist = firstArtist;
+
+  const firstPath = audioFiles[0]?.path || "";
+  const parts = firstPath.split(/[\\/]/).filter(Boolean);
+  if (parts.length >= 2) chosenAlbumName = parts[parts.length - 2];
+
+  tracks.forEach(t => t.outputName = outputNameFor(t));
+  renderTracks();
+  log(`Built tracklist from ${tracks.length} selected audio file${tracks.length === 1 ? "" : "s"}.`);
+}
+
+
+function outputNameFor(track) {
+  const mode = $("filenameMode").value;
+  if (mode === "exact" && track.audioFile) return safeFileName(stripExt(track.audioFile.name)) + ".lrc";
+  const num = String(track.trackNumber || "").padStart(2, "0");
+  const artist = track.artist || chosenArtist || $("artist").value || $("manualArtist").value || "";
+  const title = track.title || "Unknown";
+  if (mode === "track-artist-title") return safeFileName(`${num} - ${artist} - ${title}`) + ".lrc";
+  if (mode === "artist-title") return safeFileName(`${artist} - ${title}`) + ".lrc";
+  if (mode === "title") return safeFileName(title) + ".lrc";
+  return safeFileName(`${num} ${title}`) + ".lrc";
+}
+
+function bestAudioMatch(track) {
+  if (!audioFiles.length) return null;
+  const tnum = track.trackNumber;
+  const ttitle = cleanName(track.title);
+  const tartist = cleanName(track.artist || chosenArtist);
+
+  let best = null;
+  let bestScore = -1;
+
+  for (const af of audioFiles) {
+    let score = 0;
+    if (tnum && af.trackNumber === tnum) score += 80;
+    const fileTitleClean = cleanName(titleFromAudioName(af.name, track.artist || chosenArtist));
+    const baseClean = cleanName(stripExt(af.name));
+
+    if (fileTitleClean === ttitle) score += 70;
+    else if (fileTitleClean.includes(ttitle) || ttitle.includes(fileTitleClean)) score += 45;
+    else {
+      const titleWords = new Set(ttitle.split(" ").filter(Boolean));
+      const fileWords = new Set(baseClean.split(" ").filter(Boolean));
+      let overlap = 0;
+      titleWords.forEach(w => { if (fileWords.has(w)) overlap++; });
+      if (titleWords.size) score += Math.round((overlap / titleWords.size) * 35);
+    }
+
+    if (tartist && baseClean.includes(tartist)) score += 10;
+    if (score > bestScore) {
+      bestScore = score;
+      best = af;
+    }
+  }
+  return bestScore >= 65 ? best : null;
+}
+
+function rematchAudio() {
+  tracks.forEach(t => {
+    t.audioFile = bestAudioMatch(t);
+    t.outputName = outputNameFor(t);
+  });
+  renderTracks();
+}
+
+function updateCounts() {
+  $("audioCount").textContent = `${audioFiles.length} audio file${audioFiles.length === 1 ? "" : "s"} loaded`;
+  const matched = tracks.filter(t => t.audioFile).length;
+  $("matchCount").textContent = `${matched} track${matched === 1 ? "" : "s"} matched to local files`;
+}
+
+function renderTracks() {
+  const body = $("trackBody");
+  body.innerHTML = "";
+  tracks.forEach((t, idx) => {
+    t.outputName = outputNameFor(t);
+    const tr = document.createElement("tr");
+
+    const statusClass =
+      t.status === "found" ? "status-good" :
+      t.status === "missing" ? "status-bad" :
+      t.status === "plain" ? "status-warn" : "";
+
+    tr.innerHTML = `
+      <td class="nowrap">${String(t.trackNumber || idx + 1).padStart(2, "0")}</td>
+      <td>
+        <strong>${escapeHtml(t.title)}</strong>
+        <div class="hint">${escapeHtml(t.artist || chosenArtist || "")}</div>
+      </td>
+      <td>${t.audioFile ? escapeHtml(t.audioFile.name) : '<span class="status-warn">No local match</span>'}</td>
+      <td><input class="smallinput" value="${escapeHtml(t.outputName)}" data-idx="${idx}" /></td>
+      <td class="${statusClass}">${escapeHtml(t.statusText || "Not searched")}</td>
+    `;
+    body.appendChild(tr);
+  });
+
+  body.querySelectorAll("input[data-idx]").forEach(inp => {
+    inp.addEventListener("input", e => {
+      const i = Number(e.target.dataset.idx);
+      tracks[i].outputName = e.target.value;
+    });
+  });
+
+  updateCounts();
+  $("findBtn").disabled = tracks.length === 0;
+  $("zipBtn").disabled = !tracks.some(t => t.lrcText);
+}
+
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+async function searchAlbums() {
+  const artist = $("artist").value.trim();
+  const album = $("album").value.trim();
+  if (!artist || !album) return alert("Enter artist and album.");
+  chosenArtist = artist;
+  chosenAlbumName = album;
+  $("albumResults").innerHTML = "";
+  log(`Searching albums for ${artist} - ${album}...`);
+
+  const term = encodeURIComponent(`${artist} ${album}`);
+  const url = `https://itunes.apple.com/search?term=${term}&entity=album&media=music&limit=12`;
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (!data.results?.length) {
+    $("albumResults").innerHTML = `<div class="hint">No album results found. Try manual mode.</div>`;
+    log("No album results found.");
+    return;
+  }
+
+  data.results.forEach(a => {
+    const div = document.createElement("div");
+    div.className = "album";
+    const img = (a.artworkUrl100 || "").replace("100x100bb", "200x200bb");
+    div.innerHTML = `
+      <img src="${escapeHtml(img)}" alt="">
+      <div>
+        <strong>${escapeHtml(a.collectionName)}</strong>
+        <small>${escapeHtml(a.artistName)} • ${escapeHtml(a.primaryGenreName || "")} • ${a.releaseDate ? new Date(a.releaseDate).getFullYear() : ""}</small>
+      </div>
+      <button class="secondary">Load Tracks</button>
+    `;
+    div.querySelector("button").addEventListener("click", () => loadAlbumTracks(a));
+    $("albumResults").appendChild(div);
+  });
+}
+
+async function loadAlbumTracks(albumObj) {
+  chosenAlbumName = albumObj.collectionName;
+  chosenArtist = albumObj.artistName;
+  log(`Loading tracks for ${chosenArtist} - ${chosenAlbumName}...`);
+  const url = `https://itunes.apple.com/lookup?id=${albumObj.collectionId}&entity=song&limit=200`;
+  const res = await fetch(url);
+  const data = await res.json();
+  const songs = data.results.filter(r => r.wrapperType === "track" && r.kind === "song")
+    .sort((a,b) => (a.discNumber - b.discNumber) || (a.trackNumber - b.trackNumber));
+
+  tracks = songs.map((s, i) => ({
+    trackNumber: s.trackNumber || i + 1,
+    title: s.trackName,
+    artist: s.artistName || chosenArtist,
+    status: "idle",
+    statusText: "Not searched",
+    lrcText: "",
+    audioFile: null,
+    outputName: ""
+  }));
+
+  rematchAudio();
+  log(`Loaded ${tracks.length} tracks.`);
+}
+
+async function findLyrics() {
+  if (!tracks.length) return;
+  $("findBtn").disabled = true;
+  $("zipBtn").disabled = true;
+
+  tracks.forEach(t => {
+    t.status = "queued";
+    t.statusText = "Queued";
+  });
+  renderTracks();
+
+  const concurrency = Number($("concurrencyMode")?.value || 6);
+  let nextIndex = 0;
+  let completed = 0;
+
+  async function searchOne(t) {
+    t.status = "searching";
+    t.statusText = "Searching...";
+    renderTracks();
+
+    try {
+      const searchArtist = t.artist || chosenArtist || "";
+      const params = new URLSearchParams({
+        track_name: t.title,
+        artist_name: searchArtist
+      });
+
+      const url = `https://lrclib.net/api/search?${params.toString()}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const results = await res.json();
+      const cleanedTitle = cleanName(t.title);
+      const cleanedArtist = cleanName(searchArtist);
+      let candidates = Array.isArray(results) ? results : [];
+      candidates = candidates
+        .map(r => ({...r, score: lyricScore(r, cleanedTitle, cleanedArtist)}))
+        .sort((a,b) => b.score - a.score);
+
+      let pick = candidates.find(r => r.syncedLyrics && r.score >= 55);
+
+      // If exact filename-derived title included the artist and failed, try a stripped title fallback.
+      if (!pick && t.audioFile) {
+        const inferred = inferArtistTitleFromAudio(t.audioFile);
+        if (inferred.title && cleanName(inferred.title) !== cleanedTitle) {
+          const fallbackParams = new URLSearchParams({
+            track_name: inferred.title,
+            artist_name: inferred.artist || searchArtist
+          });
+          const fallbackRes = await fetch(`https://lrclib.net/api/search?${fallbackParams.toString()}`);
+          if (fallbackRes.ok) {
+            const fallbackResults = await fallbackRes.json();
+            const ft = cleanName(inferred.title);
+            const fa = cleanName(inferred.artist || searchArtist);
+            const fallbackCandidates = Array.isArray(fallbackResults) ? fallbackResults : [];
+            candidates = candidates.concat(
+              fallbackCandidates.map(r => ({...r, score: lyricScore(r, ft, fa)}))
+            ).sort((a,b) => b.score - a.score);
+            pick = candidates.find(r => r.syncedLyrics && r.score >= 55);
+          }
+        }
+      }
+
+      if (!pick && $("lyricsMode").value === "synced_plain") {
+        pick = candidates.find(r => (r.syncedLyrics || r.plainLyrics) && r.score >= 55);
+      }
+
+      if (pick?.syncedLyrics) {
+        t.lrcText = pick.syncedLyrics.trim() + "\n";
+        t.status = "found";
+        t.statusText = "Synced found";
+      } else if (pick?.plainLyrics && $("lyricsMode").value === "synced_plain") {
+        t.lrcText = pick.plainLyrics.trim() + "\n";
+        t.status = "plain";
+        t.statusText = "Plain only";
+      } else {
+        t.lrcText = "";
+        t.status = "missing";
+        t.statusText = "Missing";
+      }
+    } catch (err) {
+      t.lrcText = "";
+      t.status = "missing";
+      t.statusText = `Error: ${err.message}`;
+    } finally {
+      completed++;
+      log(`${completed}/${tracks.length}: ${t.title} — ${t.statusText}`);
+      renderTracks();
+    }
+  }
+
+  async function worker() {
+    while (nextIndex < tracks.length) {
+      const i = nextIndex++;
+      await searchOne(tracks[i]);
+    }
+  }
+
+  log(`Searching ${tracks.length} tracks in batches of ${concurrency}...`);
+  await Promise.all(Array.from({length: Math.min(concurrency, tracks.length)}, worker));
+
+  renderTracks();
+  $("findBtn").disabled = false;
+  $("zipBtn").disabled = !tracks.some(t => t.lrcText);
+  log("Batch lyric search finished.");
+}
+
+function lyricScore(r, cleanedTitle, cleanedArtist) {
+  let score = 0;
+  const rt = cleanName(r.trackName || r.name || "");
+  const ra = cleanName(r.artistName || "");
+  if (rt === cleanedTitle) score += 70;
+  else if (rt.includes(cleanedTitle) || cleanedTitle.includes(rt)) score += 45;
+  if (cleanedArtist && ra === cleanedArtist) score += 25;
+  else if (cleanedArtist && (ra.includes(cleanedArtist) || cleanedArtist.includes(ra))) score += 15;
+  if (r.syncedLyrics) score += 10;
+  return score;
+}
+
+async function downloadZip() {
+  const found = tracks.filter(t => t.lrcText);
+  if (!found.length) return alert("No lyrics to download yet.");
+  const zip = new JSZip();
+  const used = new Set();
+
+  for (const t of found) {
+    let name = t.outputName || outputNameFor(t);
+    if (!name.toLowerCase().endsWith(".lrc")) name += ".lrc";
+    name = safeFileName(name.replace(/\.lrc$/i, "")) + ".lrc";
+    let finalName = name;
+    let n = 2;
+    while (used.has(finalName.toLowerCase())) {
+      finalName = name.replace(/\.lrc$/i, ` (${n}).lrc`);
+      n++;
+    }
+    used.add(finalName.toLowerCase());
+    zip.file(finalName, t.lrcText);
+  }
+
+  const blob = await zip.generateAsync({type:"blob"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = safeFileName(`${chosenArtist ? chosenArtist + " - " : ""}${chosenAlbumName || "lyrics"} LRC`) + ".zip";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+  log(`Downloaded ZIP with ${found.length} LRC files.`);
+}
+
+function loadManualTracks() {
+  const artist = $("manualArtist").value.trim() || $("artist").value.trim();
+  const album = $("manualAlbum").value.trim() || $("album").value.trim() || "manual lyrics";
+  const lines = $("manualTracks").value.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+  if (!artist || !lines.length) return alert("Enter manual artist and at least one track.");
+  chosenArtist = artist;
+  chosenAlbumName = album;
+
+  tracks = lines.map((line, i) => {
+    const m = line.match(/^(\d{1,3})[\s.\-_)]+(.+)$/);
+    return {
+      trackNumber: m ? parseInt(m[1], 10) : i + 1,
+      title: m ? m[2].trim() : line,
+      artist,
+      status: "idle",
+      statusText: "Not searched",
+      lrcText: "",
+      audioFile: null,
+      outputName: ""
+    };
+  });
+  rematchAudio();
+  log(`Loaded ${tracks.length} manual tracks.`);
+}
+
+function loadAudioFileList(fileList) {
+  const files = Array.from(fileList || []);
+  audioFiles = files
+    .filter(f => AUDIO_EXTS.has(extOf(f.name)))
+    .map(f => ({
+      file: f,
+      name: f.name,
+      path: f.webkitRelativePath || f.name,
+      trackNumber: parseTrackNumberFromName(f.name)
+    }))
+    .sort((a,b) => (a.trackNumber || 999) - (b.trackNumber || 999) || a.name.localeCompare(b.name));
+
+  log(`Loaded ${audioFiles.length} local audio filename${audioFiles.length === 1 ? "" : "s"}.`);
+  rematchAudio();
+}
+
+$("folderInput").addEventListener("change", e => loadAudioFileList(e.target.files));
+$("fileInput").addEventListener("change", e => loadAudioFileList(e.target.files));
+
+$("filenameMode").addEventListener("change", () => {
+  tracks.forEach(t => t.outputName = outputNameFor(t));
+  renderTracks();
+});
+
+$("searchBtn").addEventListener("click", searchAlbums);
+$("manualBtn").addEventListener("click", () => {
+  $("manualCard").style.display = $("manualCard").style.display === "none" ? "block" : "none";
+});
+$("loadManualBtn").addEventListener("click", loadManualTracks);
+$("findBtn").addEventListener("click", findLyrics);
+$("zipBtn").addEventListener("click", downloadZip);
+$("buildFromFilesBtn").addEventListener("click", buildTracksFromAudioFiles);
+
+renderTracks();
+</script>
+</body>
+</html>
