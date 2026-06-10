@@ -1,126 +1,758 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>VIP Import Tool</title>
+  <meta charset="UTF-8" />
+  <title>VIP Import Tool v17</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
-    body { background:#111; color:#fff; font-family:Arial; padding:20px; }
+    :root {
+      --bg:#0f1115;
+      --panel:#171a21;
+      --panel2:#11131a;
+      --border:#2b3140;
+      --text:#f4f7fb;
+      --muted:#aab3c2;
+      --green:#4CAF50;
+      --gold:#FFD700;
+      --blue:#7cc7ff;
+      --red:#b72b2b;
+      --accent:#58a6ff;
+    }
 
-    button, select {
-      padding:6px 10px;
-      margin:5px;
-      background:#444;
-      color:#fff;
-      border:none;
+    * { box-sizing:border-box; }
+    body {
+      background:var(--bg);
+      color:var(--text);
+      font-family:Arial, Helvetica, sans-serif;
+      padding:20px;
+      margin:0;
+    }
+
+    h2 { margin:0 0 14px; }
+    h3 { margin:0 0 10px; }
+    p { color:var(--muted); margin:6px 0 12px; line-height:1.35; }
+
+    button, select, input[type="file"]::file-selector-button {
+      padding:8px 12px;
+      margin:5px 5px 5px 0;
+      background:#303646;
+      color:var(--text);
+      border:1px solid #424a5f;
+      border-radius:8px;
       cursor:pointer;
     }
 
-    .delete-btn {
-      background:#aa0000;
-      margin-left:8px;
-      padding:2px 6px;
+    button:hover, select:hover, input[type="file"]::file-selector-button:hover { background:#3b4356; }
+
+    select, input, textarea {
+      background:#0d1017;
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:8px;
+      padding:8px 10px;
+    }
+
+    textarea {
+      width:100%;
+      min-height:150px;
+      resize:vertical;
+      font-family:Consolas, monospace;
+      line-height:1.3;
+    }
+
+    .grid {
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    .card {
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:14px;
+      margin-bottom:16px;
+    }
+
+    .row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+    .muted { color:var(--muted); font-size:13px; }
+
+    .source-list {
+      display:grid;
+      gap:8px;
+      margin-top:8px;
+    }
+
+    .source-item {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background:var(--panel2);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:8px 10px;
+    }
+
+    .source-left { display:flex; align-items:center; gap:8px; min-width:0; }
+    .source-name { font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pill {
+      display:inline-block;
+      padding:2px 7px;
+      border-radius:999px;
+      background:#273044;
+      color:#d7e3f8;
       font-size:12px;
+      margin-left:5px;
+    }
+
+    .tiny-btn {
+      padding:4px 8px;
+      font-size:12px;
+      border-radius:7px;
+      background:#323847;
+    }
+
+    .delete-btn {
+      background:var(--red);
+      border-color:#de4b4b;
+      padding:3px 7px;
+      font-size:12px;
+      margin-left:8px;
+      border-radius:6px;
+    }
+
+    .summary {
+      background:#0d141d;
+      border:1px solid #223347;
+      border-radius:12px;
+      padding:12px;
+      margin-bottom:18px;
+      font-size:17px;
+      font-weight:bold;
+      line-height:1.6;
     }
 
     .date-box {
-      background:#1a1a1a;
-      border:1px solid #333;
-      border-radius:10px;
+      background:#151922;
+      border:1px solid var(--border);
+      border-radius:12px;
       padding:15px;
-      margin-bottom:20px;
+      margin-bottom:18px;
     }
 
     .date-title {
       font-size:18px;
       font-weight:bold;
-      margin-bottom:15px;
-      color:#0f0;
+      margin-bottom:12px;
+      color:#6ee07c;
     }
 
     .columns { display:flex; gap:20px; }
 
     .column {
       flex:1;
-      background:#121212;
+      background:#0f1219;
       padding:10px;
-      border-radius:8px;
-      border:1px solid #2a2a2a;
+      border-radius:10px;
+      border:1px solid #252b39;
+      min-height:40px;
     }
 
-    .job { padding:4px 0; border-bottom:1px solid #222; }
+    .col-title {
+      color:var(--muted);
+      font-weight:bold;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      padding-bottom:8px;
+      border-bottom:1px solid #252b39;
+      margin-bottom:8px;
+    }
+
+    .cleaning-key {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      margin:-2px 0 8px;
+      padding:7px 8px;
+      background:#0b0f16;
+      border:1px solid #252b39;
+      border-radius:8px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .key-dot {
+      width:10px;
+      height:10px;
+      display:inline-block;
+      border-radius:50%;
+      margin-right:5px;
+      vertical-align:-1px;
+    }
+
+    .key-green { background:var(--green); }
+    .key-gold { background:var(--gold); }
+
+    .job {
+      padding:5px 0;
+      border-bottom:1px solid #202532;
+      line-height:1.3;
+    }
+
+    .original { color:var(--green); }
+    .reclean { color:var(--gold); }
+    .labor { color:var(--blue); }
+    .unknown { color:#ffb86b; }
+
+    .error {
+      color:#ff8585;
+      font-weight:bold;
+      margin-top:8px;
+    }
+
+    .ok {
+      color:#87ff9b;
+      font-weight:bold;
+      margin-top:8px;
+    }
+
+
+    .topbar {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:8px;
+    }
+
+    .topbar h2 { margin:0; }
+
+    .gear-btn {
+      font-weight:bold;
+      background:#243247;
+      border-color:#456184;
+      white-space:nowrap;
+    }
+
+    .inline-gear {
+      display:inline-block;
+      margin-top:4px;
+      background:#2c4a2f;
+      border-color:#4e8a55;
+    }
+
+    .floating-gear {
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      z-index:9998;
+      box-shadow:0 8px 25px rgba(0,0,0,.35);
+      background:#2c4a2f;
+      border-color:#4e8a55;
+    }
+
+    .modal-backdrop {
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.68);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      padding:20px;
+    }
+
+    .modal {
+      width:min(850px, 96vw);
+      max-height:90vh;
+      overflow:auto;
+      background:#171a21;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:18px;
+      box-shadow:0 20px 60px rgba(0,0,0,.55);
+    }
+
+    .modal textarea {
+      min-height:260px;
+      margin-top:8px;
+    }
+
+    .settings-help {
+      background:#0d141d;
+      border:1px solid #223347;
+      border-radius:10px;
+      padding:10px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.45;
+      margin:10px 0;
+    }
+
+    .settings-help code { color:#d7e3f8; }
+
+    .debug-tools {
+      background:#0d1017;
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:10px;
+      margin-top:14px;
+    }
+
+    .debug-output {
+      width:100%;
+      min-height:220px;
+      max-height:380px;
+      overflow:auto;
+      white-space:pre-wrap;
+      background:#06080d;
+      color:#d7e3f8;
+      border:1px solid #252b39;
+      border-radius:8px;
+      padding:10px;
+      font-family:Consolas, monospace;
+      font-size:12px;
+      line-height:1.35;
+      margin-top:8px;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns:1fr; }
+      .columns { flex-direction:column; gap:12px; }
+    }
   </style>
 </head>
 
 <body>
 
-<h2>VIP Import Tool</h2>
+<div class="topbar">
+  <div>
+    <h2>VIP Import Tool <span class="pill">v19 shortcut + job settings</span></h2>
+    <p>Upload builder Excel files or paste copied vendor-site table text. Use the checkboxes to choose which imports are visible in the output.</p>
+    <button class="gear-btn inline-gear" onclick="openSettings()" title="Short name settings">⚙️ Short Names / Subdivision Fixes</button>
+  </div>
+  <button class="gear-btn top-gear" onclick="openSettings()" title="Short name settings">⚙️ Short Names</button>
+</div>
 
-<select id="builder">
-  <option value="pulte">Pulte</option>
-  <option value="drhorton">DR Horton</option>
-  <option value="ryan">Ryan</option>
-  <option value="drees">Drees</option> <!-- ⭐ DREES -->
-</select>
+<div class="grid">
+  <div class="card">
+    <div class="row" style="justify-content:space-between; align-items:center;">
+      <h3 style="margin:0;">Excel Uploads</h3>
+      <button class="tiny-btn" onclick="openSettings()">⚙️ Short Names</button>
+    </div>
+    <div class="row">
+      <select id="fileBuilder">
+        <option value="pulte">Pulte</option>
+        <option value="drhorton">DR Horton</option>
+        <option value="ryan">Ryan</option>
+        <option value="drees">Drees</option>
+      </select>
+      <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv">
+      <button onclick="loadFiles()">Load Selected Files</button>
+    </div>
+    <div class="muted">The selected builder is applied to every file selected in this upload batch.</div>
+    <div id="fileStatus"></div>
+  </div>
 
-<input type="file" id="fileInput">
-<button onclick="loadFile()">LOAD FILE</button>
+  <div class="card">
+    <h3>Paste Vendor Text</h3>
+    <div class="row">
+      <select id="pasteBuilder">
+        <option value="fischer">Fischer</option>
+        <option value="arbor">Arbor</option>
+      </select>
+      <input id="pasteName" placeholder="Optional name, like Fischer 6/10" style="min-width:230px; flex:1;">
+      <button onclick="loadPaste()">Add Pasted Text</button>
+    </div>
+    <textarea id="pasteText" placeholder="Paste copied table text here..."></textarea>
+    <div id="pasteStatus"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row" style="justify-content:space-between;">
+    <div>
+      <h3 style="margin-bottom:4px;">Loaded Imports</h3>
+      <div class="muted">Check/uncheck imports to show or hide them.</div>
+    </div>
+    <div>
+      <button onclick="setAllSources(true)">Select All</button>
+      <button onclick="setAllSources(false)">Select None</button>
+      <button onclick="clearSources()">Clear All</button>
+    </div>
+  </div>
+  <div id="sourceList" class="source-list"></div>
+</div>
 
 <div id="output"></div>
 
-<script>
+<button class="gear-btn floating-gear" onclick="openSettings()">⚙️ Short Names</button>
 
-// ===== DATE =====
+<div id="settingsModal" class="modal-backdrop" onclick="closeSettings(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="row" style="justify-content:space-between; align-items:flex-start;">
+      <div>
+        <h3 style="margin-bottom:4px;">Shortcut / Short Name Settings</h3>
+        <div class="muted">Put one shortcut per line. The left side is what the builder/vendor gives you. The right side is what you want it to show as.</div>
+      </div>
+      <button class="tiny-btn" onclick="closeSettings()">Close</button>
+    </div>
+
+    <div class="settings-help">
+      Format: <code>Builder Name = Short Name</code><br>
+      Example: <code>Piatt P West = Piatts</code><br>
+      Matching is case-insensitive and works when the source text contains the left side. These are saved in this browser.
+    </div>
+
+    <div style="margin-top:10px; font-weight:bold;">Subdivision / Short Name Fixes</div>
+    <textarea id="shortcutText" spellcheck="false"></textarea>
+
+    <div style="margin-top:12px; font-weight:bold;">Job / Task Name Fixes</div>
+    <div class="muted" style="margin-bottom:6px;">Use this for task wording, like Power Washing = p/w. Use ignore to hide a task.</div>
+    <textarea id="jobShortcutText" spellcheck="false"></textarea>
+
+    <div class="row" style="margin-top:10px; justify-content:space-between;">
+      <div>
+        <button onclick="saveShortcuts()">Save Settings</button>
+        <button onclick="resetShortcuts()">Reset Defaults</button>
+      </div>
+      <div id="shortcutStatus" class="muted"></div>
+    </div>
+
+    <div class="debug-tools">
+      <h3 style="margin-bottom:6px;">Debug / Raw Data</h3>
+      <div class="muted">Use this to check whether a file/paste is being read, what columns were detected, and what raw rows came through.</div>
+      <div class="row" style="margin-top:8px;">
+        <select id="debugImportSelect" style="min-width:260px;"></select>
+        <button onclick="showSelectedDebug()">Show Debug</button>
+        <button onclick="showSelectedRawData()">Show Raw Data</button>
+        <button onclick="copyDebugOutput()">Copy Output</button>
+      </div>
+      <pre id="debugOutput" class="debug-output">Open this after loading an import, then choose Show Debug or Show Raw Data.</pre>
+    </div>
+  </div>
+</div>
+
+<script>
+let imports = [];
+let nextImportId = 1;
+
+const IMPORT_STORAGE_KEY = "vipImportLoadedImportsV15";
+const IMPORT_NEXT_ID_KEY = "vipImportNextImportIdV15";
+
+function saveImportsToStorage() {
+  try {
+    const safeImports = imports.map(src => ({
+      id: src.id,
+      name: src.name,
+      builder: src.builder,
+      enabled: !!src.enabled,
+      jobs: (src.jobs || []).map(job => ({
+        lot: job.lot,
+        subdivision: job.subdivision,
+        date: job.date instanceof Date ? job.date.toISOString() : job.date,
+        dateKey: job.dateKey,
+        dateStr: job.dateStr,
+        tasks: job.tasks || []
+      })),
+      rawRows: src.rawRows || [],
+      debug: src.debug || ""
+    }));
+
+    localStorage.setItem(IMPORT_STORAGE_KEY, JSON.stringify(safeImports));
+    localStorage.setItem(IMPORT_NEXT_ID_KEY, String(nextImportId));
+  } catch (err) {
+    console.warn("Could not save imports to localStorage", err);
+  }
+}
+
+function loadImportsFromStorage() {
+  try {
+    const raw = localStorage.getItem(IMPORT_STORAGE_KEY);
+    if (!raw) return;
+
+    const saved = JSON.parse(raw);
+    if (!Array.isArray(saved)) return;
+
+    imports = saved.map(src => ({
+      id: Number(src.id) || nextImportId++,
+      name: src.name || "Saved import",
+      builder: src.builder || "unknown",
+      enabled: src.enabled !== false,
+      rawRows: src.rawRows || [],
+      debug: src.debug || "Saved import loaded from browser storage. Raw rows/debug are shown if this version saved them with the import.",
+      jobs: (src.jobs || []).map(job => {
+        const d = parseFlexibleDate(job.date);
+        return {
+          lot: job.lot,
+          subdivision: job.subdivision,
+          date: d,
+          dateKey: d ? dateKey(d) : job.dateKey,
+          dateStr: d ? dateLabel(d) : job.dateStr,
+          tasks: job.tasks || []
+        };
+      }).filter(job => job.lot && job.subdivision && job.date && !isNaN(job.date.getTime()))
+    }));
+
+    const savedNext = parseInt(localStorage.getItem(IMPORT_NEXT_ID_KEY), 10);
+    const maxId = imports.reduce((m, src) => Math.max(m, Number(src.id) || 0), 0);
+    nextImportId = Math.max(isNaN(savedNext) ? 1 : savedNext, maxId + 1);
+  } catch (err) {
+    console.warn("Could not load imports from localStorage", err);
+    imports = [];
+    nextImportId = 1;
+  }
+}
+
+function clearSavedImportsOnly() {
+  localStorage.removeItem(IMPORT_STORAGE_KEY);
+  localStorage.removeItem(IMPORT_NEXT_ID_KEY);
+}
+
+const DEFAULT_SHORTCUT_TEXT = `Piatt P West = Piatts
+Piatts P West = Piatts
+Piatt Preserve West = Piatts
+Piatt Preserve = Piatts
+Liberty Crossing SF = Liberty Crossing
+Liberty Crossing PH = Liberty Crossing
+Villages at Galloway TH = Villages at Galloway
+Kintner Crossing Patio Homes = Kintner Crossing
+Amrine TCG . = Amrine`;
+
+// These are always applied, even if older localStorage shortcut settings exist.
+const BUILTIN_SHORTCUT_TEXT = DEFAULT_SHORTCUT_TEXT;
+
+const DEFAULT_JOB_SHORTCUT_TEXT = `Power Wash = p/w
+Power Washing = p/w
+Pressure Wash = p/w
+Carpet Prep = car
+Final Flooring Prep = floor prep
+FINAL FLOORING PREP = floor prep
+Cleaning Sub = original
+CLEANING SUB = original
+Final Clean #1 = reclean
+Final Clean #2 = reclean
+First Clean = original
+Reclean 1 = reclean
+Reclean 2 = reclean
+Install Screens = ignore`;
+
+const BUILTIN_JOB_SHORTCUT_TEXT = DEFAULT_JOB_SHORTCUT_TEXT;
+
+let shortcutTextRaw = localStorage.getItem("vipImportShortcutsV19") || DEFAULT_SHORTCUT_TEXT;
+let shortcutRules = parseShortcutRules(BUILTIN_SHORTCUT_TEXT + "\n" + shortcutTextRaw);
+let jobShortcutTextRaw = localStorage.getItem("vipImportJobShortcutsV19") || DEFAULT_JOB_SHORTCUT_TEXT;
+let jobShortcutRules = parseShortcutRules(BUILTIN_JOB_SHORTCUT_TEXT + "\n" + jobShortcutTextRaw);
+
+function parseShortcutRules(text) {
+  return (text || "")
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(line => line && !line.startsWith("#") && line.includes("="))
+    .map(line => {
+      const idx = line.indexOf("=");
+      return {
+        from: line.slice(0, idx).trim(),
+        to: line.slice(idx + 1).trim()
+      };
+    })
+    .filter(rule => rule.from && rule.to);
+}
+
+function applyShortcutName(value) {
+  const original = (value || "").toString().trim();
+  if (!original) return "";
+
+  const suffixMatch = original.match(/\s\*(Fischer|Arbor)\s*$/i);
+  const suffix = suffixMatch ? " *" + suffixMatch[1] : "";
+  const base = suffixMatch ? original.replace(/\s\*(Fischer|Arbor)\s*$/i, "").trim() : original;
+
+  // First try the exact full displayed text. This fixes rules like:
+  // London Landing at Brooksedge *Arbor = London Landing *Arbor
+  const originalLower = original.toLowerCase();
+  for (const rule of shortcutRules) {
+    if (originalLower.includes(rule.from.toLowerCase())) return rule.to;
+  }
+
+  // Then try just the base subdivision, preserving Fischer/Arbor suffix when the result has no builder suffix.
+  const baseLower = base.toLowerCase();
+  for (const rule of shortcutRules) {
+    const fromClean = rule.from.replace(/\s\*(Fischer|Arbor)\s*$/i, "").trim().toLowerCase();
+    if (fromClean && baseLower.includes(fromClean)) {
+      return rule.to.includes("*") ? rule.to : rule.to + suffix;
+    }
+  }
+
+  return original;
+}
+
+function applyJobShortcutName(value) {
+  const original = (value || "").toString().trim();
+  if (!original) return "";
+  const lower = original.toLowerCase();
+  for (const rule of jobShortcutRules) {
+    if (lower.includes(rule.from.toLowerCase())) return rule.to.trim();
+  }
+  return "";
+}
+
+function openSettings() {
+  document.getElementById("shortcutText").value = shortcutTextRaw;
+  document.getElementById("jobShortcutText").value = jobShortcutTextRaw;
+  document.getElementById("shortcutStatus").textContent = "";
+  populateDebugImportSelect();
+  document.getElementById("settingsModal").style.display = "flex";
+}
+
+function closeSettings(evt) {
+  if (evt && evt.target && evt.target.id !== "settingsModal") return;
+  document.getElementById("settingsModal").style.display = "none";
+}
+
+function saveShortcuts() {
+  shortcutTextRaw = document.getElementById("shortcutText").value;
+  jobShortcutTextRaw = document.getElementById("jobShortcutText").value;
+  localStorage.setItem("vipImportShortcutsV19", shortcutTextRaw);
+  localStorage.setItem("vipImportJobShortcutsV19", jobShortcutTextRaw);
+  shortcutRules = parseShortcutRules(BUILTIN_SHORTCUT_TEXT + "\n" + shortcutTextRaw);
+  jobShortcutRules = parseShortcutRules(BUILTIN_JOB_SHORTCUT_TEXT + "\n" + jobShortcutTextRaw);
+  applyShortcutsToLoadedImports();
+  saveImportsToStorage();
+  renderOutput();
+  document.getElementById("shortcutStatus").textContent = "Saved.";
+}
+
+function resetShortcuts() {
+  document.getElementById("shortcutText").value = DEFAULT_SHORTCUT_TEXT;
+  document.getElementById("jobShortcutText").value = DEFAULT_JOB_SHORTCUT_TEXT;
+  shortcutTextRaw = DEFAULT_SHORTCUT_TEXT;
+  jobShortcutTextRaw = DEFAULT_JOB_SHORTCUT_TEXT;
+  localStorage.setItem("vipImportShortcutsV19", shortcutTextRaw);
+  localStorage.setItem("vipImportJobShortcutsV19", jobShortcutTextRaw);
+  shortcutRules = parseShortcutRules(BUILTIN_SHORTCUT_TEXT + "\n" + shortcutTextRaw);
+  jobShortcutRules = parseShortcutRules(BUILTIN_JOB_SHORTCUT_TEXT + "\n" + jobShortcutTextRaw);
+  applyShortcutsToLoadedImports();
+  saveImportsToStorage();
+  renderOutput();
+  document.getElementById("shortcutStatus").textContent = "Defaults restored.";
+}
+
+function applyShortcutsToLoadedImports() {
+  imports.forEach(src => {
+    src.jobs.forEach(job => {
+      job.subdivision = applyShortcutName(job.subdivision);
+    });
+  });
+}
+
+
+
+// ===== DATE HELPERS =====
 function excelDateToJS(serial) {
   let utc = new Date((serial - 25569 + 1) * 86400 * 1000);
-  return new Date(
-    utc.getUTCFullYear(),
-    utc.getUTCMonth(),
-    utc.getUTCDate()
-  );
-}
-// ===== META TRACKING =====
-let META;
-
-function resetMeta() {
-  META = {
-    originals: 0,
-    recleans: 0,
-    labor: 0,
-    minDate: null,
-    maxDate: null
-  };
+  return new Date(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate());
 }
 
-function updateMeta(date, task) {
-  if (!date) return;
+function parseFlexibleDate(value) {
+  if (value === null || value === undefined || value === "") return null;
 
-  if (!META.minDate || date < META.minDate) META.minDate = date;
-  if (!META.maxDate || date > META.maxDate) META.maxDate = date;
+  if (typeof value === "number") return excelDateToJS(value);
 
-  let type = classifyTask(task || "");
+  let s = value.toString().trim();
+  if (!s || s.toLowerCase() === "n/a") return null;
 
-  if (type === "original") META.originals++;
-  else if (type === "reclean") META.recleans++;
-  else if (type) META.labor++;
+  // Reject Dur./Variance cells like 0, 1, -2, 35. These were causing fake 01/01 dates.
+  if (/^-?\d+$/.test(s)) return null;
+
+  let parts = s.split(/[\/\-]/);
+  if (parts.length === 3 && parts[0].length <= 2 && parts[1].length <= 2) {
+    let y = parseInt(parts[2], 10);
+    if (y < 100) y += 2000;
+    const d = new Date(y, parseInt(parts[0], 10) - 1, parseInt(parts[1], 10));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // Allow year-first strings from CSV/localStorage, like 2026/06/09 or 2026-06-09.
+  let ymd = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if (ymd) {
+    const y = parseInt(ymd[1], 10);
+    const m = parseInt(ymd[2], 10);
+    const day = parseInt(ymd[3], 10);
+    const d = new Date(y, m - 1, day);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  return null;
 }
+
+
+function parseWorkbookDate(value) {
+  if (value === null || value === undefined || value === "") return null;
+
+  // Excel/CSV exports sometimes send Excel serial dates as either a number or a numeric string.
+  if (typeof value === "number") return excelDateToJS(value);
+
+  let s = value.toString().trim();
+  if (!s || s.toLowerCase() === "n/a") return null;
+
+  // Accept only realistic Excel serial dates here. Paste parsers still use parseFlexibleDate,
+  // so Dur./Variance values like 0, 1, -2, 35 cannot become fake 01/01 dates.
+  if (/^\d{5,6}(?:\.\d+)?$/.test(s)) {
+    const serial = Number(s);
+    if (serial > 20000 && serial < 90000) return excelDateToJS(serial);
+  }
+
+  return parseFlexibleDate(s);
+}
+
+function dateKey(date) {
+  return date.getFullYear() + "-" + String(date.getMonth()+1).padStart(2,"0") + "-" + String(date.getDate()).padStart(2,"0");
+}
+
+function dateLabel(date) {
+  return date.toLocaleDateString("en-US", {month:"2-digit", day:"2-digit"});
+}
+
 // ===== TASK CLASSIFIER =====
 function classifyTask(task) {
-  let t = task.toLowerCase().trim();
+  let t = (task || "").toLowerCase().trim();
 
-  // ⭐ ORIGINAL (Drees + others)
-  if (
-    t.includes("full clean") ||
-    t.includes("first clean") ||
-    t.includes("pre-drywall clean") ||
-    t.includes("rough clean")
-  ) return "original";
+  if (!t) return null;
 
-  // ⭐ RECLEAN (Drees + others)
+  const customTask = applyJobShortcutName(task);
+  if (customTask) {
+    const c = customTask.toLowerCase();
+    if (["ignore", "skip", "hide", "none", "null"].includes(c)) return null;
+    return customTask;
+  }
+
+  // Ignore / not useful for the importer
+  if (t.includes("screen")) return null;
+
+  // Arbor
+  if (t.includes("first clean")) return "original";
+  if (t.includes("reclean 1") || t.includes("reclean 2") || t === "reclean") return "reclean";
+  if (t.includes("power washing")) return "p/w";
+
+  // Fischer
+  if (t.includes("cleaning sub")) return "original";
+  if (t.includes("final clean #1") || t.includes("final clean #2")) return "reclean";
+  if (t.includes("final flooring prep")) return "floor prep";
+  if (t.includes("power wash basement")) return "p/w bsmt";
+  if (t.includes("power wash flatwork")) return "p/w flatwork";
+
+  // Existing builders / general
+  if (t.includes("full clean") || t.includes("pre-drywall clean") || t.includes("rough clean")) return "original";
+
   if (
     t.includes("reclean") ||
     t.includes("qc clean") ||
-    t.includes("qc") ||
+    t === "qc" ||
     t.includes("hqi clean") ||
     t.includes("new home presentation clean") ||
     t.includes("final clean") ||
@@ -128,36 +760,25 @@ function classifyTask(task) {
     t.includes("buff")
   ) return "reclean";
 
-  // ⭐ POWER WASH
-  if (
-    t.includes("power wash") ||
-    t.includes("powerwash") ||
-    t.includes("p/w") ||
-    t.includes("pressure wash")
-  ) return "p/w";
-
-  // ⭐ CARPET
+  if (t.includes("power wash") || t.includes("powerwash") || t.includes("p/w") || t.includes("pressure wash")) return "p/w";
   if (t.includes("carpet")) return "car";
-
-  // ⭐ LABOR TASKS
   if (t.includes("dehumidifier")) return "dehu";
   if (t.includes("remove basement wall bracing")) return "remove bracing";
   if (t.includes("basement wall bracing")) return "bracing";
   if (t.includes("anchor bolts")) return "bolts";
+  if (t.includes("labor") || t.includes("trim")) return "labor";
 
-  // ❌ IGNORE
-  if (t.includes("screen")) return null;
-
-  return "unknown"; // fallback
+  return "unknown";
 }
 
 // ===== SUBDIVISION CLEANUP =====
 function cleanSubdivision(name) {
   if (!name) return "";
 
+  name = applyShortcutName(name);
   let n = name.toLowerCase().trim();
 
-  // ===== HARD MAPPINGS =====
+  // Hard mappings
   if (n.includes("amrine meadows")) return "Amrine";
   if (n.includes("clark shaw reserve")) return "Clarkshaw";
   if (n.includes("clover run")) return "Clover";
@@ -174,9 +795,13 @@ function cleanSubdivision(name) {
   if (n.includes("nelson farms")) return "Nelson";
   if (n.includes("nottingham trace")) return "Nottingham";
   if (n.includes("arrowhead")) return "Arrowhead";
-  if (n.includes("Sugar Farms")) return "Sugar Farms";
-  if (n.includes("Wagnalls Run HLE")) return "Wagnalls";
-  if (n.includes("Piatt P West")) return "Piatts";
+  if (n.includes("sugar farms")) return "Sugar Farms";
+  if (n.includes("wagnalls run hle")) return "Wagnalls";
+  if (n.includes("piatt p west") || n.includes("piatts p west") || n.includes("piatt preserve west") || n.includes("piatt preserve")) return "Piatts";
+  if (n.includes("liberty crossing sf") || n.includes("liberty crossing ph")) return "Liberty Crossing";
+  if (n.includes("villages at galloway th")) return "Villages at Galloway";
+  if (n.includes("kintner crossing patio homes")) return "Kintner Crossing";
+  if (n.includes("amrine tcg")) return "Amrine";
 
   // DR Horton
   if (n.includes("longview")) return "LH";
@@ -186,419 +811,761 @@ function cleanSubdivision(name) {
   if (n.includes("lansdowne")) return "Lansdowne";
   if (n.includes("madison meadows")) return "MD";
 
-  // ===== CLEANUP LOGIC =====
   let cleaned = name
     .replace(/-/g, " ")
-    .replace(/\d+/g, "") // remove numbers
+    .replace(/\d+/g, "")
     .replace(/highlands/gi, "")
     .replace(/summit/gi, "")
     .replace(/reserve/gi, "")
     .replace(/retreat/gi, "")
     .replace(/phase/gi, "")
-    .replace(/l\b/gi, "")
+    .replace(/\bl\b/gi, "")
     .replace(/\s+/g, " ")
     .trim();
 
   return cleaned;
 }
 
-// ===== LOAD =====
-function loadFile() {
-resetMeta();
-  const builder = document.getElementById("builder").value;
-  const file = document.getElementById("fileInput").files[0];
-  if (!file) return alert("Select file");
-
-  const reader = new FileReader();
-
-  reader.onload = function(e) {
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: "array" });
-
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-    let header = rows[0].join(" ").toLowerCase();
-
-    if (builder === "pulte" && header.includes("plat")) {
-      alert("Wrong builder selected (this is DR Horton)");
-      return;
-    }
-
-    if (builder === "drhorton" && header.includes("community")) {
-      alert("Wrong builder selected (this is Pulte)");
-      return;
-    }
-
- if (builder === "pulte") processPulte(rows);
-if (builder === "drhorton") processDRHorton(rows);
-if (builder === "ryan") processRyan(rows);
-if (builder === "drees") processDrees(rows); // ⭐ DREES
-
+function cleanFischerCommunity(code) {
+  const map = {
+    "GLR MSH": "Glacier Pointe"
   };
 
-  reader.readAsArrayBuffer(file);
+  let key = (code || "").toString().trim();
+  if (!key) return "";
+
+  let base = map[key] || key;
+  base = applyShortcutName(base);
+  return base.includes("*") ? base : base + " *Fischer";
 }
 
-function parsePulteDate(value) {
+function cleanArborCommunity(name) {
+  let n = (name || "").toString().trim();
+  if (!n) return "";
+  n = applyShortcutName(n);
+  return n.includes("*") ? n : n + " *Arbor";
+}
 
-  // Excel serial (most common)
-  if (typeof value === "number") {
-    let utc_days = Math.floor(value - 25569);
-    let utc_value = utc_days * 86400;
-    let date = new Date(utc_value * 1000);
+function addImport(name, builder, jobs, rawRows = [], debug = "") {
+  imports.push({
+    id: nextImportId++,
+    name,
+    builder,
+    jobs,
+    enabled: true,
+    rawRows,
+    debug
+  });
+  saveImportsToStorage();
+  renderSources();
+  renderOutput();
+}
 
-    return new Date(
-      date.getUTCFullYear(),
-      date.getUTCMonth(),
-      date.getUTCDate()
-    );
+// ===== FILE LOADING =====
+async function loadFiles() {
+  const builder = document.getElementById("fileBuilder").value;
+  const files = Array.from(document.getElementById("fileInput").files || []);
+  const status = document.getElementById("fileStatus");
+
+  if (!files.length) {
+    status.innerHTML = '<div class="error">Select one or more files first.</div>';
+    return;
   }
 
-  // String fallback (no timezone shift)
-  if (typeof value === "string") {
-    let parts = value.split(/[\/\-]/);
-    if (parts.length === 3) {
-      return new Date(parts[2], parts[0]-1, parts[1]);
+  status.innerHTML = '<div class="muted">Loading...</div>';
+  let loaded = 0;
+  let errors = [];
+
+  for (const file of files) {
+    try {
+      const rows = await readWorkbookRows(file);
+      const jobs = processRowsByBuilder(builder, rows);
+      const debug = buildFileDebugReport(file.name, builder, rows, jobs);
+      addImport(file.name, builder, jobs, rows, debug);
+      loaded++;
+    } catch (err) {
+      errors.push(file.name + ": " + err.message);
     }
   }
 
-  return null;
+  status.innerHTML = `<div class="ok">Loaded ${loaded} file(s).</div>` +
+    (errors.length ? `<div class="error">${errors.join("<br>")}</div>` : "");
 }
 
-// ===== PROCESS =====
+function readWorkbookRows(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        resolve(rows);
+      } catch (err) {
+        reject(err);
+      }
+    };
+    reader.onerror = () => reject(new Error("Could not read file"));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function processRowsByBuilder(builder, rows) {
+  if (builder === "pulte") return processPulte(rows);
+  if (builder === "drhorton") return processDRHorton(rows);
+  if (builder === "ryan") return processRyan(rows);
+  if (builder === "drees") return processDrees(rows);
+  return [];
+}
+
+// ===== PASTE LOADING =====
+function loadPaste() {
+  const builder = document.getElementById("pasteBuilder").value;
+  const text = document.getElementById("pasteText").value;
+  const customName = document.getElementById("pasteName").value.trim();
+  const status = document.getElementById("pasteStatus");
+
+  if (!text.trim()) {
+    status.innerHTML = '<div class="error">Paste text first.</div>';
+    return;
+  }
+
+  let jobs = [];
+  if (builder === "fischer") jobs = processFischerPaste(text);
+  if (builder === "arbor") jobs = processArborPaste(text);
+
+  if (!jobs.length) {
+    status.innerHTML = '<div class="error">No jobs found. Check the selected paste builder.</div>';
+    return;
+  }
+
+  const name = customName || (builder.charAt(0).toUpperCase() + builder.slice(1) + " paste");
+  const rawRows = text.split(/\r?\n/).filter(l => l.trim()).map(line => line.split("\t"));
+  const debug = buildPasteDebugReport(name, builder, text, jobs);
+  addImport(name, builder, jobs, rawRows, debug);
+  status.innerHTML = `<div class="ok">Added ${jobs.length} job/task row(s).</div>`;
+}
+
+// ===== JOB MAP HELPERS =====
+function makeGroupedJobs() {
+  return {};
+}
+
+function addTaskToMap(map, lot, subdivision, date, task) {
+  if (!lot || !subdivision || !date || isNaN(date.getTime())) return;
+  const key = `${dateKey(date)}_${lot}_${subdivision}`;
+  if (!map[key]) {
+    map[key] = {
+      lot,
+      subdivision,
+      date,
+      dateKey: dateKey(date),
+      dateStr: dateLabel(date),
+      tasks: []
+    };
+  }
+  map[key].tasks.push(task || "");
+}
+
+function mapToArray(map) {
+  return Object.values(map);
+}
+
+// ===== EXISTING EXCEL PROCESSORS =====
+function parsePulteDate(value) {
+  return parseWorkbookDate(value);
+}
+
 function processPulte(rows) {
-  let jobs = {};
+  let jobs = makeGroupedJobs();
 
   rows.forEach(row => {
     let community = row[0];
     let jobRaw = row[1];
-    let task = row[8];
+    let task = row[8] || "";
     let dateRaw = row[12];
 
     if (!jobRaw || !dateRaw) return;
-    if (!task) task = "";
 
-    let lot = parseInt(jobRaw.split("-")[1]?.trim(), 10);
-if (isNaN(lot)) return;
+    let lot = parseInt(jobRaw.toString().split("-")[1]?.trim(), 10);
+    if (isNaN(lot)) return;
 
-let date = parsePulteDate(dateRaw);
-
-    if (!date || isNaN(date.getTime())) return;
-
-    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
-
-    let key = lot + "_" + dateStr;
-	
-	updateMeta(date, task);
-
-    if (!jobs[key]) jobs[key] = { lot, subdivision: cleanSubdivision(community), dateStr, tasks: [] };
-
-    jobs[key].tasks.push(task);
+    let date = parsePulteDate(dateRaw);
+    addTaskToMap(jobs, lot, cleanSubdivision(community), date, task);
   });
 
-  render(jobs);
+  return mapToArray(jobs);
 }
 
 function processDRHorton(rows) {
-  let jobs = {};
+  let jobs = makeGroupedJobs();
 
   let headerIndex = rows.findIndex(r => r.join(" ").toLowerCase().includes("description"));
-  let headers = rows[headerIndex].map(h => (h||"").toLowerCase());
+  if (headerIndex === -1) headerIndex = rows.findIndex(r => r.join(" ").toLowerCase().includes("activity"));
+  if (headerIndex === -1) throw new Error("DR Horton header not found");
 
-  let dateCol = headers.findIndex(h=>h.includes("date"));
-  let projectCol = headers.findIndex(h=>h.includes("project"));
-  let platCol = headers.findIndex(h=>h.includes("plat"));
-  let descCol = headers.findIndex(h=>h.includes("description"));
+  let headers = rows[headerIndex].map(h => (h||"").toLowerCase());
+  let dateCol = headers.findIndex(h=>h.includes("date") || h.includes("start"));
+  let projectCol = headers.findIndex(h=>h.includes("project") || h.includes("community"));
+  let platCol = headers.findIndex(h=>h.includes("plat") || h.includes("lot"));
+  let descCol = headers.findIndex(h=>h.includes("description") || h.includes("activity") || h.includes("task"));
+
+  if (dateCol === -1 || projectCol === -1 || platCol === -1 || descCol === -1) {
+    throw new Error("DR Horton columns not found");
+  }
 
   rows.slice(headerIndex+1).forEach(row => {
     let dateRaw = row[dateCol];
     let project = row[projectCol];
     let plat = row[platCol];
-    let task = row[descCol];
+    let task = row[descCol] || "";
 
     if (!plat || !dateRaw) return;
-    if (!task) task = "";
 
-    let match = plat.split("/")[0].match(/\d+/);
+    let match = plat.toString().split("/")[0].match(/\d+/);
     if (!match) return;
 
     let lot = parseInt(match[0],10);
     if (lot > 100000) return;
 
-    let date = new Date(dateRaw);
-    if (!date || isNaN(date.getTime())) return;
-
-    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
-    let key = lot + "_" + dateStr;
-	updateMeta(date, task);
-
-    if (!jobs[key]) jobs[key] = { lot, subdivision: cleanSubdivision(project), dateStr, tasks: [] };
-
-    jobs[key].tasks.push(task);
+    let date = parseWorkbookDate(dateRaw);
+    addTaskToMap(jobs, lot, cleanSubdivision(project), date, task);
   });
 
-  render(jobs);
+  return mapToArray(jobs);
 }
 
 function processRyan(rows) {
-  let jobs = {};
+  let jobs = makeGroupedJobs();
 
-  // 🔍 find header row safely
   let headerIndex = rows.findIndex(r => {
     let str = r.join(" ").toLowerCase();
     return str.includes("community") && (str.includes("schedule") || str.includes("date"));
   });
 
-  if (headerIndex === -1) {
-    alert("Ryan format not detected");
-    return;
-  }
+  if (headerIndex === -1) throw new Error("Ryan format not detected");
 
   let headers = rows[headerIndex].map(h => (h || "").toLowerCase());
-
   let communityCol = headers.findIndex(h => h.includes("community"));
   let lotCol = headers.findIndex(h => h.includes("lot"));
   let dateCol = headers.findIndex(h => h.includes("schedule") || h.includes("date"));
   let taskCol = headers.findIndex(h => h.includes("task") || h.includes("description"));
 
   if (communityCol === -1 || lotCol === -1 || dateCol === -1 || taskCol === -1) {
-    alert("Ryan columns not found");
-    return;
+    throw new Error("Ryan columns not found");
   }
 
-  const communityMap = {
-    "RA": "Rutherford",
-    "TT": "Terra Alta",
-    "T8": "Terra Alta"
-  };
+  const communityMap = { "RA": "Rutherford", "TT": "Terra Alta", "T8": "Terra Alta" };
 
   rows.slice(headerIndex + 1).forEach(row => {
-
     let communityRaw = (row[communityCol] || "").toString().trim();
     let lotRaw = row[lotCol];
     let dateRaw = row[dateCol];
     let taskRaw = (row[taskCol] || "").toString().toLowerCase().trim();
 
     if (!communityRaw || !lotRaw || !dateRaw) return;
+    if (taskRaw.includes("foundation") && taskRaw.includes("poured")) return;
 
     let subdivision = communityMap[communityRaw] || communityRaw;
-
     let lot = parseInt(lotRaw, 10);
-    if (isNaN(lot)) return;
+    let date = parseWorkbookDate(dateRaw);
 
-    let date = typeof dateRaw === "number"
-      ? excelDateToJS(dateRaw)
-      : new Date(dateRaw);
-
-    if (!date || isNaN(date.getTime())) return;
-
-    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
-	updateMeta(date, taskRaw);
-
-    // ===== TASK FILTER =====
-if (
-  taskRaw.includes("foundation") &&
-  taskRaw.includes("poured")
-) return;
-
-    let task;
-    if (taskRaw.includes("pressure wash")) task = "p/w";
-    else if (taskRaw.includes("final clean") || taskRaw.includes("qai reclean")) task = "reclean";
-    else if (taskRaw.includes("full clean")) task = "original";
-    else if (taskRaw.includes("carpet prep")) task = "car";
-    else task = taskRaw;
-
-    let key = lot + "_" + dateStr;
-
-    if (!jobs[key]) jobs[key] = {
-      lot,
-      subdivision: cleanSubdivision(subdivision),
-      dateStr,
-      tasks: []
-    };
-
-    jobs[key].tasks.push(task);
+    addTaskToMap(jobs, lot, cleanSubdivision(subdivision), date, taskRaw);
   });
 
-  render(jobs);
+  return mapToArray(jobs);
 }
 
 function processDrees(rows) {
-  let jobs = {};
+  let jobs = makeGroupedJobs();
 
   rows.slice(1).forEach(row => {
-
-    let taskRaw = (row[1] || "").toString().toLowerCase().trim();   // col 3
-    let subdivisionRaw = row[12];                                   // col 13
-    let dateRaw = row[24];                                          // col 24
-    let lotRaw = (row[13] || "").toString().trim();                 // ⭐ col 14 (N)
+    let taskRaw = (row[1] || "").toString().toLowerCase().trim();
+    let subdivisionRaw = row[12];
+    let dateRaw = row[24];
+    let lotRaw = (row[13] || "").toString().trim();
 
     if (!taskRaw || !subdivisionRaw || !dateRaw || !lotRaw) return;
 
-    // ⭐ extract lot from ALPL-0063-00
     let lotMatch = lotRaw.match(/-(\d+)-/);
     if (!lotMatch) return;
 
     let lot = parseInt(lotMatch[1], 10);
-    if (isNaN(lot)) return;
+    let date = parseWorkbookDate(dateRaw);
+    addTaskToMap(jobs, lot, cleanSubdivision(subdivisionRaw), date, taskRaw);
+  });
 
-   let date;
-
-// Excel number
-if (typeof dateRaw === "number") {
-  date = excelDateToJS(dateRaw);
+  return mapToArray(jobs);
 }
-// String like 3/21/2026
-else if (typeof dateRaw === "string") {
-  let parts = dateRaw.split(/[\/\-]/);
-  if (parts.length === 3) {
-    date = new Date(parts[2], parts[0]-1, parts[1]); // MM/DD/YYYY
-  } else {
-    date = new Date(dateRaw);
+
+
+function pickStartDateFromFields(fields, preferredIndex) {
+  const preferred = parseFlexibleDate(fields[preferredIndex]);
+  if (preferred) return preferred;
+
+  // Fallback: scan for date-like cells only. Do not accept plain numbers.
+  for (const cell of fields) {
+    const text = (cell || "").toString().trim();
+    if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(text) || /^\d{4}-\d{2}-\d{2}/.test(text)) {
+      const d = parseFlexibleDate(text);
+      if (d) return d;
+    }
   }
+  return null;
 }
 
-    if (!date || isNaN(date.getTime())) return;
+// ===== PASTE PROCESSORS =====
+function mergeFischerRecords(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  const records = [];
+  let current = "";
 
-    let dateStr = date.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"});
+  lines.forEach(line => {
+    // New Fischer records usually start with Row# then tabs: 101\tGLR MSH...
+    if (/^\s*\d+\t/.test(line)) {
+      if (current) records.push(current);
+      current = line.trim();
+    } else if (current) {
+      current += "\t" + line.trim();
+    }
+  });
 
-    updateMeta(date, taskRaw);
+  if (current) records.push(current);
+  return records;
+}
 
-    let task;
-    if (taskRaw.includes("pressure wash") || taskRaw.includes("p/w")) task = "p/w";
-    else if (taskRaw.includes("reclean") || taskRaw.includes("qc")) task = "reclean";
-    else if (taskRaw.includes("full clean") || taskRaw.includes("first clean")) task = "original";
-    else if (taskRaw.includes("carpet")) task = "car";
-    else task = taskRaw;
+function processFischerPaste(text) {
+  let jobs = makeGroupedJobs();
+  const records = mergeFischerRecords(text);
 
-    let key = lot + "_" + dateStr;
+  records.forEach(record => {
+    const f = record.split("\t");
 
-    if (!jobs[key]) jobs[key] = {
-      lot,
-      subdivision: cleanSubdivision(subdivisionRaw),
-      dateStr,
-      tasks: []
+    const community = f[1];
+    const lot = parseInt(f[6], 10);
+    const activity = f[9] || "";
+    const date = pickStartDateFromFields(f, 14);
+
+    if (!community || isNaN(lot) || !activity || !date) return;
+    addTaskToMap(jobs, lot, cleanFischerCommunity(community), date, activity);
+  });
+
+  return mapToArray(jobs);
+}
+
+function mergeArborRecords(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  const records = [];
+  let current = "";
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    const f = trimmed.split("\t");
+    const first = (f[0] || "").trim();
+    const second = (f[1] || "").trim();
+
+    // New Arbor rows start with Row# then Community.
+    // Continuation lines can start with Dur. then Start, like: 1<TAB>5/7/2026, so do not treat those as new rows.
+    const isNewRow = /^\d+$/.test(first) && second && !/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(second);
+
+    if (isNewRow) {
+      if (current) records.push(current);
+      current = trimmed;
+    } else if (current) {
+      current += "\t" + trimmed;
+    }
+  });
+
+  if (current) records.push(current);
+  return records;
+}
+
+function processArborPaste(text) {
+  let jobs = makeGroupedJobs();
+  const records = mergeArborRecords(text);
+
+  records.forEach(record => {
+    let f = record.split("\t");
+
+    // Normal copied Arbor columns: Row#, Community, Model, Batch, Address, Blk, Lot#, Builder, Act, Activity, Status, PO#, PO Ref#, Dur., Start...
+    // If a blank Select column was copied too, shift by one.
+    let offset = (f[0].trim() === "" && /^\d+$/.test((f[1] || "").trim())) ? 1 : 0;
+
+    const community = f[offset + 1];
+    const lot = parseInt(f[offset + 6], 10);
+    const activity = f[offset + 9] || "";
+    const date = pickStartDateFromFields(f, offset + 14);
+
+    if (!community || isNaN(lot) || !activity || !date) return;
+    addTaskToMap(jobs, lot, cleanArborCommunity(community), date, activity);
+  });
+
+  return mapToArray(jobs);
+}
+
+
+// ===== DEBUG / RAW DATA =====
+function safeJson(value) {
+  try { return JSON.stringify(value, null, 2); }
+  catch (err) { return String(value); }
+}
+
+function limitRows(rows, limit = 80) {
+  return (rows || []).slice(0, limit);
+}
+
+function findHeaderDiagnostics(builder, rows) {
+  const lines = [];
+  lines.push(`Rows read: ${(rows || []).length}`);
+  if (!rows || !rows.length) return lines.join("\n");
+
+  const candidates = [];
+  rows.slice(0, 30).forEach((r, i) => {
+    const joined = (r || []).join(" | ");
+    const low = joined.toLowerCase();
+    if (low.includes("description") || low.includes("activity") || low.includes("project") || low.includes("community") || low.includes("lot") || low.includes("plat") || low.includes("start")) {
+      candidates.push({ index:i, columns:(r || []).length, row:r });
+    }
+  });
+
+  lines.push(`Header-like rows in first 30 rows: ${candidates.length}`);
+  candidates.slice(0, 8).forEach(c => lines.push(`  Row ${c.index}: ${safeJson(c.row)}`));
+
+  if (builder === "drhorton") {
+    let headerIndex = rows.findIndex(r => (r || []).join(" ").toLowerCase().includes("description"));
+    if (headerIndex === -1) headerIndex = rows.findIndex(r => (r || []).join(" ").toLowerCase().includes("activity"));
+    lines.push(`DR detected header row: ${headerIndex}`);
+    if (headerIndex >= 0) {
+      const headers = rows[headerIndex].map(h => (h || "").toString().toLowerCase());
+      const dateCol = headers.findIndex(h=>h.includes("date") || h.includes("start"));
+      const projectCol = headers.findIndex(h=>h.includes("project") || h.includes("community"));
+      const platCol = headers.findIndex(h=>h.includes("plat") || h.includes("lot"));
+      const descCol = headers.findIndex(h=>h.includes("description") || h.includes("activity") || h.includes("task"));
+      lines.push(`DR column indexes: date/start=${dateCol}, project/community=${projectCol}, plat/lot=${platCol}, description/activity/task=${descCol}`);
+      lines.push(`DR headers: ${safeJson(rows[headerIndex])}`);
+      const samples = [];
+      rows.slice(headerIndex + 1, headerIndex + 16).forEach((row, idx) => {
+        const dateRaw = row[dateCol];
+        const date = parseWorkbookDate(dateRaw);
+        const project = row[projectCol];
+        const plat = row[platCol];
+        const task = row[descCol];
+        samples.push({ row: headerIndex + 1 + idx, dateRaw, parsedDate: date ? dateLabel(date) : null, project, plat, task });
+      });
+      lines.push(`DR first parsed sample rows: ${safeJson(samples)}`);
+    }
+  }
+
+  return lines.join("\n");
+}
+
+function buildFileDebugReport(fileName, builder, rows, jobs) {
+  const lines = [];
+  lines.push(`FILE DEBUG`);
+  lines.push(`Name: ${fileName}`);
+  lines.push(`Builder selected: ${builder}`);
+  lines.push(`Rows read by XLSX: ${(rows || []).length}`);
+  lines.push(`Jobs produced: ${(jobs || []).length}`);
+  lines.push("");
+  lines.push(findHeaderDiagnostics(builder, rows));
+  lines.push("");
+  lines.push("First 10 raw rows:");
+  lines.push(safeJson(limitRows(rows, 10)));
+  lines.push("");
+  lines.push("First 25 produced jobs:");
+  lines.push(safeJson(limitRows(jobs, 25)));
+  return lines.join("\n");
+}
+
+function buildPasteDebugReport(name, builder, text, jobs) {
+  const lines = [];
+  const rawLines = text.split(/\r?\n/).filter(l => l.trim());
+  const records = builder === "fischer" ? mergeFischerRecords(text) : builder === "arbor" ? mergeArborRecords(text) : rawLines;
+  lines.push(`PASTE DEBUG`);
+  lines.push(`Name: ${name}`);
+  lines.push(`Builder selected: ${builder}`);
+  lines.push(`Raw non-empty lines: ${rawLines.length}`);
+  lines.push(`Merged records: ${records.length}`);
+  lines.push(`Jobs produced: ${(jobs || []).length}`);
+  lines.push("");
+  lines.push("First 8 merged records split by tabs:");
+  lines.push(safeJson(records.slice(0, 8).map(r => r.split("\t"))));
+  lines.push("");
+  lines.push("First 25 produced jobs:");
+  lines.push(safeJson(limitRows(jobs, 25)));
+  return lines.join("\n");
+}
+
+function populateDebugImportSelect() {
+  const sel = document.getElementById("debugImportSelect");
+  if (!sel) return;
+  sel.innerHTML = "";
+  if (!imports.length) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "No imports loaded";
+    sel.appendChild(opt);
+    return;
+  }
+  imports.forEach(src => {
+    const opt = document.createElement("option");
+    opt.value = src.id;
+    opt.textContent = `${src.name} (${src.builder} • ${src.jobs.length})`;
+    sel.appendChild(opt);
+  });
+}
+
+function getSelectedDebugImport() {
+  const sel = document.getElementById("debugImportSelect");
+  if (!sel) return null;
+  const id = Number(sel.value);
+  return imports.find(src => Number(src.id) === id) || null;
+}
+
+function showSelectedDebug() {
+  const out = document.getElementById("debugOutput");
+  const src = getSelectedDebugImport();
+  if (!src) { out.textContent = "No import selected."; return; }
+  out.textContent = src.debug || "No debug data stored for this import. Re-import it with this v15 file to capture debug data.";
+}
+
+function showSelectedRawData() {
+  const out = document.getElementById("debugOutput");
+  const src = getSelectedDebugImport();
+  if (!src) { out.textContent = "No import selected."; return; }
+  const rows = src.rawRows || [];
+  out.textContent = [
+    `RAW DATA`,
+    `Name: ${src.name}`,
+    `Builder: ${src.builder}`,
+    `Rows stored: ${rows.length}`,
+    `Showing first 100 rows/cells below.`,
+    "",
+    safeJson(limitRows(rows, 100))
+  ].join("\n");
+}
+
+function copyDebugOutput() {
+  const out = document.getElementById("debugOutput");
+  const text = out ? out.textContent : "";
+  if (!text) return;
+  navigator.clipboard?.writeText(text).then(() => {
+    const status = document.getElementById("shortcutStatus");
+    if (status) status.textContent = "Debug output copied.";
+  }).catch(() => {
+    const status = document.getElementById("shortcutStatus");
+    if (status) status.textContent = "Could not copy automatically. Select the debug text and copy it.";
+  });
+}
+
+// ===== SOURCE CHECKBOXES =====
+function renderSources() {
+  const box = document.getElementById("sourceList");
+  if (!imports.length) {
+    box.innerHTML = '<div class="muted">No imports loaded yet.</div>';
+    return;
+  }
+
+  box.innerHTML = "";
+  imports.forEach(src => {
+    const item = document.createElement("div");
+    item.className = "source-item";
+
+    const left = document.createElement("div");
+    left.className = "source-left";
+
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = src.enabled;
+    cb.onchange = () => {
+      src.enabled = cb.checked;
+      saveImportsToStorage();
+      renderOutput();
     };
 
-    jobs[key].tasks.push(task);
+    const name = document.createElement("div");
+    name.className = "source-name";
+    name.textContent = src.name;
+
+    const meta = document.createElement("span");
+    meta.className = "pill";
+    meta.textContent = `${src.builder} • ${src.jobs.length}`;
+
+    left.appendChild(cb);
+    left.appendChild(name);
+    left.appendChild(meta);
+
+    const right = document.createElement("div");
+    const remove = document.createElement("button");
+    remove.className = "tiny-btn";
+    remove.textContent = "Remove";
+    remove.onclick = () => {
+      imports = imports.filter(i => i.id !== src.id);
+      saveImportsToStorage();
+      renderSources();
+      renderOutput();
+    };
+    right.appendChild(remove);
+
+    item.appendChild(left);
+    item.appendChild(right);
+    box.appendChild(item);
+  });
+}
+
+function setAllSources(value) {
+  imports.forEach(i => i.enabled = value);
+  saveImportsToStorage();
+  renderSources();
+  renderOutput();
+}
+
+function clearSources() {
+  imports = [];
+  clearSavedImportsOnly();
+  renderSources();
+  renderOutput();
+}
+
+// ===== RENDER OUTPUT =====
+function renderOutput() {
+  const visibleImports = imports.filter(i => i.enabled);
+  const allJobs = visibleImports.flatMap(i => i.jobs.map(j => ({...j, sourceName:i.name, sourceBuilder:i.builder})));
+  const container = document.getElementById("output");
+
+  if (!allJobs.length) {
+    container.innerHTML = '<div class="card muted">No visible jobs yet.</div>';
+    return;
+  }
+
+  let meta = {
+    originals: 0,
+    recleans: 0,
+    labor: 0,
+    minDate: null,
+    maxDate: null
+  };
+
+  allJobs.forEach(job => {
+    if (!meta.minDate || job.date < meta.minDate) meta.minDate = job.date;
+    if (!meta.maxDate || job.date > meta.maxDate) meta.maxDate = job.date;
+
+    let hasOriginal = false;
+    let hasReclean = false;
+    let laborCount = 0;
+
+    job.tasks.forEach(t => {
+      const type = classifyTask(t);
+      if (type === "original") hasOriginal = true;
+      else if (type === "reclean") hasReclean = true;
+      else if (type) laborCount++;
+    });
+
+    if (hasOriginal) meta.originals++;
+    if (hasReclean) meta.recleans++;
+    meta.labor += laborCount;
   });
 
-  render(jobs);
-}
-// ===== RENDER =====
-function render(jobs) {
+  let html = `
+    <div class="summary">
+      ${dateLabel(meta.minDate)} - ${dateLabel(meta.maxDate)}<br>
+      Imports Showing: ${visibleImports.length} |
+      Originals: ${meta.originals} |
+      Recleans: ${meta.recleans} |
+      Labor: ${meta.labor}<br>
+      <span style="font-size:13px; font-weight:normal; color:var(--muted);">Selected: ${visibleImports.map(i => escapeHtml(i.name)).join(", ")}</span>
+    </div>
+  `;
 
   let grouped = {};
-  Object.values(jobs).forEach(j => {
-    if (!grouped[j.dateStr]) grouped[j.dateStr] = [];
-    grouped[j.dateStr].push(j);
+  allJobs.forEach(j => {
+    if (!grouped[j.dateKey]) grouped[j.dateKey] = [];
+    grouped[j.dateKey].push(j);
   });
 
-  let container = document.getElementById("output");
-  container.innerHTML = "";
-  // ===== SUMMARY =====
-let summary = document.createElement("div");
-summary.style.marginBottom = "20px";
-summary.style.fontSize = "18px";
-summary.style.fontWeight = "bold";
-
-summary.innerHTML = `
-  ${META.minDate?.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"})}
-  -
-  ${META.maxDate?.toLocaleDateString("en-US",{month:"2-digit",day:"2-digit"})}<br>
-  Originals: ${META.originals} |
-  Recleans: ${META.recleans} |
-  Labor: ${META.labor}
-`;
-
-container.appendChild(summary);
-
-  Object.keys(grouped).sort().forEach(date => {
-
-    let box = document.createElement("div");
-    box.className = "date-box";
-
-    let title = document.createElement("div");
-    title.className = "date-title";
-    title.textContent = date;
-
-    let columns = document.createElement("div");
-    columns.className = "columns";
-
-    let left = document.createElement("div");
-    let right = document.createElement("div");
-
-    left.className = "column";
-    right.className = "column";
-
+  Object.keys(grouped).sort().forEach(key => {
+    const dateJobs = grouped[key];
+    const label = dateJobs[0].dateStr;
     let cleaning = [];
     let labor = [];
 
-    grouped[date].forEach(job => {
-
+    dateJobs.forEach(job => {
       let hasOriginal = false;
       let hasReclean = false;
 
-      job.tasks.forEach(t => {
-        let type = classifyTask(t);
+      job.tasks.forEach(rawTask => {
+        let type = classifyTask(rawTask);
 
         if (type === "original") hasOriginal = true;
-        if (type === "reclean") hasReclean = true;
-
-        if (type && type !== "original" && type !== "reclean") {
-          labor.push({ lot: job.lot, subdivision: job.subdivision, type, raw: t });
-        }
+        else if (type === "reclean") hasReclean = true;
+        else if (type) labor.push({
+          lot: job.lot,
+          subdivision: job.subdivision,
+          type,
+          raw: rawTask,
+          sourceName: job.sourceName
+        });
       });
 
-      if (hasOriginal) cleaning.push({ ...job, type:"original" });
-      else if (hasReclean) cleaning.push({ ...job, type:"reclean" });
-
+      if (hasOriginal) cleaning.push({...job, type:"original"});
+      if (hasReclean) cleaning.push({...job, type:"reclean"});
     });
 
-    cleaning.sort((a,b)=>{
-      if (a.type==="original" && b.type==="reclean") return -1;
-      if (a.type==="reclean" && b.type==="original") return 1;
-      return 0;
+    cleaning.sort((a,b) => {
+      if (a.type === "original" && b.type === "reclean") return -1;
+      if (a.type === "reclean" && b.type === "original") return 1;
+      return String(a.subdivision).localeCompare(String(b.subdivision)) || a.lot - b.lot;
     });
 
-    // render cleaning
-    cleaning.forEach(job=>{
-      let div=document.createElement("div");
-      div.className="job";
-      div.textContent=`${job.lot} ${job.subdivision}`;
-      div.style.color = job.type==="original" ? "#4CAF50" : "#FFD700";
-      left.appendChild(div);
-    });
+    labor.sort((a,b) => String(a.subdivision).localeCompare(String(b.subdivision)) || a.lot - b.lot);
 
-    // render labor
-    labor.forEach(job=>{
-      let div=document.createElement("div");
-      div.className="job";
-
-      let text = job.type === "unknown"
-        ? `${job.lot} ${job.subdivision}-${job.raw}`
-        : `${job.lot} ${job.subdivision}-${job.type}`;
-
-      div.textContent = text;
-
-      let del = document.createElement("button");
-      del.textContent = "";
-      del.className = "delete-btn";
-      del.onclick = () => div.remove();
-
-      div.appendChild(del);
-      right.appendChild(div);
-    });
-
-    columns.appendChild(left);
-    columns.appendChild(right);
-    box.appendChild(title);
-    box.appendChild(columns);
-    container.appendChild(box);
+    html += `
+      <div class="date-box">
+        <div class="date-title">${label}</div>
+        <div class="columns">
+          <div class="column">
+            <div class="col-title">Cleaning</div>
+            <div class="cleaning-key">
+              <strong>Key:</strong> <span><span class="key-dot key-green"></span>Green = Original</span>
+              <span><span class="key-dot key-gold"></span>Yellow = Reclean</span>
+            </div>
+            ${cleaning.length ? cleaning.map(job => `
+              <div class="job ${job.type}">${escapeHtml(job.lot)} ${escapeHtml(job.subdivision)}</div>
+            `).join("") : '<div class="muted">No cleaning jobs</div>'}
+          </div>
+          <div class="column">
+            <div class="col-title">Labor / Other</div>
+            ${labor.length ? labor.map(job => {
+              const typeClass = job.type === "unknown" ? "unknown" : "labor";
+              const text = job.type === "unknown"
+                ? `${job.lot} ${job.subdivision}-${job.raw}`
+                : `${job.lot} ${job.subdivision}-${job.type}`;
+              return `<div class="job ${typeClass}">${escapeHtml(text)} <button class="delete-btn" onclick="this.parentElement.remove()">×</button></div>`;
+            }).join("") : '<div class="muted">No labor items</div>'}
+          </div>
+        </div>
+      </div>
+    `;
   });
+
+  container.innerHTML = html;
 }
 
+function escapeHtml(value) {
+  return (value ?? "").toString()
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeSettings(); });
+
+loadImportsFromStorage();
+renderSources();
+renderOutput();
 </script>
 
 </body>
