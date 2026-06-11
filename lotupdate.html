@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pulte New Lot Checker - Today Date Fix</title>
-<!-- Version: 2026-06-11 lot-added-date-fix -->
+<title>Builder New Lot Checker - Pulte + MI + Fischer Homes + Arbor Homes + DR</title>
+<!-- Version: 2026-06-11 subdivisions-truth-source -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -15,12 +15,13 @@
   *{box-sizing:border-box}
   body{margin:0;background:linear-gradient(135deg,#08111f,#111827 55%,#0f172a);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
   .wrap{max-width:1500px;margin:0 auto;padding:24px}
-  h1{margin:0 0 6px;font-size:30px;letter-spacing:-.03em}
+  h1{margin:0 0 6px;font-size:30px;letter-spacing:-.03em}.version-pill{font-size:13px;color:#bbf7d0;border:1px solid rgba(34,197,94,.4);border-radius:999px;padding:4px 9px;vertical-align:middle}
   .sub{color:var(--muted);margin:0 0 20px;line-height:1.45}
   .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
   .card{background:rgba(17,24,39,.9);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 14px 40px rgba(0,0,0,.25)}
   .card h2{font-size:18px;margin:0 0 10px}.card p{color:var(--muted);margin:6px 0 12px;font-size:14px}
-  input[type=file]{width:100%;background:var(--input);border:1px dashed #334155;border-radius:12px;color:var(--text);padding:14px}
+  input[type=file], select{width:100%;background:var(--input);border:1px dashed #334155;border-radius:12px;color:var(--text);padding:14px}
+  select{border-style:solid;padding:11px}
   button{border:0;border-radius:12px;background:var(--accent);color:#052e16;font-weight:800;padding:11px 14px;cursor:pointer}
   button.secondary{background:#1f2937;color:var(--text);border:1px solid #334155}button.blue{background:var(--accent2);color:#082f49}
   button.warn{background:var(--warn);color:#451a03}button:disabled{opacity:.45;cursor:not-allowed}
@@ -31,7 +32,7 @@
   table{width:100%;border-collapse:collapse;background:rgba(15,23,42,.72);border-radius:14px;overflow:hidden}th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;font-size:13px;vertical-align:top}th{position:sticky;top:0;background:#172033;color:#dbeafe;z-index:1;white-space:nowrap}tr:hover td{background:#111c2f}.scroll{max-height:620px;overflow:auto;border:1px solid var(--line);border-radius:14px}
   .pill{display:inline-block;border-radius:999px;padding:3px 8px;background:var(--chip);color:#cbd5e1;font-size:12px}.ok{color:#86efac}.bad{color:#fca5a5}.muted{color:var(--muted)}
   .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.hide{display:none!important}.small{font-size:12px;color:var(--muted)}
-  details{margin-top:12px}summary{cursor:pointer;color:#bfdbfe;font-weight:700}.maprow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px}.maprow input{background:var(--input);border:1px solid #334155;color:var(--text);border-radius:10px;padding:9px}
+  .maprow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px}.maprow input{background:var(--input);border:1px solid #334155;color:var(--text);border-radius:10px;padding:9px}
   .newlots-card{border:2px solid rgba(34,197,94,.55);background:linear-gradient(180deg,rgba(20,83,45,.28),rgba(17,24,39,.94));}
   .newlots-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}
   .newlots-head h2{margin:0;font-size:22px}.newlots-head p{margin:4px 0 0;color:#bbf7d0}.badge{display:inline-flex;align-items:center;justify-content:center;min-width:44px;border-radius:999px;background:#22c55e;color:#052e16;font-weight:900;padding:8px 12px}
@@ -39,13 +40,14 @@
   .newlot-item{border:1px solid #2f3d52;background:rgba(15,23,42,.78);border-radius:14px;padding:12px}
   .newlot-title{font-weight:900;color:#f8fafc}.newlot-meta{color:#cbd5e1;font-size:13px;margin-top:4px}.newlot-address{color:#93c5fd;font-size:13px;margin-top:6px}
   .empty-newlots{border:1px dashed #334155;border-radius:14px;padding:16px;color:var(--muted);background:rgba(15,23,42,.55)}
-  @media(max-width:900px){.grid,.two,.filters,.newlots-list{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:14px}}
+  .source-box{display:grid;grid-template-columns:220px 1fr;gap:12px;align-items:end;margin-bottom:12px}.source-box label{display:block;font-size:12px;color:#bfdbfe;font-weight:800;margin-bottom:5px}
+  @media(max-width:900px){.grid,.two,.filters,.newlots-list,.source-box{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:14px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Pulte New Lot Checker <span class="version-pill">Updated: lot added date fix</span></h1>
-  <p class="sub">Upload your <b>Floor Plans</b> sheet and the <b>Pulte Jobs export</b>. This compares active Pulte-site lots against your floorplan list and shows anything missing from the floorplan sheet.</p>
+  <h1>Builder New Lot Checker <span class="version-pill">Pulte + MI + Fischer Homes + Arbor Homes + DR</span></h1>
+  <p class="sub">Upload your <b>Floor Plans</b> sheet, optionally upload your <b>Subdivisions</b> sheet for exact names, pick the builder/export type, then upload that builder export. The tool compares lots by <b>subdivision + lot</b>, with an address fallback, and shows anything missing from the Floor Plans sheet.</p>
 
   <div class="grid">
     <div class="card">
@@ -55,10 +57,35 @@
       <div id="floorStatus" class="small">No file loaded.</div>
     </div>
     <div class="card">
-      <h2>2) Pulte Jobs export</h2>
-      <p>Expected columns: Community, Job #, Street Address, City, State, Zip, Plan Name.</p>
+      <h2>2) Subdivisions sheet</h2>
+      <p>Optional, but recommended. This becomes the truth source for exact subdivision names like <b>Maris *Arbor *Bellefontaine</b>.</p>
+      <input id="subdivisionFile" type="file" accept=".xlsx,.xls,.csv" />
+      <div id="subdivisionStatus" class="small">No subdivision sheet loaded.</div>
+    </div>
+    <div class="card">
+      <h2>3) Builder export</h2>
+      <div class="source-box">
+        <div>
+          <label for="sourceSelect">Builder/export type</label>
+          <select id="sourceSelect">
+            <option value="pulte">Pulte website/export</option>
+            <option value="mi">MI Homes 90-day jobs</option>
+            <option value="fischer">Fischer Homes copied job list</option>
+            <option value="arbor">Arbor Homes copied job list</option>
+            <option value="dr">DR Horton active lots CSV</option>
+          </select>
+        </div>
+        <p id="sourceHelp">Pulte expected columns: Community, Job #, Street Address, City, State, Zip, Plan Name.</p>
+      </div>
       <input id="jobsFile" type="file" accept=".xlsx,.xls,.csv" />
-      <div id="jobsStatus" class="small">No file loaded.</div>
+      <div id="pasteBoxWrap" class="hide">
+        <textarea id="builderPasteText" placeholder="Paste the copied builder job list here..."></textarea>
+        <div class="actions" style="margin:10px 0 0">
+          <button id="loadPasteBtn" class="blue" type="button">Load pasted data</button>
+          <button id="clearPasteBtn" class="secondary" type="button">Clear paste</button>
+        </div>
+      </div>
+      <div id="jobsStatus" class="small">No builder export loaded.</div>
     </div>
   </div>
 
@@ -72,8 +99,8 @@
 
   <div class="stats">
     <div class="stat"><b id="newCount">0</b><span>New lots missing</span></div>
-    <div class="stat"><b id="matchedCount">0</b><span>Matched lots</span></div>
-    <div class="stat"><b id="jobCount">0</b><span>Pulte export rows</span></div>
+    <div class="stat"><b id="matchedCount">0</b><span>Matched unique lots</span></div>
+    <div class="stat"><b id="jobCount">0</b><span id="jobCountLabel">Export rows</span></div>
     <div class="stat"><b id="floorCount">0</b><span>Floorplan rows</span></div>
     <div class="stat"><b id="commCount">0</b><span>Communities checked</span></div>
   </div>
@@ -82,7 +109,7 @@
     <div class="newlots-head">
       <div>
         <h2>New lots added / missing from Floor Plans</h2>
-        <p>This box only shows lots found in the Pulte export that are not already on your Floor Plans sheet. The date shown is when the lot is added/found by this tool, not Pulte's Last Updated date.</p>
+        <p id="newLotsHelp">This box only shows lots found in the selected builder export that are not already on your Floor Plans sheet. <b>Date Added</b> is always today's date from your computer.</p>
       </div>
       <div class="badge" id="newLotsBadge">0</div>
     </div>
@@ -97,7 +124,7 @@
       <input id="search" placeholder="Search lot, address, community, plan..." />
       <select id="communityFilter"><option value="">All communities</option></select>
       <select id="hoursFilter"><option value="">All hour statuses</option><option value="with">Has suggested hours</option><option value="missing">Missing suggested hours</option></select>
-      <select id="sortBy"><option value="community">Sort by community/lot</option><option value="lot">Sort by lot #</option><option value="plan">Sort by floorplan</option><option value="updated">Sort by lot added date</option></select>
+      <select id="sortBy"><option value="community">Sort by community/lot</option><option value="lot">Sort by lot #</option><option value="plan">Sort by floorplan</option><option value="updated">Sort by date added</option></select>
     </div>
     <div class="scroll"><table id="resultsTable"><thead></thead><tbody></tbody></table></div>
   </div>
@@ -105,12 +132,12 @@
   <div class="two">
     <div class="card">
       <h2>Paste-ready rows for Floor Plans</h2>
-      <p>These columns match your floorplan sheet: Builder, Subdivision, Lot, Floorplan, Original, Reclean, Windows, Address, Date Added. The exported Date Added value is always today's date from your computer. Pulte's Last Updated column and any Floor Plans lastUpdated column are ignored.</p>
+      <p>These columns match your floorplan sheet: Builder, Subdivision, Lot, Floorplan, Original, Reclean, Windows, Address, Date Added. Date Added ignores all dates from both uploaded files and always uses today.</p>
       <textarea id="pasteBox" readonly></textarea>
     </div>
     <div class="card">
-      <h2>Community mappings</h2>
-      <p>Left = Pulte website/export community. Right = the base subdivision name in your Floor Plans sheet. Saved in this browser.</p>
+      <h2>Saved community settings</h2>
+      <p>Left = builder export community. Right = optional override. Exact starred values here still win, but if this is blank/basic, the Subdivisions sheet will be used for the exact Floor Plans-style name.</p>
       <div id="mappingList"></div>
       <button class="secondary" id="addMapBtn">Add mapping</button>
     </div>
@@ -119,196 +146,452 @@
 
 <script>
 const DEFAULT_MAPPINGS = {
-  "Abberley Park":"Abberley Park",
-  "Amrine Meadows":"Amrine",
-  "Amrine TCG 4.5":"Amrine",
-  "Arrowhead 5-35":"Arrowhead at Evans Farms",
-  "Berlin Bluffs":"Berlin Bluffs",
-  "Beulah Park":"Beulah Park",
-  "Bloomfield Hills":"Bloomfield Hills",
-  "Buckstone Bend":"Buckstone Bend",
-  "Clark Shaw Reserve":"Clarkshaw",
-  "Clover Run":"Clover",
-  "DW Maygrass-Preserve 34'":"Maygrass",
-  "DW Maygrass-Retreat 40'":"Maygrass",
-  "DW Maygrass-Sanctuary 54'":"Maygrass",
-  "DWE Northstar-Preserve 34'":"Northstar",
-  "DWE Northstar-Retreat 40'":"Northstar",
-  "DWE Northstar-Sanctuary 54'":"Northstar",
-  "Eagle Creek":"Eagle",
-  "Glenross":"Glenross",
-  "Homestead at Scotts Farm":"Scotts",
-  "Honey Grove":"Honey Grove at Northstar",
-  "Hyatts Crossing":"Hyatts",
-  "Jefferson Manor":"Jefferson Manor",
-  "Jerome Village 5-35":"Jerome Village",
-  "Limestone Ridge":"Limestone",
-  "Maeve Meadows":"Maeve",
-  "Magnolia Park":"Magnolia Park",
-  "Nelson Farms":"Nelson",
-  "Nottingham Trace":"Nottingham Trace",
-  "Pioneer Crossing":"Pioneer",
-  "Price Ponds - Highlands 5L":"Price Ponds",
-  "Price Ponds - Summit 5-40":"Price Ponds",
-  "Slate Ridge - Preserve":"Slate",
-  "Slate Ridge - Retreat":"Slate",
-  "Sugar Farms - Highlands 5L":"Sugar Farms",
-  "Sugar Farms - Retreat 10-40":"Sugar Farms",
-  "Sugar Farms - Summit 5-40":"Sugar Farms",
-  "Towns on the Greenway":"Towns on the Greenway",
-  "Towns on the Parkway":"Towns On The Parkway"
+  pulte: {
+    "Abberley Park":"Abberley Park","Amrine Meadows":"Amrine","Amrine TCG 4.5":"Amrine","Arrowhead 5-35":"Arrowhead at Evans Farms",
+    "Berlin Bluffs":"Berlin Bluffs","Beulah Park":"Beulah Park","Bloomfield Hills":"Bloomfield Hills","Buckstone Bend":"Buckstone Bend",
+    "Clark Shaw Reserve":"Clarkshaw","Clover Run":"Clover","DW Maygrass-Preserve 34'":"Maygrass","DW Maygrass-Retreat 40'":"Maygrass",
+    "DW Maygrass-Sanctuary 54'":"Maygrass","DWE Northstar-Preserve 34'":"Northstar","DWE Northstar-Retreat 40'":"Northstar",
+    "DWE Northstar-Sanctuary 54'":"Northstar","Eagle Creek":"Eagle","Glenross":"Glenross","Homestead at Scotts Farm":"Scotts",
+    "Honey Grove":"Honey Grove at Northstar","Hyatts Crossing":"Hyatts","Jefferson Manor":"Jefferson Manor","Jerome Village 5-35":"Jerome Village",
+    "Limestone Ridge":"Limestone","Maeve Meadows":"Maeve","Magnolia Park":"Magnolia Park","Nelson Farms":"Nelson","Nottingham Trace":"Nottingham Trace",
+    "Pioneer Crossing":"Pioneer","Price Ponds - Highlands 5L":"Price Ponds","Price Ponds - Summit 5-40":"Price Ponds",
+    "Slate Ridge - Preserve":"Slate","Slate Ridge - Retreat":"Slate","Sugar Farms - Highlands 5L":"Sugar Farms",
+    "Sugar Farms - Retreat 10-40":"Sugar Farms","Sugar Farms - Summit 5-40":"Sugar Farms","Towns on the Greenway":"Towns on the Greenway",
+    "Towns on the Parkway":"Towns On The Parkway"
+  },
+  mi: {
+    "Berlin Farm":"Berlin Farm","Clarkshaw Crossing":"Clarkshaw Crossing","Darby Station":"Darby Station","Forest Ridge":"Forest Ridge",
+    "Foxfire":"Foxfire","Hebron Landing":"Hebron Landing","Heron Crossing West":"Heron Crossing","Hill Farm":"Hill Farm",
+    "Hyatts Meadows":"Hyatts Meadows","Hyland Glen":"Hyland Glen","Jerome Village Applewood":"Jerome Village Applewood",
+    "Miller Farm":"Miller Farm","Northwood":"Northwood","Pinnacle Quarry":"Pinnacle","The Ridge at Glacier Pointe":"Glacier Pointe",
+    "Winterbrooke Place":"Winterbrooke Place","Woodcrest Crossing":"Woodcrest Crossing"
+  },
+  fischer: {
+    "GLR MSH":"Glacier Pointe",
+    "CHL MSH":"Chase Landings *Fischer *Galloway",
+    "ATR MSH":"ATR MSH",
+    "SRP MSH":"SRP MSH"
+  },
+  arbor: {
+    "London Landing at Brooksedge":"London Landing at Brooksedge",
+    "Maren Reserve":"Maren Reserve",
+    "Maris Park":"Maris Park",
+    "Old Heritage":"Old Heritage",
+    "Day Farm":"Day Farm",
+    "Edgewood Farms":"Edgewood Farms",
+    "Trailside Landing, Arrival Series":"Trailside Landing *Arbor *Jeffersonville",
+    "Trotter's Pointe":"Trotter's Pointe *Arbor *Washington Courthouse"
+  },
+  dr: {
+    "Bishop Estates":"Bishop Estates",
+    "Chase Landings":"Chase Landings",
+    "Galloway East":"Galloway East",
+    "Johnson's Creek":"Johnson's Creek",
+    "Kintner Crossing":"Kintner Crossing",
+    "Lansdowne Farms":"Lansdowne",
+    "Leasure Farms":"Leasure Farms",
+    "Liberty Crossing":"Liberty Crossing",
+    "Longview Highlands":"Longview",
+    "Madison Meadows":"Madison Meadows",
+    "Piatt Preserve":"Piatts",
+    "Sugar Creek":"Sugar Creek",
+    "The Overlook":"Overlook",
+    "Wagnalls Run":"Wagnalls",
+    "Walnut Mill":"Walnut"
+  }
 };
 
-let floorRows = [], jobRows = [], resultRows = [];
-let mappings = loadMappings();
-
+let floorRows = [], subdivisionRows = [], rawRows = [], jobRows = [], resultRows = [];
+let sourceType = 'pulte';
+let mappings = loadMappings(sourceType);
 const $ = id => document.getElementById(id);
 const HEADERS = ["Builder","Subdivision","Lot","Floorplan","Original","Reclean","Windows","Address","Date Added"];
-function todayLotAddedDate(){
-  // Always use TODAY from the computer running this file.
-  // Do not read Pulte Last Updated from Pulte or lastUpdated/Date Added from Floor Plans.
-  const d = new Date();
-  return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
-}
 
-function loadMappings(){
-  try { return {...DEFAULT_MAPPINGS, ...(JSON.parse(localStorage.getItem('pulteLotMappings')||'{}'))}; }
-  catch { return {...DEFAULT_MAPPINGS}; }
+function todayLotAddedDate(){ const d = new Date(); return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`; }
+function storageKey(){ return `newLotMappings_${sourceType}`; }
+function loadMappings(type){
+  try {
+    const saved = JSON.parse(localStorage.getItem(`newLotMappings_${type}`)||'{}');
+    // Keep older browser-saved Arbor mappings from blocking newer exact city mappings.
+    if (type === 'arbor') {
+      const forced = {
+        "Trailside Landing, Arrival Series":"Trailside Landing *Arbor *Jeffersonville",
+        "Trotter's Pointe":"Trotter's Pointe *Arbor *Washington Courthouse"
+      };
+      for (const [k,v] of Object.entries(forced)) {
+        if (!saved[k] || saved[k] === k || saved[k] === baseSubdivision(v)) saved[k] = v;
+      }
+    }
+    return {...DEFAULT_MAPPINGS[type], ...saved};
+  }
+  catch { return {...DEFAULT_MAPPINGS[type]}; }
 }
-function saveMappings(){ localStorage.setItem('pulteLotMappings', JSON.stringify(mappings)); }
-function resetMappings(){ localStorage.removeItem('pulteLotMappings'); mappings = {...DEFAULT_MAPPINGS}; renderMappings(); }
+function saveMappings(){ localStorage.setItem(storageKey(), JSON.stringify(mappings)); }
+function resetMappings(){ localStorage.removeItem(storageKey()); mappings = {...DEFAULT_MAPPINGS[sourceType]}; normalizeJobsFromRaw(); renderMappings(); }
 function norm(v){ return String(v ?? '').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'').trim(); }
 function cleanText(v){ return String(v ?? '').replace(/\s+/g,' ').trim(); }
 function baseSubdivision(v){ return cleanText(v).split('*')[0].trim(); }
 function cleanLot(v){
-  let s = cleanText(v);
-  if (!s) return '';
+  let s = cleanText(v); if (!s) return '';
+  if (s.includes('/')) s = s.split('/')[0].trim();
   if (s.includes('-')) s = s.split('-').pop().trim();
-  const m = s.match(/[A-Za-z]*0*([0-9]+)[A-Za-z]?/);
-  if (m) return String(parseInt(m[1],10));
+  const m = s.match(/[A-Za-z]*0*([0-9]+)[A-Za-z]?/); if (m) return String(parseInt(m[1],10));
   return s.toUpperCase();
 }
 function cleanAddress(v){ return cleanText(v).replace(/\b(ave|avenue)\b/ig,'avenue').replace(/\b(st|street)\b/ig,'street').replace(/\b(dr|drive)\b/ig,'drive').replace(/\b(rd|road)\b/ig,'road').replace(/\b(ln|lane)\b/ig,'lane').replace(/\b(ct|court)\b/ig,'court').toLowerCase().replace(/[^a-z0-9]+/g,''); }
-function excelDateToText(v){
-  if (v == null || v === '') return '';
-  if (v instanceof Date) return v.toLocaleDateString();
-  if (typeof v === 'number' && v > 20000 && v < 80000) {
-    const d = XLSX.SSF.parse_date_code(v); if (d) return `${d.m}/${d.d}/${d.y}`;
-  }
-  return cleanText(v);
-}
 function cityOnly(cityStateZip){ return cleanText(cityStateZip).split(',')[0].trim(); }
-function subdivisionWithStars(base, builder, city){
-  const b = cleanText(builder || guessBuilder(base));
-  const c = cleanText(city);
-  if (!base) return '';
-  return `${base} *${b} ${c ? '*' + c : ''}`.trim();
+function cleanMISubdivision(v){ return cleanText(v).replace(/^\d+\s+/, '').replace(/_\d+$/, '').trim(); }
+function cleanMIPlan(v){ return cleanText(v).replace(/\s+\d{3,5}\b.*$/, '').trim(); }
+function cleanDRCommunity(v){ return cleanText(v).replace(/\s+-\s*\d+\s*$/, '').trim(); }
+function titleCase(v){ return cleanText(v).toLowerCase().replace(/\b\w/g, ch => ch.toUpperCase()); }
+function parseMIAddress(job){
+  let s = cleanText(job);
+  const m = s.match(/\)\s*-\s*(.+)$/); if (m) s = cleanText(m[1]);
+  else if (s.includes('-')) s = cleanText(s.split('-').slice(2).join('-') || s.split('-').pop());
+  s = s.replace(/_\d+\s+/g, ' ').replace(/^\d{6,}\s*/, '').trim();
+  const words = s.split(' ').filter(Boolean);
+  if (words.length % 2 === 0) {
+    const half = words.length / 2;
+    if (norm(words.slice(0, half).join(' ')) === norm(words.slice(half).join(' '))) s = words.slice(0, half).join(' ');
+  }
+  return s;
 }
+function parseCopiedJobListText(text){
+  const parsed = [];
+  const lines = String(text || '').split(/\r?\n/);
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const cells = line.split('\t').map(cleanText);
+
+    // Arbor copied rows do not use short community codes. They look like:
+    // # | Community | Plan | Batch | Address | Block | Lot | ... | Task Code | Task | Status | Job ID | ...
+    if (sourceType === 'arbor') {
+      // Arbor sometimes wraps Released rows onto a second line like:
+      // 1 | 5/15/2026 | 6 | 5/15/2026 | | N/A | N/A
+      // Those continuation lines were getting parsed as fake communities/dates.
+      // Only accept rows where the number is followed by a real community, plan,
+      // production batch, street address, block, and lot.
+      let idx = -1;
+      for (let i = 0; i < cells.length - 8; i++) {
+        if (!/^\d+$/.test(cells[i])) continue;
+        const communityCandidate = cells[i + 1] || '';
+        const planCandidate = cells[i + 2] || '';
+        const batchCandidate = cells[i + 3] || '';
+        const addressCandidate = cells[i + 4] || '';
+        const lotCandidate = cleanLot(cells[i + 6] || '');
+        const looksLikeDate = /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(communityCandidate);
+        const looksLikeBatch = /prod batch|old heritage|batch/i.test(batchCandidate);
+        const looksLikeAddress = /^\d+\s+/.test(addressCandidate);
+        if (!looksLikeDate && communityCandidate && planCandidate && looksLikeBatch && looksLikeAddress && lotCandidate) {
+          idx = i + 1;
+          break;
+        }
+      }
+      if (idx < 0) continue;
+
+      const community = cells[idx] || '';
+      const plan = cells[idx + 1] || '';
+      const phase = cells[idx + 2] || '';
+      const address = cells[idx + 3] || '';
+      let lot = cleanLot(cells[idx + 5] || '');
+
+      if (!community || !plan || !address || !lot) continue;
+      const taskCode = cells[idx + 7] || '';
+      const task = cells[idx + 8] || '';
+      const status = cells[idx + 9] || '';
+      const jobId = cells[idx + 10] || '';
+      parsed.push({Community:community, Plan:plan, Phase:phase, Address:address, Lot:lot, TaskCode:taskCode, Task:task, Status:status, JobId:jobId});
+      continue;
+    }
+
+    // Fischer copied rows use short codes like GLR MSH / CHL MSH.
+    const idx = cells.findIndex(c => /^[A-Z]{2,6}\s+MSH\b/i.test(c) || /^[A-Z]{2,6}\s+(?:FIS|ARB)\b/i.test(c));
+    if (idx < 0) continue;
+
+    const community = cells[idx] || '';
+    const plan = cells[idx + 1] || '';
+    const phase = cells[idx + 2] || '';
+    const address = cells[idx + 3] || '';
+    let lot = cleanLot(cells[idx + 5] || '');
+
+    if (!lot) {
+      for (let i = idx + 4; i <= Math.min(cells.length - 1, idx + 8); i++) {
+        const candidate = cleanLot(cells[i]);
+        if (candidate && /^\d+$/.test(candidate)) { lot = candidate; break; }
+      }
+    }
+
+    const taskCode = cells[idx + 7] || '';
+    const task = cells[idx + 8] || '';
+    const status = cells[idx + 9] || '';
+    const jobId = cells[idx + 10] || '';
+
+    if (!community || !lot) continue;
+    parsed.push({Community:community, Plan:plan, Phase:phase, Address:address, Lot:lot, TaskCode:taskCode, Task:task, Status:status, JobId:jobId});
+  }
+  return parsed;
+}
+function subdivisionWithStars(base, builder, city){ const b = cleanText(builder); const c = cleanText(city); return base ? `${base} *${b}${c ? ' *' + c : ''}`.trim() : ''; }
 function guessBuilder(base){
+  if (sourceType === 'mi') return 'MI Homes';
+  if (sourceType === 'fischer') return 'Fischer Homes';
+  if (sourceType === 'arbor') return 'Arbor Homes';
+  if (sourceType === 'dr') return 'DR Horton';
   if (/maygrass|northstar/i.test(base)) return 'Del Webb';
   if (/bloomfield|clover/i.test(base)) return 'Centex';
   return 'Pulte';
 }
+function isFloorBuilderMatch(r){
+  const b = norm(r.Builder + ' ' + r.Subdivision);
+  if (sourceType === 'mi') return b.includes('mihomes') || b.includes('mi');
+  if (sourceType === 'fischer') return b.includes('fischer');
+  if (sourceType === 'arbor') return b.includes('arbor');
+  if (sourceType === 'dr') return b.includes('drhorton') || b.includes('drh') || b.includes('dr');
+  return b.includes('pulte') || b.includes('centex') || b.includes('delwebb');
+}
+function builderAliasesForSource(){
+  if (sourceType === 'mi') return ['mi homes','mi'];
+  if (sourceType === 'fischer') return ['fischer homes','fischer'];
+  if (sourceType === 'arbor') return ['arbor homes','arbor'];
+  if (sourceType === 'dr') return ['dr horton','drhorton','dr','drh'];
+  return ['pulte','centex','del webb','delwebb'];
+}
+function isSubdivisionBuilderMatch(r){
+  const hay = norm((r.Builder || '') + ' ' + (r.Subdivision || ''));
+  return builderAliasesForSource().some(alias => hay.includes(norm(alias)));
+}
+function isCustomizedMapping(raw, mapped){
+  raw = cleanText(raw); mapped = cleanText(mapped);
+  if (!mapped || mapped === raw) return false;
+  // Exact starred outputs are intentional settings and should win over sheet guesses.
+  if (mapped.includes('*')) return true;
+  // Non-star mappings are usually base-name cleanup. Let the Subdivisions sheet enrich them when possible.
+  return false;
+}
+function buildSubdivisionTruthIndex(){
+  const list = subdivisionRows.filter(isSubdivisionBuilderMatch).map(r => ({
+    Builder: cleanText(r.Builder),
+    Subdivision: cleanText(r.Subdivision),
+    Base: baseSubdivision(r.Subdivision),
+    Address: cleanText(r.Address)
+  })).filter(r => r.Subdivision && r.Base);
+  const exact = new Map();
+  for (const r of list) if (!exact.has(norm(r.Base))) exact.set(norm(r.Base), r);
+  return {list, exact};
+}
+function findSubdivisionTruth(rawBase, idx){
+  const rawN = norm(rawBase);
+  if (!rawN || !idx || !idx.list.length) return null;
+  if (idx.exact.has(rawN)) return idx.exact.get(rawN);
+  // Handle export names like "Maris Park" when the sheet says "Maris *Arbor *Bellefontaine",
+  // or "London Landing at Brooksedge" when the sheet says "London Landing *Arbor *London".
+  let best = null, bestScore = 0;
+  for (const r of idx.list) {
+    const bN = norm(r.Base);
+    if (!bN) continue;
+    let score = 0;
+    if (rawN === bN) score = 1000;
+    else if (rawN.startsWith(bN) || rawN.includes(bN)) score = 700 + bN.length;
+    else if (bN.includes(rawN)) score = 600 + rawN.length;
+    if (score > bestScore) { best = r; bestScore = score; }
+  }
+  return bestScore >= 600 ? best : null;
+}
+function resolveCommunity(rawCommunity, floorIdx, subIdx){
+  const raw = cleanText(rawCommunity);
+  const mapped = cleanText(mappings[raw] || raw);
+  if (isCustomizedMapping(raw, mapped)) {
+    return {displaySubdivision: mapped, matchBase: baseSubdivision(mapped) || mapped, source: 'saved setting'};
+  }
+
+  const mappedBase = baseSubdivision(mapped) || mapped;
+  const rawBase = baseSubdivision(raw) || raw;
+  const subTruth = findSubdivisionTruth(mappedBase, subIdx) || findSubdivisionTruth(rawBase, subIdx);
+  if (subTruth) return {displaySubdivision: subTruth.Subdivision, matchBase: subTruth.Base, source: 'subdivisions sheet'};
+
+  const floorTemplate = floorIdx.subTemplate.get(norm(mappedBase)) || floorIdx.subTemplate.get(norm(rawBase));
+  if (floorTemplate) return {displaySubdivision: floorTemplate, matchBase: baseSubdivision(floorTemplate), source: 'floor plans sheet'};
+
+  return {displaySubdivision: mapped.includes('*') ? mapped : '', matchBase: mappedBase, source: 'built-in/raw'};
+}
 function findHeaderRow(rows, required){
-  for (let r=0; r<Math.min(rows.length,30); r++) {
+  for (let r=0; r<Math.min(rows.length,40); r++) {
     const vals = rows[r].map(x => cleanText(x).toLowerCase());
     if (required.every(req => vals.includes(req.toLowerCase()))) return r;
   }
   return -1;
 }
-function rowObj(headers, row){
-  const o = {};
-  headers.forEach((h,i)=>{ if(cleanText(h)) o[cleanText(h)] = row[i]; });
-  return o;
-}
-async function readWorkbook(file){
-  const buf = await file.arrayBuffer();
-  return XLSX.read(buf, {type:'array', cellDates:true});
-}
-function sheetRows(wb){
-  const ws = wb.Sheets[wb.SheetNames[0]];
-  return XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
-}
+function rowObj(headers, row){ const o = {}; headers.forEach((h,i)=>{ if(cleanText(h)) o[cleanText(h)] = row[i]; }); return o; }
+async function readWorkbook(file){ const buf = await file.arrayBuffer(); return XLSX.read(buf, {type:'array', cellDates:true}); }
+function sheetRows(wb){ const ws = wb.Sheets[wb.SheetNames[0]]; return XLSX.utils.sheet_to_json(ws, {header:1, defval:''}); }
 
 async function loadFloor(file){
-  const wb = await readWorkbook(file);
-  const rows = sheetRows(wb);
+  const wb = await readWorkbook(file); const rows = sheetRows(wb);
   const h = findHeaderRow(rows, ['Builder','Subdivision','Lot']);
   if (h < 0) throw new Error('Could not find Floor Plans headers.');
   const headers = rows[h];
   floorRows = rows.slice(h+1).map(r => rowObj(headers,r)).filter(r => cleanText(r.Subdivision) && cleanLot(r.Lot));
   $('floorStatus').innerHTML = `<span class="ok">Loaded ${floorRows.length} floorplan rows.</span>`;
-  $('floorCount').textContent = floorRows.length;
-  checkReady();
+  $('floorCount').textContent = floorRows.length; checkReady();
 }
-async function loadJobs(file){
-  const wb = await readWorkbook(file);
-  const rows = sheetRows(wb);
-  const h = findHeaderRow(rows, ['Community','Job #','Street Address']);
-  if (h < 0) throw new Error('Could not find Pulte Jobs export headers.');
+async function loadSubdivisions(file){
+  const wb = await readWorkbook(file); const rows = sheetRows(wb);
+  const h = findHeaderRow(rows, ['Builder','Subdivision']);
+  if (h < 0) throw new Error('Could not find Subdivisions sheet headers.');
   const headers = rows[h];
-  jobRows = rows.slice(h+1).map(r => rowObj(headers,r)).filter(r => cleanText(r.Community) && cleanLot(r['Job #']));
-  $('jobsStatus').innerHTML = `<span class="ok">Loaded ${jobRows.length} Pulte job rows.</span>`;
-  $('jobCount').textContent = jobRows.length;
-  addMissingMappingsFromJobs();
-  checkReady();
+  subdivisionRows = rows.slice(h+1).map(r => rowObj(headers,r)).filter(r => cleanText(r.Subdivision));
+  $('subdivisionStatus').innerHTML = `<span class="ok">Loaded ${subdivisionRows.length} subdivision rows. These will be used for exact output names.</span>`;
+}
+async function loadBuilderExport(file){
+  const wb = await readWorkbook(file); const rows = sheetRows(wb);
+  const required = sourceType === 'mi' ? ['Account','Subdivision','Lot/Block','Plan','Job'] : (sourceType === 'dr' ? ['Community','Address','Plan','Lot'] : ['Community','Job #','Street Address']);
+  const h = findHeaderRow(rows, required);
+  if (h < 0) throw new Error(sourceType === 'mi' ? 'Could not find MI Homes 90-day job headers.' : (sourceType === 'dr' ? 'Could not find DR Horton CSV headers.' : 'Could not find Pulte export headers.'));
+  const headers = rows[h];
+  rawRows = rows.slice(h+1).map(r => rowObj(headers,r));
+  normalizeJobsFromRaw();
+  const label = sourceType === 'mi' ? 'MI Homes job rows' : (sourceType === 'dr' ? 'DR Horton lot rows' : 'Pulte job rows');
+  $('jobsStatus').innerHTML = `<span class="ok">Loaded ${rawRows.length} ${label}. Parsed ${jobRows.length} usable rows.</span>`;
+  $('jobCount').textContent = rawRows.length;
+  addMissingMappingsFromJobs(); checkReady();
+}
+function loadPastedBuilderExport(){
+  const text = $('builderPasteText').value;
+  rawRows = parseCopiedJobListText(text);
+  normalizeJobsFromRaw();
+  const label = sourceType === 'arbor' ? 'Arbor pasted rows' : 'Fischer pasted rows';
+  $('jobsStatus').innerHTML = `<span class="ok">Loaded ${rawRows.length} ${label}. Parsed ${jobRows.length} usable rows.</span>`;
+  $('jobCount').textContent = rawRows.length;
+  addMissingMappingsFromJobs(); checkReady();
+}
+function normalizeJobsFromRaw(){
+  jobRows = [];
+  for (const r of rawRows) {
+    if (sourceType === 'mi') {
+      const acct = cleanText(r.Account);
+      if (acct && !/m\/?i homes/i.test(acct)) continue;
+      const community = cleanMISubdivision(r.Subdivision);
+      const lot = cleanLot(r['Lot/Block']) || cleanLot(r.Job);
+      if (!community || !lot) continue;
+      jobRows.push({
+        RawCommunity: community,
+        Community: community,
+        Lot: lot,
+        Plan: cleanMIPlan(r.Plan),
+        Address: parseMIAddress(r.Job),
+        City: '',
+        Elevation: cleanText(r.Elevation),
+        Task: cleanText(r.Task),
+        TaskStart: r['Task Start Date']
+      });
+    } else if (sourceType === 'dr') {
+      const community = cleanDRCommunity(r.Community);
+      const lot = cleanLot(r.Lot) || cleanLot(r['Job Number']);
+      if (!community || !lot) continue;
+      jobRows.push({
+        RawCommunity: community,
+        Community: community,
+        Lot: lot,
+        Plan: cleanText(r.Plan),
+        Address: cleanText(r.Address),
+        City: titleCase(r.City),
+        Elevation: cleanText(r.Elevation),
+        Phase: cleanText(r.Phase),
+        Task: '',
+        TaskCode: '',
+        Status: cleanText(r.HouseType)
+      });
+    } else if (sourceType === 'fischer' || sourceType === 'arbor') {
+      const community = cleanText(r.Community);
+      const lot = cleanLot(r.Lot);
+      if (!community || !lot) continue;
+      jobRows.push({
+        RawCommunity: community,
+        Community: community,
+        Lot: lot,
+        Plan: cleanText(r.Plan),
+        Address: cleanText(r.Address),
+        City: '',
+        Elevation: '',
+        Phase: cleanText(r.Phase),
+        Task: cleanText(r.Task),
+        TaskCode: cleanText(r.TaskCode),
+        Status: cleanText(r.Status)
+      });
+    } else {
+      const community = cleanText(r.Community);
+      const lot = cleanLot(r['Job #']);
+      if (!community || !lot) continue;
+      jobRows.push({
+        RawCommunity: community,
+        Community: community,
+        Lot: lot,
+        Plan: cleanText(r['Plan Name']),
+        Address: cleanText(r['Street Address']),
+        City: cityOnly(r['City, State, Zip']),
+        Elevation: cleanText(r.Elevation),
+        FieldManager: cleanText(r['Field Manager'])
+      });
+    }
+  }
 }
 function checkReady(){ $('compareBtn').disabled = !(floorRows.length && jobRows.length); }
 
 function buildIndexes(){
   const bySubLot = new Map(), byAddress = new Map(), hoursBySubPlan = new Map(), hoursByPlan = new Map(), subTemplate = new Map();
   for (const r of floorRows) {
+    if (!isFloorBuilderMatch(r)) continue;
     const base = baseSubdivision(r.Subdivision);
     const key = `${norm(base)}|${cleanLot(r.Lot)}`;
     bySubLot.set(key, r);
-    const addr = cleanAddress(r.Address);
-    if (addr) byAddress.set(addr, r);
-    const planKey = `${norm(base)}|${norm(r.Floorplan)}`;
+    const addr = cleanAddress(r.Address); if (addr) byAddress.set(addr, r);
+    const floorPlanClean = sourceType === 'mi' ? cleanMIPlan(r.Floorplan) : cleanText(r.Floorplan);
+    const planKey = `${norm(base)}|${norm(floorPlanClean)}`;
     const hours = {Original:r.Original ?? '', Reclean:r.Reclean ?? '', Windows:r.Windows ?? ''};
-    if (norm(r.Floorplan) && !hoursBySubPlan.has(planKey)) hoursBySubPlan.set(planKey, hours);
-    if (norm(r.Floorplan) && !hoursByPlan.has(norm(r.Floorplan))) hoursByPlan.set(norm(r.Floorplan), hours);
+    if (norm(floorPlanClean) && !hoursBySubPlan.has(planKey)) hoursBySubPlan.set(planKey, hours);
+    if (norm(floorPlanClean) && !hoursByPlan.has(norm(floorPlanClean))) hoursByPlan.set(norm(floorPlanClean), hours);
     if (!subTemplate.has(norm(base))) subTemplate.set(norm(base), r.Subdivision);
   }
   return {bySubLot, byAddress, hoursBySubPlan, hoursByPlan, subTemplate};
 }
 function compare(){
   const idx = buildIndexes();
-  let matched = 0;
-  resultRows = [];
-  const seen = new Set();
+  const subIdx = buildSubdivisionTruthIndex();
+  let matched = 0; resultRows = [];
+  const seenLots = new Set();
   for (const j of jobRows) {
     const community = cleanText(j.Community);
-    const mappedBase = cleanText(mappings[community] || community);
-    const lot = cleanLot(j['Job #']);
+    const resolved = resolveCommunity(community, idx, subIdx);
+    const mappedBase = resolved.matchBase;
+    const lot = cleanLot(j.Lot);
+    const addrKey = cleanAddress(j.Address);
+    const uniqueKey = `${norm(mappedBase)}|${lot}|${addrKey || norm(j.Plan)}`;
+    if (seenLots.has(uniqueKey)) continue;
+    seenLots.add(uniqueKey);
     const subLotKey = `${norm(mappedBase)}|${lot}`;
-    const addrKey = cleanAddress(j['Street Address']);
     const match = idx.bySubLot.get(subLotKey) || idx.byAddress.get(addrKey);
     if (match) { matched++; continue; }
-    const dupeKey = `${norm(mappedBase)}|${lot}|${addrKey}`;
-    if (seen.has(dupeKey)) continue;
-    seen.add(dupeKey);
-    const city = cityOnly(j['City, State, Zip']);
-    const plan = cleanText(j['Plan Name']);
-    const subTemplate = idx.subTemplate.get(norm(mappedBase));
-    const subdivision = subTemplate || subdivisionWithStars(mappedBase, guessBuilder(mappedBase), city);
+    const city = cleanText(j.City);
+    const plan = sourceType === 'mi' ? cleanMIPlan(j.Plan) : cleanText(j.Plan);
+    const builder = guessBuilder(mappedBase);
+    const subdivisionBuilder = sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : builder);
+    const subdivision = resolved.displaySubdivision || subdivisionWithStars(mappedBase, subdivisionBuilder, city);
     const hours = idx.hoursBySubPlan.get(`${norm(mappedBase)}|${norm(plan)}`) || idx.hoursByPlan.get(norm(plan)) || {Original:'',Reclean:'',Windows:''};
-    const builder = (subdivision.match(/\*([^*]+)\*/)?.[1] || guessBuilder(mappedBase)).trim();
     resultRows.push({
+      Source: sourceType === 'mi' ? 'MI Homes' : (sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : (sourceType === 'dr' ? 'DR Horton' : 'Pulte'))),
       Community: community,
       MatchedSubdivisionBase: mappedBase,
-      Builder: builder,
+      NameSource: resolved.source,
+      Builder: (sourceType === 'mi' || sourceType === 'fischer' || sourceType === 'arbor' || sourceType === 'dr') ? builder : ((subdivision.match(/\*([^*]+)\*/)?.[1] || builder).trim()),
       Subdivision: subdivision,
       Lot: lot,
       Floorplan: plan,
       Original: hours.Original ?? '',
       Reclean: hours.Reclean ?? '',
       Windows: hours.Windows ?? '',
-      Address: cleanText(j['Street Address']),
+      Address: cleanText(j.Address),
       City: city,
       Elevation: cleanText(j.Elevation),
-      FieldManager: cleanText(j['Field Manager']),
-      ScarStart: excelDateToText(j['SCAR Start Date']),
-      ScarFinal: excelDateToText(j['SCAR Final Date']),
       DateAdded: todayLotAddedDate()
     });
   }
@@ -316,13 +599,10 @@ function compare(){
   $('matchedCount').textContent = matched;
   $('commCount').textContent = new Set(jobRows.map(r=>cleanText(r.Community))).size;
   $('copyBtn').disabled = $('csvBtn').disabled = $('xlsxBtn').disabled = resultRows.length === 0;
-  refreshCommunityFilter();
-  renderResults();
+  refreshCommunityFilter(); renderResults();
 }
 function filteredRows(){
-  const q = norm($('search').value);
-  const c = $('communityFilter').value;
-  const hf = $('hoursFilter').value;
+  const q = norm($('search').value); const c = $('communityFilter').value; const hf = $('hoursFilter').value;
   let rows = resultRows.filter(r => {
     if (c && r.Community !== c) return false;
     if (hf === 'with' && !(r.Original || r.Reclean || r.Windows)) return false;
@@ -340,20 +620,16 @@ function filteredRows(){
   return rows;
 }
 function renderResults(){
-  const rows = filteredRows();
-  renderNewLotsBox(rows);
-  const cols = ['Community','Subdivision','Lot','Floorplan','Original','Reclean','Windows','Address','City','Elevation','DateAdded'];
-  const labels = {DateAdded:'Date Added'};
+  const rows = filteredRows(); renderNewLotsBox(rows);
+  const cols = ['Source','Community','Subdivision','NameSource','Lot','Floorplan','Original','Reclean','Windows','Address','City','Elevation','DateAdded'];
+  const labels = {DateAdded:'Date Added', NameSource:'Name Source'};
   $('resultsTable').querySelector('thead').innerHTML = `<tr>${cols.map(c=>`<th>${labels[c] || c}</th>`).join('')}</tr>`;
   $('resultsTable').querySelector('tbody').innerHTML = rows.map(r => `<tr>${cols.map(c=>`<td>${escapeHtml(r[c] ?? '')}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${cols.length}" class="muted">No matching rows for the current filters.</td></tr>`;
   $('pasteBox').value = toTSV(rows.map(toFloorPlanRow), HEADERS);
 }
 function renderNewLotsBox(rows){
   $('newLotsBadge').textContent = rows.length;
-  if (!rows.length) {
-    $('newLotsList').innerHTML = `<div class="empty-newlots">No new lots match the current filters.</div>`;
-    return;
-  }
+  if (!rows.length) { $('newLotsList').innerHTML = `<div class="empty-newlots">No new lots match the current filters.</div>`; return; }
   $('newLotsList').innerHTML = rows.map(r => `
     <div class="newlot-item">
       <div class="newlot-title">Lot ${escapeHtml(r.Lot)} — ${escapeHtml(r.Subdivision)}</div>
@@ -364,40 +640,26 @@ function renderNewLotsBox(rows){
 }
 function toFloorPlanRow(r){ return {Builder:r.Builder, Subdivision:r.Subdivision, Lot:r.Lot, Floorplan:r.Floorplan, Original:r.Original, Reclean:r.Reclean, Windows:r.Windows, Address:r.Address, "Date Added":r.DateAdded || todayLotAddedDate()}; }
 function toTSV(rows, headers){ return [headers.join('\t'), ...rows.map(r=>headers.map(h=>r[h] ?? '').join('\t'))].join('\n'); }
-function toCSV(rows, headers){
-  const esc = v => '"' + String(v ?? '').replace(/"/g,'""') + '"';
-  return [headers.map(esc).join(','), ...rows.map(r=>headers.map(h=>esc(r[h])).join(','))].join('\n');
-}
+function toCSV(rows, headers){ const esc = v => '"' + String(v ?? '').replace(/"/g,'""') + '"'; return [headers.map(esc).join(','), ...rows.map(r=>headers.map(h=>esc(r[h])).join(','))].join('\n'); }
 function refreshCommunityFilter(){
-  const cur = $('communityFilter').value;
-  const comms = [...new Set(resultRows.map(r=>r.Community))].sort();
+  const cur = $('communityFilter').value; const comms = [...new Set(resultRows.map(r=>r.Community))].sort();
   $('communityFilter').innerHTML = `<option value="">All communities</option>` + comms.map(c=>`<option ${c===cur?'selected':''}>${escapeHtml(c)}</option>`).join('');
 }
 function copyNewLots(){ navigator.clipboard.writeText($('pasteBox').value); }
-function download(name, text, type){
-  const blob = new Blob([text], {type}); const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href);
-}
-function downloadCSV(){ const rows = filteredRows().map(toFloorPlanRow); download('new-pulte-lots.csv', toCSV(rows, HEADERS), 'text/csv'); }
+function download(name, text, type){ const blob = new Blob([text], {type}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href); }
+function downloadCSV(){ const rows = filteredRows().map(toFloorPlanRow); download(`new-${sourceType}-lots.csv`, toCSV(rows, HEADERS), 'text/csv'); }
 function downloadXLSX(){
-  const rows = filteredRows();
-  const wb = XLSX.utils.book_new();
-  const ws1 = XLSX.utils.json_to_sheet(rows.map(toFloorPlanRow), {header:HEADERS});
-  XLSX.utils.book_append_sheet(wb, ws1, 'FloorPlan Paste Rows');
-  const ws2 = XLSX.utils.json_to_sheet(rows);
-  XLSX.utils.book_append_sheet(wb, ws2, 'Detailed New Lots');
-  XLSX.writeFile(wb, 'new-pulte-lots.xlsx');
+  const rows = filteredRows(); const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.json_to_sheet(rows.map(toFloorPlanRow), {header:HEADERS}); XLSX.utils.book_append_sheet(wb, ws1, 'FloorPlan Paste Rows');
+  const ws2 = XLSX.utils.json_to_sheet(rows); XLSX.utils.book_append_sheet(wb, ws2, 'Detailed New Lots');
+  XLSX.writeFile(wb, `new-${sourceType}-lots.xlsx`);
 }
 function escapeHtml(v){ return String(v).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
 
 function addMissingMappingsFromJobs(){
   let changed = false;
-  for (const r of jobRows) {
-    const c = cleanText(r.Community);
-    if (c && !(c in mappings)) { mappings[c] = c; changed = true; }
-  }
-  if (changed) saveMappings();
-  renderMappings();
+  for (const r of jobRows) { const c = cleanText(r.Community); if (c && !(c in mappings)) { mappings[c] = c; changed = true; } }
+  if (changed) saveMappings(); renderMappings();
 }
 function renderMappings(){
   const keys = Object.keys(mappings).sort();
@@ -406,19 +668,47 @@ function renderMappings(){
   $('mappingList').querySelectorAll('button[data-del]').forEach(btn => btn.addEventListener('click', e => { delete mappings[e.target.dataset.del]; saveMappings(); renderMappings(); }));
 }
 function updateMapInput(e){
-  const old = e.target.dataset.old;
-  const row = e.target.closest('.maprow');
-  const from = cleanText(row.querySelector('[data-type="from"]').value);
-  const to = cleanText(row.querySelector('[data-type="to"]').value);
-  if (!from) return;
-  if (from !== old) delete mappings[old];
-  mappings[from] = to || from;
-  saveMappings(); renderMappings();
+  const old = e.target.dataset.old; const row = e.target.closest('.maprow');
+  const from = cleanText(row.querySelector('[data-type="from"]').value); const to = cleanText(row.querySelector('[data-type="to"]').value);
+  if (!from) return; if (from !== old) delete mappings[old]; mappings[from] = to || from; saveMappings(); renderMappings();
 }
-function addMapping(){ mappings['New Website Community'] = 'Floor Sheet Subdivision'; saveMappings(); renderMappings(); }
+function addMapping(){ mappings['New Export Community'] = 'Floor Sheet Subdivision'; saveMappings(); renderMappings(); }
+function updateSourceUI(){
+  sourceType = $('sourceSelect').value; mappings = loadMappings(sourceType); rawRows = []; jobRows = []; resultRows = [];
+  const isPasteSource = sourceType === 'fischer' || sourceType === 'arbor';
+  $('jobsFile').value = ''; $('builderPasteText').value = ''; $('jobsStatus').textContent = isPasteSource ? 'No pasted data loaded.' : 'No builder export loaded.';
+  $('jobsFile').classList.toggle('hide', isPasteSource);
+  $('pasteBoxWrap').classList.toggle('hide', !isPasteSource);
+  $('jobCount').textContent = '0'; $('matchedCount').textContent = '0'; $('newCount').textContent = '0'; $('commCount').textContent = '0';
+  $('copyBtn').disabled = $('csvBtn').disabled = $('xlsxBtn').disabled = true;
+
+  if (sourceType === 'mi') {
+    $('sourceHelp').textContent = 'MI expected columns: Account, Subdivision, Lot/Block, Plan, Job, Task. Multiple task rows for the same lot are deduped into one lot.';
+    $('jobCountLabel').textContent = 'MI 90-day job rows';
+  } else if (sourceType === 'fischer') {
+    $('sourceHelp').textContent = 'Fischer: copy the job list from the website/export and paste it below. The tool reads community code, floorplan, address, and lot, then dedupes repeated task rows.';
+    $('jobCountLabel').textContent = 'Fischer pasted rows';
+  } else if (sourceType === 'arbor') {
+    $('sourceHelp').textContent = 'Arbor Homes: copy the job list from the website/export and paste it below. Community output/mappings can be edited in the saved settings below.';
+    $('jobCountLabel').textContent = 'Arbor pasted rows';
+  } else if (sourceType === 'dr') {
+    $('sourceHelp').textContent = 'DR Horton expected CSV columns: Community, Address, City, State, Zip, Plan, Lot. Community codes like “Bishop Estates - 97800” are cleaned to “Bishop Estates”.';
+    $('jobCountLabel').textContent = 'DR Horton lot rows';
+  } else {
+    $('sourceHelp').textContent = 'Pulte expected columns: Community, Job #, Street Address, City, State, Zip, Plan Name.';
+    $('jobCountLabel').textContent = 'Pulte export rows';
+  }
+
+  $('newLotsList').innerHTML = `<div class="empty-newlots">Upload/paste builder data and your Floor Plans sheet, then click <b>Compare lots</b>.</div>`; $('newLotsBadge').textContent = '0';
+  renderMappings(); checkReady();
+}
 
 $('floorFile').addEventListener('change', e => loadFloor(e.target.files[0]).catch(err => $('floorStatus').innerHTML = `<span class="bad">${escapeHtml(err.message)}</span>`));
-$('jobsFile').addEventListener('change', e => loadJobs(e.target.files[0]).catch(err => $('jobsStatus').innerHTML = `<span class="bad">${escapeHtml(err.message)}</span>`));
+$('subdivisionFile').addEventListener('change', e => loadSubdivisions(e.target.files[0]).catch(err => $('subdivisionStatus').innerHTML = `<span class="bad">${escapeHtml(err.message)}</span>`));
+$('jobsFile').addEventListener('change', e => loadBuilderExport(e.target.files[0]).catch(err => $('jobsStatus').innerHTML = `<span class="bad">${escapeHtml(err.message)}</span>`));
+$('sourceSelect').addEventListener('change', updateSourceUI);
+$('loadPasteBtn').addEventListener('click', () => { try { loadPastedBuilderExport(); } catch(err) { $('jobsStatus').innerHTML = `<span class="bad">${escapeHtml(err.message)}</span>`; } });
+$('clearPasteBtn').addEventListener('click', () => { $('builderPasteText').value=''; rawRows=[]; jobRows=[]; $('jobsStatus').textContent='No pasted data loaded.'; checkReady(); });
 $('compareBtn').addEventListener('click', compare);
 $('copyBtn').addEventListener('click', copyNewLots);
 $('csvBtn').addEventListener('click', downloadCSV);
@@ -426,7 +716,7 @@ $('xlsxBtn').addEventListener('click', downloadXLSX);
 $('resetBtn').addEventListener('click', resetMappings);
 $('addMapBtn').addEventListener('click', addMapping);
 ['search','communityFilter','hoursFilter','sortBy'].forEach(id => $(id).addEventListener('input', renderResults));
-renderMappings();
+updateSourceUI();
 </script>
 </body>
 </html>
