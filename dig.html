@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Monday New Lot Parser v1.9</title>
+<title>Monday New Lot Parser v2.0</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -56,8 +56,8 @@
 <body>
 <header>
   <div class="top">
-    <h1>Monday New Lot Parser <span style="font-size:12px;color:#9fb0d0;font-weight:700;">v1.9</span></h1>
-    <span class="version">v1.9</span>
+    <h1>Monday New Lot Parser <span style="font-size:12px;color:#9fb0d0;font-weight:700;">v2.0</span></h1>
+    <span class="version">v2.0</span>
   </div>
 </header>
 <main>
@@ -100,6 +100,21 @@
         If this HTML and <b>Subdivisions.xlsx</b> are in the same GitHub repo folder, leave this as <b>Subdivisions.xlsx</b> and click <b>Load From Same Repo</b>. If the Excel file is in another folder in the same repo, use a relative path like <b>data/Subdivisions.xlsx</b> or <b>../Subdivisions.xlsx</b>. This path is saved locally.
       </div>
 
+      <label>Upload floorplan hours sheet</label>
+      <input id="hoursFile" type="file" accept=".xlsx,.xls,.csv" />
+      <div class="small" style="margin:8px 0 12px">
+        Best columns: <b>Builder</b>, <b>FloorPlan</b>, <b>Original</b>, <b>Reclean</b>, and <b>Windows</b>. These hours save in this browser after upload/load.
+      </div>
+
+      <label>Floorplan hours file from same GitHub repo</label>
+      <div class="row" style="grid-template-columns:1fr auto;margin-bottom:8px">
+        <input id="hoursServerUrl" type="text" placeholder="Original-Recleans-Windows Hours.xlsx" />
+        <button class="secondary" id="loadHoursServerBtn" type="button">Load Hours From Repo</button>
+      </div>
+      <div class="small" style="margin:0 0 12px">
+        Put <b>Original-Recleans-Windows Hours.xlsx</b> in the same repo folder as this HTML, or type a relative path here.
+      </div>
+
       <label>Paste Monday lot text</label>
       <textarea id="rawInput" spellcheck="false" placeholder="Lot 3 Lansdowne Farms 50’s&#10;4200 Sycamore Oak Avenue&#10;X429/B&#10;Permit # NEWR2614426&#10;Dig date 5/18/26"></textarea>
 
@@ -117,6 +132,7 @@
         <span class="pill">Matched subdivisions: <strong id="countMatched">0</strong></span>
         <span class="pill">Needs review: <strong id="countReview">0</strong></span>
         <span class="pill">Mappings saved: <strong id="countMaps">0</strong></span>
+        <span class="pill">Hours saved: <strong id="countHours">0</strong></span>
       </div>
       <div class="btns" style="margin-top:0;margin-bottom:12px">
         <button id="copyTSV">Copy for Excel</button>
@@ -143,7 +159,8 @@
 </main>
 <script>
 const STORAGE_KEY = "mondayLotParser.subdivisionMappings.v2";
-const SETTINGS_KEY = "mondayLotParser.settings.v1";
+const SETTINGS_KEY = "mondayLotParser.settings.v2";
+const HOURS_STORAGE_KEY = "mondayLotParser.floorplanHours.v1";
 
 const HARD_OVERRIDES = new Map([
   ["kintner crossing", "Kintner Crossing *DR *Sunbury"],
@@ -176,10 +193,12 @@ const defaultMappings = [
 ];
 
 let mappings = loadMappings();
+let floorplanHours = loadHoursData();
 let parsedRows = [];
 
 loadUiSettings();
 renderMappings();
+renderHoursCount();
 
 function normalizeKey(s){
   return String(s || "")
@@ -211,6 +230,96 @@ function saveMappings(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(custom));
 }
 
+function loadHoursData(){
+  try { return JSON.parse(localStorage.getItem(HOURS_STORAGE_KEY) || "[]"); } catch(e) { return []; }
+}
+
+function saveHoursData(){
+  localStorage.setItem(HOURS_STORAGE_KEY, JSON.stringify(floorplanHours));
+  renderHoursCount();
+}
+
+function renderHoursCount(){
+  const el = document.getElementById("countHours");
+  if(el) el.textContent = floorplanHours.length;
+}
+
+function normalizeFloorplan(s){
+  return String(s || "")
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, "")
+    .split("/")[0];
+}
+
+function canonicalBuilderKey(builder){
+  const b = normalizeKey(builder);
+  if(["dr", "dr horton", "d r horton", "horton"].includes(b)) return "dr horton";
+  if(["ryan", "ryan homes"].includes(b)) return "ryan homes";
+  if(["mi", "mi homes", "m i homes"].includes(b)) return "mi homes";
+  if(["drees", "drees homes"].includes(b)) return "drees homes";
+  if(["amh", "america homes 4 rent"].includes(b)) return "amh";
+  return b;
+}
+
+function findHours(builder, floorplan){
+  const fp = normalizeFloorplan(floorplan);
+  if(!fp) return null;
+  const b = canonicalBuilderKey(builder);
+  let match = floorplanHours.find(h => normalizeFloorplan(h.Floorplan) === fp && canonicalBuilderKey(h.Builder) === b);
+  if(match) return match;
+  // Fallback: exact floorplan, any builder. Useful if the hours sheet builder label differs slightly.
+  return floorplanHours.find(h => normalizeFloorplan(h.Floorplan) === fp) || null;
+}
+
+function valueOrBlank(v){
+  return (v === null || v === undefined) ? "" : String(v).trim();
+}
+
+function rowToHours(row){
+  const builderCol = detectColumn(row, ["builder"]);
+  const floorplanCol = detectColumn(row, ["floorplan", "floor plan", "plan"]);
+  const originalCol = detectColumn(row, ["original"]);
+  const recleanCol = detectColumn(row, ["reclean"]);
+  const windowsCol = detectColumn(row, ["windows", "window"]);
+  const builder = valueOrBlank(row[builderCol]);
+  const floorplan = normalizeFloorplan(row[floorplanCol]);
+  if(!builder || !floorplan) return null;
+  return {
+    Builder: builder,
+    Floorplan: floorplan,
+    Original: valueOrBlank(row[originalCol]),
+    Reclean: valueOrBlank(row[recleanCol]),
+    Windows: valueOrBlank(row[windowsCol])
+  };
+}
+
+function importHoursFromWorkbook(wb, sourceName){
+  const map = new Map(floorplanHours.map(h => [canonicalBuilderKey(h.Builder) + "|" + normalizeFloorplan(h.Floorplan), h]));
+  let added = 0;
+  wb.SheetNames.forEach(name => {
+    const ws = wb.Sheets[name];
+    const rows = XLSX.utils.sheet_to_json(ws, {defval:""});
+    rows.forEach(row => {
+      const h = rowToHours(row);
+      if(!h) return;
+      map.set(canonicalBuilderKey(h.Builder) + "|" + normalizeFloorplan(h.Floorplan), h);
+      added++;
+    });
+  });
+  floorplanHours = Array.from(map.values()).sort((a,b) => (a.Builder+a.Floorplan).localeCompare(b.Builder+b.Floorplan));
+  saveHoursData();
+  setStatus(`Loaded ${added} floorplan hour row(s) from ${sourceName}. Saved locally.`);
+  return added;
+}
+
+async function handleHoursFile(file){
+  const data = await file.arrayBuffer();
+  const wb = XLSX.read(data, {type:"array"});
+  importHoursFromWorkbook(wb, file.name);
+  if(rawInput.value.trim()) parseBtn.click();
+}
+
 function loadUiSettings(){
   let settings = {};
   try { settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}"); } catch(e) {}
@@ -218,12 +327,14 @@ function loadUiSettings(){
   const dateEl = document.getElementById("lastUpdated");
   const rawEl = document.getElementById("rawInput");
   const urlEl = document.getElementById("serverUrl");
+  const hoursUrlEl = document.getElementById("hoursServerUrl");
 
   if(settings.builder) builderEl.value = settings.builder;
   if(settings.lastUpdated) dateEl.value = settings.lastUpdated;
   else dateEl.valueAsDate = new Date();
   if(settings.rawInput) rawEl.value = settings.rawInput;
   urlEl.value = settings.serverUrl || "Subdivisions.xlsx";
+  hoursUrlEl.value = settings.hoursServerUrl || "Original-Recleans-Windows Hours.xlsx";
 }
 
 function saveUiSettings(){
@@ -231,12 +342,13 @@ function saveUiSettings(){
     builder: document.getElementById("builder").value,
     lastUpdated: document.getElementById("lastUpdated").value,
     rawInput: document.getElementById("rawInput").value,
-    serverUrl: document.getElementById("serverUrl").value.trim()
+    serverUrl: document.getElementById("serverUrl").value.trim(),
+    hoursServerUrl: document.getElementById("hoursServerUrl").value.trim()
   };
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
-["builder","lastUpdated","rawInput","serverUrl"].forEach(id => {
+["builder","lastUpdated","rawInput","serverUrl","hoursServerUrl"].forEach(id => {
   document.getElementById(id).addEventListener("input", saveUiSettings);
   document.getElementById(id).addEventListener("change", saveUiSettings);
 });
@@ -385,20 +497,24 @@ function parseBlock(block){
     }
   }
 
+  const builder = document.getElementById("builder").value;
   const formattedSubdivision = findMapping(rawSubdivision);
+  const hours = findHours(builder, floorplan);
+  let review = !formattedSubdivision ? "Subdivision not mapped" : (!address ? "Missing address" : (!floorplan ? "Missing floorplan" : ""));
+  if(!review && floorplan && !hours) review = "Missing floorplan hours";
   return {
-    Builder: document.getElementById("builder").value,
+    Builder: builder,
     Subdivision: formattedSubdivision || rawSubdivision,
     Lot: lot,
     Floorplan: floorplan,
-    Original: "",
-    Reclean: "",
-    Windows: "",
+    Original: hours ? hours.Original : "",
+    Reclean: hours ? hours.Reclean : "",
+    Windows: hours ? hours.Windows : "",
     Address: address,
     lastUpdated: document.getElementById("lastUpdated").value,
     rawSubdivision,
     matched: !!formattedSubdivision,
-    review: !formattedSubdivision ? "Subdivision not mapped" : (!address ? "Missing address" : (!floorplan ? "Missing floorplan" : ""))
+    review
   };
 }
 
@@ -567,6 +683,37 @@ async function loadMappingsFromServer(options = {}){
   return false;
 }
 
+async function loadHoursFromServer(options = {}){
+  const { silent = false, autoParse = false } = options;
+  let url = document.getElementById("hoursServerUrl").value.trim() || "Original-Recleans-Windows Hours.xlsx";
+  document.getElementById("hoursServerUrl").value = url;
+  saveUiSettings();
+
+  const candidates = buildServerCandidates(url);
+  const errors = [];
+
+  for(const candidate of candidates){
+    try{
+      if(!silent) setStatus("Loading floorplan hours from " + candidate + "...");
+      const res = await fetch(candidate, { cache:"no-store" });
+      if(!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      const data = await res.arrayBuffer();
+      const wb = XLSX.read(data, {type:"array"});
+      const added = importHoursFromWorkbook(wb, candidate);
+      setStatus(`Loaded ${added} floorplan hour row(s) from ${candidate}. Saved locally.${autoParse && rawInput.value.trim() ? "\nAuto-parsing pasted lots..." : ""}`);
+      if(autoParse && rawInput.value.trim()) parseBtn.click();
+      return true;
+    }catch(err){
+      errors.push(`${candidate}: ${err.message}`);
+    }
+  }
+
+  if(!silent || !floorplanHours.length){
+    setStatus("Could not load the floorplan hours file from the repo. I tried:\n" + errors.join("\n") + "\n\nMake sure the file is published on GitHub Pages and the capitalization matches exactly.");
+  }
+  return false;
+}
+
 function setStatus(msg){ document.getElementById("status").textContent = msg; }
 
 // Events
@@ -586,7 +733,9 @@ sampleBtn.addEventListener("click", () => {
 clearBtn.addEventListener("click", () => { rawInput.value=""; saveUiSettings(); parsedRows=[]; renderRows(); setStatus("Cleared."); });
 
 mapFile.addEventListener("change", e => { const file = e.target.files[0]; if(file) handleFile(file); });
+hoursFile.addEventListener("change", e => { const file = e.target.files[0]; if(file) handleHoursFile(file); });
 loadServerBtn.addEventListener("click", () => loadMappingsFromServer({silent:false, autoParse:true}));
+loadHoursServerBtn.addEventListener("click", () => loadHoursFromServer({silent:false, autoParse:true}));
 
 copyTSV.addEventListener("click", async () => {
   const tsv = rowsToTSV(true);
@@ -629,8 +778,10 @@ resetMappings.addEventListener("click", () => {
 
 // Auto-load the repo Subdivisions.xlsx on page open, then auto-parse if pasted text is saved.
 // Manual Browse upload still works and also saves locally.
-setTimeout(() => {
-  loadMappingsFromServer({ silent:true, autoParse:true });
+setTimeout(async () => {
+  await loadMappingsFromServer({ silent:true, autoParse:false });
+  await loadHoursFromServer({ silent:true, autoParse:false });
+  if(rawInput.value.trim()) parseBtn.click();
 }, 250);
 
 </script>
