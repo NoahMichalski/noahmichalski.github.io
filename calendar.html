@@ -801,6 +801,19 @@
       line-height: 1;
     }
 
+  
+    .lastTaskBox { margin-top:7px; font-size:11px; line-height:1.35; color:var(--muted); }
+    .lastTaskBox.warn { color:#fde68a; font-weight:850; }
+    .lastTaskBox.danger { color:#fecdd3; font-weight:900; }
+    .shortcutEditorWrap { max-height:380px; overflow:auto; border:1px solid var(--border); border-radius:14px; margin-top:12px; }
+    .shortcutEditorTable { width:100%; min-width:720px; table-layout:fixed; border-collapse:collapse; font-size:12px; }
+    .shortcutEditorTable th, .shortcutEditorTable td { padding:8px; border-bottom:1px solid rgba(255,255,255,.08); }
+    .shortcutEditorTable input { padding:8px; border-radius:10px; font-size:12px; }
+    .shortcutEditorTable th:nth-child(1), .shortcutEditorTable td:nth-child(1) { width:22%; }
+    .shortcutEditorTable th:nth-child(2), .shortcutEditorTable td:nth-child(2) { width:48%; }
+    .shortcutEditorTable th:nth-child(3), .shortcutEditorTable td:nth-child(3) { width:18%; }
+    .shortcutEditorTable th:nth-child(4), .shortcutEditorTable td:nth-child(4) { width:12%; }
+
   </style>
 </head>
 <body>
@@ -810,7 +823,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.95</div>
+      <div class="version">v1.96</div>
     </div>
   </header>
 
@@ -875,6 +888,7 @@
 
             <div class="btns">
               <button onclick="parseAndRender()">Parse / Preview</button>
+              <button class="secondary" onclick="checkLastTasks()">Check Last Tasks</button>
               <button class="blue" onclick="downloadCSV()">Export All CSV</button>
               <button class="secondary" onclick="copyCSV()">Copy CSV</button>
               <button class="danger" onclick="clearAll()">Clear Text</button>
@@ -933,6 +947,24 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
               <button class="secondary" onclick="exportSavedShortcuts()">Export Shortcuts JSON</button>
               <button class="danger" onclick="clearSavedData()">Clear Saved Data</button>
             </div>
+          </div>
+        </div>
+
+
+        <div class="card">
+          <div class="cardHead">
+            <h2>Shortcut Editor</h2>
+            <span class="pill" id="shortcutEditorPill">Editable</span>
+          </div>
+          <div class="cardBody">
+            <p class="help">Edit saved Shortened.xlsx rows in the browser. Changes save locally and can be exported back to Excel.</p>
+            <div class="btns">
+              <button class="secondary" onclick="renderShortcutEditor()">Open / Refresh Editor</button>
+              <button class="secondary" onclick="addShortcutEditorRow()">Add Shortcut Row</button>
+              <button class="blue" onclick="saveShortcutEditor()">Save Shortcut Edits</button>
+              <button class="secondary" onclick="exportShortcutExcel()">Export Shortened.xlsx</button>
+            </div>
+            <div id="shortcutEditorOutput"><div class="empty">Click Open / Refresh Editor to edit shortcuts.</div></div>
           </div>
         </div>
 
@@ -1621,6 +1653,15 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     }
 
 
+
+    function renderLastTaskHTML(row) {
+      if (!row.lastTaskChecked) return '<div class="lastTaskBox">Last task: not checked</div>';
+      if (!row.lastTaskFound) return '<div class="lastTaskBox">Last task: none found in 30 days</div>';
+      const cls = row.lastTaskDuplicateOriginal ? 'danger' : (row.lastTaskDryClean ? 'warn' : '');
+      const flag = row.lastTaskDuplicateOriginal ? ' ⚠ Duplicate Original' : (row.lastTaskDryClean ? ' ⚠ Last was Dry Clean' : '');
+      return `<div class="lastTaskBox ${cls}">Last: ${escapeHTML(row.lastTaskType || '')} — ${escapeHTML(row.lastTaskDate || '')}${flag}<br>${escapeHTML(row.lastTaskSubject || '')}</div>`;
+    }
+
     function parsePreviewFromRows() {
       parsedRows = markDuplicates(parsedRows);
       updateDateBanner();
@@ -1705,6 +1746,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
                 </td>
                 <td>
                   ${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : (row.matched ? '<span class="tag original">Matched</span>' : '<span class="tag miss">' + escapeHTML(row.matchStatus) + '</span>')}
+                  ${renderLastTaskHTML(row)}
                 </td>
               </tr>
             `).join('')}
@@ -2193,6 +2235,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         </div>
         <div class="modalStat"><b>Total events:</b> ${summary.rows.length}</div>
         ${summary.duplicates ? `<div class="modalWarn"><b>Duplicate warning:</b> ${summary.duplicates} duplicate row(s) found inside this schedule. This is warn-only, so you can still import.<ul>${duplicateList}</ul>${summary.duplicates > 8 ? '<div>...and more</div>' : ''}</div>` : ''}
+        ${summary.rows.filter(r => r.lastTaskDuplicateOriginal).length ? `<div class="modalDanger"><b>Last task warning:</b> ${summary.rows.filter(r => r.lastTaskDuplicateOriginal).length} current Original job(s) appear to already have an Original/Dry Clean in the last 30 days. This is warn-only.</div>` : ''}
         <p class="help">This will create events on the selected Google Calendar(s). CSV export is still available as backup.</p>
       `;
 
@@ -3135,6 +3178,173 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const end = byId('reportEndDate').value || 'end';
       XLSX.writeFile(wb, `calendar-report-${start}-to-${end}.xlsx`);
       showToast('Exported report Excel workbook.');
+    }
+
+
+
+    function shortcutEditorRowsFromDOM() {
+      const rows = [];
+      document.querySelectorAll('[data-shortcut-editor-row]').forEach(tr => {
+        const builder = tr.querySelector('[data-field="builder"]')?.value.trim() || '';
+        const subdivision = tr.querySelector('[data-field="subdivision"]')?.value.trim() || '';
+        const shortened = tr.querySelector('[data-field="shortened"]')?.value.trim() || '';
+        if (builder || subdivision || shortened) {
+          rows.push({ builder, subdivision, shortened, shortKey: normalizeKey(shortened), subdivisionKey: normalizeKey(subdivision) });
+        }
+      });
+      return rows;
+    }
+
+    function renderShortcutEditor() {
+      const output = byId('shortcutEditorOutput');
+      if (!output) return;
+      byId('shortcutEditorPill').textContent = `${shortcutRows.length} rows`;
+      output.innerHTML = `
+        <div class="shortcutEditorWrap">
+          <table class="shortcutEditorTable">
+            <thead><tr><th>Builder</th><th>Subdivision</th><th>Shortened</th><th>Action</th></tr></thead>
+            <tbody>
+              ${shortcutRows.map((row, idx) => `
+                <tr data-shortcut-editor-row="${idx}">
+                  <td><input data-field="builder" value="${escapeHTML(row.builder || '')}" /></td>
+                  <td><input data-field="subdivision" value="${escapeHTML(row.subdivision || '')}" /></td>
+                  <td><input data-field="shortened" value="${escapeHTML(row.shortened || '')}" /></td>
+                  <td><button class="smallBtn danger" onclick="deleteShortcutEditorRow(${idx})">Delete</button></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    function saveShortcutRowsToStorage() {
+      shortcutRows = shortcutRows.map(row => ({
+        builder: String(row.builder || '').trim(),
+        subdivision: String(row.subdivision || '').trim(),
+        shortened: String(row.shortened || '').trim(),
+        shortKey: normalizeKey(row.shortened || ''),
+        subdivisionKey: normalizeKey(row.subdivision || '')
+      })).filter(row => row.builder || row.subdivision || row.shortened);
+      localStorage.setItem(STORAGE_KEYS.shortcuts, JSON.stringify(shortcutRows));
+      localStorage.setItem(STORAGE_KEYS.updated, new Date().toLocaleString());
+      refreshStorageUI();
+    }
+
+    function saveShortcutEditor(show = true) {
+      const output = byId('shortcutEditorOutput');
+      if (output && output.querySelector('[data-shortcut-editor-row]')) shortcutRows = shortcutEditorRowsFromDOM();
+      saveShortcutRowsToStorage();
+      if (show) showToast(`Saved ${shortcutRows.length} shortcut rows locally.`);
+      renderShortcutEditor();
+      parseAndRender();
+    }
+
+    function addShortcutEditorRow() {
+      saveShortcutEditor(false);
+      shortcutRows.push({ builder: '', subdivision: '', shortened: '', shortKey: '', subdivisionKey: '' });
+      renderShortcutEditor();
+    }
+
+    function deleteShortcutEditorRow(index) {
+      saveShortcutEditor(false);
+      shortcutRows.splice(index, 1);
+      saveShortcutRowsToStorage();
+      renderShortcutEditor();
+      parseAndRender();
+    }
+
+    function exportShortcutExcel() {
+      saveShortcutEditor(false);
+      const rows = shortcutRows.map(row => ({ Builder: row.builder || '', Subdivision: row.subdivision || '', Shortened: row.shortened || '' }));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows.length ? rows : [{ Builder: '', Subdivision: '', Shortened: '' }]), 'Shortened');
+      XLSX.writeFile(wb, 'Shortened.xlsx');
+      showToast(`Exported ${rows.length} shortcut rows.`);
+    }
+
+    function addDaysISO(iso, days) {
+      const d = parseISODateLocal(iso);
+      d.setDate(d.getDate() + days);
+      return dateToISO(d);
+    }
+
+    function rowReportDetails(row) {
+      const parsed = parseSubdivisionParts(row.shortcutSubdivision || row.typedSub || '', row.shortcutBuilder || '');
+      return { lot: cleanLot(row.lot || ''), subdivision: parsed.subdivision || row.typedSub || '', subdivisionKey: normalizeKey(parsed.subdivision || row.typedSub || '') };
+    }
+
+    function reportRowMatchesParsedRow(historyRow, parsedRow) {
+      const current = rowReportDetails(parsedRow);
+      if (!current.lot || !historyRow.Lot) return false;
+      if (normalizeKey(historyRow.Lot) !== normalizeKey(current.lot)) return false;
+      const histSub = normalizeKey(historyRow.Subdivision || historyRow.SubdivisionShort || '');
+      const curSub = current.subdivisionKey;
+      if (!histSub || !curSub) return false;
+      return histSub === curSub || histSub.includes(curSub) || curSub.includes(histSub);
+    }
+
+    function isOriginalLikeTask(taskType) {
+      return taskType === 'Original' || taskType === 'Dry Clean';
+    }
+
+    async function checkLastTasks() {
+      try {
+        if (!requireSelectedDate('check last tasks')) return;
+        if (!parsedRows.length) parseAndRender();
+        collectPreviewEdits();
+
+        await ensureGoogleReady();
+        if (!googleAccessToken && !gapi.client.getToken()) {
+          googleTokenClient.requestAccessToken({ prompt: 'consent' });
+          showToast('Sign in first, then check last tasks again.');
+          return;
+        }
+
+        const generalCalendarId = byId('generalCalendarSelect')?.value || '';
+        const windowsCalendarId = byId('windowsCalendarSelect')?.value || '';
+        if (!generalCalendarId && !windowsCalendarId) {
+          showToast('Select at least one Google calendar first.');
+          return;
+        }
+
+        const selected = selectedDateValue();
+        const startDate = addDaysISO(selected, -30);
+        const endDate = addDaysISO(selected, -1);
+        showToast('Checking last 30 days of calendar history...');
+
+        let history = [];
+        if (generalCalendarId) {
+          const generalName = byId('generalCalendarSelect').selectedOptions[0]?.textContent || 'General';
+          history.push(...await fetchCalendarEvents(generalCalendarId, generalName, 'general', startDate, endDate));
+        }
+        if (windowsCalendarId) {
+          const windowsName = byId('windowsCalendarSelect').selectedOptions[0]?.textContent || 'Windows';
+          history.push(...await fetchCalendarEvents(windowsCalendarId, windowsName, 'windows', startDate, endDate));
+        }
+
+        parsedRows.forEach(row => {
+          const matches = history
+            .filter(hist => reportRowMatchesParsedRow(hist, row))
+            .sort((a, b) => `${b.Date} ${b.Start}`.localeCompare(`${a.Date} ${a.Start}`));
+
+          const last = matches[0];
+          row.lastTaskChecked = true;
+          row.lastTaskFound = Boolean(last);
+          row.lastTaskType = last?.TaskType || '';
+          row.lastTaskDate = last?.Date || '';
+          row.lastTaskSubject = last?.Subject || '';
+          row.lastTaskDryClean = last?.TaskType === 'Dry Clean';
+          row.lastTaskDuplicateOriginal = row.type === 'original' && isOriginalLikeTask(last?.TaskType || '');
+        });
+
+        parsePreviewFromRows();
+        const flagged = parsedRows.filter(r => r.lastTaskDuplicateOriginal).length;
+        const dryFlags = parsedRows.filter(r => r.lastTaskDryClean).length;
+        showToast(`Last task check complete. ${flagged} duplicate-original flag(s), ${dryFlags} dry-clean flag(s).`);
+      } catch (err) {
+        console.error(err);
+        showToast(err.message || 'Could not check last tasks.');
+      }
     }
 
 
