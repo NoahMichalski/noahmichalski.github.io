@@ -343,7 +343,7 @@
 
 <div class="topbar">
   <div>
-    <h2>VIP Import Tool <span class="pill">v24 Fischer paste fix</span></h2>
+    <h2>VIP Import Tool <span class="pill">v27 Epcon reclean fix</span></h2>
     <p>Upload builder Excel files or paste copied vendor-site table text. Use the checkboxes to choose which imports are visible in the output.</p>
     <button class="gear-btn inline-gear" onclick="openSettings()" title="Short name settings">⚙️ Short Names / Subdivision Fixes</button>
   </div>
@@ -362,6 +362,7 @@
         <option value="drhorton">DR Horton</option>
         <option value="ryan">Ryan</option>
         <option value="drees">Drees</option>
+        <option value="epcon">Epcon</option>
       </select>
       <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.csv">
       <button onclick="loadFiles()">Load Selected Files</button>
@@ -426,10 +427,20 @@
     </label>
 
     <div style="margin-top:10px; font-weight:bold;">Subdivision / Short Name Fixes</div>
+    <div class="row" style="margin:6px 0;">
+      <button class="tiny-btn" onclick="exportShortcutSettings()">Export Subdivision Fixes</button>
+      <button class="tiny-btn" onclick="document.getElementById('shortcutImportFile').click()">Import Subdivision Fixes</button>
+      <input id="shortcutImportFile" type="file" accept=".txt,.json" style="display:none" onchange="importShortcutSettings(event)">
+    </div>
     <textarea id="shortcutText" spellcheck="false"></textarea>
 
     <div style="margin-top:12px; font-weight:bold;">Job / Task Name Fixes</div>
     <div class="muted" style="margin-bottom:6px;">Use this for task wording, like Power Washing = p/w. Use ignore to hide a task.</div>
+    <div class="row" style="margin:6px 0;">
+      <button class="tiny-btn" onclick="exportJobShortcutSettings()">Export Job Fixes</button>
+      <button class="tiny-btn" onclick="document.getElementById('jobShortcutImportFile').click()">Import Job Fixes</button>
+      <input id="jobShortcutImportFile" type="file" accept=".txt,.json" style="display:none" onchange="importJobShortcutSettings(event)">
+    </div>
     <textarea id="jobShortcutText" spellcheck="false"></textarea>
 
     <div class="row" style="margin-top:10px; justify-content:space-between;">
@@ -570,6 +581,8 @@ const DEFAULT_JOB_SHORTCUT_TEXT = `Power Wash = p/w
 Power Washing = p/w
 Pressure Wash = p/w
 Carpet Prep = car
+Rough Clean = car
+QM Clean = original
 Final Flooring Prep = floor prep
 FINAL FLOORING PREP = floor prep
 Cleaning Sub = original
@@ -640,6 +653,21 @@ function applyJobShortcutName(value) {
   return "";
 }
 
+function normalizeJobShortcutResult(value) {
+  const raw = (value || "").toString().trim();
+  const c = raw.toLowerCase();
+  if (!raw) return "";
+  if (["ignore", "skip", "hide", "none", "null"].includes(c)) return null;
+  if (["original", "orig", "first clean", "qm clean"].includes(c)) return "original";
+  if (["reclean", "rec", "final clean", "final clean #1", "final clean #2"].includes(c)) return "reclean";
+  if (["p/w", "pw", "power wash", "power washing", "pressure wash"].includes(c)) return "p/w";
+  if (["car", "carpet", "carpet prep", "rough clean"].includes(c)) return "car";
+  if (["floor prep", "final flooring prep"].includes(c)) return "floor prep";
+  if (["p/w bsmt", "pw bsmt", "power wash basement"].includes(c)) return "p/w bsmt";
+  if (["p/w flatwork", "pw flatwork", "power wash flatwork"].includes(c)) return "p/w flatwork";
+  return raw;
+}
+
 function openSettings() {
   document.getElementById("shortcutText").value = shortcutTextRaw;
   document.getElementById("jobShortcutText").value = jobShortcutTextRaw;
@@ -679,6 +707,66 @@ function resetShortcuts() {
   saveImportsToStorage();
   renderOutput();
   document.getElementById("shortcutStatus").textContent = "Defaults restored.";
+}
+
+
+function downloadSettingsFile(filename, text) {
+  const blob = new Blob([text || ""], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function exportShortcutSettings() {
+  const text = document.getElementById("shortcutText").value || shortcutTextRaw || "";
+  downloadSettingsFile("vip-subdivision-shortcuts.txt", text);
+}
+
+function exportJobShortcutSettings() {
+  const text = document.getElementById("jobShortcutText").value || jobShortcutTextRaw || "";
+  downloadSettingsFile("vip-job-task-shortcuts.txt", text);
+}
+
+function readSettingsFile(file, callback) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    let text = (e.target.result || "").toString();
+    try {
+      const parsed = JSON.parse(text);
+      if (typeof parsed === "string") text = parsed;
+      else if (parsed && typeof parsed.text === "string") text = parsed.text;
+      else if (parsed && typeof parsed.shortcuts === "string") text = parsed.shortcuts;
+      else if (parsed && typeof parsed.jobs === "string") text = parsed.jobs;
+    } catch (_) {}
+    callback(text);
+  };
+  reader.readAsText(file);
+}
+
+function importShortcutSettings(event) {
+  const file = event.target.files && event.target.files[0];
+  readSettingsFile(file, text => {
+    document.getElementById("shortcutText").value = text;
+    saveShortcuts();
+    document.getElementById("shortcutStatus").textContent = "Subdivision fixes imported and saved.";
+  });
+  event.target.value = "";
+}
+
+function importJobShortcutSettings(event) {
+  const file = event.target.files && event.target.files[0];
+  readSettingsFile(file, text => {
+    document.getElementById("jobShortcutText").value = text;
+    saveShortcuts();
+    document.getElementById("shortcutStatus").textContent = "Job/task fixes imported and saved.";
+  });
+  event.target.value = "";
 }
 
 function applyShortcutsToLoadedImports() {
@@ -765,9 +853,7 @@ function classifyTask(task) {
 
   const customTask = applyJobShortcutName(task);
   if (customTask) {
-    const c = customTask.toLowerCase();
-    if (["ignore", "skip", "hide", "none", "null"].includes(c)) return null;
-    return customTask;
+    return normalizeJobShortcutResult(customTask);
   }
 
   // Ignore / not useful for the importer
@@ -785,8 +871,12 @@ function classifyTask(task) {
   if (t.includes("power wash basement")) return "p/w bsmt";
   if (t.includes("power wash flatwork")) return "p/w flatwork";
 
+  // Epcon
+  if (t.includes("qm clean")) return "original";
+  if (t.includes("rough clean")) return "car";
+
   // Existing builders / general
-  if (t.includes("full clean") || t.includes("pre-drywall clean") || t.includes("rough clean")) return "original";
+  if (t.includes("full clean") || t.includes("pre-drywall clean")) return "original";
 
   if (
     t.includes("reclean") ||
@@ -963,6 +1053,7 @@ function processRowsByBuilder(builder, rows) {
   if (builder === "drhorton") return processDRHorton(rows);
   if (builder === "ryan") return processRyan(rows);
   if (builder === "drees") return processDrees(rows);
+  if (builder === "epcon") return processEpconRows(rows);
   return [];
 }
 
@@ -1337,6 +1428,105 @@ function processArborPaste(text) {
     if (!community || isNaN(lot) || !activity || !date) return;
     addTaskToMap(jobs, lot, cleanArborCommunity(community), date, activity);
   });
+
+  return mapToArray(jobs);
+}
+
+
+function cleanEpconCommunity(codeOrName) {
+  let n = (codeOrName || "").toString().trim();
+  if (!n) return "";
+  n = applyShortcutName(n);
+  return n;
+}
+
+
+function parseEpconScheduleBlock(block) {
+  const text = (block || "").toString();
+  const houseMatch = text.match(/House:\s*([^\r\n]+)/i);
+  const taskMatch = text.match(/Task:\s*([^\r\n]+)/i);
+  const startMatch = text.match(/Start:\s*([^\r\n]+)/i);
+  if (!houseMatch || !taskMatch || !startMatch) return null;
+
+  const houseParts = houseMatch[1].trim().split(/\s+/);
+  const lot = parseInt(houseParts[0], 10);
+  const code = houseParts[1] || "";
+  const task = taskMatch[1].trim();
+  const date = parseFlexibleDate(startMatch[1].trim());
+
+  if (isNaN(lot) || !code || !task || !date) return null;
+  return { lot, subdivision: cleanEpconCommunity(code), date, task };
+}
+
+function processEpconRows(rows) {
+  let jobs = makeGroupedJobs();
+  const maxCols = rows.reduce((m, r) => Math.max(m, (r || []).length), 0);
+  let blocks = [];
+
+  for (let c = 0; c < maxCols; c++) {
+    let current = [];
+
+    for (let r = 0; r < rows.length; r++) {
+      const raw = rows[r] ? rows[r][c] : null;
+      if (raw === null || raw === undefined || raw === "") continue;
+      const cell = raw.toString().trim();
+      if (!cell) continue;
+
+      if (/^\[(begin\s+of\s+schedule|one\s+day\s+schedule)\]/i.test(cell)) {
+        if (current.length) blocks.push(current.join("\n"));
+        current = [];
+        continue;
+      }
+
+      // Skip calendar day markers like [1], [2], and weekday headers.
+      if (/^\[\d+\]$/.test(cell) || /^(sun|mon|tue|wed|thr|thu|fri|sat)$/i.test(cell)) continue;
+      current.push(cell);
+    }
+
+    if (current.length) blocks.push(current.join("\n"));
+  }
+
+  blocks.forEach(block => {
+    const rec = parseEpconScheduleBlock(block);
+    if (rec) addTaskToMap(jobs, rec.lot, rec.subdivision, rec.date, rec.task);
+  });
+
+  return mapToArray(jobs);
+}
+
+function processEpconPaste(text) {
+  let jobs = makeGroupedJobs();
+  const blocks = (text || "").split(/\[one\s+Day\s+Schedule\]/i).map(b => b.trim()).filter(Boolean);
+
+  blocks.forEach(block => {
+    const houseMatch = block.match(/House:\s*([^\r\n]+)/i);
+    const taskMatch = block.match(/Task:\s*([^\r\n]+)/i);
+    const startMatch = block.match(/Start:\s*([^\r\n]+)/i);
+    if (!houseMatch || !taskMatch || !startMatch) return;
+
+    const houseParts = houseMatch[1].trim().split(/\s+/);
+    const lot = parseInt(houseParts[0], 10);
+    const code = houseParts[1] || "";
+    const task = taskMatch[1].trim();
+    const date = parseFlexibleDate(startMatch[1].trim());
+
+    if (isNaN(lot) || !code || !task || !date) return;
+    addTaskToMap(jobs, lot, cleanEpconCommunity(code), date, task);
+  });
+
+  // Fallback: handle text copied without the [one Day Schedule] separators.
+  if (!Object.keys(jobs).length) {
+    const matches = [...(text || "").matchAll(/House:\s*([^\r\n]+)[\s\S]*?Task:\s*([^\r\n]+)[\s\S]*?Start:\s*([^\r\n]+)/gi)];
+    matches.forEach(m => {
+      const houseParts = m[1].trim().split(/\s+/);
+      const lot = parseInt(houseParts[0], 10);
+      const code = houseParts[1] || "";
+      const task = m[2].trim();
+      const date = parseFlexibleDate(m[3].trim());
+      if (isNaN(lot) || !code || !task || !date) return;
+      addTaskToMap(jobs, lot, cleanEpconCommunity(code), date, task);
+    });
+  }
 
   return mapToArray(jobs);
 }
