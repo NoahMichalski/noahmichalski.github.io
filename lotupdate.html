@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Builder New Lot Checker - Pulte + MI + Fischer Homes + Arbor Homes + DR + Epcon</title>
-<!-- Version: 2026-06-17 epcon-monthly-schedule -->
+<!-- Version: 2026-06-18 settings-textarea-localstorage-fix -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -33,6 +33,7 @@
   .pill{display:inline-block;border-radius:999px;padding:3px 8px;background:var(--chip);color:#cbd5e1;font-size:12px}.ok{color:#86efac}.bad{color:#fca5a5}.muted{color:var(--muted)}
   .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.hide{display:none!important}.small{font-size:12px;color:var(--muted)}
   .maprow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:8px}.maprow input{background:var(--input);border:1px solid #334155;color:var(--text);border-radius:10px;padding:9px}
+  .settings-actions{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.settings-help{border:1px solid #334155;background:rgba(15,23,42,.55);border-radius:12px;padding:10px;color:#cbd5e1;font-size:13px;line-height:1.45}.settings-help code{color:#fff;background:#020617;border-radius:6px;padding:1px 4px}.settings-status{font-size:12px;color:#86efac;min-height:18px;margin-top:6px}.mapping-textarea{min-height:310px;font-size:14px;line-height:1.45;white-space:pre;overflow:auto}
   .newlots-card{border:2px solid rgba(34,197,94,.55);background:linear-gradient(180deg,rgba(20,83,45,.28),rgba(17,24,39,.94));}
   .newlots-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}
   .newlots-head h2{margin:0;font-size:22px}.newlots-head p{margin:4px 0 0;color:#bbf7d0}.badge{display:inline-flex;align-items:center;justify-content:center;min-width:44px;border-radius:999px;background:#22c55e;color:#052e16;font-weight:900;padding:8px 12px}
@@ -46,7 +47,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Builder New Lot Checker <span class="version-pill">Pulte + MI + Fischer Homes + Arbor Homes + DR + Epcon</span></h1>
+  <h1>Builder New Lot Checker <span class="version-pill">All builders + saved settings</span></h1>
   <p class="sub">Upload your <b>Floor Plans</b> sheet, optionally upload your <b>Subdivisions</b> sheet for exact names, pick the builder/export type, then upload that builder export. The tool compares lots by <b>subdivision + lot</b>, with an address fallback, and shows anything missing from the Floor Plans sheet.</p>
 
   <div class="grid">
@@ -95,7 +96,7 @@
     <button id="copyBtn" class="secondary" disabled>Copy new lots</button>
     <button id="csvBtn" class="secondary" disabled>Download CSV</button>
     <button id="xlsxBtn" class="blue" disabled>Download Excel</button>
-    <button id="resetBtn" class="warn">Reset saved mappings</button>
+    <button id="resetBtn" class="warn">Reset current builder settings</button>
   </div>
 
   <div class="stats">
@@ -138,9 +139,22 @@
     </div>
     <div class="card">
       <h2>Saved community settings</h2>
-      <p>Left = builder export community. Right = optional override. Exact starred values here still win, but if this is blank/basic, the Subdivisions sheet will be used for the exact Floor Plans-style name.</p>
-      <div id="mappingList"></div>
-      <button class="secondary" id="addMapBtn">Add mapping</button>
+      <p>These save in this browser. Use one fix per line. The left side is what the builder/export gives you. The right side is what you want it to show as.</p>
+      <div class="settings-help">
+        Format: <code>Builder Export Name = Floor Plans/Subdivisions Name</code><br>
+        Example: <code>Maris Park = Maris *Arbor Homes *Bellefontaine</code><br>
+        This updates immediately after you click <b>Save & Apply Settings</b>. It can also use your Subdivisions sheet when the right side is a basic name.
+      </div>
+      <div class="settings-actions">
+        <button class="blue" id="saveSettingsBtn" type="button">Save & Apply Settings</button>
+        <button class="secondary" id="exportSettingsBtn" type="button">Export Settings</button>
+        <label class="secondary" style="display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:10px 12px;cursor:pointer;border:1px solid #334155;background:#1f2937;color:#e5e7eb;font-weight:800">
+          Import Settings <input id="importSettingsFile" type="file" accept=".txt,.json" style="display:none">
+        </label>
+        <button class="secondary" id="addMapBtn" type="button">Add blank line</button>
+      </div>
+      <textarea id="mappingText" class="mapping-textarea" spellcheck="false"></textarea>
+      <div id="mappingStatus" class="settings-status"></div>
     </div>
   </div>
 </div>
@@ -220,9 +234,19 @@ const HEADERS = ["Builder","Subdivision","Lot","Floorplan","Original","Reclean",
 
 function todayLotAddedDate(){ const d = new Date(); return `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`; }
 function storageKey(){ return `newLotMappings_${sourceType}`; }
+function globalSettingsKey(){ return 'builderNewLotCheckerCommunitySettings_v2'; }
+function loadGlobalSettings(){
+  try { return JSON.parse(localStorage.getItem(globalSettingsKey()) || '{}') || {}; }
+  catch { return {}; }
+}
+function saveGlobalSettings(all){ localStorage.setItem(globalSettingsKey(), JSON.stringify(all || {})); }
+function getGlobalSourceSettings(type){ return loadGlobalSettings()[type] || {}; }
+function setGlobalSourceSettings(type, data){ const all = loadGlobalSettings(); all[type] = data || {}; saveGlobalSettings(all); }
 function loadMappings(type){
   try {
-    const saved = JSON.parse(localStorage.getItem(`newLotMappings_${type}`)||'{}');
+    const oldSaved = JSON.parse(localStorage.getItem(`newLotMappings_${type}`)||'{}');
+    const globalSaved = getGlobalSourceSettings(type);
+    const saved = {...oldSaved, ...globalSaved};
     // Keep older browser-saved Arbor mappings from blocking newer exact city mappings.
     if (type === 'arbor') {
       const forced = {
@@ -237,8 +261,41 @@ function loadMappings(type){
   }
   catch { return {...DEFAULT_MAPPINGS[type]}; }
 }
-function saveMappings(){ localStorage.setItem(storageKey(), JSON.stringify(mappings)); }
-function resetMappings(){ localStorage.removeItem(storageKey()); mappings = {...DEFAULT_MAPPINGS[sourceType]}; normalizeJobsFromRaw(); renderMappings(); }
+function saveMappings(){
+  const cleaned = cleanMappingObject(mappings);
+  mappings = cleaned;
+  localStorage.setItem(storageKey(), JSON.stringify(cleaned));
+  setGlobalSourceSettings(sourceType, cleaned);
+  setMappingStatus(`Saved ${Object.keys(cleaned).length} setting(s) for ${sourceLabel(sourceType)}.`);
+}
+function resetMappings(){
+  if (!confirm(`Reset saved ${sourceLabel(sourceType)} community settings back to defaults?`)) return;
+  localStorage.removeItem(storageKey());
+  setGlobalSourceSettings(sourceType, {});
+  mappings = {...DEFAULT_MAPPINGS[sourceType]};
+  saveMappings();
+  normalizeJobsFromRaw();
+  renderMappings();
+  rerunCompareIfPossible();
+}
+function cleanMappingObject(obj){
+  const out = {};
+  for (const [k,v] of Object.entries(obj || {})) {
+    const from = cleanText(k);
+    const to = cleanText(v);
+    if (!from) continue;
+    out[from] = to || from;
+  }
+  return out;
+}
+function sourceLabel(type){
+  return {pulte:'Pulte', mi:'MI Homes', fischer:'Fischer Homes', arbor:'Arbor Homes', dr:'DR Horton', epcon:'Epcon'}[type] || type;
+}
+function setMappingStatus(msg){
+  const el = $('mappingStatus');
+  if (!el) return;
+  el.textContent = msg || '';
+}
 function norm(v){ return String(v ?? '').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'').trim(); }
 function cleanText(v){ return String(v ?? '').replace(/\s+/g,' ').trim(); }
 function baseSubdivision(v){ return cleanText(v).split('*')[0].trim(); }
@@ -498,7 +555,7 @@ async function loadFloor(file){
   const headers = rows[h];
   floorRows = rows.slice(h+1).map(r => rowObj(headers,r)).filter(r => cleanText(r.Subdivision) && cleanLot(r.Lot));
   $('floorStatus').innerHTML = `<span class="ok">Loaded ${floorRows.length} floorplan rows.</span>`;
-  $('floorCount').textContent = floorRows.length; checkReady();
+  $('floorCount').textContent = floorRows.length; checkReady(); rerunCompareIfPossible();
 }
 async function loadSubdivisions(file){
   const wb = await readWorkbook(file); const rows = sheetRows(wb);
@@ -507,6 +564,7 @@ async function loadSubdivisions(file){
   const headers = rows[h];
   subdivisionRows = rows.slice(h+1).map(r => rowObj(headers,r)).filter(r => cleanText(r.Subdivision));
   $('subdivisionStatus').innerHTML = `<span class="ok">Loaded ${subdivisionRows.length} subdivision rows. These will be used for exact output names.</span>`;
+  rerunCompareIfPossible();
 }
 async function loadBuilderExport(files){
   const fileList = Array.from(files && files.length !== undefined ? files : [files]).filter(Boolean);
@@ -764,21 +822,71 @@ function escapeHtml(v){ return String(v).replace(/[&<>"]/g, ch => ({'&':'&amp;',
 
 function addMissingMappingsFromJobs(){
   let changed = false;
-  for (const r of jobRows) { const c = cleanText(r.Community); if (c && !(c in mappings)) { mappings[c] = c; changed = true; } }
-  if (changed) saveMappings(); renderMappings();
+  for (const r of jobRows) {
+    const c = cleanText(r.Community);
+    if (c && !(c in mappings)) { mappings[c] = c; changed = true; }
+  }
+  if (changed) saveMappings();
+  renderMappings();
+}
+function mappingsToText(obj){
+  return Object.keys(obj || {}).sort((a,b)=>a.localeCompare(b)).map(k => `${k} = ${obj[k] ?? k}`).join('\n');
+}
+function parseMappingsText(text){
+  const out = {};
+  const lines = String(text || '').split(/\r?\n/);
+  for (const rawLine of lines) {
+    let line = rawLine.trim();
+    if (!line || line.startsWith('#') || line.startsWith('//')) continue;
+    const eq = line.indexOf('=');
+    if (eq < 0) continue;
+    const from = cleanText(line.slice(0, eq));
+    const to = cleanText(line.slice(eq + 1));
+    if (from) out[from] = to || from;
+  }
+  return out;
 }
 function renderMappings(){
-  const keys = Object.keys(mappings).sort();
-  $('mappingList').innerHTML = keys.map(k => `<div class="maprow"><input value="${escapeHtml(k)}" data-old="${escapeHtml(k)}" data-type="from"><input value="${escapeHtml(mappings[k])}" data-old="${escapeHtml(k)}" data-type="to"><button class="secondary" data-del="${escapeHtml(k)}">Delete</button></div>`).join('');
-  $('mappingList').querySelectorAll('input').forEach(inp => inp.addEventListener('change', updateMapInput));
-  $('mappingList').querySelectorAll('button[data-del]').forEach(btn => btn.addEventListener('click', e => { delete mappings[e.target.dataset.del]; saveMappings(); renderMappings(); }));
+  if (!$('mappingText')) return;
+  $('mappingText').value = mappingsToText(mappings);
+  setMappingStatus(`Loaded ${Object.keys(mappings).length} setting(s) for ${sourceLabel(sourceType)}.`);
 }
-function updateMapInput(e){
-  const old = e.target.dataset.old; const row = e.target.closest('.maprow');
-  const from = cleanText(row.querySelector('[data-type="from"]').value); const to = cleanText(row.querySelector('[data-type="to"]').value);
-  if (!from) return; if (from !== old) delete mappings[old]; mappings[from] = to || from; saveMappings(); renderMappings();
+function saveSettingsFromText(){
+  const parsed = parseMappingsText($('mappingText').value);
+  // Keep defaults unless the user overrides them, so important built-in fixes never disappear accidentally.
+  mappings = {...DEFAULT_MAPPINGS[sourceType], ...parsed};
+  if (sourceType === 'arbor') {
+    mappings["Trailside Landing, Arrival Series"] = mappings["Trailside Landing, Arrival Series"] || "Trailside Landing *Arbor *Jeffersonville";
+    mappings["Trotter's Pointe"] = mappings["Trotter's Pointe"] || "Trotter's Pointe *Arbor *Washington Courthouse";
+  }
+  saveMappings();
+  renderMappings();
+  normalizeJobsFromRaw();
+  rerunCompareIfPossible();
 }
-function addMapping(){ mappings['New Export Community'] = 'Floor Sheet Subdivision'; saveMappings(); renderMappings(); }
+function rerunCompareIfPossible(){
+  if (floorRows.length && jobRows.length) compare();
+}
+function addMapping(){
+  const box = $('mappingText');
+  box.value = (box.value.trimEnd() + '\nNew Export Community = Floor Plans Subdivision').trimStart();
+  box.focus();
+  setMappingStatus('Added a blank setting line. Edit it, then click Save & Apply Settings.');
+}
+function exportSettings(){
+  const name = `${sourceType}-community-settings.txt`;
+  download(name, $('mappingText').value, 'text/plain');
+  setMappingStatus(`Exported ${sourceLabel(sourceType)} settings.`);
+}
+async function importSettingsFile(file){
+  if (!file) return;
+  const text = await file.text();
+  // Append by default so you do not lose existing fixes.
+  const box = $('mappingText');
+  box.value = (box.value.trimEnd() + '\n' + text.trim()).trim();
+  saveSettingsFromText();
+  $('importSettingsFile').value = '';
+}
 function updateSourceUI(){
   sourceType = $('sourceSelect').value; mappings = loadMappings(sourceType); rawRows = []; jobRows = []; resultRows = [];
   const isPasteSource = sourceType === 'fischer' || sourceType === 'arbor';
@@ -825,6 +933,10 @@ $('csvBtn').addEventListener('click', downloadCSV);
 $('xlsxBtn').addEventListener('click', downloadXLSX);
 $('resetBtn').addEventListener('click', resetMappings);
 $('addMapBtn').addEventListener('click', addMapping);
+$('saveSettingsBtn').addEventListener('click', saveSettingsFromText);
+$('exportSettingsBtn').addEventListener('click', exportSettings);
+$('importSettingsFile').addEventListener('change', e => importSettingsFile(e.target.files[0]).catch(err => setMappingStatus(err.message)));
+$('mappingText').addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveSettingsFromText(); } });
 ['search','communityFilter','hoursFilter','sortBy'].forEach(id => $(id).addEventListener('input', renderResults));
 updateSourceUI();
 </script>
