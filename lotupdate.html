@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Builder New Lot Checker - Pulte + MI + Fischer Homes + Arbor Homes + DR + Epcon</title>
-<!-- Version: 2026-06-18 settings-textarea-localstorage-fix -->
+<!-- Version: 2026-06-18 settings-save-apply-no-overwrite-fix -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -47,7 +47,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Builder New Lot Checker <span class="version-pill">All builders + saved settings</span></h1>
+  <h1>Builder New Lot Checker <span class="version-pill">All builders + fixed saved settings</span></h1>
   <p class="sub">Upload your <b>Floor Plans</b> sheet, optionally upload your <b>Subdivisions</b> sheet for exact names, pick the builder/export type, then upload that builder export. The tool compares lots by <b>subdivision + lot</b>, with an address fallback, and shows anything missing from the Floor Plans sheet.</p>
 
   <div class="grid">
@@ -143,7 +143,7 @@
       <div class="settings-help">
         Format: <code>Builder Export Name = Floor Plans/Subdivisions Name</code><br>
         Example: <code>Maris Park = Maris *Arbor Homes *Bellefontaine</code><br>
-        This updates immediately after you click <b>Save & Apply Settings</b>. It can also use your Subdivisions sheet when the right side is a basic name.
+        Click <b>Save & Apply Settings</b> to save this text to localStorage and re-run the comparison. The box will not reload/overwrite your edits after saving.
       </div>
       <div class="settings-actions">
         <button class="blue" id="saveSettingsBtn" type="button">Save & Apply Settings</button>
@@ -262,21 +262,22 @@ function loadMappings(type){
   catch { return {...DEFAULT_MAPPINGS[type]}; }
 }
 function saveMappings(){
+  // Save only what is currently in the textarea/user settings.
+  // Defaults are applied in memory, but are not re-written over what you typed.
   const cleaned = cleanMappingObject(mappings);
-  mappings = cleaned;
   localStorage.setItem(storageKey(), JSON.stringify(cleaned));
   setGlobalSourceSettings(sourceType, cleaned);
-  setMappingStatus(`Saved ${Object.keys(cleaned).length} setting(s) for ${sourceLabel(sourceType)}.`);
+  setMappingStatus(`Saved ${Object.keys(cleaned).length} custom setting(s) for ${sourceLabel(sourceType)}.`);
 }
 function resetMappings(){
   if (!confirm(`Reset saved ${sourceLabel(sourceType)} community settings back to defaults?`)) return;
   localStorage.removeItem(storageKey());
   setGlobalSourceSettings(sourceType, {});
   mappings = {...DEFAULT_MAPPINGS[sourceType]};
-  saveMappings();
   normalizeJobsFromRaw();
   renderMappings();
   rerunCompareIfPossible();
+  setMappingStatus(`Reset ${sourceLabel(sourceType)} settings back to defaults.`);
 }
 function cleanMappingObject(obj){
   const out = {};
@@ -848,19 +849,31 @@ function parseMappingsText(text){
 }
 function renderMappings(){
   if (!$('mappingText')) return;
+  // On screen, show what is currently effective for the selected builder.
+  // Save & Apply will not call this, so your edits will not get overwritten mid-edit.
   $('mappingText').value = mappingsToText(mappings);
   setMappingStatus(`Loaded ${Object.keys(mappings).length} setting(s) for ${sourceLabel(sourceType)}.`);
 }
 function saveSettingsFromText(){
-  const parsed = parseMappingsText($('mappingText').value);
-  // Keep defaults unless the user overrides them, so important built-in fixes never disappear accidentally.
-  mappings = {...DEFAULT_MAPPINGS[sourceType], ...parsed};
+  const box = $('mappingText');
+  const parsed = parseMappingsText(box.value);
+
+  // Effective settings = built-in defaults + your textarea edits.
+  // Saved settings = only your textarea edits. This stops the button from
+  // immediately reloading/replacing your changes with the built-in list.
+  const effective = {...DEFAULT_MAPPINGS[sourceType], ...parsed};
   if (sourceType === 'arbor') {
-    mappings["Trailside Landing, Arrival Series"] = mappings["Trailside Landing, Arrival Series"] || "Trailside Landing *Arbor *Jeffersonville";
-    mappings["Trotter's Pointe"] = mappings["Trotter's Pointe"] || "Trotter's Pointe *Arbor *Washington Courthouse";
+    effective["Trailside Landing, Arrival Series"] = effective["Trailside Landing, Arrival Series"] || "Trailside Landing *Arbor *Jeffersonville";
+    effective["Trotter's Pointe"] = effective["Trotter's Pointe"] || "Trotter's Pointe *Arbor *Washington Courthouse";
   }
-  saveMappings();
-  renderMappings();
+
+  mappings = cleanMappingObject(effective);
+  const savedOnly = cleanMappingObject(parsed);
+  localStorage.setItem(storageKey(), JSON.stringify(savedOnly));
+  setGlobalSourceSettings(sourceType, savedOnly);
+
+  // Keep exactly what you typed visible. No reload/re-render here.
+  setMappingStatus(`Saved and applied ${Object.keys(savedOnly).length} custom setting(s) for ${sourceLabel(sourceType)}.`);
   normalizeJobsFromRaw();
   rerunCompareIfPossible();
 }
