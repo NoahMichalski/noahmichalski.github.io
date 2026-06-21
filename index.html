@@ -1,164 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Noah’s Tools Hub</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0f0f0f;
-  color: #fff;
-}
-
-header {
-  padding: 20px 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #222;
-}
-
-h1 {
-  margin: 0;
-  font-size: 24px;
-}
-
-.version {
-  font-size: 12px;
-  color: #888;
-}
-
-.search {
-  margin: 20px auto;
-  width: 400px;
-  display: block;
-  padding: 10px;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  color: white;
-  border-radius: 6px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-  padding: 40px;
-}
-
-.card {
-  background: #1a1a1a;
-  border-radius: 12px;
-  padding: 20px;
-  cursor: pointer;
-  transition: 0.2s;
-  border: 1px solid #222;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  border-color: #555;
-}
-
-.card h2 {
-  margin: 0 0 10px;
-  font-size: 18px;
-}
-
-.card p {
-  margin: 0;
-  font-size: 14px;
-  color: #aaa;
-}
-
-.footer {
-  text-align: center;
-  padding: 20px;
-  color: #555;
-  font-size: 12px;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101c18">
+  <meta name="description" content="Noah's frequently used and recently updated contractor tools.">
+  <title>Noah's Tools</title>
+  <style>
+    :root {
+      --ink: #17201d;
+      --muted: #63706b;
+      --paper: #f4f1e9;
+      --card: #fffdf7;
+      --line: #dcd8cd;
+      --forest: #183c32;
+      --forest-2: #24594a;
+      --lime: #d9f99d;
+      --orange: #ee7d4a;
+      --shadow: 0 18px 50px rgba(28, 45, 38, .10);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 92% 8%, rgba(238,125,74,.16), transparent 24rem),
+        radial-gradient(circle at 4% 28%, rgba(36,89,74,.10), transparent 28rem),
+        var(--paper);
+      font: 16px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    a { color: inherit; }
+    .shell { width: min(1160px, calc(100% - 36px)); margin: auto; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 0;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: -.02em; }
+    .mark {
+      width: 38px; height: 38px; display: grid; place-items: center;
+      color: var(--lime); background: var(--forest); border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(24,60,50,.18);
+    }
+    .repo-link {
+      color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 700;
+      border-bottom: 1px solid transparent;
+    }
+    .repo-link:hover { color: var(--forest); border-color: currentColor; }
+    .hero {
+      position: relative; overflow: hidden; isolation: isolate;
+      min-height: 370px; padding: clamp(34px, 6vw, 72px);
+      color: white; background: var(--forest); border-radius: 30px; box-shadow: var(--shadow);
+    }
+    .hero::after {
+      content: ""; position: absolute; z-index: -1; right: -110px; bottom: -165px;
+      width: 430px; height: 430px; border: 74px solid rgba(217,249,157,.11); border-radius: 50%;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin: 0 0 22px; color: var(--lime); font-size: 12px; font-weight: 850;
+      letter-spacing: .14em; text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 24px; height: 2px; background: currentColor; }
+    h1 { max-width: 760px; margin: 0; font-size: clamp(42px, 7vw, 78px); line-height: .98; letter-spacing: -.055em; }
+    .hero-copy { max-width: 590px; margin: 22px 0 0; color: rgba(255,255,255,.72); font-size: clamp(16px, 2vw, 19px); }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 42px; color: rgba(255,255,255,.66); font-size: 13px; }
+    .hero-meta strong { color: white; }
+    main { padding: 54px 0 72px; }
+    .toolbar {
+      display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: end;
+      margin-bottom: 26px;
+    }
+    .section-kicker { margin: 0 0 4px; color: var(--orange); font-size: 12px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+    h2 { margin: 0; font-size: clamp(28px, 4vw, 42px); line-height: 1.05; letter-spacing: -.04em; }
+    .search-wrap { position: relative; width: min(100%, 330px); }
+    .search-wrap svg { position: absolute; left: 15px; top: 50%; width: 18px; transform: translateY(-50%); color: var(--muted); }
+    #search {
+      width: 100%; padding: 13px 16px 13px 43px; color: var(--ink); background: rgba(255,253,247,.82);
+      border: 1px solid var(--line); border-radius: 14px; outline: none; font: inherit;
+    }
+    #search:focus { border-color: var(--forest-2); box-shadow: 0 0 0 4px rgba(36,89,74,.10); }
+    .filters { display: flex; gap: 8px; overflow-x: auto; padding: 0 0 22px; scrollbar-width: none; }
+    .filter {
+      flex: 0 0 auto; padding: 9px 14px; color: var(--muted); background: transparent;
+      border: 1px solid var(--line); border-radius: 999px; cursor: pointer; font: 750 13px/1 inherit;
+    }
+    .filter:hover, .filter.active { color: white; background: var(--forest); border-color: var(--forest); }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .card {
+      min-height: 230px; display: flex; flex-direction: column; padding: 23px;
+      text-decoration: none; background: rgba(255,253,247,.88); border: 1px solid var(--line);
+      border-radius: 20px; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .card:hover, .card:focus-visible { transform: translateY(-4px); border-color: #a8b7b1; box-shadow: var(--shadow); outline: none; }
+    .card.featured { color: white; background: var(--forest-2); border-color: var(--forest-2); }
+    .card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .icon { width: 43px; height: 43px; display: grid; place-items: center; background: #e7eee8; border-radius: 13px; font-size: 20px; }
+    .featured .icon { background: rgba(255,255,255,.12); }
+    .badge {
+      padding: 6px 9px; color: var(--forest); background: var(--lime); border-radius: 999px;
+      font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .card h3 { margin: 25px 0 8px; font-size: 21px; line-height: 1.15; letter-spacing: -.025em; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .featured p { color: rgba(255,255,255,.68); }
+    .open { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 20px; color: var(--forest-2); font-size: 12px; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
+    .featured .open { color: var(--lime); }
+    .open span { transition: transform .18s ease; }
+    .card:hover .open span { transform: translateX(4px); }
+    .empty { display: none; padding: 54px 20px; color: var(--muted); text-align: center; border: 1px dashed var(--line); border-radius: 20px; }
+    footer { display: flex; justify-content: space-between; gap: 20px; padding: 24px 0 36px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); }
+    @media (max-width: 860px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 24px, 1160px); }
+      header { padding: 16px 2px; }
+      .repo-link { font-size: 0; }
+      .repo-link::after { content: "GitHub ↗"; font-size: 13px; }
+      .hero { min-height: 360px; padding: 34px 25px; border-radius: 23px; }
+      .toolbar { grid-template-columns: 1fr; align-items: stretch; }
+      .search-wrap { width: 100%; }
+      .grid { grid-template-columns: 1fr; }
+      .card { min-height: 205px; }
+      footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+  </style>
 </head>
-
 <body>
+  <div class="shell">
+    <header>
+      <div class="brand"><span class="mark">N</span><span>Noah's Tools</span></div>
+      <a class="repo-link" href="https://github.com/NoahMichalski/noahmichalski.github.io" target="_blank" rel="noreferrer">View repository ↗</a>
+    </header>
 
-<header>
-  <h1>Noah’s Tools Hub</h1>
-  <div class="version">v1.0</div>
-</header>
+    <section class="hero">
+      <p class="eyebrow">Contractor toolkit</p>
+      <h1>The tools that keep work moving.</h1>
+      <p class="hero-copy">A cleaner home for the utilities you use most—organized around recent activity, quick to search, and built to work just as well from the field.</p>
+      <div class="hero-meta">
+        <span><strong>12</strong> tools indexed</span>
+        <span><strong>4</strong> recently updated</span>
+        <span>Last curated <strong>June 2026</strong></span>
+      </div>
+    </section>
 
-<input class="search" placeholder="Search tools..." onkeyup="filterTools(this.value)">
+    <main>
+      <div class="toolbar">
+        <div>
+          <p class="section-kicker">Quick launch</p>
+          <h2>Frequently in rotation</h2>
+        </div>
+        <label class="search-wrap">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.4-3.4"/></svg>
+          <span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search tools</span>
+          <input id="search" type="search" placeholder="Search tools…" autocomplete="off">
+        </label>
+      </div>
 
-<div class="grid" id="grid">
+      <div class="filters" aria-label="Filter tools">
+        <button class="filter active" data-filter="all">All tools</button>
+        <button class="filter" data-filter="recent">Recently updated</button>
+        <button class="filter" data-filter="lots">Lots & builders</button>
+        <button class="filter" data-filter="operations">Operations</button>
+        <button class="filter" data-filter="data">Data tools</button>
+      </div>
 
-  <div class="card" data-name="builder map vip">
-    <h2>Builder Map</h2>
-    <p>Interactive subdivision + builder map</p>
+      <section class="grid" id="grid" aria-live="polite"></section>
+      <div class="empty" id="empty">No tools match that search. Try a shorter phrase.</div>
+    </main>
+
+    <footer>
+      <span>VIP contractor tools · Internal use</span>
+      <span>Built from recent repository activity</span>
+    </footer>
   </div>
 
-  <div class="card" data-name="import builder import">
-    <h2>Import Tool</h2>
-    <p>Upload and process builder data</p>
-  </div>
+  <script>
+    const tools = [
+      { name: "New Lot Checker", file: "lotupdate.html", desc: "Check Pulte, M/I, Fischer, Arbor, D.R. Horton, and Epcon for newly added lots.", icon: "⌖", group: "lots", recent: true, featured: true },
+      { name: "VIP Import Tool", file: "import.html", desc: "Bring builder and job data into your workflow quickly and consistently.", icon: "⇣", group: "data", recent: true, featured: true },
+      { name: "Calendar CSV Cleaner", file: "calendar.html", desc: "Clean and prepare Google Calendar CSV exports for the next step.", icon: "□", group: "operations", recent: true, featured: true },
+      { name: "Schedule Budget Exporter", file: "budget.html", desc: "Turn a VIP schedule into a clean budget-ready Excel export.", icon: "$", group: "operations", recent: true, featured: true },
+      { name: "Builder Map", file: "vip.html", desc: "Explore subdivisions, builders, and active locations on an interactive map.", icon: "◇", group: "lots" },
+      { name: "Monday Lot Parser", file: "dig.html", desc: "Parse new-lot information into a Monday-friendly format.", icon: "↳", group: "data" },
+      { name: "Labor + Cleaning Parser", file: "par.html", desc: "Structure VIP labor and cleaning information from raw source text.", icon: "≋", group: "data" },
+      { name: "Lot Lookup", file: "lots.html", desc: "Search lots, builders, subdivisions, and floor plans in one place.", icon: "⌕", group: "lots" },
+      { name: "Overtime Dashboard", file: "overtime.html", desc: "Review hours, overtime, and crew workload at a glance.", icon: "◷", group: "operations" },
+      { name: "Job Formatter", file: "order.html", desc: "Convert raw order text into clean, structured job details.", icon: "✓", group: "operations" },
+      { name: "Lots to Excel", file: "lotstoexcel.html", desc: "Package lot information into a spreadsheet-ready export.", icon: "▦", group: "data" },
+      { name: "Lots to JSON", file: "converter.html", desc: "Convert lot data into reusable JSON without manual cleanup.", icon: "{ }", group: "data" }
+    ];
 
-  <div class="card" data-name="job formatter order">
-    <h2>Job Formatter</h2>
-    <p>Convert raw text into structured jobs</p>
-  </div>
+    const grid = document.querySelector("#grid");
+    const empty = document.querySelector("#empty");
+    const search = document.querySelector("#search");
+    let activeFilter = "all";
 
-  <div class="card" data-name="lot lookup lots">
-    <h2>Lot Lookup</h2>
-    <p>Search lots, builders, and floorplans</p>
-  </div>
+    function render() {
+      const query = search.value.trim().toLowerCase();
+      const visible = tools.filter(tool => {
+        const matchesFilter = activeFilter === "all" || (activeFilter === "recent" ? tool.recent : tool.group === activeFilter);
+        const matchesSearch = (tool.name + " " + tool.desc + " " + tool.group).toLowerCase().includes(query);
+        return matchesFilter && matchesSearch;
+      });
 
-  <div class="card" data-name="overtime dashboard hours">
-    <h2>Overtime Dashboard</h2>
-    <p>Track hours, OT, and crew efficiency</p>
-  </div>
+      grid.innerHTML = visible.map(tool => `
+        <a class="card ${tool.featured ? "featured" : ""}" href="./${tool.file}" data-group="${tool.group}">
+          <div class="card-top">
+            <span class="icon" aria-hidden="true">${tool.icon}</span>
+            ${tool.recent ? '<span class="badge">Updated</span>' : ""}
+          </div>
+          <h3>${tool.name}</h3>
+          <p>${tool.desc}</p>
+          <div class="open">Open tool <span>→</span></div>
+        </a>
+      `).join("");
 
-  <div class="card" data-name="converter json lots">
-    <h2>Lots → JSON Converter</h2>
-    <p>Convert lot data into JSON format</p>
-  </div>
+      empty.style.display = visible.length ? "none" : "block";
+    }
 
-</div>
+    document.querySelectorAll(".filter").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelector(".filter.active").classList.remove("active");
+        button.classList.add("active");
+        activeFilter = button.dataset.filter;
+        render();
+      });
+    });
 
-<div class="footer">
-  VIP Contractor Tools • Internal Use
-</div>
-
-<script>
-
-// ROUTING
-const routes = [
-  "/vip",
-  "/import",
-  "/order",
-  "/lots",
-  "/overtime",
-  "/converter"
-];
-
-document.querySelectorAll(".card").forEach((card, i) => {
-  card.onclick = () => {
-    window.location.href = routes[i];
-  };
-});
-
-// SEARCH FILTER
-function filterTools(value) {
-  value = value.toLowerCase();
-
-  document.querySelectorAll(".card").forEach(card => {
-    const name = card.dataset.name;
-    card.style.display = name.includes(value) ? "block" : "none";
-  });
-}
-
-</script>
-
+    search.addEventListener("input", render);
+    render();
+  </script>
 </body>
 </html>
