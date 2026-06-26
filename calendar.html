@@ -823,7 +823,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
       </div>
-      <div class="version">v1.96</div>
+      <div class="version">v1.97</div>
     </div>
   </header>
 
@@ -1657,9 +1657,15 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     function renderLastTaskHTML(row) {
       if (!row.lastTaskChecked) return '<div class="lastTaskBox">Last task: not checked</div>';
       if (!row.lastTaskFound) return '<div class="lastTaskBox">Last task: none found in 30 days</div>';
-      const cls = row.lastTaskDuplicateOriginal ? 'danger' : (row.lastTaskDryClean ? 'warn' : '');
-      const flag = row.lastTaskDuplicateOriginal ? ' ⚠ Duplicate Original' : (row.lastTaskDryClean ? ' ⚠ Last was Dry Clean' : '');
-      return `<div class="lastTaskBox ${cls}">Last: ${escapeHTML(row.lastTaskType || '')} — ${escapeHTML(row.lastTaskDate || '')}${flag}<br>${escapeHTML(row.lastTaskSubject || '')}</div>`;
+
+      const cls = row.lastTaskDuplicateOriginal || row.lastTaskPreviousDay ? 'danger' : (row.lastTaskDryClean ? 'warn' : '');
+      const flags = [];
+      if (row.lastTaskPreviousDay) flags.push('⚠ Cleaned previous day');
+      if (row.lastTaskDuplicateOriginal) flags.push('⚠ Duplicate Original');
+      else if (row.lastTaskDryClean) flags.push('⚠ Last was Dry Clean');
+
+      const flagText = flags.length ? ' — ' + flags.join(' · ') : '';
+      return `<div class="lastTaskBox ${cls}">Last: ${escapeHTML(row.lastTaskType || '')} — ${escapeHTML(row.lastTaskDate || '')}${flagText}<br>${escapeHTML(row.lastTaskSubject || '')}</div>`;
     }
 
     function parsePreviewFromRows() {
@@ -2236,6 +2242,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         <div class="modalStat"><b>Total events:</b> ${summary.rows.length}</div>
         ${summary.duplicates ? `<div class="modalWarn"><b>Duplicate warning:</b> ${summary.duplicates} duplicate row(s) found inside this schedule. This is warn-only, so you can still import.<ul>${duplicateList}</ul>${summary.duplicates > 8 ? '<div>...and more</div>' : ''}</div>` : ''}
         ${summary.rows.filter(r => r.lastTaskDuplicateOriginal).length ? `<div class="modalDanger"><b>Last task warning:</b> ${summary.rows.filter(r => r.lastTaskDuplicateOriginal).length} current Original job(s) appear to already have an Original/Dry Clean in the last 30 days. This is warn-only.</div>` : ''}
+        ${summary.rows.filter(r => r.lastTaskPreviousDay).length ? `<div class="modalDanger"><b>Previous-day warning:</b> ${summary.rows.filter(r => r.lastTaskPreviousDay).length} job(s) were also found on the calendar for the previous day. This is warn-only.</div>` : ''}
         <p class="help">This will create events on the selected Google Calendar(s). CSV export is still available as backup.</p>
       `;
 
@@ -3334,13 +3341,15 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           row.lastTaskDate = last?.Date || '';
           row.lastTaskSubject = last?.Subject || '';
           row.lastTaskDryClean = last?.TaskType === 'Dry Clean';
+          row.lastTaskPreviousDay = Boolean(last && last.Date === endDate);
           row.lastTaskDuplicateOriginal = row.type === 'original' && isOriginalLikeTask(last?.TaskType || '');
         });
 
         parsePreviewFromRows();
         const flagged = parsedRows.filter(r => r.lastTaskDuplicateOriginal).length;
         const dryFlags = parsedRows.filter(r => r.lastTaskDryClean).length;
-        showToast(`Last task check complete. ${flagged} duplicate-original flag(s), ${dryFlags} dry-clean flag(s).`);
+        const previousDayFlags = parsedRows.filter(r => r.lastTaskPreviousDay).length;
+        showToast(`Last task check complete. ${flagged} duplicate-original flag(s), ${dryFlags} dry-clean flag(s), ${previousDayFlags} previous-day flag(s).`);
       } catch (err) {
         console.error(err);
         showToast(err.message || 'Could not check last tasks.');
