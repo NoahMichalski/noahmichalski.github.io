@@ -73,7 +73,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: 390px minmax(0, 1fr);
+      grid-template-columns: 390px 390px minmax(0, 1fr);
       gap: 18px;
       align-items: start;
     }
@@ -239,7 +239,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(7, minmax(105px, 1fr));
+      grid-template-columns: repeat(8, minmax(100px, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -814,6 +814,32 @@
     .shortcutEditorTable th:nth-child(3), .shortcutEditorTable td:nth-child(3) { width:18%; }
     .shortcutEditorTable th:nth-child(4), .shortcutEditorTable td:nth-child(4) { width:12%; }
 
+  
+    .tag.cincinnati { background: rgba(249,115,22,.14); color: #fed7aa; border: 1px solid rgba(249,115,22,.36); }
+
+    .settingsPanel textarea {
+      min-height: 240px;
+      width: 100%;
+    }
+
+    .settingsPanel .settingsGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 900px) { .settingsPanel .settingsGrid { grid-template-columns: 1fr; } }
+
+    .settingsHelp {
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,.58);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
   </style>
 </head>
 <body>
@@ -821,9 +847,9 @@
     <div class="wrap topbar">
       <div>
         <h1>Google Calendar Cleaning CSV Parser</h1>
-        <div class="sub">Paste originals/recleans/windows → pull saved shortcut/address data → export Google Calendar CSV.</div>
+        <div class="sub">Paste originals/recleans/windows/Cincinnati → preview/edit → export or import to Google Calendar.</div>
       </div>
-      <div class="version">v1.97</div>
+      <div class="version">v2.00</div>
     </div>
   </header>
 
@@ -886,6 +912,12 @@
             </div>
             <textarea id="windowsText" placeholder="Paste windows here...&#10;Example:&#10;206 MD**PM&#10;102 LH (screens in garage)&#10;&#10;Windows exports WITHOUT adding the word Windows to the subject."></textarea>
 
+            <div class="sectionLabel">
+              <label for="cincinnatiText">Cincinnati Section</label>
+              <span class="pill" id="cincinnatiCount">0 jobs</span>
+            </div>
+            <textarea id="cincinnatiText" placeholder="Paste Cincinnati jobs here...&#10;Example:&#10;240 Salt Run *Fischer p/w&#10;65 Trailhead Reclean & P/w&#10;12 Arabella FLOORS AND SURFACES ONLY"></textarea>
+
             <div class="btns">
               <button onclick="parseAndRender()">Parse / Preview</button>
               <button class="secondary" onclick="checkLastTasks()">Check Last Tasks</button>
@@ -895,7 +927,7 @@
             </div>
 
             <p class="help">
-              Originals start at <b>1:00 AM</b>. It leaves <b>one blank hour</b> between each filled section: Originals → Recleans → Windows. The preview rows are editable before export.
+              Originals start at <b>1:00 AM</b>. It leaves <b>one blank hour</b> between each filled section: Originals → Recleans → Windows → Cincinnati. The preview rows are editable before export.
             </p>
 
             <div class="sampleBox">Shortcut file format supported:
@@ -951,23 +983,26 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         </div>
 
 
+
         <div class="card">
           <div class="cardHead">
-            <h2>Shortcut Editor</h2>
-            <span class="pill" id="shortcutEditorPill">Editable</span>
+            <h2>Settings / Fixes</h2>
+            <span class="pill" id="settingsPill">Local</span>
           </div>
           <div class="cardBody">
-            <p class="help">Edit saved Shortened.xlsx rows in the browser. Changes save locally and can be exported back to Excel.</p>
+            <p class="help">
+              Edit shortcuts and task-name fixes in a full-size panel, like the other tools.
+            </p>
             <div class="btns">
-              <button class="secondary" onclick="renderShortcutEditor()">Open / Refresh Editor</button>
-              <button class="secondary" onclick="addShortcutEditorRow()">Add Shortcut Row</button>
-              <button class="blue" onclick="saveShortcutEditor()">Save Shortcut Edits</button>
+              <button class="blue" onclick="openSettingsPanel()">Open Settings / Fixes</button>
               <button class="secondary" onclick="exportShortcutExcel()">Export Shortened.xlsx</button>
             </div>
-            <div id="shortcutEditorOutput"><div class="empty">Click Open / Refresh Editor to edit shortcuts.</div></div>
           </div>
         </div>
 
+      </section>
+
+      <section>
         <div class="card">
           <div class="cardHead">
             <h2>Google Calendar Direct Import</h2>
@@ -990,7 +1025,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
             <select id="generalCalendarSelect" onchange="saveSelectedCalendars()">
               <option value="">Sign in to load calendars...</option>
             </select>
-            <p class="help">Originals and Recleans import here.</p>
+            <p class="help">Originals, Recleans, and Cincinnati import here.</p>
 
             <div style="height:12px"></div>
 
@@ -1010,54 +1045,6 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
             </div>
 
             <p class="help">Google import uses the editable preview rows. Calendar choices save locally. CSV export still works as backup.</p>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="cardHead">
-            <h2>Calendar Reports</h2>
-            <span class="pill" id="reportStatusPill">Not pulled</span>
-          </div>
-          <div class="cardBody">
-            <div class="reportControls">
-              <label>Report Range</label>
-              <div class="reportPresetGrid">
-                <button type="button" onclick="setReportRange('single')">Single Day</button>
-                <button type="button" onclick="setReportRange('thisWeek')">This Week</button>
-                <button type="button" onclick="setReportRange('lastWeek')">Last Week</button>
-                <button type="button" onclick="setReportRange('month')">This Month</button>
-                <button type="button" onclick="setReportRange('custom')">Custom</button>
-              </div>
-
-              <div class="fields">
-                <div>
-                  <label for="reportStartDate">Start Date</label>
-                  <input id="reportStartDate" type="date" />
-                </div>
-                <div>
-                  <label for="reportEndDate">End Date</label>
-                  <input id="reportEndDate" type="date" />
-                </div>
-              </div>
-
-              <div class="btns">
-                <button class="blue" onclick="pullCalendarReport()">Pull Calendar Report</button>
-                <button class="secondary" onclick="exportReportExcel()">Export Report Excel</button>
-              </div>
-
-              <div class="reportLibraryBar">
-                <input id="lotHistorySearch" type="text" placeholder="Lot history search, e.g. 206 MD" oninput="renderReport()" />
-                <button class="secondary" onclick="renderReport()">Search Lot History</button>
-                <button class="secondary" onclick="byId('lotHistorySearch').value=''; renderReport();">Clear Search</button>
-              </div>
-
-              <p class="help">
-                Pulls from the selected General and Windows calendars. Weeks are Monday through Friday.
-                Dry Clean counts in its own report and also inside Original totals. Floors Only is separate.
-              </p>
-            </div>
-
-            <div id="reportMiniStatus" class="sampleBox">Report results will open in the full-width dashboard below.</div>
           </div>
         </div>
 
@@ -1087,6 +1074,10 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
               <div class="txt">Windows</div>
             </div>
             <div class="stat">
+              <div class="num" id="cincinnatiJobs">0</div>
+              <div class="txt">Cincinnati</div>
+            </div>
+            <div class="stat">
               <div class="num" id="hourBlocks">0</div>
               <div class="txt">Hour Blocks</div>
             </div>
@@ -1112,17 +1103,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
     </div>
 
-    <section class="card reportResultsCard">
-      <div class="cardHead">
-        <h2>Report Dashboard</h2>
-        <span class="pill" id="reportDashboardPill">No report pulled</span>
-      </div>
-      <div class="cardBody">
-        <div id="reportOutput">
-          <div class="empty">Choose a range and pull a report.</div>
-        </div>
-      </div>
-    </section>
+
 
   </main>
 
@@ -1141,6 +1122,38 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     </div>
   </div>
 
+
+  <div class="modalBackdrop" id="settingsModal">
+    <div class="modal settingsPanel" style="width:min(1100px,100%);">
+      <div class="modalHead">
+        <h3>Shortcut / Short Name Settings</h3>
+        <button class="secondary" onclick="closeSettingsPanel()">Close</button>
+      </div>
+      <div class="modalBody">
+        <div class="settingsHelp">
+          <b>Subdivision / Short Name Fixes</b><br>
+          Format: <code>Builder | Full Subdivision = Short Name</code><br>
+          Example: <code>DR Horton | Madison Meadows *DR *Plain City = MD</code>
+        </div>
+        <div class="settingsGrid">
+          <div>
+            <label for="settingsShortcutText">Subdivision / Short Name Fixes</label>
+            <textarea id="settingsShortcutText" spellcheck="false"></textarea>
+          </div>
+          <div>
+            <label for="settingsJobFixText">Job / Task Name Fixes</label>
+            <textarea id="settingsJobFixText" spellcheck="false" placeholder="Power Wash = p/w&#10;Pressure Wash = p/w&#10;Final Clean #1 = reclean"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modalFoot">
+        <button class="secondary" onclick="exportShortcutExcel()">Export Shortened.xlsx</button>
+        <button class="secondary" onclick="resetJobFixDefaults()">Reset Job Fix Defaults</button>
+        <button class="blue" onclick="saveSettingsPanel()">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
@@ -1150,7 +1163,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       updated: 'gcal_cleaning_updated_v130',
       googleClientId: 'gcal_cleaning_google_client_id_v160',
       generalCalendarId: 'gcal_cleaning_general_calendar_id_v170',
-      windowsCalendarId: 'gcal_cleaning_windows_calendar_id_v170'
+      windowsCalendarId: 'gcal_cleaning_windows_calendar_id_v170',
+      jobFixes: 'gcal_cleaning_job_fixes_v200'
     };
 
     const GOOGLE_CLIENT_ID = '399565751863-oqbm7bq7trdl2m6lnkng10vvitl55mpc.apps.googleusercontent.com';
@@ -1175,7 +1189,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
     byId('eventDate').value = '';
 
-    ['eventDate','startTime','jobsPerHour','duration','originalText','recleanText','windowsText','appendFloorplan'].forEach(id => {
+    ['eventDate','startTime','jobsPerHour','duration','originalText','recleanText','windowsText','cincinnatiText','appendFloorplan'].forEach(id => {
       byId(id).addEventListener('input', parseAndRender);
       byId(id).addEventListener('change', parseAndRender);
     });
@@ -1363,7 +1377,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const row = parsedRows[index];
       if (!row) return;
       row.type = newType;
-      row.typeLabel = newType === 'original' ? 'Original' : newType === 'reclean' ? 'Reclean' : 'Windows';
+      row.typeLabel = newType === 'original' ? 'Original' : newType === 'reclean' ? 'Reclean' : newType === 'windows' ? 'Windows' : 'Cincinnati';
 
       const cleaned = row.subject
         .replace(/\s+(Original|Reclean)$/i, '')
@@ -1374,7 +1388,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const prefix = row.isAM ? '*AM* ' : row.isPM ? '*PM* ' : '';
       const base = cleaned.replace(/^\*AM\*\s*/i, '').replace(/^\*PM\*\s*/i, '').replace(/\s+\([^)]*\)\s*$/,'').trim();
 
-      row.subject = `${prefix}${base}${newType === 'windows' ? '' : ' ' + row.typeLabel}${note}`.replace(/\s+/g, ' ').trim();
+      row.subject = `${prefix}${base}${(newType === 'windows' || newType === 'cincinnati') ? '' : ' ' + row.typeLabel}${note}`.replace(/\s+/g, ' ').trim();
       markDuplicates(parsedRows);
       parsePreviewFromRows();
     }
@@ -1398,6 +1412,8 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         .replace(/\s+/g, ' ')
         .trim();
 
+      const subjectRaw = raw;
+
       let note = '';
       const noteMatch = raw.match(/\s*(\([^)]*\))\s*$/);
       if (noteMatch) {
@@ -1415,9 +1431,11 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const lookupSub = shortcutMatch ? shortcutMatch.subdivision : typedSub;
       const lookup = findLotRecord(lot, typedSub, lookupSub);
 
-      const typeLabel = type === 'original' ? 'Original' : type === 'reclean' ? 'Reclean' : 'Windows';
-      const subjectTypeLabel = type === 'windows' ? '' : ` ${typeLabel}`;
-      let subjectCore = `${raw}${subjectTypeLabel}`.replace(/\s+/g, ' ').trim();
+      const typeLabel = type === 'original' ? 'Original' : type === 'reclean' ? 'Reclean' : type === 'windows' ? 'Windows' : 'Cincinnati';
+      const subjectTypeLabel = (type === 'windows' || type === 'cincinnati') ? '' : ` ${typeLabel}`;
+      let subjectCore = type === 'cincinnati'
+        ? subjectRaw
+        : `${raw}${subjectTypeLabel}`.replace(/\s+/g, ' ').trim();
 
       if (byId('appendFloorplan')?.checked && lookup?.floorplan) {
         subjectCore += ` - ${lookup.floorplan}`;
@@ -1480,6 +1498,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const originalRows = parseSection(byId('originalText').value, 'original', 0);
       const recleanRows = parseSection(byId('recleanText').value, 'reclean', 1);
       const windowsRows = parseSection(byId('windowsText').value, 'windows', 2);
+      const cincinnatiRows = parseSection(byId('cincinnatiText').value, 'cincinnati', 3);
 
       const date = selectedDateOrPreviewDate();
       const startTime = byId('startTime').value || '01:00';
@@ -1507,15 +1526,20 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
       const originalBlocks = originalRows.length ? Math.ceil(originalRows.length / jobsPerHour) : 0;
       const recleanBlocks = recleanRows.length ? Math.ceil(recleanRows.length / jobsPerHour) : 0;
+      const windowsBlocks = windowsRows.length ? Math.ceil(windowsRows.length / jobsPerHour) : 0;
 
-      const hasAfterOriginals = recleanRows.length || windowsRows.length;
+      const hasAfterOriginals = recleanRows.length || windowsRows.length || cincinnatiRows.length;
       const gapAfterOriginals = originalRows.length && hasAfterOriginals ? 1 : 0;
 
-      const hasWindowsAfterRecleans = windowsRows.length && recleanRows.length;
-      const gapAfterRecleans = hasWindowsAfterRecleans ? 1 : 0;
+      const hasAfterRecleans = windowsRows.length || cincinnatiRows.length;
+      const gapAfterRecleans = recleanRows.length && hasAfterRecleans ? 1 : 0;
+
+      const hasAfterWindows = cincinnatiRows.length;
+      const gapAfterWindows = windowsRows.length && hasAfterWindows ? 1 : 0;
 
       const recleanStartTime = addMinutes(startTime, (originalBlocks + gapAfterOriginals) * 60);
       const windowsStartTime = addMinutes(startTime, (originalBlocks + gapAfterOriginals + recleanBlocks + gapAfterRecleans) * 60);
+      const cincinnatiStartTime = addMinutes(startTime, (originalBlocks + gapAfterOriginals + recleanBlocks + gapAfterRecleans + windowsBlocks + gapAfterWindows) * 60);
 
       const scheduledOriginals = scheduleSection(originalRows, startTime, 1, 1);
       const scheduledRecleans = scheduleSection(
@@ -1530,10 +1554,15 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         scheduledOriginals.length + scheduledRecleans.length + 1,
         originalBlocks + gapAfterOriginals + recleanBlocks + gapAfterRecleans + 1
       );
+      const scheduledCincinnati = scheduleSection(
+        cincinnatiRows,
+        cincinnatiStartTime,
+        scheduledOriginals.length + scheduledRecleans.length + scheduledWindows.length + 1,
+        originalBlocks + gapAfterOriginals + recleanBlocks + gapAfterRecleans + windowsBlocks + gapAfterWindows + 1
+      );
 
-      return [...scheduledOriginals, ...scheduledRecleans, ...scheduledWindows];
+      return [...scheduledOriginals, ...scheduledRecleans, ...scheduledWindows, ...scheduledCincinnati];
     }
-
 
     function updateParsedRow(index, field, value) {
       if (!parsedRows[index]) return;
@@ -1568,6 +1597,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const originalCount = parsedRows.filter(r => r.type === 'original').length;
       const recleanCount = parsedRows.filter(r => r.type === 'reclean').length;
       const windowsCount = parsedRows.filter(r => r.type === 'windows').length;
+      const cincinnatiCount = parsedRows.filter(r => r.type === 'cincinnati').length;
       const amCount = parsedRows.filter(r => r.isAM).length;
       const pmCount = parsedRows.filter(r => r.isPM).length;
       const matchedCount = parsedRows.filter(r => r.matched).length;
@@ -1584,10 +1614,12 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       byId('originalCount').textContent = `${originalCount} job${originalCount === 1 ? '' : 's'}`;
       byId('recleanCount').textContent = `${recleanCount} job${recleanCount === 1 ? '' : 's'}`;
       byId('windowsCount').textContent = `${windowsCount} job${windowsCount === 1 ? '' : 's'}`;
+      byId('cincinnatiCount').textContent = `${cincinnatiCount} job${cincinnatiCount === 1 ? '' : 's'}`;
       byId('totalJobs').textContent = parsedRows.length;
       byId('originalJobs').textContent = originalCount;
       byId('recleanJobs').textContent = recleanCount;
       byId('windowsJobs').textContent = windowsCount;
+      byId('cincinnatiJobs').textContent = cincinnatiCount;
       byId('hourBlocks').textContent = blocks;
       byId('matchedJobs').textContent = matchedCount;
       byId('missingJobs').textContent = missingCount;
@@ -1633,6 +1665,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
                     <option value="original" ${row.type === 'original' ? 'selected' : ''}>Original</option>
                     <option value="reclean" ${row.type === 'reclean' ? 'selected' : ''}>Reclean</option>
                     <option value="windows" ${row.type === 'windows' ? 'selected' : ''}>Windows</option>
+                    <option value="cincinnati" ${row.type === 'cincinnati' ? 'selected' : ''}>Cincinnati</option>
                   </select>
                   ${row.isAM ? '<span class="tag am">AM</span>' : ''}${row.isPM ? '<span class="tag pm">PM</span>' : ''}${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : ''}
                 </td>
@@ -1728,6 +1761,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
                     <option value="original" ${row.type === 'original' ? 'selected' : ''}>Original</option>
                     <option value="reclean" ${row.type === 'reclean' ? 'selected' : ''}>Reclean</option>
                     <option value="windows" ${row.type === 'windows' ? 'selected' : ''}>Windows</option>
+                    <option value="cincinnati" ${row.type === 'cincinnati' ? 'selected' : ''}>Cincinnati</option>
                   </select>
                   <div class="previewMeta">
                     ${row.isAM ? '<span class="tag am">AM</span>' : ''}${row.isPM ? '<span class="tag pm">PM</span>' : ''}${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : ''}
@@ -1854,9 +1888,9 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     function downloadGeneralCSV() {
       if (!requireSelectedDate('export General CSV')) return;
       if (!parsedRows.length) parseAndRender();
-      const result = buildFilteredCSV(row => row.type === 'original' || row.type === 'reclean');
+      const result = buildFilteredCSV(row => row.type === 'original' || row.type === 'reclean' || row.type === 'cincinnati');
       if (!result.count) {
-        showToast('No Original/Reclean rows for General CSV.');
+        showToast('No Original/Reclean/Cincinnati rows for General CSV.');
         return;
       }
       const date = selectedDateOrPreviewDate();
@@ -2197,7 +2231,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
 
     function rowsForScope(scope) {
-      if (scope === 'general') return parsedRows.filter(row => row.type === 'original' || row.type === 'reclean');
+      if (scope === 'general') return parsedRows.filter(row => row.type === 'original' || row.type === 'reclean' || row.type === 'cincinnati');
       if (scope === 'windows') return parsedRows.filter(row => row.type === 'windows');
       return parsedRows;
     }
@@ -2207,10 +2241,11 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const originals = rows.filter(r => r.type === 'original').length;
       const recleans = rows.filter(r => r.type === 'reclean').length;
       const windows = rows.filter(r => r.type === 'windows').length;
+      const cincinnati = rows.filter(r => r.type === 'cincinnati').length;
       const duplicates = rows.filter(r => r.duplicate).length;
       const first = rows[0];
       const last = rows[rows.length - 1];
-      return { rows, originals, recleans, windows, duplicates, first, last };
+      return { rows, originals, recleans, windows, cincinnati, duplicates, first, last };
     }
 
     function openConfirmModal(scope) {
@@ -2236,7 +2271,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         <div class="modalGrid">
           <div class="modalStat"><b>Date</b><br>${escapeHTML(formatLongDate(selectedDateValue()))}</div>
           <div class="modalStat"><b>Time range</b><br>${escapeHTML(summary.first?.googleStart || '')} - ${escapeHTML(summary.last?.googleEnd || '')}</div>
-          <div class="modalStat"><b>General</b><br>Originals: ${summary.originals}<br>Recleans: ${summary.recleans}</div>
+          <div class="modalStat"><b>General</b><br>Originals: ${summary.originals}<br>Recleans: ${summary.recleans}<br>Cincinnati: ${summary.cincinnati}</div>
           <div class="modalStat"><b>Windows</b><br>Windows: ${summary.windows}</div>
         </div>
         <div class="modalStat"><b>Total events:</b> ${summary.rows.length}</div>
@@ -2282,11 +2317,11 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         const generalCalendarId = byId('generalCalendarSelect')?.value || '';
         const windowsCalendarId = byId('windowsCalendarSelect')?.value || '';
 
-        const hasGeneralRows = rowsToImport.some(row => row.type === 'original' || row.type === 'reclean');
+        const hasGeneralRows = rowsToImport.some(row => row.type === 'original' || row.type === 'reclean' || row.type === 'cincinnati');
         const hasWindowsRows = rowsToImport.some(row => row.type === 'windows');
 
         if (hasGeneralRows && !generalCalendarId) {
-          showToast('Pick a General calendar for Originals/Recleans.');
+          showToast('Pick a General calendar for Originals/Recleans/Cincinnati.');
           return;
         }
 
@@ -2369,11 +2404,11 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         const generalCalendarId = byId('generalCalendarSelect')?.value || '';
         const windowsCalendarId = byId('windowsCalendarSelect')?.value || '';
 
-        const hasGeneralRows = parsedRows.some(row => row.type === 'original' || row.type === 'reclean');
+        const hasGeneralRows = parsedRows.some(row => row.type === 'original' || row.type === 'reclean' || row.type === 'cincinnati');
         const hasWindowsRows = parsedRows.some(row => row.type === 'windows');
 
         if (hasGeneralRows && !generalCalendarId) {
-          showToast('Pick a General calendar for Originals/Recleans.');
+          showToast('Pick a General calendar for Originals/Recleans/Cincinnati.');
           return;
         }
 
@@ -3189,171 +3224,87 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
 
 
-    function shortcutEditorRowsFromDOM() {
-      const rows = [];
-      document.querySelectorAll('[data-shortcut-editor-row]').forEach(tr => {
-        const builder = tr.querySelector('[data-field="builder"]')?.value.trim() || '';
-        const subdivision = tr.querySelector('[data-field="subdivision"]')?.value.trim() || '';
-        const shortened = tr.querySelector('[data-field="shortened"]')?.value.trim() || '';
-        if (builder || subdivision || shortened) {
-          rows.push({ builder, subdivision, shortened, shortKey: normalizeKey(shortened), subdivisionKey: normalizeKey(subdivision) });
-        }
-      });
-      return rows;
+    function shortcutRowsToSettingsText() {
+      return (shortcutRows || []).map(row => {
+        const left = `${row.builder || ''} | ${row.subdivision || ''}`.trim();
+        return `${left} = ${row.shortened || ''}`;
+      }).join('\n');
     }
 
-    function renderShortcutEditor() {
-      const output = byId('shortcutEditorOutput');
-      if (!output) return;
-      byId('shortcutEditorPill').textContent = `${shortcutRows.length} rows`;
-      output.innerHTML = `
-        <div class="shortcutEditorWrap">
-          <table class="shortcutEditorTable">
-            <thead><tr><th>Builder</th><th>Subdivision</th><th>Shortened</th><th>Action</th></tr></thead>
-            <tbody>
-              ${shortcutRows.map((row, idx) => `
-                <tr data-shortcut-editor-row="${idx}">
-                  <td><input data-field="builder" value="${escapeHTML(row.builder || '')}" /></td>
-                  <td><input data-field="subdivision" value="${escapeHTML(row.subdivision || '')}" /></td>
-                  <td><input data-field="shortened" value="${escapeHTML(row.shortened || '')}" /></td>
-                  <td><button class="smallBtn danger" onclick="deleteShortcutEditorRow(${idx})">Delete</button></td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>`;
+    function parseShortcutSettingsText(text) {
+      return String(text || '')
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => line && !line.startsWith('#'))
+        .map(line => {
+          const parts = line.split('=');
+          const right = (parts.pop() || '').trim();
+          const left = parts.join('=').trim();
+          const pipe = left.includes('|') ? left.split('|') : ['', left];
+          const builder = (pipe[0] || '').trim();
+          const subdivision = (pipe.slice(1).join('|') || '').trim();
+          return {
+            builder,
+            subdivision,
+            shortened: right,
+            shortKey: normalizeKey(right),
+            subdivisionKey: normalizeKey(subdivision)
+          };
+        })
+        .filter(row => row.subdivision || row.shortened || row.builder);
     }
 
-    function saveShortcutRowsToStorage() {
-      shortcutRows = shortcutRows.map(row => ({
-        builder: String(row.builder || '').trim(),
-        subdivision: String(row.subdivision || '').trim(),
-        shortened: String(row.shortened || '').trim(),
-        shortKey: normalizeKey(row.shortened || ''),
-        subdivisionKey: normalizeKey(row.subdivision || '')
-      })).filter(row => row.builder || row.subdivision || row.shortened);
+    const DEFAULT_JOB_FIXES = `Power Wash = p/w
+Power Washing = p/w
+Pressure Wash = p/w
+p/w = p/w
+Final Clean #1 = reclean
+Final Clean #2 = reclean
+Cleaning Sub = original
+Dry Clean = original
+Floors and Surfaces = floors/surfaces
+Surfaces Only = floors/surfaces`;
+
+    function openSettingsPanel() {
+      byId('settingsShortcutText').value = shortcutRowsToSettingsText();
+      byId('settingsJobFixText').value = localStorage.getItem(STORAGE_KEYS.jobFixes) || DEFAULT_JOB_FIXES;
+      byId('settingsModal').classList.add('show');
+    }
+
+    function closeSettingsPanel() {
+      byId('settingsModal').classList.remove('show');
+    }
+
+    function saveSettingsPanel() {
+      shortcutRows = parseShortcutSettingsText(byId('settingsShortcutText').value);
       localStorage.setItem(STORAGE_KEYS.shortcuts, JSON.stringify(shortcutRows));
+      localStorage.setItem(STORAGE_KEYS.jobFixes, byId('settingsJobFixText').value || DEFAULT_JOB_FIXES);
       localStorage.setItem(STORAGE_KEYS.updated, new Date().toLocaleString());
       refreshStorageUI();
-    }
-
-    function saveShortcutEditor(show = true) {
-      const output = byId('shortcutEditorOutput');
-      if (output && output.querySelector('[data-shortcut-editor-row]')) shortcutRows = shortcutEditorRowsFromDOM();
-      saveShortcutRowsToStorage();
-      if (show) showToast(`Saved ${shortcutRows.length} shortcut rows locally.`);
-      renderShortcutEditor();
+      closeSettingsPanel();
       parseAndRender();
+      showToast(`Saved ${shortcutRows.length} shortcut rows.`);
     }
 
-    function addShortcutEditorRow() {
-      saveShortcutEditor(false);
-      shortcutRows.push({ builder: '', subdivision: '', shortened: '', shortKey: '', subdivisionKey: '' });
-      renderShortcutEditor();
-    }
-
-    function deleteShortcutEditorRow(index) {
-      saveShortcutEditor(false);
-      shortcutRows.splice(index, 1);
-      saveShortcutRowsToStorage();
-      renderShortcutEditor();
-      parseAndRender();
+    function resetJobFixDefaults() {
+      byId('settingsJobFixText').value = DEFAULT_JOB_FIXES;
     }
 
     function exportShortcutExcel() {
-      saveShortcutEditor(false);
-      const rows = shortcutRows.map(row => ({ Builder: row.builder || '', Subdivision: row.subdivision || '', Shortened: row.shortened || '' }));
+      const modalOpen = byId('settingsModal')?.classList.contains('show');
+      if (modalOpen) {
+        shortcutRows = parseShortcutSettingsText(byId('settingsShortcutText').value);
+      }
+      const rows = (shortcutRows || []).map(row => ({
+        Builder: row.builder || '',
+        Subdivision: row.subdivision || '',
+        Shortened: row.shortened || ''
+      }));
+
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows.length ? rows : [{ Builder: '', Subdivision: '', Shortened: '' }]), 'Shortened');
       XLSX.writeFile(wb, 'Shortened.xlsx');
       showToast(`Exported ${rows.length} shortcut rows.`);
-    }
-
-    function addDaysISO(iso, days) {
-      const d = parseISODateLocal(iso);
-      d.setDate(d.getDate() + days);
-      return dateToISO(d);
-    }
-
-    function rowReportDetails(row) {
-      const parsed = parseSubdivisionParts(row.shortcutSubdivision || row.typedSub || '', row.shortcutBuilder || '');
-      return { lot: cleanLot(row.lot || ''), subdivision: parsed.subdivision || row.typedSub || '', subdivisionKey: normalizeKey(parsed.subdivision || row.typedSub || '') };
-    }
-
-    function reportRowMatchesParsedRow(historyRow, parsedRow) {
-      const current = rowReportDetails(parsedRow);
-      if (!current.lot || !historyRow.Lot) return false;
-      if (normalizeKey(historyRow.Lot) !== normalizeKey(current.lot)) return false;
-      const histSub = normalizeKey(historyRow.Subdivision || historyRow.SubdivisionShort || '');
-      const curSub = current.subdivisionKey;
-      if (!histSub || !curSub) return false;
-      return histSub === curSub || histSub.includes(curSub) || curSub.includes(histSub);
-    }
-
-    function isOriginalLikeTask(taskType) {
-      return taskType === 'Original' || taskType === 'Dry Clean';
-    }
-
-    async function checkLastTasks() {
-      try {
-        if (!requireSelectedDate('check last tasks')) return;
-        if (!parsedRows.length) parseAndRender();
-        collectPreviewEdits();
-
-        await ensureGoogleReady();
-        if (!googleAccessToken && !gapi.client.getToken()) {
-          googleTokenClient.requestAccessToken({ prompt: 'consent' });
-          showToast('Sign in first, then check last tasks again.');
-          return;
-        }
-
-        const generalCalendarId = byId('generalCalendarSelect')?.value || '';
-        const windowsCalendarId = byId('windowsCalendarSelect')?.value || '';
-        if (!generalCalendarId && !windowsCalendarId) {
-          showToast('Select at least one Google calendar first.');
-          return;
-        }
-
-        const selected = selectedDateValue();
-        const startDate = addDaysISO(selected, -30);
-        const endDate = addDaysISO(selected, -1);
-        showToast('Checking last 30 days of calendar history...');
-
-        let history = [];
-        if (generalCalendarId) {
-          const generalName = byId('generalCalendarSelect').selectedOptions[0]?.textContent || 'General';
-          history.push(...await fetchCalendarEvents(generalCalendarId, generalName, 'general', startDate, endDate));
-        }
-        if (windowsCalendarId) {
-          const windowsName = byId('windowsCalendarSelect').selectedOptions[0]?.textContent || 'Windows';
-          history.push(...await fetchCalendarEvents(windowsCalendarId, windowsName, 'windows', startDate, endDate));
-        }
-
-        parsedRows.forEach(row => {
-          const matches = history
-            .filter(hist => reportRowMatchesParsedRow(hist, row))
-            .sort((a, b) => `${b.Date} ${b.Start}`.localeCompare(`${a.Date} ${a.Start}`));
-
-          const last = matches[0];
-          row.lastTaskChecked = true;
-          row.lastTaskFound = Boolean(last);
-          row.lastTaskType = last?.TaskType || '';
-          row.lastTaskDate = last?.Date || '';
-          row.lastTaskSubject = last?.Subject || '';
-          row.lastTaskDryClean = last?.TaskType === 'Dry Clean';
-          row.lastTaskPreviousDay = Boolean(last && last.Date === endDate);
-          row.lastTaskDuplicateOriginal = row.type === 'original' && isOriginalLikeTask(last?.TaskType || '');
-        });
-
-        parsePreviewFromRows();
-        const flagged = parsedRows.filter(r => r.lastTaskDuplicateOriginal).length;
-        const dryFlags = parsedRows.filter(r => r.lastTaskDryClean).length;
-        const previousDayFlags = parsedRows.filter(r => r.lastTaskPreviousDay).length;
-        showToast(`Last task check complete. ${flagged} duplicate-original flag(s), ${dryFlags} dry-clean flag(s), ${previousDayFlags} previous-day flag(s).`);
-      } catch (err) {
-        console.error(err);
-        showToast(err.message || 'Could not check last tasks.');
-      }
     }
 
 
