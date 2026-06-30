@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calendar → Floorplans Backfill Checker v2.07</title>
+  <title>Calendar → Floorplans Backfill Checker v2.09</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
@@ -127,7 +127,7 @@
 <body>
   <header>
     <div class="wrap">
-      <div class="titleRow"><h1>Calendar → Floorplans Backfill Checker</h1><span class="versionBadge">v2.07</span></div>
+      <div class="titleRow"><h1>Calendar → Floorplans Backfill Checker</h1><span class="versionBadge">v2.09</span></div>
       <div class="sub">Sign into Google Calendar, pull old job events, upload your Floorplans sheet, then find lots that were completed before the sheet existed. Pulte and DR Horton get special address-based floorplan matching. Uploaded reference files save in browser storage so you do not have to reload them every time.</div>
     </div>
   </header>
@@ -854,10 +854,15 @@ CAV = Cottages at Verbena *Schottenstein`;
       const bestAddr = pickBestAddressRow(addrRows, parsed);
       if (bestAddr) {
         const auto = isPulteOrDR(parsed.normBuilder) || isPulteOrDR(bestAddr.normBuilder);
-        const row = makeResultRow(parsed, bestAddr, auto ? 'Pulte/DR Address → Floorplan auto-fill' : 'Address match - review');
+        const row = makeResultRow(parsed, bestAddr, auto ? 'Pulte/DR Address → Floorplan candidate' : 'Address match - review');
         results.addressMatches.push(row);
-        if (auto) results.missingAuto.push(row);
-        else results.needsReview.push(row);
+        if (auto && isReadyToAdd(row)) {
+          row.matchSource = 'Ready: address + full builder/subdivision' + (row.matchSource.includes('hours row') ? row.matchSource.replace(/^.*?(\+ hours row.*)$/,' $1') : '');
+          results.missingAuto.push(row);
+        } else {
+          row.matchSource += ' — review: not a complete builder + subdivision + address match';
+          results.needsReview.push(row);
+        }
         continue;
       }
 
@@ -877,11 +882,17 @@ CAV = Cottages at Verbena *Schottenstein`;
           _row: template?._row || '',
           normBuilder: normBuilder(template?.builder || inferredBuilder || parsed.builder || '')
         };
-        const row = makeResultRow(parsed, floorStub, 'Original event location floorplan + subdivision match');
+        const row = makeResultRow(parsed, floorStub, 'Original event location floorplan + subdivision candidate');
         row.possibleSubdivision = possible.name;
         row.score = possible.score;
         results.possibleMatches.push(row);
-        results.missingAuto.push(row);
+        if (isReadyToAdd(row)) {
+          row.matchSource = 'Ready: original + full subdivision/builder + address' + (row.matchSource.includes('hours row') ? row.matchSource.replace(/^.*?(\+ hours row.*)$/,' $1') : '');
+          results.missingAuto.push(row);
+        } else {
+          row.matchSource += ' — review: not a complete builder + subdivision + address match';
+          results.needsReview.push(row);
+        }
         continue;
       }
 
@@ -1118,6 +1129,28 @@ CAV = Cottages at Verbena *Schottenstein`;
     return pdr || rows[0];
   }
 
+
+  function subdivisionLooksCanonical(subdivision, builder) {
+    const sub = cleanCell(subdivision || '');
+    const b = cleanCell(builder || '');
+    if (!sub || !b) return false;
+    const ns = normSub(sub);
+    if (indexes.subdivisions?.has(ns)) return true;
+    // Current canonical names usually carry builder/city markers like *Pulte *Powell.
+    if (/\*/.test(sub) && detectBuilder(sub)) return true;
+    return false;
+  }
+
+  function isReadyToAdd(row) {
+    if (!row) return false;
+    if (!cleanCell(row.builder)) return false;
+    if (!subdivisionLooksCanonical(row.subdivision, row.builder)) return false;
+    if (!cleanCell(row.lot) && !cleanCell(row.address)) return false;
+    // Ready to Add requires a solid location and resolved builder/subdivision. Floorplan/hours are bonuses, not required.
+    if (!cleanCell(row.address)) return false;
+    return true;
+  }
+
   function makeResultRow(parsed, floor, source) {
     const subdivision = canonicalizeSubdivision(floor?.subdivision || parsed.subdivision || parsed.possibleSubdivision || '');
     const builderHint = floor?.builder || builderFromSubdivision(subdivision) || parsed.builder || subdivision || '';
@@ -1352,7 +1385,7 @@ CAV = Cottages at Verbena *Schottenstein`;
 
   function renderTabs() {
     const names = [
-      ['missingAuto', 'Missing Auto-Filled'],
+      ['missingAuto', 'Ready to Add'],
       ['needsReview', 'Needs Review'],
       ['already', 'Already In Sheet'],
       ['addressMatches', 'Address Matches'],
@@ -1383,7 +1416,7 @@ CAV = Cottages at Verbena *Schottenstein`;
   function exportWorkbook() {
     const wb = XLSX.utils.book_new();
     const tabMap = {
-      'Missing Auto Filled': results.missingAuto,
+      'Ready to Add': results.missingAuto,
       'Needs Review': results.needsReview,
       'Already In Sheet': results.already,
       'Address Matches': results.addressMatches,
