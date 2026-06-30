@@ -137,8 +137,8 @@
         <div class="notice danger">
           For Google sign-in, host this file from <code>http://localhost</code> or your website and add that origin to your Google OAuth client. Double-clicking the file may not work because Google blocks most <code>file://</code> origins.
         </div>
-        <label>Google OAuth Client ID</label>
-        <input id="clientId" placeholder="Paste your Web application client ID here" />
+        <label>Google OAuth Client ID <span class="pill good">built in</span></label>
+        <input id="clientId" value="399565751863-oqbm7bq7trdl2m6lnkng10vvitl55mpc.apps.googleusercontent.com" placeholder="Google OAuth Client ID is built in" />
         <div class="row" style="margin-top:10px">
           <button id="saveClientBtn" class="secondary">Save Client ID</button>
           <button id="authorizeBtn">Sign into Calendar</button>
@@ -231,6 +231,7 @@
 (() => {
   const SCOPE = 'https://www.googleapis.com/auth/calendar.readonly';
   const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
+  const BUILT_IN_CLIENT_ID = '399565751863-oqbm7bq7trdl2m6lnkng10vvitl55mpc.apps.googleusercontent.com';
   let tokenClient = null;
   let accessToken = null;
   let calendars = [];
@@ -282,7 +283,8 @@ CAV = Cottages at Verbena *Schottenstein`;
     const start = new Date(now.getFullYear() - 20, 0, 1);
     $('#dateStart').value = toDateInput(start);
     $('#dateEnd').value = toDateInput(end);
-    $('#clientId').value = localStorage.getItem('gcal_backfill_client_id') || '';
+    $('#clientId').value = localStorage.getItem('gcal_backfill_client_id') || BUILT_IN_CLIENT_ID;
+    localStorage.setItem('gcal_backfill_client_id', $('#clientId').value.trim());
     $('#aliasBox').value = localStorage.getItem('gcal_backfill_aliases') || defaultAliases;
     $('#ignoreWords').value = localStorage.getItem('gcal_backfill_ignore_words') || defaultIgnore;
     bind();
@@ -336,7 +338,7 @@ CAV = Cottages at Verbena *Schottenstein`;
 
   function authorize() {
     const clientId = $('#clientId').value.trim();
-    if (!clientId) return alert('Paste your Google OAuth Web Client ID first.');
+    if (!clientId) return alert('Google OAuth Client ID is missing.');
     localStorage.setItem('gcal_backfill_client_id', clientId);
     if (!window.google || !google.accounts || !google.accounts.oauth2) {
       return alert('Google Identity Services has not loaded yet. Check your internet connection or refresh.');
