@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calendar → Floorplans Backfill Checker v2.09</title>
+  <title>Calendar → Floorplans Backfill Checker v2.10</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
@@ -127,7 +127,7 @@
 <body>
   <header>
     <div class="wrap">
-      <div class="titleRow"><h1>Calendar → Floorplans Backfill Checker</h1><span class="versionBadge">v2.09</span></div>
+      <div class="titleRow"><h1>Calendar → Floorplans Backfill Checker</h1><span class="versionBadge">v2.10</span></div>
       <div class="sub">Sign into Google Calendar, pull old job events, upload your Floorplans sheet, then find lots that were completed before the sheet existed. Pulte and DR Horton get special address-based floorplan matching. Uploaded reference files save in browser storage so you do not have to reload them every time.</div>
     </div>
   </header>
@@ -235,14 +235,14 @@
           <div class="stat"><div class="num">0</div><div class="lbl">Events pulled</div></div>
           <div class="stat"><div class="num">0</div><div class="lbl">Floorplan rows</div></div>
           <div class="stat"><div class="num">0</div><div class="lbl">Already in sheet</div></div>
-          <div class="stat"><div class="num">0</div><div class="lbl">Missing auto-filled</div></div>
+          <div class="stat"><div class="num">0</div><div class="lbl">Ready to Add</div></div>
           <div class="stat"><div class="num">0</div><div class="lbl">Needs review</div></div>
           <div class="stat"><div class="num">0</div><div class="lbl">Bad parses</div></div>
         </div>
         <div class="row" style="margin:14px 0">
           <button id="exportBtn" class="good" disabled>Export results to Excel</button>
-          <button id="copyRowsBtn" class="secondary" disabled>Copy missing rows</button>
-          <button id="downloadCsvBtn" class="secondary" disabled>Download missing CSV</button>
+          <button id="copyRowsBtn" class="secondary" disabled>Copy Ready to Add</button>
+          <button id="downloadCsvBtn" class="secondary" disabled>Download Ready CSV</button>
         </div>
         <div class="tabs" id="tabs"></div>
         <div id="tableArea" class="table-wrap"><table><tbody><tr><td class="muted">Nothing to show yet.</td></tr></tbody></table></div>
@@ -1432,7 +1432,9 @@ CAV = Cottages at Verbena *Schottenstein`;
   }
 
   function missingRowsForFloorplans() {
-    return [...results.missingAuto, ...results.needsReview].map(r => ({
+    // IMPORTANT: copy/download must only use the Ready to Add tab.
+    // Do not include Needs Review here, because that is where partial/loose matches live.
+    return (results.missingAuto || []).filter(isReadyToAdd).map(r => ({
       Builder: r.builder,
       Subdivision: r.subdivision || r.parsedSubdivision,
       Lot: r.lot,
@@ -1452,7 +1454,7 @@ CAV = Cottages at Verbena *Schottenstein`;
     const rows = missingRowsForFloorplans();
     const text = toTsv(rows);
     await navigator.clipboard.writeText(text);
-    toast(`Copied ${rows.length} rows as tab-separated values.`);
+    toast(`Copied ${rows.length} Ready to Add rows as tab-separated values.`);
   }
 
   function downloadMissingCsv() {
@@ -1460,7 +1462,7 @@ CAV = Cottages at Verbena *Schottenstein`;
     const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `calendar-floorplan-missing-${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `calendar-floorplan-ready-to-add-${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
     URL.revokeObjectURL(a.href);
   }
