@@ -198,6 +198,10 @@
         <label>Upload Shortened.xlsx, optional</label>
         <input id="shortenedFile" type="file" accept=".xlsx,.xls,.csv" />
         <p class="tiny">Expected columns: Builder, Subdivision, Shortened. This adds alias lines like <code>Shortened = exact Floorplans subdivision</code> so older calendar titles match your current sheet names.</p>
+
+        <label style="margin-top:14px">Upload Subdivisions.xlsx, optional</label>
+        <input id="subdivisionFile" type="file" accept=".xlsx,.xls,.csv" />
+        <p class="tiny">Expected columns: Builder and Subdivision. This is used as the builder/subdivision reference so rows with matched subdivisions can fill Builder even when the Floorplans row is blank.</p>
         <div class="row">
           <div>
             <label>Subdivision aliases, one per line: <code>old name = exact floorplans subdivision</code></label>
@@ -246,6 +250,7 @@
   let events = [];
   let floorWorkbook = null;
   let floorRows = [];
+  let subdivisionRows = [];
   let indexes = {};
   let results = emptyResults();
   let activeTab = 'missingAuto';
@@ -312,6 +317,7 @@ CAV = Cottages at Verbena *Schottenstein`;
     $('#clearEventsBtn').addEventListener('click', () => { events = []; results = emptyResults(); renderTable(); updateStats(); });
     $('#floorFile').addEventListener('change', loadWorkbook);
     $('#shortenedFile').addEventListener('change', loadShortenedAliases);
+    $('#subdivisionFile').addEventListener('change', loadSubdivisionFile);
     $('#readSheetBtn').addEventListener('click', readSelectedSheet);
     $('#runBtn').addEventListener('click', runComparison);
     $('#originalOnly').addEventListener('change', () => { if (events.length && floorRows.length) runComparison(); });
@@ -472,6 +478,7 @@ CAV = Cottages at Verbena *Schottenstein`;
       const subKey = findHeader(keys, ['subdivision', 'community', 'project', 'sub']);
       const shortKey = findHeader(keys, ['shortened', 'short', 'alias', 'abbr', 'abbreviation']);
       const lines = [];
+      const subRefs = [];
       for (const r of raw) {
         const builder = cleanCell(r[builderKey]);
         const sub = cleanCell(r[subKey]);
@@ -480,7 +487,10 @@ CAV = Cottages at Verbena *Schottenstein`;
         lines.push(`${short} = ${sub}`);
         lines.push(`${sub} = ${sub}`);
         if (builder && short) lines.push(`${short} ${builder} = ${sub}`);
+        subRefs.push({ subdivision: sub, builder, normSub: normSub(sub), normBuilder: normBuilder(builder + ' ' + sub) });
       }
+      subdivisionRows = mergeSubdivisionRows(subdivisionRows, subRefs);
+      buildIndexes();
       const existing = $('#aliasBox').value.trim();
       const combined = [...new Set([...(existing ? existing.split(/\r?\n/) : []), ...lines].map(x => x.trim()).filter(Boolean))];
       $('#aliasBox').value = combined.join('\n');
@@ -491,6 +501,65 @@ CAV = Cottages at Verbena *Schottenstein`;
       alert('Could not read Shortened file: ' + err.message);
     }
   }
+
+
+  async function loadSubdivisionFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: 'array', cellDates: true });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
+      subdivisionRows = normalizeSubdivisionRows(raw);
+      buildIndexes();
+      toast(`Loaded ${subdivisionRows.length} subdivision reference rows.`);
+      if (events.length && floorRows.length) runComparison();
+    } catch (err) {
+      alert('Could not read Subdivisions file: ' + err.message);
+    }
+  }
+
+  function normalizeSubdivisionRows(raw) {
+    if (!raw.length) return [];
+    const keys = Object.keys(raw[0] || {});
+    const map = {
+      builder: findHeader(keys, ['builder', 'build']),
+      subdivision: findHeader(keys, ['subdivision', 'community', 'project', 'sub', 'name'])
+    };
+    return raw.map((r, idx) => {
+      const subdivision = cleanCell(r[map.subdivision]);
+      let builder = cleanCell(r[map.builder]);
+      if (!builder) builder = detectBuilder(subdivision);
+      return {
+        _row: idx + 2,
+        builder,
+        subdivision,
+        normSub: normSub(subdivision),
+        normBuilder: normBuilder(builder + ' ' + subdivision)
+      };
+    }).filter(r => r.subdivision && r.normSub);
+  }
+
+  function mergeSubdivisionRows(existing, incoming) {
+    const bySub = new Map();
+    for (const r of [...(existing || []), ...(incoming || [])]) {
+      if (!r || !r.subdivision) continue;
+      const ns = r.normSub || normSub(r.subdivision);
+      if (!ns) continue;
+      const current = bySub.get(ns);
+      if (!current || (!current.builder && r.builder)) {
+        bySub.set(ns, {
+          subdivision: cleanCell(r.subdivision),
+          builder: cleanCell(r.builder) || detectBuilder(r.subdivision),
+          normSub: ns,
+          normBuilder: normBuilder((r.builder || '') + ' ' + r.subdivision)
+        });
+      }
+    }
+    return [...bySub.values()];
+  }
+
 
   async function loadWorkbook(e) {
     const file = e.target.files[0];
@@ -567,16 +636,44 @@ CAV = Cottages at Verbena *Schottenstein`;
   }
 
   function buildIndexes() {
-    indexes = { byLotSub: new Map(), byAddress: new Map(), subdivisions: new Map() };
+    indexes = { byLotSub: new Map(), byAddress: new Map(), subdivisions: new Map(), subdivisionInfo: new Map() };
+
+    function addSubdivisionInfo(subdivision, builder) {
+      const sub = cleanCell(subdivision);
+      if (!sub) return;
+      const ns = normSub(sub);
+      if (!ns) return;
+      const detectedBuilder = cleanCell(builder) || detectBuilder(sub);
+      const nb = normBuilder(detectedBuilder + ' ' + sub);
+      if (!indexes.subdivisions.has(ns)) indexes.subdivisions.set(ns, sub);
+      const existing = indexes.subdivisionInfo.get(ns);
+      if (!existing || (!existing.builder && detectedBuilder)) {
+        indexes.subdivisionInfo.set(ns, { subdivision: sub, builder: detectedBuilder, normBuilder: nb });
+      }
+    }
+
+    for (const s of subdivisionRows) addSubdivisionInfo(s.subdivision, s.builder);
+
     for (const r of floorRows) {
+      addSubdivisionInfo(r.subdivision, r.builder);
       if (r.lot && r.normSub) indexes.byLotSub.set(`${r.normSub}|${r.lot}`, r);
       if (r.normAddress) {
         if (!indexes.byAddress.has(r.normAddress)) indexes.byAddress.set(r.normAddress, []);
         indexes.byAddress.get(r.normAddress).push(r);
       }
-      if (r.subdivision && r.normSub && !indexes.subdivisions.has(r.normSub)) indexes.subdivisions.set(r.normSub, r.subdivision);
     }
   }
+
+  function subdivisionInfoFor(subdivision) {
+    const ns = normSub(subdivision || '');
+    return indexes.subdivisionInfo?.get(ns) || null;
+  }
+
+  function builderFromSubdivision(subdivision) {
+    const info = subdivisionInfoFor(subdivision);
+    return info?.builder || detectBuilder(subdivision || '');
+  }
+
 
   function runComparison() {
     results = emptyResults();
@@ -613,7 +710,7 @@ CAV = Cottages at Verbena *Schottenstein`;
 
       const possible = possibleSubdivisionMatch(parsed);
       if (possible && parsed.jobType === 'Original' && parsed.floorplanFromLocation && parsed.lot) {
-        const inferredBuilder = detectBuilder(possible.name);
+        const inferredBuilder = builderFromSubdivision(possible.name) || detectBuilder(possible.name);
         const template = findFloorplanTemplate(parsed.floorplanFromLocation, inferredBuilder, possible.name);
         const floorStub = {
           builder: template?.builder || inferredBuilder || parsed.builder || '',
@@ -804,8 +901,8 @@ CAV = Cottages at Verbena *Schottenstein`;
   }
 
   function makeResultRow(parsed, floor, source) {
-    const builder = floor?.builder || parsed.builder || '';
     const subdivision = floor?.subdivision || parsed.subdivision || '';
+    const builder = floor?.builder || builderFromSubdivision(subdivision) || parsed.builder || '';
     return {
       builder,
       subdivision,
