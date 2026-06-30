@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calendar → Floorplans Backfill Checker</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --good: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --line: rgba(255,255,255,.12);
+      --input: #0b1220;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #1e3a8a 0, #0f172a 35%, #020617 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      padding: 28px 22px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(2, 6, 23, .58);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .wrap { max-width: 1500px; margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: clamp(24px, 3vw, 38px); letter-spacing: -0.04em; }
+    .sub { color: var(--muted); max-width: 1050px; line-height: 1.5; }
+    main { padding: 22px; }
+    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
+    .card {
+      background: linear-gradient(180deg, rgba(31,41,55,.94), rgba(17,24,39,.94));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 14px 36px rgba(0,0,0,.22);
+    }
+    .span-4 { grid-column: span 4; }
+    .span-5 { grid-column: span 5; }
+    .span-6 { grid-column: span 6; }
+    .span-7 { grid-column: span 7; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+    @media (max-width: 980px) { .span-4,.span-5,.span-6,.span-7,.span-8 { grid-column: span 12; } }
+    h2 { margin: 0 0 14px; font-size: 18px; }
+    h3 { margin: 18px 0 10px; font-size: 15px; color: #dbeafe; }
+    label { display: block; color: var(--muted); font-size: 13px; margin: 10px 0 6px; }
+    input, select, textarea {
+      width: 100%;
+      background: var(--input);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 11px 12px;
+      outline: none;
+      font: inherit;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: rgba(56,189,248,.75); box-shadow: 0 0 0 3px rgba(56,189,248,.12); }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .row > * { flex: 1; min-width: 160px; }
+    button {
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, #0284c7, #0369a1);
+      color: white;
+      padding: 11px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(0,0,0,.2);
+    }
+    button.secondary { background: linear-gradient(180deg, #374151, #1f2937); }
+    button.good { background: linear-gradient(180deg, #16a34a, #15803d); }
+    button.warn { background: linear-gradient(180deg, #d97706, #b45309); }
+    button.bad { background: linear-gradient(180deg, #dc2626, #991b1b); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line); border-radius: 999px;
+      padding: 7px 10px; color: #d1d5db; background: rgba(255,255,255,.06); font-size: 12px;
+    }
+    .pill.good { border-color: rgba(34,197,94,.35); color: #bbf7d0; }
+    .pill.warn { border-color: rgba(245,158,11,.35); color: #fde68a; }
+    .pill.bad { border-color: rgba(239,68,68,.35); color: #fecaca; }
+    .muted { color: var(--muted); }
+    .tiny { font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .stats { display: grid; grid-template-columns: repeat(6, minmax(130px, 1fr)); gap: 10px; }
+    @media (max-width: 900px) { .stats { grid-template-columns: repeat(2, minmax(120px, 1fr)); } }
+    .stat { background: rgba(255,255,255,.06); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+    .stat .num { font-size: 24px; font-weight: 800; }
+    .stat .lbl { color: var(--muted); font-size: 12px; }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .tab { background: rgba(255,255,255,.07); border: 1px solid var(--line); padding: 9px 11px; border-radius: 999px; cursor: pointer; font-weight: 700; font-size: 13px; }
+    .tab.active { background: rgba(56,189,248,.18); border-color: rgba(56,189,248,.55); color: #bae6fd; }
+    .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 14px; max-height: 650px; }
+    table { border-collapse: collapse; width: 100%; min-width: 1200px; background: rgba(2,6,23,.45); }
+    th, td { border-bottom: 1px solid rgba(255,255,255,.08); padding: 9px 10px; text-align: left; font-size: 12px; vertical-align: top; }
+    th { position: sticky; top: 0; background: #111827; color: #bfdbfe; z-index: 3; }
+    tr:hover td { background: rgba(56,189,248,.06); }
+    .checklist { max-height: 280px; overflow: auto; border: 1px solid var(--line); border-radius: 14px; padding: 10px; background: rgba(2,6,23,.32); }
+    .calendar-item { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center; padding: 7px; border-bottom: 1px solid rgba(255,255,255,.07); }
+    .calendar-item:last-child { border-bottom: none; }
+    .calendar-item input { width: auto; }
+    .badge { font-size: 11px; padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,.09); color: #d1d5db; white-space: nowrap; }
+    .notice { border-left: 4px solid var(--accent); background: rgba(56,189,248,.1); padding: 12px 14px; border-radius: 12px; color: #dbeafe; line-height: 1.45; }
+    .danger { border-left-color: var(--warn); background: rgba(245,158,11,.1); color: #fffbeb; }
+    .hidden { display: none !important; }
+    code { background: rgba(255,255,255,.08); padding: 2px 5px; border-radius: 6px; color: #bfdbfe; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Calendar → Floorplans Backfill Checker</h1>
+      <div class="sub">Sign into Google Calendar, pull old job events, upload your Floorplans sheet, then find lots that were completed before the sheet existed. Pulte and DR Horton get special address-based floorplan matching.</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid">
+      <section class="card span-4">
+        <h2>1. Google setup</h2>
+        <div class="notice danger">
+          For Google sign-in, host this file from <code>http://localhost</code> or your website and add that origin to your Google OAuth client. Double-clicking the file may not work because Google blocks most <code>file://</code> origins.
+        </div>
+        <label>Google OAuth Client ID</label>
+        <input id="clientId" placeholder="Paste your Web application client ID here" />
+        <div class="row" style="margin-top:10px">
+          <button id="saveClientBtn" class="secondary">Save Client ID</button>
+          <button id="authorizeBtn">Sign into Calendar</button>
+        </div>
+        <p class="tiny">Scope used: <code>https://www.googleapis.com/auth/calendar.readonly</code>. This tool only reads events and keeps the comparison in your browser.</p>
+
+        <h3>Date range</h3>
+        <div class="row">
+          <div>
+            <label>Start</label>
+            <input id="dateStart" type="date" />
+          </div>
+          <div>
+            <label>End</label>
+            <input id="dateEnd" type="date" />
+          </div>
+        </div>
+        <label>Search text filter, optional</label>
+        <input id="eventFilter" placeholder="Example: Original OR Reclean OR Windows" />
+      </section>
+
+      <section class="card span-4">
+        <h2>2. Calendars</h2>
+        <div class="row">
+          <button id="loadCalendarsBtn" class="secondary" disabled>Load calendars</button>
+          <button id="selectLikelyBtn" class="secondary" disabled>Select likely job calendars</button>
+        </div>
+        <div id="calendarList" class="checklist" style="margin-top:12px">
+          <div class="tiny">Sign in first, then load calendars.</div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button id="pullEventsBtn" disabled>Pull calendar events</button>
+          <button id="clearEventsBtn" class="secondary">Clear events</button>
+        </div>
+      </section>
+
+      <section class="card span-4">
+        <h2>3. Floorplans sheet</h2>
+        <label>Upload Floorplans .xlsx / .xls / .csv</label>
+        <input id="floorFile" type="file" accept=".xlsx,.xls,.csv" />
+        <label>Sheet tab</label>
+        <select id="sheetSelect" disabled></select>
+        <div class="row" style="margin-top:10px">
+          <button id="readSheetBtn" class="secondary" disabled>Read selected sheet</button>
+          <button id="runBtn" class="good" disabled>Run comparison</button>
+        </div>
+        <p class="tiny">Expected columns can be named normally: Builder, Subdivision, Lot, Floorplan, Original, Reclean, Windows, Address. The tool does fuzzy header matching.</p>
+      </section>
+
+      <section class="card span-12">
+        <h2>Aliases / cleanup rules</h2>
+        <div class="row">
+          <div>
+            <label>Subdivision aliases, one per line: <code>old name = exact floorplans subdivision</code></label>
+            <textarea id="aliasBox" spellcheck="false"></textarea>
+          </div>
+          <div>
+            <label>Ignore event title words, comma-separated</label>
+            <textarea id="ignoreWords" spellcheck="false"></textarea>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button id="saveRulesBtn" class="secondary">Save rules</button>
+          <button id="resetRulesBtn" class="secondary">Load default rules</button>
+        </div>
+      </section>
+
+      <section class="card span-12">
+        <h2>Results</h2>
+        <div class="stats" id="stats">
+          <div class="stat"><div class="num">0</div><div class="lbl">Events pulled</div></div>
+          <div class="stat"><div class="num">0</div><div class="lbl">Floorplan rows</div></div>
+          <div class="stat"><div class="num">0</div><div class="lbl">Already in sheet</div></div>
+          <div class="stat"><div class="num">0</div><div class="lbl">Missing auto-filled</div></div>
+          <div class="stat"><div class="num">0</div><div class="lbl">Needs review</div></div>
+          <div class="stat"><div class="num">0</div><div class="lbl">Bad parses</div></div>
+        </div>
+        <div class="row" style="margin:14px 0">
+          <button id="exportBtn" class="good" disabled>Export results to Excel</button>
+          <button id="copyRowsBtn" class="secondary" disabled>Copy missing rows</button>
+          <button id="downloadCsvBtn" class="secondary" disabled>Download missing CSV</button>
+        </div>
+        <div class="tabs" id="tabs"></div>
+        <div id="tableArea" class="table-wrap"><table><tbody><tr><td class="muted">Nothing to show yet.</td></tr></tbody></table></div>
+      </section>
+    </div>
+  </main>
+
+<script>
+(() => {
+  const SCOPE = 'https://www.googleapis.com/auth/calendar.readonly';
+  const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
+  let tokenClient = null;
+  let accessToken = null;
+  let calendars = [];
+  let events = [];
+  let floorWorkbook = null;
+  let floorRows = [];
+  let indexes = {};
+  let results = emptyResults();
+  let activeTab = 'missingAuto';
+
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => [...document.querySelectorAll(sel)];
+
+  const defaultAliases = `BB = Berlin Bluffs *Pulte *Delaware
+Berlin = Berlin Bluffs *Pulte *Delaware
+Eagle = Eagle *Pulte *Galena
+Towns Greenway = Towns on the Greenway *Pulte *Westerville
+Towns Parkway = Towns on the Parkway *Pulte *Westerville
+Piatts Preserve = Piatts *DR *Delaware
+Piatt Preserve = Piatts *DR *Delaware
+Piatts = Piatts *DR *Delaware
+Longview = Longview *DR *Pickerington
+LH = Longview *DR *Pickerington
+MD = Madison Meadows *DR *Plain City
+Madison = Madison Meadows *DR *Plain City
+Lansdowne = Lansdowne Farms *DR *Canal
+Kintner Crossing TH = Kintner Crossing *DR *Sunbury
+Kintner Crossing Patio Homes = Kintner Crossing *DR *Sunbury
+JV = Jerome Village
+CAV = Cottages at Verbena *Schottenstein`;
+
+  const defaultIgnore = `cleaning,clean,calendar,scheduled,job,task,am,pm,original,reclean,re-clean,windows,window,model,dry clean,floors only,hardwood,carpet,final clean,final`;
+
+  function emptyResults() {
+    return {
+      missingAuto: [],
+      needsReview: [],
+      already: [],
+      addressMatches: [],
+      possibleMatches: [],
+      badParses: [],
+      rawEvents: []
+    };
+  }
+
+  function init() {
+    const now = new Date();
+    const end = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const start = new Date(now.getFullYear() - 20, 0, 1);
+    $('#dateStart').value = toDateInput(start);
+    $('#dateEnd').value = toDateInput(end);
+    $('#clientId').value = localStorage.getItem('gcal_backfill_client_id') || '';
+    $('#aliasBox').value = localStorage.getItem('gcal_backfill_aliases') || defaultAliases;
+    $('#ignoreWords').value = localStorage.getItem('gcal_backfill_ignore_words') || defaultIgnore;
+    bind();
+    updateStats();
+    renderTabs();
+  }
+
+  function bind() {
+    $('#saveClientBtn').addEventListener('click', () => {
+      localStorage.setItem('gcal_backfill_client_id', $('#clientId').value.trim());
+      toast('Client ID saved.');
+    });
+    $('#authorizeBtn').addEventListener('click', authorize);
+    $('#loadCalendarsBtn').addEventListener('click', loadCalendars);
+    $('#selectLikelyBtn').addEventListener('click', selectLikelyCalendars);
+    $('#pullEventsBtn').addEventListener('click', pullEvents);
+    $('#clearEventsBtn').addEventListener('click', () => { events = []; results = emptyResults(); renderTable(); updateStats(); });
+    $('#floorFile').addEventListener('change', loadWorkbook);
+    $('#readSheetBtn').addEventListener('click', readSelectedSheet);
+    $('#runBtn').addEventListener('click', runComparison);
+    $('#exportBtn').addEventListener('click', exportWorkbook);
+    $('#copyRowsBtn').addEventListener('click', copyMissingRows);
+    $('#downloadCsvBtn').addEventListener('click', downloadMissingCsv);
+    $('#saveRulesBtn').addEventListener('click', () => {
+      localStorage.setItem('gcal_backfill_aliases', $('#aliasBox').value);
+      localStorage.setItem('gcal_backfill_ignore_words', $('#ignoreWords').value);
+      toast('Rules saved.');
+    });
+    $('#resetRulesBtn').addEventListener('click', () => {
+      $('#aliasBox').value = defaultAliases;
+      $('#ignoreWords').value = defaultIgnore;
+      toast('Default rules loaded.');
+    });
+  }
+
+  function toDateInput(d) {
+    return d.toISOString().slice(0, 10);
+  }
+
+  function toast(msg) {
+    console.log(msg);
+    const old = $('#toast');
+    if (old) old.remove();
+    const div = document.createElement('div');
+    div.id = 'toast';
+    div.textContent = msg;
+    div.style.cssText = 'position:fixed;right:18px;bottom:18px;background:#0f172a;border:1px solid rgba(255,255,255,.2);color:#e5e7eb;padding:12px 14px;border-radius:12px;z-index:99;box-shadow:0 12px 30px rgba(0,0,0,.35)';
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 2500);
+  }
+
+  function authorize() {
+    const clientId = $('#clientId').value.trim();
+    if (!clientId) return alert('Paste your Google OAuth Web Client ID first.');
+    localStorage.setItem('gcal_backfill_client_id', clientId);
+    if (!window.google || !google.accounts || !google.accounts.oauth2) {
+      return alert('Google Identity Services has not loaded yet. Check your internet connection or refresh.');
+    }
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: clientId,
+      scope: SCOPE,
+      callback: (resp) => {
+        if (resp.error) return alert('Google auth error: ' + resp.error);
+        accessToken = resp.access_token;
+        $('#loadCalendarsBtn').disabled = false;
+        toast('Signed in. Load calendars next.');
+      }
+    });
+    tokenClient.requestAccessToken({ prompt: accessToken ? '' : 'consent' });
+  }
+
+  async function gcalFetch(url) {
+    if (!accessToken) throw new Error('Not signed in.');
+    const res = await fetch(url, { headers: { Authorization: 'Bearer ' + accessToken } });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Google Calendar request failed ${res.status}: ${text}`);
+    }
+    return res.json();
+  }
+
+  async function loadCalendars() {
+    try {
+      const data = await gcalFetch('https://www.googleapis.com/calendar/v3/users/me/calendarList?maxResults=250');
+      calendars = (data.items || []).filter(c => !c.deleted).map(c => ({
+        id: c.id,
+        summary: c.summaryOverride || c.summary || c.id,
+        primary: !!c.primary,
+        accessRole: c.accessRole
+      }));
+      renderCalendars();
+      $('#selectLikelyBtn').disabled = false;
+      $('#pullEventsBtn').disabled = false;
+      toast(`Loaded ${calendars.length} calendars.`);
+    } catch (e) { alert(e.message); }
+  }
+
+  function renderCalendars() {
+    const box = $('#calendarList');
+    if (!calendars.length) { box.innerHTML = '<div class="tiny">No calendars found.</div>'; return; }
+    box.innerHTML = calendars.map((c, i) => {
+      const name = escapeHtml(c.summary);
+      const checked = /general|window|clean|original|reclean|work/i.test(c.summary) ? 'checked' : '';
+      return `<label class="calendar-item"><input type="checkbox" class="calCheck" data-id="${escapeAttr(c.id)}" ${checked}><span>${name}</span><span class="badge">${c.primary ? 'primary' : c.accessRole}</span></label>`;
+    }).join('');
+  }
+
+  function selectLikelyCalendars() {
+    $$('.calCheck').forEach(cb => {
+      const cal = calendars.find(c => c.id === cb.dataset.id);
+      cb.checked = !!cal && /general|window|clean|original|reclean|work/i.test(cal.summary);
+    });
+  }
+
+  async function pullEvents() {
+    const selected = $$('.calCheck:checked').map(cb => cb.dataset.id);
+    if (!selected.length) return alert('Select at least one calendar.');
+    const start = $('#dateStart').value;
+    const end = $('#dateEnd').value;
+    if (!start || !end) return alert('Choose a start and end date.');
+    const timeMin = new Date(start + 'T00:00:00').toISOString();
+    const timeMax = new Date(end + 'T23:59:59').toISOString();
+    const q = $('#eventFilter').value.trim();
+    events = [];
+    $('#pullEventsBtn').disabled = true;
+    try {
+      for (const calId of selected) {
+        const cal = calendars.find(c => c.id === calId);
+        let pageToken = '';
+        do {
+          const params = new URLSearchParams({
+            singleEvents: 'true',
+            showDeleted: 'false',
+            orderBy: 'startTime',
+            maxResults: '2500',
+            timeMin,
+            timeMax
+          });
+          if (q && !/\bOR\b/i.test(q)) params.set('q', q);
+          if (pageToken) params.set('pageToken', pageToken);
+          const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events?${params}`;
+          const data = await gcalFetch(url);
+          const items = (data.items || []).map(ev => ({...ev, _calendarId: calId, _calendarName: cal?.summary || calId}));
+          events.push(...items);
+          pageToken = data.nextPageToken || '';
+        } while (pageToken);
+      }
+      if (q && /\bOR\b/i.test(q)) {
+        const parts = q.split(/\s+OR\s+/i).map(x => x.trim().toLowerCase()).filter(Boolean);
+        events = events.filter(ev => parts.some(p => `${ev.summary || ''} ${ev.description || ''} ${ev.location || ''}`.toLowerCase().includes(p)));
+      }
+      toast(`Pulled ${events.length} events.`);
+      results.rawEvents = events.map(eventToRawRow);
+      updateStats();
+      $('#runBtn').disabled = !(events.length && floorRows.length);
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      $('#pullEventsBtn').disabled = false;
+    }
+  }
+
+  async function loadWorkbook(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const buf = await file.arrayBuffer();
+    floorWorkbook = XLSX.read(buf, { type: 'array', cellDates: true });
+    const select = $('#sheetSelect');
+    select.innerHTML = floorWorkbook.SheetNames.map(n => `<option>${escapeHtml(n)}</option>`).join('');
+    select.disabled = false;
+    $('#readSheetBtn').disabled = false;
+    toast('Workbook loaded. Pick the Floorplans tab and read it.');
+  }
+
+  function readSelectedSheet() {
+    if (!floorWorkbook) return;
+    const sheetName = $('#sheetSelect').value || floorWorkbook.SheetNames[0];
+    const ws = floorWorkbook.Sheets[sheetName];
+    const raw = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
+    floorRows = normalizeFloorRows(raw);
+    buildIndexes();
+    updateStats();
+    $('#runBtn').disabled = !(events.length && floorRows.length);
+    toast(`Read ${floorRows.length} usable floorplan rows.`);
+  }
+
+  function normalizeFloorRows(raw) {
+    if (!raw.length) return [];
+    const keys = Object.keys(raw[0] || {});
+    const map = {
+      builder: findHeader(keys, ['builder', 'build']),
+      subdivision: findHeader(keys, ['subdivision', 'community', 'project', 'sub']),
+      lot: findHeader(keys, ['lot', 'plat lot', 'lot #', 'lot number']),
+      floorplan: findHeader(keys, ['floorplan', 'floor plan', 'plan', 'model']),
+      original: findHeader(keys, ['original', 'orig']),
+      reclean: findHeader(keys, ['reclean', 're clean', 're-clean']),
+      windows: findHeader(keys, ['windows', 'window']),
+      address: findHeader(keys, ['address', 'street address', 'home address']),
+      lastUpdated: findHeader(keys, ['last updated', 'lastupdated', 'updated'])
+    };
+    return raw.map((r, idx) => {
+      const row = {
+        _row: idx + 2,
+        builder: cleanCell(r[map.builder]),
+        subdivision: cleanCell(r[map.subdivision]),
+        lot: cleanLot(r[map.lot]),
+        floorplan: cleanCell(r[map.floorplan]),
+        original: cleanCell(r[map.original]),
+        reclean: cleanCell(r[map.reclean]),
+        windows: cleanCell(r[map.windows]),
+        address: cleanCell(r[map.address]),
+        lastUpdated: cleanCell(r[map.lastUpdated])
+      };
+      row.normSub = normSub(row.subdivision);
+      row.normAddress = normAddress(row.address);
+      row.normBuilder = normBuilder(row.builder + ' ' + row.subdivision);
+      return row;
+    }).filter(r => r.subdivision || r.lot || r.address || r.floorplan);
+  }
+
+  function findHeader(keys, candidates) {
+    const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const nkeys = keys.map(k => [k, norm(k)]);
+    for (const cand of candidates) {
+      const nc = norm(cand);
+      const exact = nkeys.find(([k,n]) => n === nc);
+      if (exact) return exact[0];
+    }
+    for (const cand of candidates) {
+      const nc = norm(cand);
+      const partial = nkeys.find(([k,n]) => n.includes(nc) || nc.includes(n));
+      if (partial) return partial[0];
+    }
+    return keys.find(k => norm(k).includes(norm(candidates[0]))) || '__missing__';
+  }
+
+  function buildIndexes() {
+    indexes = { byLotSub: new Map(), byAddress: new Map(), subdivisions: new Map() };
+    for (const r of floorRows) {
+      if (r.lot && r.normSub) indexes.byLotSub.set(`${r.normSub}|${r.lot}`, r);
+      if (r.normAddress) {
+        if (!indexes.byAddress.has(r.normAddress)) indexes.byAddress.set(r.normAddress, []);
+        indexes.byAddress.get(r.normAddress).push(r);
+      }
+      if (r.subdivision && r.normSub && !indexes.subdivisions.has(r.normSub)) indexes.subdivisions.set(r.normSub, r.subdivision);
+    }
+  }
+
+  function runComparison() {
+    results = emptyResults();
+    const seenEventKeys = new Set();
+    for (const ev of events) {
+      const parsed = parseEvent(ev);
+      results.rawEvents.push({...eventToRawRow(ev), ...parsed});
+      if (!parsed.lot && !parsed.address) {
+        results.badParses.push(makeResultRow(parsed, null, 'Could not find lot or address'));
+        continue;
+      }
+      const eventKey = [parsed.date, parsed.calendar, parsed.title, parsed.lot, parsed.normAddress].join('|');
+      if (seenEventKeys.has(eventKey)) continue;
+      seenEventKeys.add(eventKey);
+
+      let exactRow = null;
+      if (parsed.lot && parsed.normSub) exactRow = indexes.byLotSub.get(`${parsed.normSub}|${parsed.lot}`);
+      if (exactRow) {
+        results.already.push(makeResultRow(parsed, exactRow, 'Exact Subdivision + Lot'));
+        continue;
+      }
+
+      const addrRows = parsed.normAddress ? (indexes.byAddress.get(parsed.normAddress) || []) : [];
+      const bestAddr = pickBestAddressRow(addrRows, parsed);
+      if (bestAddr) {
+        const auto = isPulteOrDR(parsed.normBuilder) || isPulteOrDR(bestAddr.normBuilder);
+        const row = makeResultRow(parsed, bestAddr, auto ? 'Pulte/DR Address → Floorplan auto-fill' : 'Address match - review');
+        results.addressMatches.push(row);
+        if (auto) results.missingAuto.push(row);
+        else results.needsReview.push(row);
+        continue;
+      }
+
+      const possible = possibleSubdivisionMatch(parsed);
+      if (possible) {
+        const row = makeResultRow(parsed, null, 'Possible subdivision match: ' + possible.name);
+        row.possibleSubdivision = possible.name;
+        row.score = possible.score;
+        results.possibleMatches.push(row);
+        results.needsReview.push(row);
+      } else {
+        results.needsReview.push(makeResultRow(parsed, null, 'Missing lot - no floorplan/address match'));
+      }
+    }
+    renderTabs();
+    activeTab = 'missingAuto';
+    renderTable();
+    updateStats();
+    $('#exportBtn').disabled = false;
+    $('#copyRowsBtn').disabled = false;
+    $('#downloadCsvBtn').disabled = false;
+    toast('Comparison complete.');
+  }
+
+  function eventToRawRow(ev) {
+    return {
+      calendar: ev._calendarName || '',
+      date: getEventDate(ev),
+      title: ev.summary || '',
+      location: ev.location || '',
+      description: stripHtml(ev.description || '')
+    };
+  }
+
+  function parseEvent(ev) {
+    const title = cleanCell(ev.summary || '');
+    const location = cleanCell(ev.location || '');
+    const description = stripHtml(ev.description || '');
+    const calendar = ev._calendarName || '';
+    const date = getEventDate(ev);
+    const text = `${title} ${location} ${description}`;
+    const jobType = detectJobType(`${calendar} ${title} ${description}`);
+    const lot = detectLot(title) || detectLot(description);
+    const address = detectAddress(location) || detectAddress(title) || detectAddress(description);
+    const normAddr = normAddress(address);
+    const subdivision = detectSubdivision(title, description);
+    const builder = detectBuilder(`${calendar} ${title} ${description} ${subdivision}`);
+    return {
+      calendar, date, title, location, description,
+      lot, subdivision, normSub: normSub(subdivision), builder, normBuilder: normBuilder(builder + ' ' + subdivision),
+      jobType, address, normAddress: normAddr,
+      eventId: ev.id || ''
+    };
+  }
+
+  function detectJobType(text) {
+    const t = text.toLowerCase();
+    if (/\bwindows?\b|\bwindow\b/.test(t)) return 'Windows';
+    if (/\bre[ -]?clean\b|\bfinal clean #?2\b/.test(t)) return 'Reclean';
+    if (/\bmodel\b/.test(t)) return 'Model';
+    if (/\boriginal\b|\bdry clean\b|\bcleaning sub\b|\bfinal clean #?1\b/.test(t)) return 'Original';
+    return '';
+  }
+
+  function detectLot(text) {
+    text = String(text || '').replace(/^[*\s]+/, '').trim();
+    let m = text.match(/^(?:lot\s*)?(\d{1,5}[A-Za-z]?)\b/i);
+    if (m) return cleanLot(m[1]);
+    m = text.match(/\blot\s*[:#-]?\s*(\d{1,5}[A-Za-z]?)\b/i);
+    if (m) return cleanLot(m[1]);
+    m = text.match(/\b(?:house|home)\s*[:#-]?\s*(\d{1,5}[A-Za-z]?)\b/i);
+    if (m) return cleanLot(m[1]);
+    return '';
+  }
+
+  function detectAddress(...texts) {
+    const text = texts.join(' ').replace(/\s+/g, ' ');
+    const suffixes = 'Street|St\.?|Drive|Dr\.?|Avenue|Ave\.?|Road|Rd\.?|Court|Ct\.?|Lane|Ln\.?|Boulevard|Blvd\.?|Circle|Cir\.?|Way|Place|Pl\.?|Trail|Trl\.?|Parkway|Pkwy\.?|Terrace|Ter\.?|Loop|Crossing|Xing|Run|Row|Path|Pass|View|Bend|Grove|Green|Park|Commons';
+    const re = new RegExp(`\\b\\d{2,6}\\s+[A-Za-z0-9 .'’#-]{2,70}\\s+(?:${suffixes})\\b(?:\\s+[A-Za-z .-]+)?`, 'i');
+    const m = text.match(re);
+    if (!m) return '';
+    return cleanCell(m[0]).replace(/\s+(original|reclean|windows|window|model).*$/i, '').replace(/[,-]+$/, '').trim();
+  }
+
+  function detectSubdivision(title, description) {
+    const aliases = parseAliases();
+    const hay = normSub(`${title} ${description}`);
+    for (const [aliasNorm, canonical] of aliases) {
+      if (hay.includes(aliasNorm)) return canonical;
+    }
+    let best = { name: '', score: 0 };
+    for (const [nsub, original] of indexes.subdivisions.entries()) {
+      if (!nsub) continue;
+      if (hay.includes(nsub)) {
+        const score = Math.min(100, 70 + nsub.length);
+        if (score > best.score) best = { name: original, score };
+      }
+    }
+    if (best.name) return best.name;
+
+    let part = String(title || '');
+    part = part.split(/\s+[–—-]\s+|\s+-\s+/)[0];
+    part = part.replace(/^\*?\s*(?:lot\s*)?\d{1,5}[A-Za-z]?\s*/i, '');
+    part = part.replace(/\b(original|reclean|re-clean|windows?|model|dry clean|floors only)\b.*$/i, '');
+    part = removeIgnoreWords(part);
+    return cleanCell(part.replace(/[*]+/g, ' '));
+  }
+
+  function possibleSubdivisionMatch(parsed) {
+    const hay = parsed.normSub || normSub(parsed.title);
+    if (!hay) return null;
+    let best = { name: '', score: 0 };
+    for (const [nsub, original] of indexes.subdivisions.entries()) {
+      const score = similarity(hay, nsub);
+      if (score > best.score) best = { name: original, score };
+    }
+    return best.score >= 0.58 ? best : null;
+  }
+
+  function pickBestAddressRow(rows, parsed) {
+    if (!rows.length) return null;
+    if (rows.length === 1) return rows[0];
+    const builder = parsed.normBuilder;
+    const sameBuilder = rows.find(r => r.normBuilder && builder && r.normBuilder === builder);
+    if (sameBuilder) return sameBuilder;
+    const pdr = rows.find(r => isPulteOrDR(r.normBuilder));
+    return pdr || rows[0];
+  }
+
+  function makeResultRow(parsed, floor, source) {
+    const builder = floor?.builder || parsed.builder || '';
+    const subdivision = floor?.subdivision || parsed.subdivision || '';
+    return {
+      builder,
+      subdivision,
+      lot: parsed.lot || '',
+      floorplan: floor?.floorplan || '',
+      original: floor?.original || '',
+      reclean: floor?.reclean || '',
+      windows: floor?.windows || '',
+      address: parsed.address || floor?.address || '',
+      jobType: parsed.jobType || '',
+      calendarDate: parsed.date || '',
+      calendar: parsed.calendar || '',
+      eventTitle: parsed.title || '',
+      eventLocation: parsed.location || '',
+      matchSource: source || '',
+      floorplanRow: floor?._row || '',
+      parsedSubdivision: parsed.subdivision || '',
+      possibleSubdivision: '',
+      score: ''
+    };
+  }
+
+  function parseAliases() {
+    const lines = $('#aliasBox').value.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+    const out = [];
+    for (const line of lines) {
+      const [a, ...rest] = line.split('=');
+      if (!a || !rest.length) continue;
+      out.push([normSub(a), cleanCell(rest.join('='))]);
+    }
+    out.sort((x,y) => y[0].length - x[0].length);
+    return out;
+  }
+
+  function removeIgnoreWords(text) {
+    let out = String(text || '');
+    const words = $('#ignoreWords').value.split(',').map(w => w.trim()).filter(Boolean);
+    for (const w of words) {
+      const re = new RegExp('\\b' + escapeRegExp(w) + '\\b', 'ig');
+      out = out.replace(re, ' ');
+    }
+    return out.replace(/\s+/g, ' ').trim();
+  }
+
+  function detectBuilder(text) {
+    const t = String(text || '').toLowerCase();
+    if (/\bpulte\b/.test(t)) return 'Pulte';
+    if (/\bdr\s*horton\b|\b\*dr\b|\bdrh\b/.test(t)) return 'DR Horton';
+    if (/\bryan\b|\bryan homes\b/.test(t)) return 'Ryan';
+    if (/\bepcon\b/.test(t)) return 'Epcon';
+    if (/\bschottenstein\b/.test(t)) return 'Schottenstein';
+    if (/\brockford\b/.test(t)) return 'Rockford';
+    if (/\bmi\s*homes\b|\bmi\b/.test(t)) return 'MI Homes';
+    if (/\barbor\b/.test(t)) return 'Arbor Homes';
+    if (/\bfischer\b/.test(t)) return 'Fischer Homes';
+    return '';
+  }
+
+  function isPulteOrDR(builderNorm) {
+    return builderNorm === 'pulte' || builderNorm === 'drhorton';
+  }
+
+  function normBuilder(text) {
+    const t = String(text || '').toLowerCase();
+    if (/pulte/.test(t)) return 'pulte';
+    if (/dr\s*horton|\bdr\b|\*dr/.test(t)) return 'drhorton';
+    if (/ryan/.test(t)) return 'ryan';
+    if (/epcon/.test(t)) return 'epcon';
+    if (/schottenstein/.test(t)) return 'schottenstein';
+    if (/rockford/.test(t)) return 'rockford';
+    if (/mi\s*homes|\bmi\b/.test(t)) return 'mihomes';
+    if (/arbor/.test(t)) return 'arborhomes';
+    if (/fischer/.test(t)) return 'fischerhomes';
+    return '';
+  }
+
+  function cleanCell(v) {
+    return String(v ?? '').replace(/\u00a0/g, ' ').replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\s+/g, ' ').trim();
+  }
+
+  function cleanLot(v) {
+    const s = cleanCell(v).replace(/^0+(?=\d)/, '').toUpperCase();
+    const m = s.match(/\d{1,5}[A-Z]?/);
+    return m ? m[0].replace(/^0+(?=\d)/, '') : '';
+  }
+
+  function normSub(s) {
+    return cleanCell(s).toLowerCase()
+      .replace(/&/g, ' and ')
+      .replace(/['’]/g, '')
+      .replace(/\b(the|at|of|on)\b/g, ' ')
+      .replace(/\*+/g, ' ')
+      .replace(/\b(pulte|dr horton|dr|ryan|epcon|schottenstein|rockford|arbor|fischer|mihomes|mi homes|delaware|galena|plain city|sunbury|canal|pickerington|westerville|hilliard|powell|dublin|pataskala|lewis center|marysville|columbus|grove city)\b/g, ' ')
+      .replace(/[^a-z0-9]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function normAddress(addr) {
+    let s = cleanCell(addr).toLowerCase();
+    if (!s) return '';
+    s = s.replace(/[,#]/g, ' ').replace(/\./g, '').replace(/['’]/g, '').replace(/\s+/g, ' ');
+    const repl = {
+      'street':'st','drive':'dr','avenue':'ave','road':'rd','court':'ct','lane':'ln','boulevard':'blvd','circle':'cir','place':'pl','trail':'trl','parkway':'pkwy','terrace':'ter','crossing':'xing'
+    };
+    for (const [long, short] of Object.entries(repl)) s = s.replace(new RegExp('\\b' + long + '\\b', 'g'), short);
+    s = s.replace(/\b(oh|ohio|usa|united states)\b/g, ' ');
+    s = s.replace(/\b(delaware|galena|plain city|sunbury|canal winchester|canal|pickerington|westerville|hilliard|powell|dublin|pataskala|lewis center|marysville|columbus|grove city|new albany|lancaster|blacklick|johnstown|washington courthouse|jeffersonville)\b/g, ' ');
+    s = s.replace(/\b\d{5}(?:-\d{4})?\b/g, ' ');
+    return s.replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function stripHtml(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html || '';
+    return cleanCell(div.textContent || div.innerText || '');
+  }
+
+  function getEventDate(ev) {
+    const raw = ev.start?.dateTime || ev.start?.date || '';
+    return raw ? raw.slice(0, 10) : '';
+  }
+
+  function similarity(a, b) {
+    a = String(a || ''); b = String(b || '');
+    if (!a || !b) return 0;
+    if (a === b) return 1;
+    if (a.includes(b) || b.includes(a)) return Math.min(a.length, b.length) / Math.max(a.length, b.length) + .25;
+    const ad = new Set(a.split(' '));
+    const bd = new Set(b.split(' '));
+    const inter = [...ad].filter(x => bd.has(x)).length;
+    const union = new Set([...ad, ...bd]).size;
+    return inter / Math.max(1, union);
+  }
+
+  function renderTabs() {
+    const names = [
+      ['missingAuto', 'Missing Auto-Filled'],
+      ['needsReview', 'Needs Review'],
+      ['already', 'Already In Sheet'],
+      ['addressMatches', 'Address Matches'],
+      ['possibleMatches', 'Possible Matches'],
+      ['badParses', 'Bad Parses'],
+      ['rawEvents', 'Raw Events']
+    ];
+    $('#tabs').innerHTML = names.map(([key, label]) => `<div class="tab ${activeTab === key ? 'active' : ''}" data-tab="${key}">${label} (${(results[key] || []).length})</div>`).join('');
+    $$('#tabs .tab').forEach(t => t.addEventListener('click', () => { activeTab = t.dataset.tab; renderTabs(); renderTable(); }));
+  }
+
+  function renderTable() {
+    const rows = results[activeTab] || [];
+    if (!rows.length) {
+      $('#tableArea').innerHTML = '<table><tbody><tr><td class="muted">No rows in this tab.</td></tr></tbody></table>';
+      return;
+    }
+    const cols = Object.keys(rows[0]);
+    $('#tableArea').innerHTML = `<table><thead><tr>${cols.map(c => `<th>${escapeHtml(pretty(c))}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${cols.map(c => `<td>${escapeHtml(r[c])}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  }
+
+  function updateStats() {
+    const nums = [events.length, floorRows.length, results.already.length, results.missingAuto.length, results.needsReview.length, results.badParses.length];
+    $$('#stats .num').forEach((n, i) => n.textContent = nums[i] || 0);
+    renderTabs();
+  }
+
+  function exportWorkbook() {
+    const wb = XLSX.utils.book_new();
+    const tabMap = {
+      'Missing Auto Filled': results.missingAuto,
+      'Needs Review': results.needsReview,
+      'Already In Sheet': results.already,
+      'Address Matches': results.addressMatches,
+      'Possible Matches': results.possibleMatches,
+      'Bad Parses': results.badParses,
+      'Raw Events': results.rawEvents
+    };
+    for (const [name, rows] of Object.entries(tabMap)) {
+      const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{note: 'No rows'}]);
+      XLSX.utils.book_append_sheet(wb, ws, name.slice(0,31));
+    }
+    XLSX.writeFile(wb, `calendar-floorplan-backfill-${new Date().toISOString().slice(0,10)}.xlsx`);
+  }
+
+  function missingRowsForFloorplans() {
+    return [...results.missingAuto, ...results.needsReview].map(r => ({
+      Builder: r.builder,
+      Subdivision: r.subdivision || r.parsedSubdivision,
+      Lot: r.lot,
+      Floorplan: r.floorplan,
+      Original: r.original,
+      Reclean: r.reclean,
+      Windows: r.windows,
+      Address: r.address,
+      LastUpdated: new Date().toISOString().slice(0,10),
+      Source: r.matchSource,
+      CalendarDate: r.calendarDate,
+      EventTitle: r.eventTitle
+    }));
+  }
+
+  async function copyMissingRows() {
+    const rows = missingRowsForFloorplans();
+    const text = toTsv(rows);
+    await navigator.clipboard.writeText(text);
+    toast(`Copied ${rows.length} rows as tab-separated values.`);
+  }
+
+  function downloadMissingCsv() {
+    const csv = toCsv(missingRowsForFloorplans());
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `calendar-floorplan-missing-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function toTsv(rows) {
+    if (!rows.length) return '';
+    const cols = Object.keys(rows[0]);
+    return [cols.join('\t'), ...rows.map(r => cols.map(c => r[c] ?? '').join('\t'))].join('\n');
+  }
+
+  function toCsv(rows) {
+    if (!rows.length) return '';
+    const cols = Object.keys(rows[0]);
+    const esc = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+    return [cols.map(esc).join(','), ...rows.map(r => cols.map(c => esc(r[c])).join(','))].join('\n');
+  }
+
+  function pretty(k) { return String(k).replace(/([A-Z])/g, ' $1').replace(/^./, x => x.toUpperCase()); }
+  function escapeHtml(s) { return String(s ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
+  function escapeAttr(s) { return escapeHtml(s).replace(/'/g, '&#39;'); }
+  function escapeRegExp(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  init();
+})();
+</script>
+</body>
+</html>
