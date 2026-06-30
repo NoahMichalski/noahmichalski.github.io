@@ -126,7 +126,7 @@
   <header>
     <div class="wrap">
       <h1>Calendar → Floorplans Backfill Checker</h1>
-      <div class="sub">Sign into Google Calendar, pull old job events, upload your Floorplans sheet, then find lots that were completed before the sheet existed. Pulte and DR Horton get special address-based floorplan matching.</div>
+      <div class="sub">Sign into Google Calendar, pull old job events, upload your Floorplans sheet, then find lots that were completed before the sheet existed. Pulte and DR Horton get special address-based floorplan matching. Uploaded reference files save in browser storage so you do not have to reload them every time.</div>
     </div>
   </header>
 
@@ -202,6 +202,15 @@
         <label style="margin-top:14px">Upload Subdivisions.xlsx, optional</label>
         <input id="subdivisionFile" type="file" accept=".xlsx,.xls,.csv" />
         <p class="tiny">Expected columns: Builder and Subdivision. This is used as the builder/subdivision reference so rows with matched subdivisions can fill Builder even when the Floorplans row is blank.</p>
+
+        <label style="margin-top:14px">Upload Original-Reclean-Windows Hours.xlsx, optional</label>
+        <input id="hoursFile" type="file" accept=".xlsx,.xls,.csv" />
+        <p class="tiny">Expected columns: Builder, FloorPlan, Original, Reclean, Windows. This fills hours when the calendar gives a floorplan like <code>ProsperityII</code> and the hours file has <code>Prosperity II</code> or <code>Prosperity</code>.</p>
+        <div id="storageStatus" class="tiny" style="margin-top:8px">Saved uploads: checking browser storage...</div>
+        <div class="row" style="margin-top:10px">
+          <button id="clearSavedUploadsBtn" class="secondary" type="button">Clear saved uploaded data</button>
+        </div>
+
         <div class="row">
           <div>
             <label>Subdivision aliases, one per line: <code>old name = exact floorplans subdivision</code></label>
@@ -251,7 +260,13 @@
   let floorWorkbook = null;
   let floorRows = [];
   let subdivisionRows = [];
+  let hoursRows = [];
   let indexes = {};
+  const STORAGE = {
+    floorRows: 'gcal_backfill_floor_rows_v3',
+    subdivisionRows: 'gcal_backfill_subdivision_rows_v3',
+    hoursRows: 'gcal_backfill_hours_rows_v1'
+  };
   let results = emptyResults();
   let activeTab = 'missingAuto';
 
@@ -300,6 +315,7 @@ CAV = Cottages at Verbena *Schottenstein`;
     localStorage.setItem('gcal_backfill_client_id', $('#clientId').value.trim());
     $('#aliasBox').value = localStorage.getItem('gcal_backfill_aliases') || defaultAliases;
     $('#ignoreWords').value = localStorage.getItem('gcal_backfill_ignore_words') || defaultIgnore;
+    loadSavedUploadedData();
     bind();
     updateStats();
     renderTabs();
@@ -318,6 +334,8 @@ CAV = Cottages at Verbena *Schottenstein`;
     $('#floorFile').addEventListener('change', loadWorkbook);
     $('#shortenedFile').addEventListener('change', loadShortenedAliases);
     $('#subdivisionFile').addEventListener('change', loadSubdivisionFile);
+    $('#hoursFile').addEventListener('change', loadHoursFile);
+    $('#clearSavedUploadsBtn').addEventListener('click', clearSavedUploadedData);
     $('#readSheetBtn').addEventListener('click', readSelectedSheet);
     $('#runBtn').addEventListener('click', runComparison);
     $('#originalOnly').addEventListener('change', () => { if (events.length && floorRows.length) runComparison(); });
@@ -339,6 +357,54 @@ CAV = Cottages at Verbena *Schottenstein`;
   function toDateInput(d) {
     return d.toISOString().slice(0, 10);
   }
+  function saveJson(key, value, label) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value || []));
+      updateStorageStatus();
+      return true;
+    } catch (err) {
+      console.warn('Could not save ' + label + ' to localStorage:', err);
+      toast(label + ' loaded, but it was too large to save in browser storage.');
+      return false;
+    }
+  }
+
+  function loadJson(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  }
+
+  function loadSavedUploadedData() {
+    floorRows = loadJson(STORAGE.floorRows);
+    subdivisionRows = loadJson(STORAGE.subdivisionRows);
+    hoursRows = loadJson(STORAGE.hoursRows);
+    buildIndexes();
+    updateStorageStatus();
+  }
+
+  function clearSavedUploadedData() {
+    if (!confirm('Clear saved Floorplans/Subdivisions/Hours data from this browser? Your Google events are not affected.')) return;
+    localStorage.removeItem(STORAGE.floorRows);
+    localStorage.removeItem(STORAGE.subdivisionRows);
+    localStorage.removeItem(STORAGE.hoursRows);
+    floorRows = [];
+    subdivisionRows = [];
+    hoursRows = [];
+    buildIndexes();
+    updateStats();
+    updateStorageStatus();
+    $('#runBtn').disabled = true;
+    toast('Saved uploaded data cleared.');
+  }
+
+  function updateStorageStatus() {
+    const el = $('#storageStatus');
+    if (!el) return;
+    el.textContent = `Saved uploads in this browser: Floorplans ${floorRows.length || 0} rows · Subdivisions ${subdivisionRows.length || 0} rows · Hours ${hoursRows.length || 0} rows`;
+  }
+
 
   function toast(msg) {
     console.log(msg);
@@ -490,6 +556,7 @@ CAV = Cottages at Verbena *Schottenstein`;
         subRefs.push({ subdivision: sub, builder, normSub: normSub(sub), normBuilder: normBuilder(builder + ' ' + sub) });
       }
       subdivisionRows = mergeSubdivisionRows(subdivisionRows, subRefs);
+      saveJson(STORAGE.subdivisionRows, subdivisionRows, 'Shortened/Subdivision aliases');
       buildIndexes();
       const existing = $('#aliasBox').value.trim();
       const combined = [...new Set([...(existing ? existing.split(/\r?\n/) : []), ...lines].map(x => x.trim()).filter(Boolean))];
@@ -512,6 +579,7 @@ CAV = Cottages at Verbena *Schottenstein`;
       const ws = wb.Sheets[wb.SheetNames[0]];
       const raw = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
       subdivisionRows = normalizeSubdivisionRows(raw);
+      saveJson(STORAGE.subdivisionRows, subdivisionRows, 'Subdivisions file');
       buildIndexes();
       toast(`Loaded ${subdivisionRows.length} subdivision reference rows.`);
       if (events.length && floorRows.length) runComparison();
@@ -561,6 +629,66 @@ CAV = Cottages at Verbena *Schottenstein`;
   }
 
 
+  async function loadHoursFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: 'array', cellDates: true });
+      let all = [];
+      for (const sheetName of wb.SheetNames) {
+        const ws = wb.Sheets[sheetName];
+        const raw = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
+        all.push(...normalizeHoursRows(raw));
+      }
+      hoursRows = dedupeHoursRows(all);
+      saveJson(STORAGE.hoursRows, hoursRows, 'Hours file');
+      buildIndexes();
+      toast(`Loaded ${hoursRows.length} floorplan-hour rows.`);
+      if (events.length && floorRows.length) runComparison();
+    } catch (err) {
+      alert('Could not read Hours file: ' + err.message);
+    }
+  }
+
+  function normalizeHoursRows(raw) {
+    if (!raw.length) return [];
+    const keys = Object.keys(raw[0] || {});
+    const map = {
+      builder: findHeader(keys, ['builder', 'build']),
+      floorplan: findHeader(keys, ['floorplan', 'floor plan', 'plan', 'model']),
+      original: findHeader(keys, ['original', 'orig']),
+      reclean: findHeader(keys, ['reclean', 're clean', 're-clean']),
+      windows: findHeader(keys, ['windows', 'window']),
+      sqft: findHeader(keys, ['sqft', 'square feet', 'sf'])
+    };
+    return raw.map((r, idx) => {
+      const floorplan = cleanCell(r[map.floorplan]);
+      const builder = cleanCell(r[map.builder]);
+      return {
+        _row: idx + 2,
+        builder,
+        floorplan,
+        original: cleanCell(r[map.original]),
+        reclean: cleanCell(r[map.reclean]),
+        windows: cleanCell(r[map.windows]),
+        sqft: cleanCell(r[map.sqft]),
+        normBuilder: normBuilder(builder),
+        normFloorplan: normFloorplan(floorplan),
+        normFloorplanBase: normFloorplanBase(floorplan)
+      };
+    }).filter(r => r.floorplan && (r.original || r.reclean || r.windows));
+  }
+
+  function dedupeHoursRows(rows) {
+    const byKey = new Map();
+    for (const r of rows) {
+      const key = `${r.normBuilder}|${r.normFloorplan}|${r.original}|${r.reclean}|${r.windows}`;
+      if (!byKey.has(key)) byKey.set(key, r);
+    }
+    return [...byKey.values()];
+  }
+
   async function loadWorkbook(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -579,6 +707,7 @@ CAV = Cottages at Verbena *Schottenstein`;
     const ws = floorWorkbook.Sheets[sheetName];
     const raw = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
     floorRows = normalizeFloorRows(raw);
+    saveJson(STORAGE.floorRows, floorRows, 'Floorplans sheet');
     buildIndexes();
     updateStats();
     $('#runBtn').disabled = !(events.length && floorRows.length);
@@ -615,6 +744,8 @@ CAV = Cottages at Verbena *Schottenstein`;
       row.normSub = normSub(row.subdivision);
       row.normAddress = normAddress(row.address);
       row.normBuilder = normBuilder(row.builder + ' ' + row.subdivision);
+      row.normFloorplan = normFloorplan(row.floorplan);
+      row.normFloorplanBase = normFloorplanBase(row.floorplan);
       return row;
     }).filter(r => r.subdivision || r.lot || r.address || r.floorplan);
   }
@@ -636,7 +767,7 @@ CAV = Cottages at Verbena *Schottenstein`;
   }
 
   function buildIndexes() {
-    indexes = { byLotSub: new Map(), byAddress: new Map(), subdivisions: new Map(), subdivisionInfo: new Map() };
+    indexes = { byLotSub: new Map(), byAddress: new Map(), subdivisions: new Map(), subdivisionInfo: new Map(), hoursExact: new Map(), hoursBase: new Map() };
 
     function addSubdivisionInfo(subdivision, builder) {
       const sub = cleanCell(subdivision);
@@ -662,6 +793,23 @@ CAV = Cottages at Verbena *Schottenstein`;
         indexes.byAddress.get(r.normAddress).push(r);
       }
     }
+    for (const h of hoursRows) {
+      const exactKey = `${h.normBuilder || ''}|${h.normFloorplan}`;
+      const genericExactKey = `|${h.normFloorplan}`;
+      if (!indexes.hoursExact.has(exactKey)) indexes.hoursExact.set(exactKey, []);
+      indexes.hoursExact.get(exactKey).push(h);
+      if (!indexes.hoursExact.has(genericExactKey)) indexes.hoursExact.set(genericExactKey, []);
+      indexes.hoursExact.get(genericExactKey).push(h);
+      const baseKey = `${h.normBuilder || ''}|${h.normFloorplanBase}`;
+      const genericBaseKey = `|${h.normFloorplanBase}`;
+      if (h.normFloorplanBase) {
+        if (!indexes.hoursBase.has(baseKey)) indexes.hoursBase.set(baseKey, []);
+        indexes.hoursBase.get(baseKey).push(h);
+        if (!indexes.hoursBase.has(genericBaseKey)) indexes.hoursBase.set(genericBaseKey, []);
+        indexes.hoursBase.get(genericBaseKey).push(h);
+      }
+    }
+    updateStorageStatus();
   }
 
   function subdivisionInfoFor(subdivision) {
@@ -811,19 +959,75 @@ CAV = Cottages at Verbena *Schottenstein`;
   }
 
   function findFloorplanTemplate(floorplan, builder, subdivision) {
-    const nf = normSub(floorplan);
+    const nf = normFloorplan(floorplan);
+    const nbase = normFloorplanBase(floorplan);
     const nb = normBuilder(builder || subdivision || '');
     const ns = normSub(subdivision || '');
     if (!nf) return null;
     let best = null;
     for (const r of floorRows) {
-      if (normSub(r.floorplan) !== nf) continue;
-      let score = 1;
+      const rf = normFloorplan(r.floorplan);
+      const rb = normFloorplanBase(r.floorplan);
+      if (rf !== nf && (!nbase || rb !== nbase)) continue;
+      let score = rf === nf ? 4 : 2;
       if (nb && r.normBuilder === nb) score += 2;
       if (ns && r.normSub === ns) score += 3;
-      if (!best || score > best.score) best = { row: r, score };
+      if (!best || score > best.score) best = { row: enrichWithHours(r, floorplan, builder || r.builder || subdivision), score };
     }
-    return best?.row || null;
+    if (best) return best.row;
+    const hours = findHoursTemplate(floorplan, builder || subdivision);
+    return hours ? {
+      builder: hours.builder || detectBuilder(builder || subdivision || ''),
+      subdivision: subdivision || '',
+      lot: '',
+      floorplan: cleanCell(floorplan) || hours.floorplan,
+      original: hours.original || '',
+      reclean: hours.reclean || '',
+      windows: hours.windows || '',
+      address: '',
+      _row: `hours:${hours._row}`,
+      normBuilder: normBuilder(hours.builder || builder || subdivision || '')
+    } : null;
+  }
+
+  function enrichWithHours(row, fallbackFloorplan, builderHint) {
+    if (!row) return row;
+    if (row.original && row.reclean && row.windows) return row;
+    const h = findHoursTemplate(row.floorplan || fallbackFloorplan, row.builder || builderHint || row.subdivision);
+    if (!h) return row;
+    return {
+      ...row,
+      original: row.original || h.original || '',
+      reclean: row.reclean || h.reclean || '',
+      windows: row.windows || h.windows || '',
+      floorplan: row.floorplan || fallbackFloorplan || h.floorplan || '',
+      builder: row.builder || h.builder || '',
+      _hoursRow: h._row
+    };
+  }
+
+  function findHoursTemplate(floorplan, builderHint) {
+    const nf = normFloorplan(floorplan);
+    const nbase = normFloorplanBase(floorplan);
+    const nb = normBuilder(builderHint || '');
+    if (!nf) return null;
+    const candidates = [];
+    const add = arr => { if (arr) candidates.push(...arr); };
+    add(indexes.hoursExact?.get(`${nb}|${nf}`));
+    add(indexes.hoursExact?.get(`|${nf}`));
+    if (nbase) {
+      add(indexes.hoursBase?.get(`${nb}|${nbase}`));
+      add(indexes.hoursBase?.get(`|${nbase}`));
+    }
+    if (!candidates.length) return null;
+    candidates.sort((a, b) => {
+      const aBuilder = nb && a.normBuilder === nb ? 1 : 0;
+      const bBuilder = nb && b.normBuilder === nb ? 1 : 0;
+      const aExact = a.normFloorplan === nf ? 1 : 0;
+      const bExact = b.normFloorplan === nf ? 1 : 0;
+      return (bBuilder - aBuilder) || (bExact - aExact);
+    });
+    return candidates[0];
   }
 
   function detectJobType(text) {
@@ -902,7 +1106,10 @@ CAV = Cottages at Verbena *Schottenstein`;
 
   function makeResultRow(parsed, floor, source) {
     const subdivision = floor?.subdivision || parsed.subdivision || '';
+    const builderHint = floor?.builder || builderFromSubdivision(subdivision) || parsed.builder || subdivision || '';
+    floor = enrichWithHours(floor, parsed.floorplanFromLocation, builderHint);
     const builder = floor?.builder || builderFromSubdivision(subdivision) || parsed.builder || '';
+    const hoursMatch = floor?._hoursRow ? ` + hours row ${floor._hoursRow}` : '';
     return {
       builder,
       subdivision,
@@ -917,7 +1124,7 @@ CAV = Cottages at Verbena *Schottenstein`;
       calendar: parsed.calendar || '',
       eventTitle: parsed.title || '',
       eventLocation: parsed.location || '',
-      matchSource: source || '',
+      matchSource: (source || '') + hoursMatch,
       floorplanRow: floor?._row || '',
       parsedSubdivision: parsed.subdivision || '',
       possibleSubdivision: '',
@@ -998,6 +1205,31 @@ CAV = Cottages at Verbena *Schottenstein`;
       .replace(/\b(pulte|dr horton|dr|ryan|epcon|schottenstein|rockford|arbor|fischer|mihomes|mi homes|delaware|galena|plain city|sunbury|canal|pickerington|westerville|hilliard|powell|dublin|pataskala|lewis center|marysville|columbus|grove city)\b/g, ' ')
       .replace(/[^a-z0-9]+/g, ' ')
       .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function normFloorplan(s) {
+    return cleanCell(s).toLowerCase()
+      .replace(/&/g, ' and ')
+      .replace(/['’]/g, '')
+      .replace(/(the|at|of|on)/g, ' ')
+      .replace(/(phase|series|elevation|elev|floorplan|plan|model)/g, ' ')
+      .replace(/\bii\b/g, '2')
+      .replace(/\biii\b/g, '3')
+      .replace(/\biv\b/g, '4')
+      .replace(/\bv\b/g, '5')
+      .replace(/([a-z])ii\b/g, '$12')
+      .replace(/([a-z])iii\b/g, '$13')
+      .replace(/([a-z])iv\b/g, '$14')
+      .replace(/([a-z])v\b/g, '$15')
+      .replace(/[^a-z0-9]+/g, '')
+      .trim();
+  }
+
+  function normFloorplanBase(s) {
+    return normFloorplan(s)
+      .replace(/(?:2|3|4|5)$/g, '')
+      .replace(/(?:ii|iii|iv|v)$/g, '')
       .trim();
   }
 
