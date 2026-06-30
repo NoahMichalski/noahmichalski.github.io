@@ -158,6 +158,11 @@
         </div>
         <label>Search text filter, optional</label>
         <input id="eventFilter" placeholder="Example: Original OR Reclean OR Windows" />
+        <label style="display:flex;align-items:center;gap:8px;margin-top:12px;text-transform:none;letter-spacing:0;font-size:14px;color:var(--text);font-weight:800;">
+          <input id="originalOnly" type="checkbox" checked style="width:auto;">
+          Only compare Originals / dry cleans / cleaning subs
+        </label>
+        <p class="tiny">This keeps recleans/windows from flooding Needs Review. Raw Events still shows everything pulled.</p>
       </section>
 
       <section class="card span-4">
@@ -190,6 +195,9 @@
 
       <section class="card span-12">
         <h2>Aliases / cleanup rules</h2>
+        <label>Upload Shortened.xlsx, optional</label>
+        <input id="shortenedFile" type="file" accept=".xlsx,.xls,.csv" />
+        <p class="tiny">Expected columns: Builder, Subdivision, Shortened. This adds alias lines like <code>Shortened = exact Floorplans subdivision</code> so older calendar titles match your current sheet names.</p>
         <div class="row">
           <div>
             <label>Subdivision aliases, one per line: <code>old name = exact floorplans subdivision</code></label>
@@ -303,8 +311,10 @@ CAV = Cottages at Verbena *Schottenstein`;
     $('#pullEventsBtn').addEventListener('click', pullEvents);
     $('#clearEventsBtn').addEventListener('click', () => { events = []; results = emptyResults(); renderTable(); updateStats(); });
     $('#floorFile').addEventListener('change', loadWorkbook);
+    $('#shortenedFile').addEventListener('change', loadShortenedAliases);
     $('#readSheetBtn').addEventListener('click', readSelectedSheet);
     $('#runBtn').addEventListener('click', runComparison);
+    $('#originalOnly').addEventListener('change', () => { if (events.length && floorRows.length) runComparison(); });
     $('#exportBtn').addEventListener('click', exportWorkbook);
     $('#copyRowsBtn').addEventListener('click', copyMissingRows);
     $('#downloadCsvBtn').addEventListener('click', downloadMissingCsv);
@@ -447,6 +457,41 @@ CAV = Cottages at Verbena *Schottenstein`;
     }
   }
 
+
+  async function loadShortenedAliases(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: 'array', cellDates: true });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
+      if (!raw.length) return alert('Shortened file did not have readable rows.');
+      const keys = Object.keys(raw[0] || {});
+      const builderKey = findHeader(keys, ['builder', 'build']);
+      const subKey = findHeader(keys, ['subdivision', 'community', 'project', 'sub']);
+      const shortKey = findHeader(keys, ['shortened', 'short', 'alias', 'abbr', 'abbreviation']);
+      const lines = [];
+      for (const r of raw) {
+        const builder = cleanCell(r[builderKey]);
+        const sub = cleanCell(r[subKey]);
+        const short = cleanCell(r[shortKey]);
+        if (!sub || !short) continue;
+        lines.push(`${short} = ${sub}`);
+        lines.push(`${sub} = ${sub}`);
+        if (builder && short) lines.push(`${short} ${builder} = ${sub}`);
+      }
+      const existing = $('#aliasBox').value.trim();
+      const combined = [...new Set([...(existing ? existing.split(/\r?\n/) : []), ...lines].map(x => x.trim()).filter(Boolean))];
+      $('#aliasBox').value = combined.join('\n');
+      localStorage.setItem('gcal_backfill_aliases', $('#aliasBox').value);
+      toast(`Loaded ${lines.length} alias rules from Shortened file.`);
+      if (events.length && floorRows.length) runComparison();
+    } catch (err) {
+      alert('Could not read Shortened file: ' + err.message);
+    }
+  }
+
   async function loadWorkbook(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -539,6 +584,7 @@ CAV = Cottages at Verbena *Schottenstein`;
     for (const ev of events) {
       const parsed = parseEvent(ev);
       results.rawEvents.push({...eventToRawRow(ev), ...parsed});
+      if ($('#originalOnly')?.checked && parsed.jobType !== 'Original') continue;
       if (!parsed.lot && !parsed.address) {
         results.badParses.push(makeResultRow(parsed, null, 'Could not find lot or address'));
         continue;
@@ -566,6 +612,29 @@ CAV = Cottages at Verbena *Schottenstein`;
       }
 
       const possible = possibleSubdivisionMatch(parsed);
+      if (possible && parsed.jobType === 'Original' && parsed.floorplanFromLocation && parsed.lot) {
+        const inferredBuilder = detectBuilder(possible.name);
+        const template = findFloorplanTemplate(parsed.floorplanFromLocation, inferredBuilder, possible.name);
+        const floorStub = {
+          builder: template?.builder || inferredBuilder || parsed.builder || '',
+          subdivision: possible.name,
+          lot: parsed.lot,
+          floorplan: parsed.floorplanFromLocation,
+          original: template?.original || '',
+          reclean: template?.reclean || '',
+          windows: template?.windows || '',
+          address: parsed.address || '',
+          _row: template?._row || '',
+          normBuilder: normBuilder(template?.builder || inferredBuilder || parsed.builder || '')
+        };
+        const row = makeResultRow(parsed, floorStub, 'Original event location floorplan + subdivision match');
+        row.possibleSubdivision = possible.name;
+        row.score = possible.score;
+        results.possibleMatches.push(row);
+        results.missingAuto.push(row);
+        continue;
+      }
+
       if (possible) {
         const row = makeResultRow(parsed, null, 'Possible subdivision match: ' + possible.name);
         row.possibleSubdivision = possible.name;
@@ -603,18 +672,61 @@ CAV = Cottages at Verbena *Schottenstein`;
     const calendar = ev._calendarName || '';
     const date = getEventDate(ev);
     const text = `${title} ${location} ${description}`;
+    const parseTitle = stripCleanerPrefix(title);
     const jobType = detectJobType(`${calendar} ${title} ${description}`);
-    const lot = detectLot(title) || detectLot(description);
-    const address = detectAddress(location) || detectAddress(title) || detectAddress(description);
+    const lot = detectLot(parseTitle) || detectLot(description);
+    const locParts = splitLocationAddressFloorplan(location);
+    const address = locParts.address || detectAddress(location) || detectAddress(parseTitle) || detectAddress(description);
     const normAddr = normAddress(address);
-    const subdivision = detectSubdivision(title, description);
+    const subdivision = detectSubdivision(parseTitle, description);
     const builder = detectBuilder(`${calendar} ${title} ${description} ${subdivision}`);
     return {
       calendar, date, title, location, description,
       lot, subdivision, normSub: normSub(subdivision), builder, normBuilder: normBuilder(builder + ' ' + subdivision),
-      jobType, address, normAddress: normAddr,
+      jobType, address, normAddress: normAddr, floorplanFromLocation: locParts.floorplan || '',
       eventId: ev.id || ''
     };
+  }
+
+
+  function stripCleanerPrefix(text) {
+    let s = cleanCell(text);
+    s = s.replace(/^\*?(?:AM|PM)\*?\s*/i, '');
+    s = s.replace(/^last\s*[-–—]\s*(?=\d)/i, '');
+    // Removes cleaner/team prefixes only when they are clearly before a lot number.
+    // Examples: Edmundo-2392 Magnolia original, Ana-AM**146 Renner reclean.
+    s = s.replace(/^[A-Za-zÁÉÍÓÚáéíóúÑñ .'/&]+[-–—]\s*(?:AM|PM)?\*{0,2}\s*(?=\d)/i, '');
+    s = s.replace(/^(?:AM|PM)\*{0,2}\s*(?=\d)/i, '');
+    return s.trim();
+  }
+
+  function splitLocationAddressFloorplan(location) {
+    const loc = cleanCell(location);
+    if (!loc || !loc.includes('/')) return { address: '', floorplan: '' };
+    const parts = loc.split('/').map(x => cleanCell(x)).filter(Boolean);
+    if (parts.length < 2) return { address: '', floorplan: '' };
+    const address = detectAddress(parts[0]) || parts[0];
+    let floorplan = parts.slice(1).join(' / ')
+      .replace(/\b(original|reclean|windows?|window|model)\b.*$/i, '')
+      .trim();
+    if (floorplan.length > 40) floorplan = '';
+    return { address, floorplan };
+  }
+
+  function findFloorplanTemplate(floorplan, builder, subdivision) {
+    const nf = normSub(floorplan);
+    const nb = normBuilder(builder || subdivision || '');
+    const ns = normSub(subdivision || '');
+    if (!nf) return null;
+    let best = null;
+    for (const r of floorRows) {
+      if (normSub(r.floorplan) !== nf) continue;
+      let score = 1;
+      if (nb && r.normBuilder === nb) score += 2;
+      if (ns && r.normSub === ns) score += 3;
+      if (!best || score > best.score) best = { row: r, score };
+    }
+    return best?.row || null;
   }
 
   function detectJobType(text) {
@@ -698,7 +810,7 @@ CAV = Cottages at Verbena *Schottenstein`;
       builder,
       subdivision,
       lot: parsed.lot || '',
-      floorplan: floor?.floorplan || '',
+      floorplan: floor?.floorplan || parsed.floorplanFromLocation || '',
       original: floor?.original || '',
       reclean: floor?.reclean || '',
       windows: floor?.windows || '',
