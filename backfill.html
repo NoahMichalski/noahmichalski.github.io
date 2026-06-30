@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calendar → Floorplans Backfill Checker</title>
+  <title>Calendar → Floorplans Backfill Checker v2.07</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
@@ -40,6 +40,8 @@
     .wrap { max-width: 1500px; margin: 0 auto; }
     h1 { margin: 0 0 8px; font-size: clamp(24px, 3vw, 38px); letter-spacing: -0.04em; }
     .sub { color: var(--muted); max-width: 1050px; line-height: 1.5; }
+    .titleRow { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .versionBadge { border:1px solid rgba(56,189,248,.45); background:rgba(56,189,248,.12); color:#bae6fd; border-radius:999px; padding:7px 11px; font-size:13px; font-weight:900; letter-spacing:.02em; }
     main { padding: 22px; }
     .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
     .card {
@@ -125,7 +127,7 @@
 <body>
   <header>
     <div class="wrap">
-      <h1>Calendar → Floorplans Backfill Checker</h1>
+      <div class="titleRow"><h1>Calendar → Floorplans Backfill Checker</h1><span class="versionBadge">v2.07</span></div>
       <div class="sub">Sign into Google Calendar, pull old job events, upload your Floorplans sheet, then find lots that were completed before the sheet existed. Pulte and DR Horton get special address-based floorplan matching. Uploaded reference files save in browser storage so you do not have to reload them every time.</div>
     </div>
   </header>
