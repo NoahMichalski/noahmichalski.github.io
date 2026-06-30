@@ -278,11 +278,13 @@ Berlin = Berlin Bluffs *Pulte *Delaware
 Eagle = Eagle *Pulte *Galena
 Towns Greenway = Towns on the Greenway *Pulte *Westerville
 Towns Parkway = Towns on the Parkway *Pulte *Westerville
-Piatts Preserve = Piatts *DR *Delaware
-Piatt Preserve = Piatts *DR *Delaware
-Piatts = Piatts *DR *Delaware
-Longview = Longview *DR *Pickerington
-LH = Longview *DR *Pickerington
+Piatts Preserve = Piatt Preserve *DR *Delaware
+Piatt Preserve = Piatt Preserve *DR *Delaware
+Piatts = Piatt Preserve *DR *Delaware
+Piatt = Piatt Preserve *DR *Delaware
+Longview = Longview Highlands *DR *Pickerington
+Longview Highlands = Longview Highlands *DR *Pickerington
+LH = Longview Highlands *DR *Pickerington
 MD = Madison Meadows *DR *Plain City
 Madison = Madison Meadows *DR *Plain City
 Lansdowne = Lansdowne Farms *DR *Canal
@@ -313,7 +315,8 @@ CAV = Cottages at Verbena *Schottenstein`;
     $('#dateEnd').value = toDateInput(end);
     $('#clientId').value = localStorage.getItem('gcal_backfill_client_id') || BUILT_IN_CLIENT_ID;
     localStorage.setItem('gcal_backfill_client_id', $('#clientId').value.trim());
-    $('#aliasBox').value = localStorage.getItem('gcal_backfill_aliases') || defaultAliases;
+    $('#aliasBox').value = migrateAliasText(localStorage.getItem('gcal_backfill_aliases') || defaultAliases);
+    localStorage.setItem('gcal_backfill_aliases', $('#aliasBox').value);
     $('#ignoreWords').value = localStorage.getItem('gcal_backfill_ignore_words') || defaultIgnore;
     loadSavedUploadedData();
     bind();
@@ -923,8 +926,8 @@ CAV = Cottages at Verbena *Schottenstein`;
     const locParts = splitLocationAddressFloorplan(location);
     const address = locParts.address || detectAddress(location) || detectAddress(parseTitle) || detectAddress(description);
     const normAddr = normAddress(address);
-    const subdivision = detectSubdivision(parseTitle, description);
-    const builder = detectBuilder(`${calendar} ${title} ${description} ${subdivision}`);
+    const subdivision = canonicalizeSubdivision(detectSubdivision(parseTitle, description));
+    const builder = builderFromSubdivision(subdivision) || detectBuilder(`${calendar} ${title} ${description} ${subdivision}`);
     return {
       calendar, date, title, location, description,
       lot, subdivision, normSub: normSub(subdivision), builder, normBuilder: normBuilder(builder + ' ' + subdivision),
@@ -1063,7 +1066,7 @@ CAV = Cottages at Verbena *Schottenstein`;
     const aliases = parseAliases();
     const hay = normSub(`${title} ${description}`);
     for (const [aliasNorm, canonical] of aliases) {
-      if (hay.includes(aliasNorm)) return canonical;
+      if (aliasNorm && hay.includes(aliasNorm)) return canonicalizeSubdivision(canonical);
     }
     let best = { name: '', score: 0 };
     for (const [nsub, original] of indexes.subdivisions.entries()) {
@@ -1073,24 +1076,33 @@ CAV = Cottages at Verbena *Schottenstein`;
         if (score > best.score) best = { name: original, score };
       }
     }
-    if (best.name) return best.name;
+    if (best.name) return canonicalizeSubdivision(best.name);
 
     let part = String(title || '');
     part = part.split(/\s+[–—-]\s+|\s+-\s+/)[0];
     part = part.replace(/^\*?\s*(?:lot\s*)?\d{1,5}[A-Za-z]?\s*/i, '');
     part = part.replace(/\b(original|reclean|re-clean|windows?|model|dry clean|floors only)\b.*$/i, '');
     part = removeIgnoreWords(part);
-    return cleanCell(part.replace(/[*]+/g, ' '));
+    return canonicalizeSubdivision(cleanCell(part.replace(/[*]+/g, ' ')));
   }
 
   function possibleSubdivisionMatch(parsed) {
     const hay = parsed.normSub || normSub(parsed.title);
     if (!hay) return null;
+
+    // First prefer a unique partial canonical match from the loaded Subdivisions/Floorplans data.
+    const canonical = canonicalizeSubdivision(parsed.subdivision || parsed.title || '');
+    const canonicalNorm = normSub(canonical);
+    if (canonical && canonicalNorm && canonicalNorm !== hay && indexes.subdivisions?.has(canonicalNorm)) {
+      return { name: canonical, score: 0.92 };
+    }
+
     let best = { name: '', score: 0 };
     for (const [nsub, original] of indexes.subdivisions.entries()) {
       const score = similarity(hay, nsub);
       if (score > best.score) best = { name: original, score };
     }
+    if (best.name) best.name = canonicalizeSubdivision(best.name);
     return best.score >= 0.58 ? best : null;
   }
 
@@ -1105,7 +1117,7 @@ CAV = Cottages at Verbena *Schottenstein`;
   }
 
   function makeResultRow(parsed, floor, source) {
-    const subdivision = floor?.subdivision || parsed.subdivision || '';
+    const subdivision = canonicalizeSubdivision(floor?.subdivision || parsed.subdivision || parsed.possibleSubdivision || '');
     const builderHint = floor?.builder || builderFromSubdivision(subdivision) || parsed.builder || subdivision || '';
     floor = enrichWithHours(floor, parsed.floorplanFromLocation, builderHint);
     const builder = floor?.builder || builderFromSubdivision(subdivision) || parsed.builder || '';
@@ -1132,16 +1144,82 @@ CAV = Cottages at Verbena *Schottenstein`;
     };
   }
 
+  function migrateAliasText(text) {
+    return String(text || defaultAliases)
+      .replace(/Piatts\s*=\s*Piatts\s*\*DR\s*\*Delaware/ig, 'Piatts = Piatt Preserve *DR *Delaware')
+      .replace(/Piatts Preserve\s*=\s*Piatts\s*\*DR\s*\*Delaware/ig, 'Piatts Preserve = Piatt Preserve *DR *Delaware')
+      .replace(/Piatt Preserve\s*=\s*Piatts\s*\*DR\s*\*Delaware/ig, 'Piatt Preserve = Piatt Preserve *DR *Delaware')
+      .replace(/Longview\s*=\s*Longview\s*\*DR\s*\*Pickerington/ig, 'Longview = Longview Highlands *DR *Pickerington')
+      .replace(/LH\s*=\s*Longview\s*\*DR\s*\*Pickerington/ig, 'LH = Longview Highlands *DR *Pickerington');
+  }
+
+  function mergeAliasLines(lines) {
+    const byAlias = new Map();
+    const order = [];
+    for (const raw of lines.map(x => migrateAliasText(x).trim()).filter(Boolean)) {
+      const [a, ...rest] = raw.split('=');
+      const alias = cleanCell(a);
+      const rhs = cleanCell(rest.join('='));
+      if (!alias || !rhs) continue;
+      const key = normSub(alias);
+      if (!byAlias.has(key)) order.push(key);
+      byAlias.set(key, `${alias} = ${rhs}`); // later uploads win over older/default aliases
+    }
+    return order.map(k => byAlias.get(k)).filter(Boolean);
+  }
+
   function parseAliases() {
-    const lines = $('#aliasBox').value.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+    const lines = mergeAliasLines($('#aliasBox').value.split(/\r?\n/));
     const out = [];
     for (const line of lines) {
       const [a, ...rest] = line.split('=');
       if (!a || !rest.length) continue;
-      out.push([normSub(a), cleanCell(rest.join('='))]);
+      const aliasNorm = normSub(a);
+      const canonical = canonicalizeSubdivision(cleanCell(rest.join('=')), { skipAliases: true });
+      if (aliasNorm && canonical) out.push([aliasNorm, canonical]);
     }
     out.sort((x,y) => y[0].length - x[0].length);
     return out;
+  }
+
+  function canonicalizeSubdivision(input, opts = {}) {
+    let sub = cleanCell(input || '');
+    if (!sub) return '';
+    sub = migrateAliasText(sub).replace(/^.*=\s*/, '').trim();
+    let ns = normSub(sub);
+    if (!ns) return sub;
+
+    // Exact canonical name from Subdivisions/Floorplans.
+    if (indexes.subdivisions?.has(ns)) return indexes.subdivisions.get(ns);
+
+    // Alias canonicalization, unless we are already canonicalizing an alias RHS.
+    if (!opts.skipAliases && $('#aliasBox')) {
+      const hay = ns;
+      const aliases = parseAliases();
+      for (const [aliasNorm, canonical] of aliases) {
+        if (aliasNorm && (hay === aliasNorm || hay.includes(aliasNorm) || aliasNorm.includes(hay))) {
+          return canonicalizeSubdivision(canonical, { skipAliases: true });
+        }
+      }
+    }
+
+    // Unique partial match from uploaded Subdivisions/Floorplans.
+    const weak = new Set(['park','farms','farm','village','villages','crossing','preserve','meadows','highlands','run','landing','trail','trace','the','at','on','of']);
+    if (ns.length >= 4 && !weak.has(ns)) {
+      const partials = [];
+      for (const [nsub, original] of indexes.subdivisions?.entries?.() || []) {
+        if (!nsub) continue;
+        const compactN = nsub.replace(/s\b/g, '');
+        const compactNs = ns.replace(/s\b/g, '');
+        if (nsub.includes(ns) || ns.includes(nsub) || compactN.includes(compactNs) || compactNs.includes(compactN)) {
+          partials.push({ nsub, original, len: nsub.length });
+        }
+      }
+      partials.sort((a,b) => b.len - a.len);
+      if (partials.length === 1 || (partials[0] && partials[0].len >= (partials[1]?.len || 0) + 4)) return partials[0].original;
+    }
+
+    return sub;
   }
 
   function removeIgnoreWords(text) {
