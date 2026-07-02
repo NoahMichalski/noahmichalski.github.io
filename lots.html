@@ -143,14 +143,29 @@ th .col-resizer {
   position: absolute;
   top: 0;
   right: 0;
-  width: 8px;
+  width: 14px;
   height: 100%;
   cursor: col-resize;
   z-index: 5;
 }
 
-th .col-resizer:hover {
-  background: rgba(255,255,255,0.12);
+th .col-resizer::after {
+  content: "⋮";
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
+  color: #aaa;
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+th .col-resizer:hover::after,
+th.resizing .col-resizer::after {
+  opacity: 1;
+  color: #fff;
 }
 
 td {
@@ -208,6 +223,12 @@ tr:hover {
   background: #2a2a2a;
   border-color: #444;
   color: #aaa;
+}
+
+.budget-inline {
+  font-weight: 700;
+  color: #d8e7ff;
+  letter-spacing: 0.2px;
 }
 
 .budget-card {
@@ -346,10 +367,8 @@ tr:hover {
   td:nth-child(3)::before { content: "Builder"; }
   td:nth-child(4)::before { content: "Address"; }
   td:nth-child(5)::before { content: "Floorplan"; }
-  td:nth-child(6)::before { content: "Original"; }
-  td:nth-child(7)::before { content: "Reclean"; }
-  td:nth-child(8)::before { content: "Windows"; }
-  td:nth-child(9)::before { content: "Updated"; }
+  td:nth-child(6)::before { content: "Budget"; }
+  td:nth-child(7)::before { content: "Updated"; }
 
   .filters {
     grid-template-columns: 1fr 1fr;
@@ -424,9 +443,7 @@ tr:hover {
 <col data-col="builder" style="width:150px">
 <col data-col="address" style="width:260px">
 <col data-col="floorplan" style="width:130px">
-<col data-col="original" style="width:100px">
-<col data-col="reclean" style="width:100px">
-<col data-col="windows" style="width:100px">
+<col data-col="budget" style="width:170px">
 <col data-col="lastUpdated" style="width:110px">
 </colgroup>
 <thead>
@@ -436,9 +453,7 @@ tr:hover {
 <th data-col="builder" onclick="sortTable('builder')"><span class="th-inner">Builder</span><span class="col-resizer"></span></th>
 <th data-col="address" onclick="sortTable('address')"><span class="th-inner">Address</span><span class="col-resizer"></span></th>
 <th data-col="floorplan" onclick="sortTable('floorplan')"><span class="th-inner">Floorplan</span><span class="col-resizer"></span></th>
-<th data-col="original" onclick="sortTable('original')"><span class="th-inner">Original</span><span class="col-resizer"></span></th>
-<th data-col="reclean" onclick="sortTable('reclean')"><span class="th-inner">Reclean</span><span class="col-resizer"></span></th>
-<th data-col="windows" onclick="sortTable('windows')"><span class="th-inner">Windows</span><span class="col-resizer"></span></th>
+<th data-col="budget"><span class="th-inner">Budget</span><span class="col-resizer"></span></th>
 <th data-col="lastUpdated" onclick="sortTable('lastUpdated')"><span class="th-inner">Updated</span><span class="col-resizer"></span></th>
 </tr>
 </thead>
@@ -446,7 +461,7 @@ tr:hover {
 </table>
 </div>
 
-<div id="versionTag">v1.23</div>
+<div id="versionTag">v1.26</div>
 
 <!-- UNLOCK MODAL -->
 <div id="unlockModal" class="modal-backdrop">
@@ -520,6 +535,7 @@ function initColumnResize() {
       e.stopPropagation();
 
       const th = handle.closest('th');
+      th.classList.add('resizing');
       const key = th.dataset.col;
       const col = document.querySelector(`#lotsTable col[data-col="${key}"]`);
       const startX = e.pageX;
@@ -534,6 +550,7 @@ function initColumnResize() {
         const widths = JSON.parse(localStorage.getItem(COL_WIDTHS_KEY) || "{}");
         widths[key] = Math.round(col.getBoundingClientRect().width);
         localStorage.setItem(COL_WIDTHS_KEY, JSON.stringify(widths));
+        th.classList.remove('resizing');
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
       }
@@ -562,7 +579,7 @@ function loadData() {
       console.error(err);
       resultsTable.innerHTML = `
         <tr>
-          <td colspan="9" style="color:#ff6b6b; padding:20px;">
+          <td colspan="7" style="color:#ff6b6b; padding:20px;">
             Error loading lots(1).json
           </td>
         </tr>
@@ -741,7 +758,7 @@ function renderTable(data) {
   if (!data.length) {
     resultsTable.innerHTML = `
       <tr>
-        <td colspan="9" style="color:#aaa; padding:20px;">
+        <td colspan="7" style="color:#aaa; padding:20px;">
           No lots found
         </td>
       </tr>
@@ -757,9 +774,9 @@ function renderTable(data) {
     const builder = escapeHTML(l.builder);
     const address = escapeHTML(l.address);
     const floorplan = escapeHTML(l.floorplan);
-    const original = budgetUnlocked ? escapeHTML(l.original) || '—' : '🔒';
-    const reclean = budgetUnlocked ? escapeHTML(l.reclean) || '—' : '🔒';
-    const windows = budgetUnlocked ? escapeHTML(l.windows) || '—' : '🔒';
+    const budgetText = budgetUnlocked
+      ? `O ${escapeHTML(l.original) || '—'}/R ${escapeHTML(l.reclean) || '—'}/W ${escapeHTML(l.windows) || '—'}`
+      : '<button class="budget-btn locked">🔒 Budget</button>';
     const updated = escapeHTML(daysAgo(l.lastUpdated));
 
     row.innerHTML = `
@@ -773,13 +790,19 @@ function renderTable(data) {
         </div>
       </td>
       <td>${floorplan}</td>
-      <td>${original}</td>
-      <td>${reclean}</td>
-      <td>${windows}</td>
+      <td>${budgetUnlocked ? `<span class="budget-inline">${budgetText}</span>` : budgetText}</td>
       <td>${updated}</td>
     `;
 
     const copyBtn = row.querySelector('.copy-btn');
+    const budgetBtn = row.querySelector('.budget-btn');
+
+    if (budgetBtn) {
+      budgetBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        openUnlockModal();
+      });
+    }
 
     copyBtn.addEventListener('click', e => {
       e.stopPropagation();
