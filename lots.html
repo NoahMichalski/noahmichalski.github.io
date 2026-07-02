@@ -65,7 +65,7 @@ body {
 /* FILTERS */
 .filters {
   display: grid;
-  grid-template-columns: 100px auto 1fr 140px 140px auto auto;
+  grid-template-columns: 100px 64px minmax(140px, 1fr) minmax(140px, 1fr) 140px 140px auto auto;
   gap: 8px;
   margin-top: 8px;
 }
@@ -112,6 +112,7 @@ body {
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 th, td {
@@ -126,6 +127,36 @@ th {
   position: sticky;
   top: 0;
   z-index: 2;
+  user-select: none;
+  position: sticky;
+}
+
+th .th-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+th .col-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 5;
+}
+
+th .col-resizer:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 tr:hover {
@@ -141,8 +172,7 @@ tr:hover {
 }
 
 .address-text {
-  color: #4da3ff;
-  cursor: pointer;
+  color: #ddd;
 }
 
 .copy-btn {
@@ -316,8 +346,10 @@ tr:hover {
   td:nth-child(3)::before { content: "Builder"; }
   td:nth-child(4)::before { content: "Address"; }
   td:nth-child(5)::before { content: "Floorplan"; }
-  td:nth-child(6)::before { content: "Budget"; }
-  td:nth-child(7)::before { content: "Updated"; }
+  td:nth-child(6)::before { content: "Original"; }
+  td:nth-child(7)::before { content: "Reclean"; }
+  td:nth-child(8)::before { content: "Windows"; }
+  td:nth-child(9)::before { content: "Updated"; }
 
   .filters {
     grid-template-columns: 1fr 1fr;
@@ -363,9 +395,10 @@ tr:hover {
 
   <div class="filters">
     <input id="filterLot" placeholder="Lot">
-    <button class="btn" onclick="exactLotSearch()">🎯</button>
+    <button class="btn" onclick="exactLotSearch()">Go</button>
 
     <input id="filterSubdivision" placeholder="Subdivision">
+    <input id="filterAddress" placeholder="Address">
     <input id="filterBuilder" placeholder="Builder">
     <input id="filterFloorplan" placeholder="Floorplan">
 
@@ -384,23 +417,36 @@ tr:hover {
 </div>
 
 <div class="table-container">
-<table>
+<table id="lotsTable">
+<colgroup>
+<col data-col="lotNumber" style="width:90px">
+<col data-col="subdivision" style="width:240px">
+<col data-col="builder" style="width:150px">
+<col data-col="address" style="width:260px">
+<col data-col="floorplan" style="width:130px">
+<col data-col="original" style="width:100px">
+<col data-col="reclean" style="width:100px">
+<col data-col="windows" style="width:100px">
+<col data-col="lastUpdated" style="width:110px">
+</colgroup>
 <thead>
 <tr>
-<th onclick="sortTable('lotNumber')">Lot</th>
-<th onclick="sortTable('subdivision')">Subdivision</th>
-<th onclick="sortTable('builder')">Builder</th>
-<th onclick="sortTable('address')">Address</th>
-<th onclick="sortTable('floorplan')">Floorplan</th>
-<th>Budget</th>
-<th onclick="sortTable('lastUpdated')">Updated</th>
+<th data-col="lotNumber" onclick="sortTable('lotNumber')"><span class="th-inner">Lot</span><span class="col-resizer"></span></th>
+<th data-col="subdivision" onclick="sortTable('subdivision')"><span class="th-inner">Subdivision</span><span class="col-resizer"></span></th>
+<th data-col="builder" onclick="sortTable('builder')"><span class="th-inner">Builder</span><span class="col-resizer"></span></th>
+<th data-col="address" onclick="sortTable('address')"><span class="th-inner">Address</span><span class="col-resizer"></span></th>
+<th data-col="floorplan" onclick="sortTable('floorplan')"><span class="th-inner">Floorplan</span><span class="col-resizer"></span></th>
+<th data-col="original" onclick="sortTable('original')"><span class="th-inner">Original</span><span class="col-resizer"></span></th>
+<th data-col="reclean" onclick="sortTable('reclean')"><span class="th-inner">Reclean</span><span class="col-resizer"></span></th>
+<th data-col="windows" onclick="sortTable('windows')"><span class="th-inner">Windows</span><span class="col-resizer"></span></th>
+<th data-col="lastUpdated" onclick="sortTable('lastUpdated')"><span class="th-inner">Updated</span><span class="col-resizer"></span></th>
 </tr>
 </thead>
 <tbody id="resultsTable"></tbody>
 </table>
 </div>
 
-<div id="versionTag">v1.22</div>
+<div id="versionTag">v1.23</div>
 
 <!-- UNLOCK MODAL -->
 <div id="unlockModal" class="modal-backdrop">
@@ -456,6 +502,50 @@ let budgetUnlocked = false;
 
 const BUDGET_PIN = "1714";
 
+const COL_WIDTHS_KEY = "lotLookupColumnWidths";
+
+function initColumnResize() {
+  const saved = JSON.parse(localStorage.getItem(COL_WIDTHS_KEY) || "{}");
+
+  document.querySelectorAll('#lotsTable col[data-col]').forEach(col => {
+    const key = col.dataset.col;
+    if (saved[key]) col.style.width = saved[key] + 'px';
+  });
+
+  document.querySelectorAll('th .col-resizer').forEach(handle => {
+    handle.addEventListener('click', e => e.stopPropagation());
+
+    handle.addEventListener('mousedown', e => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const th = handle.closest('th');
+      const key = th.dataset.col;
+      const col = document.querySelector(`#lotsTable col[data-col="${key}"]`);
+      const startX = e.pageX;
+      const startWidth = col.getBoundingClientRect().width;
+
+      function onMouseMove(moveEvent) {
+        const newWidth = Math.max(55, startWidth + moveEvent.pageX - startX);
+        col.style.width = newWidth + 'px';
+      }
+
+      function onMouseUp() {
+        const widths = JSON.parse(localStorage.getItem(COL_WIDTHS_KEY) || "{}");
+        widths[key] = Math.round(col.getBoundingClientRect().width);
+        localStorage.setItem(COL_WIDTHS_KEY, JSON.stringify(widths));
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      }
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    });
+  });
+}
+
+initColumnResize();
+
 /* LOAD DATA */
 function loadData() {
   fetch('lots2.json?t=' + Date.now())
@@ -472,7 +562,7 @@ function loadData() {
       console.error(err);
       resultsTable.innerHTML = `
         <tr>
-          <td colspan="7" style="color:#ff6b6b; padding:20px;">
+          <td colspan="9" style="color:#ff6b6b; padding:20px;">
             Error loading lots(1).json
           </td>
         </tr>
@@ -526,28 +616,37 @@ function buildBuilderUpdates() {
 
   builderUpdateList.innerHTML = '';
 
-  Object.entries(latest).forEach(([b,d]) => {
-    const parsed = new Date(d);
-    const diff = isNaN(parsed) ? null : Math.floor((Date.now() - parsed) / 86400000);
+  Object.entries(latest)
+    .sort((a, b) => {
+      const dateA = new Date(a[1]);
+      const dateB = new Date(b[1]);
+      const timeA = isNaN(dateA) ? 0 : dateA.getTime();
+      const timeB = isNaN(dateB) ? 0 : dateB.getTime();
+      return timeB - timeA;
+    })
+    .forEach(([b,d]) => {
+      const parsed = new Date(d);
+      const diff = isNaN(parsed) ? null : Math.floor((Date.now() - parsed) / 86400000);
 
-    const span = document.createElement('span');
-    span.className = 'builder-pill';
+      const span = document.createElement('span');
+      span.className = 'builder-pill';
 
-    if (diff === null) {
-      span.textContent = `${b} – ${d}`;
-    } else {
-      span.textContent = `${b} – ${diff}d`;
-      if (diff > 30) span.style.color = '#ff6b6b';
-    }
+      if (diff === null) {
+        span.textContent = `${b} – ${d}`;
+      } else {
+        span.textContent = `${b} – ${diff}d`;
+        if (diff > 30) span.style.color = '#ff6b6b';
+      }
 
-    builderUpdateList.appendChild(span);
-  });
+      builderUpdateList.appendChild(span);
+    });
 }
 
 /* FILTER */
 function filterLots() {
   const lot = filterLot.value.trim().toLowerCase();
   const sub = filterSubdivision.value.trim().toLowerCase();
+  const addressFilter = filterAddress.value.trim().toLowerCase();
   const builder = filterBuilder.value.trim().toLowerCase();
   const floor = filterFloorplan.value.trim().toLowerCase();
 
@@ -555,11 +654,13 @@ function filterLots() {
     const lotNumber = safeText(l.lotNumber).toLowerCase();
     const subdivision = safeText(l.subdivision).toLowerCase();
     const builderName = safeText(l.builder).toLowerCase();
+    const address = safeText(l.address).toLowerCase();
     const floorplan = safeText(l.floorplan).toLowerCase();
 
     return (
       (!lot || lotNumber.includes(lot)) &&
       (!sub || subdivision.includes(sub)) &&
+      (!addressFilter || address.includes(addressFilter)) &&
       (!builder || builderName.includes(builder)) &&
       (!floor || floorplan.includes(floor))
     );
@@ -570,13 +671,19 @@ function filterLots() {
       let A = safeText(a[currentSort.key]).toLowerCase();
       let B = safeText(b[currentSort.key]).toLowerCase();
 
-      if (currentSort.key === "lotNumber") {
+      if (["lotNumber", "original", "reclean", "windows"].includes(currentSort.key)) {
         const numA = parseFloat(A);
         const numB = parseFloat(B);
 
         if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
           return currentSort.asc ? numA - numB : numB - numA;
         }
+      }
+
+      if (currentSort.key === "lastUpdated") {
+        const timeA = new Date(a.lastUpdated).getTime() || 0;
+        const timeB = new Date(b.lastUpdated).getTime() || 0;
+        return currentSort.asc ? timeA - timeB : timeB - timeA;
       }
 
       return currentSort.asc ? A.localeCompare(B) : B.localeCompare(A);
@@ -634,7 +741,7 @@ function renderTable(data) {
   if (!data.length) {
     resultsTable.innerHTML = `
       <tr>
-        <td colspan="7" style="color:#aaa; padding:20px;">
+        <td colspan="9" style="color:#aaa; padding:20px;">
           No lots found
         </td>
       </tr>
@@ -650,6 +757,9 @@ function renderTable(data) {
     const builder = escapeHTML(l.builder);
     const address = escapeHTML(l.address);
     const floorplan = escapeHTML(l.floorplan);
+    const original = budgetUnlocked ? escapeHTML(l.original) || '—' : '🔒';
+    const reclean = budgetUnlocked ? escapeHTML(l.reclean) || '—' : '🔒';
+    const windows = budgetUnlocked ? escapeHTML(l.windows) || '—' : '🔒';
     const updated = escapeHTML(daysAgo(l.lastUpdated));
 
     row.innerHTML = `
@@ -663,17 +773,13 @@ function renderTable(data) {
         </div>
       </td>
       <td>${floorplan}</td>
-      <td>
-        <button class="budget-btn ${budgetUnlocked ? '' : 'locked'}">
-          ${budgetUnlocked ? 'View Budget' : '🔒 View Budget'}
-        </button>
-      </td>
+      <td>${original}</td>
+      <td>${reclean}</td>
+      <td>${windows}</td>
       <td>${updated}</td>
     `;
 
-    const addressText = row.querySelector('.address-text');
     const copyBtn = row.querySelector('.copy-btn');
-    const budgetBtn = row.querySelector('.budget-btn');
 
     copyBtn.addEventListener('click', e => {
       e.stopPropagation();
@@ -682,21 +788,6 @@ function renderTable(data) {
       setTimeout(() => copyBtn.textContent = "Copy", 800);
     });
 
-    addressText.addEventListener('click', e => {
-      e.stopPropagation();
-      window.open(`https://maps.google.com/?q=${encodeURIComponent(safeText(l.address))}`);
-    });
-
-    budgetBtn.addEventListener('click', e => {
-      e.stopPropagation();
-
-      if (!budgetUnlocked) {
-        openUnlockModal();
-        return;
-      }
-
-      openBudgetModal(l);
-    });
 
     resultsTable.appendChild(row);
   });
