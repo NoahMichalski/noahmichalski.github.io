@@ -759,6 +759,28 @@
     "lastUpdated": "2026-06-11"
   },
   {
+    "lotNumber": "143",
+    "subdivision": "Amrine *Pulte *Marysville",
+    "builder": "Pulte",
+    "floorplan": "Ivy",
+    "original": "10",
+    "reclean": "3.5",
+    "windows": "8",
+    "address": "2525 Red Winter Avenue",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "203",
+    "subdivision": "Amrine *Pulte *Marysville",
+    "builder": "Pulte",
+    "floorplan": "Mitchell II - Bsmt",
+    "original": "12",
+    "reclean": "4",
+    "windows": "7",
+    "address": "2534 Red Winter Avenue",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "4024",
     "subdivision": "Arrowhead at Evans Farms *Pulte *Lewis Center",
     "builder": "Pulte",
@@ -779,6 +801,39 @@
     "windows": "",
     "address": "2278 Weyant Street",
     "lastUpdated": "2026-06-16"
+  },
+  {
+    "lotNumber": "4020",
+    "subdivision": "Arrowhead at Evans Farms *Pulte *Lewis Center",
+    "builder": "Pulte",
+    "floorplan": "Waldorf",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "2262 Weyant Street",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "4026",
+    "subdivision": "Arrowhead at Evans Farms *Pulte *Lewis Center",
+    "builder": "Pulte",
+    "floorplan": "Dakota",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "2249 Hera Boulevard",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "4027",
+    "subdivision": "Arrowhead at Evans Farms *Pulte *Lewis Center",
+    "builder": "Pulte",
+    "floorplan": "Prospect",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "2261 Hera Boulevard",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "3543",
@@ -999,6 +1054,28 @@
     "windows": "12",
     "address": "3027 Cleo Street",
     "lastUpdated": "2026-06-11"
+  },
+  {
+    "lotNumber": "3534",
+    "subdivision": "Berlin Bluffs *Pulte *Delaware",
+    "builder": "Pulte",
+    "floorplan": "Deer Valley II",
+    "original": "12",
+    "reclean": "4",
+    "windows": "12",
+    "address": "2962 Cleo Street",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "3571",
+    "subdivision": "Berlin Bluffs *Pulte *Delaware",
+    "builder": "Pulte",
+    "floorplan": "Deer Valley II",
+    "original": "12",
+    "reclean": "4",
+    "windows": "12",
+    "address": "3098 Cleo Street",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "3686",
@@ -1837,6 +1914,28 @@
     "lastUpdated": "2026-06-11"
   },
   {
+    "lotNumber": "3732",
+    "subdivision": "Berlin Farm *MI *Delaware",
+    "builder": "MI Homes",
+    "floorplan": "Erie",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "1568 Kenneth Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "3734",
+    "subdivision": "Berlin Farm *MI *Delaware",
+    "builder": "MI Homes",
+    "floorplan": "Madison",
+    "original": "8",
+    "reclean": "3",
+    "windows": "7",
+    "address": "1588 Kenneth Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "98",
     "subdivision": "Beulah Park *Pulte *Grove City",
     "builder": "Pulte",
@@ -1989,6 +2088,28 @@
     "windows": "8",
     "address": "442 Jaret Way",
     "lastUpdated": "2026-04-03"
+  },
+  {
+    "lotNumber": "31",
+    "subdivision": "Bishop Estates *DR *Washington Courthouse",
+    "builder": "DR Horton",
+    "floorplan": "X450",
+    "original": "6",
+    "reclean": "3",
+    "windows": "4",
+    "address": "512 Jaret Way",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "32",
+    "subdivision": "Bishop Estates *DR *Washington Courthouse",
+    "builder": "DR Horton",
+    "floorplan": "X422",
+    "original": "7",
+    "reclean": "3",
+    "windows": "4",
+    "address": "113 Merritt Way",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "304",
@@ -2561,6 +2682,50 @@
     "windows": "7",
     "address": "339 Honeysuckle Street",
     "lastUpdated": "2026-06-11"
+  },
+  {
+    "lotNumber": "294",
+    "subdivision": "Bloomfield Hills *Centex *South Bloomfield",
+    "builder": "Centex",
+    "floorplan": "Hampton",
+    "original": "9",
+    "reclean": "4",
+    "windows": "7",
+    "address": "267 Dowler Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "295",
+    "subdivision": "Bloomfield Hills *Centex *South Bloomfield",
+    "builder": "Centex",
+    "floorplan": "Aspire",
+    "original": "8",
+    "reclean": "3",
+    "windows": "6",
+    "address": "269 Dowler Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "296",
+    "subdivision": "Bloomfield Hills *Centex *South Bloomfield",
+    "builder": "Centex",
+    "floorplan": "Mitchell",
+    "original": "12",
+    "reclean": "4",
+    "windows": "7",
+    "address": "271 Dowler Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "297",
+    "subdivision": "Bloomfield Hills *Centex *South Bloomfield",
+    "builder": "Centex",
+    "floorplan": "Hampton",
+    "original": "9",
+    "reclean": "4",
+    "windows": "7",
+    "address": "273 Dowler Drive",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "61",
@@ -5302,6 +5467,39 @@
     "lastUpdated": "2026-04-14"
   },
   {
+    "lotNumber": "263",
+    "subdivision": "Carr *Epcon *Hillard",
+    "builder": "Epcon",
+    "floorplan": "Cambridge",
+    "original": "9",
+    "reclean": "3",
+    "windows": "8",
+    "address": "5656 Aristocrat Drive",
+    "lastUpdated": "2026-06-17"
+  },
+  {
+    "lotNumber": "265",
+    "subdivision": "Carr *Epcon *Hillard",
+    "builder": "Epcon",
+    "floorplan": "Windsor",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "5644 Aristocrat Drive",
+    "lastUpdated": "2026-06-17"
+  },
+  {
+    "lotNumber": "266",
+    "subdivision": "Carr *Epcon *Hillard",
+    "builder": "Epcon",
+    "floorplan": "Cambridge",
+    "original": "9",
+    "reclean": "3",
+    "windows": "8",
+    "address": "5636 Aristocrat Drive",
+    "lastUpdated": "2026-06-17"
+  },
+  {
     "lotNumber": "120",
     "subdivision": "Chase Landings *DR *Galloway",
     "builder": "DR Horton",
@@ -6248,6 +6446,50 @@
     "lastUpdated": "2026-06-11"
   },
   {
+    "lotNumber": "7469",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Petoskey",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "5924 Creekview Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "7471",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Westerville",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "5908 Creekview Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "7473",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Naperville",
+    "original": "6",
+    "reclean": "2",
+    "windows": "",
+    "address": "5894 Creekview Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "7474",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Saugatuck",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "5888 Creekview Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "48",
     "subdivision": "Clover *Centex *Galloway",
     "builder": "Centex",
@@ -7060,6 +7302,83 @@
     "windows": "8",
     "address": "7499 Hazy Gate Lane",
     "lastUpdated": "2026-05-28"
+  },
+  {
+    "lotNumber": "45",
+    "subdivision": "Concord *Epcon *Dublin",
+    "builder": "Epcon",
+    "floorplan": "Verona",
+    "original": "9",
+    "reclean": "3",
+    "windows": "8",
+    "address": "10213 Holmhill Lane",
+    "lastUpdated": "2026-06-17"
+  },
+  {
+    "lotNumber": "46",
+    "subdivision": "Concord *Epcon *Dublin",
+    "builder": "Epcon",
+    "floorplan": "Verona",
+    "original": "9",
+    "reclean": "3",
+    "windows": "8",
+    "address": "10221 Holmhill Lane",
+    "lastUpdated": "2026-06-17"
+  },
+  {
+    "lotNumber": "48",
+    "subdivision": "Concord *Epcon *Dublin",
+    "builder": "Epcon",
+    "floorplan": "Promenade",
+    "original": "9",
+    "reclean": "3",
+    "windows": "8",
+    "address": "10239 Holmhill Lane",
+    "lastUpdated": "2026-06-17"
+  },
+  {
+    "lotNumber": "54",
+    "subdivision": "Concord *Epcon *Dublin",
+    "builder": "Epcon",
+    "floorplan": "Promenade",
+    "original": "9",
+    "reclean": "3",
+    "windows": "8",
+    "address": "7604 Hazy Gate Lane",
+    "lastUpdated": "2026-06-17"
+  },
+  {
+    "lotNumber": "999",
+    "subdivision": "Concord *Epcon *Dublin",
+    "builder": "Epcon",
+    "floorplan": "Med. Clubhouse",
+    "original": "12",
+    "reclean": "6",
+    "windows": "12",
+    "address": "7419 Hazy Gate Lane",
+    "lastUpdated": "2026-06-17"
+  },
+  {
+    "lotNumber": "7",
+    "subdivision": "Concord *Epcon *Dublin",
+    "builder": "Epcon",
+    "floorplan": "",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "7557 Hazy Gate Lane",
+    "lastUpdated": "2026-06-17"
+  },
+  {
+    "lotNumber": "104",
+    "subdivision": "Concord *Epcon *Dublin",
+    "builder": "Epcon",
+    "floorplan": "",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "10248 Holmhill Lane",
+    "lastUpdated": "2026-06-17"
   },
   {
     "lotNumber": "1988",
@@ -8569,6 +8888,83 @@
     "lastUpdated": "2026-06-11"
   },
   {
+    "lotNumber": "246",
+    "subdivision": "Darby Station *MI *Plain City",
+    "builder": "MI Homes",
+    "floorplan": "Bexley",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "1057 Slate Wagon Road",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "250",
+    "subdivision": "Darby Station *MI *Plain City",
+    "builder": "MI Homes",
+    "floorplan": "Findlay",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "1105 Slate Wagon Road",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "348",
+    "subdivision": "Darby Station *MI *Plain City",
+    "builder": "MI Homes",
+    "floorplan": "Dearborn",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
+    "address": "1066 Railbus Avenue",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "357",
+    "subdivision": "Darby Station *MI *Plain City",
+    "builder": "MI Homes",
+    "floorplan": "Dearborn",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
+    "address": "1083 Railbus Avenue",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "369",
+    "subdivision": "Darby Station *MI *Plain City",
+    "builder": "MI Homes",
+    "floorplan": "Ashland",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "1199 Slate Wagon Road",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "379",
+    "subdivision": "Darby Station *MI *Plain City",
+    "builder": "MI Homes",
+    "floorplan": "Erie",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "1098 Saddle Tank Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "402",
+    "subdivision": "Darby Station *MI *Plain City",
+    "builder": "MI Homes",
+    "floorplan": "Fremont",
+    "original": "7",
+    "reclean": "3",
+    "windows": "8",
+    "address": "1146 Slate Wagon Road",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "41",
     "subdivision": "Day Farm *Arbor *South Bloomfield",
     "builder": "Arbor Homes",
@@ -9086,6 +9482,28 @@
     "lastUpdated": "2026-06-11"
   },
   {
+    "lotNumber": "2947",
+    "subdivision": "Eagle *Pulte *Galena",
+    "builder": "Pulte",
+    "floorplan": "Mitchell II",
+    "original": "12",
+    "reclean": "4",
+    "windows": "7",
+    "address": "7127 Crown Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "2948",
+    "subdivision": "Eagle *Pulte *Galena",
+    "builder": "Pulte",
+    "floorplan": "Aspire II",
+    "original": "8",
+    "reclean": "3",
+    "windows": "6",
+    "address": "7135 Crown Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "139",
     "subdivision": "Eastwood *AMH *Reynoldsburg",
     "builder": "American Homes 4 Rent",
@@ -9438,6 +9856,17 @@
     "lastUpdated": "2026-04-03"
   },
   {
+    "lotNumber": "6758",
+    "subdivision": "Enfield ct *Compass *Dublin",
+    "builder": "Compass",
+    "floorplan": "Custom",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "6758 enfield ct",
+    "lastUpdated": "2026-06-17"
+  },
+  {
     "lotNumber": "9188",
     "subdivision": "Evans Farm *Bob Webb *Lewis Center",
     "builder": "Bob Webb",
@@ -9447,6 +9876,17 @@
     "windows": "20",
     "address": "5466 Evens Farm Drive",
     "lastUpdated": "2026-05-27"
+  },
+  {
+    "lotNumber": "587",
+    "subdivision": "Eversole Run *Bob Webb *Plain City",
+    "builder": "Bob Webb",
+    "floorplan": "Custom",
+    "original": "22",
+    "reclean": "10",
+    "windows": "20",
+    "address": "11356 periwinkle way",
+    "lastUpdated": "2026-06-30"
   },
   {
     "lotNumber": "610",
@@ -9777,6 +10217,17 @@
     "windows": "10",
     "address": "528 Creekside Loop South",
     "lastUpdated": "2026-06-11"
+  },
+  {
+    "lotNumber": "88",
+    "subdivision": "Forest Ridge *MI *Pataskala",
+    "builder": "MI Homes",
+    "floorplan": "Bella",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
+    "address": "600 Paloma Lane",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "273",
@@ -10393,6 +10844,39 @@
     "windows": "",
     "address": "16 Englewood Road",
     "lastUpdated": "2026-06-11"
+  },
+  {
+    "lotNumber": "340",
+    "subdivision": "Foxfire *MI *Commercial Point",
+    "builder": "MI Homes",
+    "floorplan": "Granville",
+    "original": "9",
+    "reclean": "3",
+    "windows": "",
+    "address": "362 Oakmont Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "360",
+    "subdivision": "Foxfire *MI *Commercial Point",
+    "builder": "MI Homes",
+    "floorplan": "Dearborn",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
+    "address": "27 Englewood Road",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "368",
+    "subdivision": "Foxfire *MI *Commercial Point",
+    "builder": "MI Homes",
+    "floorplan": "Worthington",
+    "original": "8",
+    "reclean": "3",
+    "windows": "9",
+    "address": "15 Englewood Road",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "269",
@@ -11086,6 +11570,39 @@
     "windows": "",
     "address": "9694 Riley Road",
     "lastUpdated": "2026-06-11"
+  },
+  {
+    "lotNumber": "375",
+    "subdivision": "Glacier Pointe *MI *Plain City",
+    "builder": "MI Homes",
+    "floorplan": "Hillsdale",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "9700 Lennon Lane",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "399",
+    "subdivision": "Glacier Pointe *MI *Plain City",
+    "builder": "MI Homes",
+    "floorplan": "Fordham II",
+    "original": "12",
+    "reclean": "4",
+    "windows": "",
+    "address": "9653 Riley Road",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "403",
+    "subdivision": "Glacier Pointe *MI *Plain City",
+    "builder": "MI Homes",
+    "floorplan": "Vanderbilt",
+    "original": "12",
+    "reclean": "4",
+    "windows": "",
+    "address": "8691 Jenny Road",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "88",
@@ -12441,6 +12958,28 @@
     "lastUpdated": "2026-05-27"
   },
   {
+    "lotNumber": "999",
+    "subdivision": "Haines Creek *Epcon *New Albany",
+    "builder": "Epcon",
+    "floorplan": "",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "9470 Antioch Dr.",
+    "lastUpdated": "2026-06-17"
+  },
+  {
+    "lotNumber": "3980",
+    "subdivision": "Harpers Pointe *Bob Webb *Powell",
+    "builder": "Bob Webb",
+    "floorplan": "Custom",
+    "original": "18",
+    "reclean": "8",
+    "windows": "18",
+    "address": "149 Chedworth Row",
+    "lastUpdated": "2026-06-22"
+  },
+  {
     "lotNumber": "4003",
     "subdivision": "Harpers Pointe *Bob Webb *Powell",
     "builder": "Bob Webb",
@@ -12775,9 +13314,9 @@
     "subdivision": "Hazelton *Rockford *Pataskala",
     "builder": "Rockford",
     "floorplan": "Unknown",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "205 Scotsgrove Drive",
     "lastUpdated": "2026-04-10"
   },
@@ -12786,9 +13325,9 @@
     "subdivision": "Hazelton *Rockford *Pataskala",
     "builder": "Rockford",
     "floorplan": "Unknown",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "203 Scotsgrive Drive",
     "lastUpdated": "2026-04-10"
   },
@@ -12797,9 +13336,9 @@
     "subdivision": "Hazelton *Rockford *Pataskala",
     "builder": "Rockford",
     "floorplan": "Unknown",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "406 Coachman Drive",
     "lastUpdated": "2026-04-10"
   },
@@ -12808,9 +13347,9 @@
     "subdivision": "Hazelton *Rockford *Pataskala",
     "builder": "Rockford",
     "floorplan": "Unknown",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "410 Coachman Drive",
     "lastUpdated": "2026-04-10"
   },
@@ -12819,9 +13358,9 @@
     "subdivision": "Hazelton *Rockford *Pataskala",
     "builder": "Rockford",
     "floorplan": "Unknown",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "407 Coachman Drive",
     "lastUpdated": "2026-04-10"
   },
@@ -12830,9 +13369,9 @@
     "subdivision": "Hazelton *Rockford *Pataskala",
     "builder": "Rockford",
     "floorplan": "Unknown",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "602 Hannahs Drive",
     "lastUpdated": "2026-04-10"
   },
@@ -12841,9 +13380,9 @@
     "subdivision": "Hazelton *Rockford *Pataskala",
     "builder": "Rockford",
     "floorplan": "Unknown",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "604 Hannahs Drive",
     "lastUpdated": "2026-04-10"
   },
@@ -12852,9 +13391,9 @@
     "subdivision": "Hazelton *Rockford *Pataskala",
     "builder": "Rockford",
     "floorplan": "Unknown",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "109 Ashburn Lane",
     "lastUpdated": "2026-04-10"
   },
@@ -12863,9 +13402,9 @@
     "subdivision": "Hazelton *Rockford *Pataskala",
     "builder": "Rockford",
     "floorplan": "Unknown",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "107 Ashburn Lane",
     "lastUpdated": "2026-04-10"
   },
@@ -12874,9 +13413,9 @@
     "subdivision": "Hazelton *Rockford *Pataskala",
     "builder": "Rockford",
     "floorplan": "Unknown",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "105 Ashburn Lane",
     "lastUpdated": "2026-04-10"
   },
@@ -12885,9 +13424,9 @@
     "subdivision": "Hazelton *Rockford *Pataskala",
     "builder": "Rockford",
     "floorplan": "Unknown",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "103 Ashburn Lane",
     "lastUpdated": "2026-04-10"
   },
@@ -12896,9 +13435,9 @@
     "subdivision": "Hazelton *Rockford *Pataskala",
     "builder": "Rockford",
     "floorplan": "Unknown",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "101 Ashburn Lane",
     "lastUpdated": "2026-04-10"
   },
@@ -12907,9 +13446,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Spring Valley",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1007 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -12918,9 +13457,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Hinkle",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1009 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -12929,9 +13468,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "New Castle",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1011 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -12940,9 +13479,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Hickory",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1013 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -12951,9 +13490,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Spring Valley",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1015 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -12962,9 +13501,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Muncie",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1017 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -12973,9 +13512,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "New Castle",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1019 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -12984,9 +13523,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Hickory",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1021 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -12995,9 +13534,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Muncie",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1023 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -13006,9 +13545,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Spring Valley",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1027 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -13017,9 +13556,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Spring Valley",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1029 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -13028,9 +13567,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Hickory",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1031 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -13039,9 +13578,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Attucks",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1033 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -13050,9 +13589,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Muncie",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1030 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -13061,9 +13600,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Hinkle",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1028 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -13072,9 +13611,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Muncie",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1024 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -13083,9 +13622,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Attucks",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1020 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -13094,9 +13633,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Hickory",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1016 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -13105,9 +13644,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "New Castle",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1012 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -13116,9 +13655,9 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Hinkle",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1002 Dawsons Drive",
     "lastUpdated": "2026-06-11"
   },
@@ -13127,11 +13666,55 @@
     "subdivision": "Hebron *MI *Hebron OH",
     "builder": "MI Homes",
     "floorplan": "Spring Valley",
-    "original": "",
-    "reclean": "",
-    "windows": "",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "1000 Dawsons Drive",
     "lastUpdated": "2026-06-11"
+  },
+  {
+    "lotNumber": "44",
+    "subdivision": "Hebron *MI *Hebron OH",
+    "builder": "MI Homes",
+    "floorplan": "New Castle",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
+    "address": "1034 Dawsons Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "45",
+    "subdivision": "Hebron *MI *Hebron OH",
+    "builder": "MI Homes",
+    "floorplan": "Hinkle",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
+    "address": "1032 Dawsons Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "52",
+    "subdivision": "Hebron *MI *Hebron OH",
+    "builder": "MI Homes",
+    "floorplan": "Hickory",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
+    "address": "1008 Dawsons Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "53",
+    "subdivision": "Hebron *MI *Hebron OH",
+    "builder": "MI Homes",
+    "floorplan": "Attucks",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
+    "address": "1006 Dawsons Drive",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "34",
@@ -13662,6 +14245,28 @@
     "lastUpdated": "2026-06-11"
   },
   {
+    "lotNumber": "1015",
+    "subdivision": "Hill Farm *MI *Hillard",
+    "builder": "MI Homes",
+    "floorplan": "Beaufort",
+    "original": "8",
+    "reclean": "3",
+    "windows": "9",
+    "address": "4534 Nonius Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "1016",
+    "subdivision": "Hill Farm *MI *Hillard",
+    "builder": "MI Homes",
+    "floorplan": "Beaufort",
+    "original": "8",
+    "reclean": "3",
+    "windows": "9",
+    "address": "4536 Nonius Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "164",
     "subdivision": "Holton *Schott *Grove City",
     "builder": "Schottenstein",
@@ -13679,7 +14284,7 @@
     "floorplan": "Hayes",
     "original": "9",
     "reclean": "4",
-    "windows": "",
+    "windows": "9",
     "address": "3570 Whirla Way",
     "lastUpdated": "2026-04-15"
   },
@@ -15452,12 +16057,12 @@
     "reclean": "10",
     "windows": "25",
     "address": "9026 Fox Field Path",
-    "lastUpdated": "2026-06-16"
+    "lastUpdated": "2026-07-02"
   },
   {
     "lotNumber": "7",
-    "subdivision": "Ivy Rose",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Ivy Rose *Fischer *Cincinnati",
+    "builder": "Fischer Homes",
     "floorplan": "Charles / Finley",
     "original": "",
     "reclean": "",
@@ -15467,8 +16072,8 @@
   },
   {
     "lotNumber": "36",
-    "subdivision": "Ivy Rose",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Ivy Rose *Fischer *Cincinnati",
+    "builder": "Fischer Homes",
     "floorplan": "Magnolia",
     "original": "",
     "reclean": "",
@@ -15478,8 +16083,8 @@
   },
   {
     "lotNumber": "21",
-    "subdivision": "Ivy Rose",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Ivy Rose *Fischer *Cincinnati",
+    "builder": "Fischer Homes",
     "floorplan": "Magnolia",
     "original": "",
     "reclean": "",
@@ -16665,6 +17270,17 @@
     "lastUpdated": "2026-06-11"
   },
   {
+    "lotNumber": "2563",
+    "subdivision": "Jerome Village Applewood *MI *Plain City",
+    "builder": "MI Homes",
+    "floorplan": "Emory",
+    "original": "12",
+    "reclean": "4",
+    "windows": "",
+    "address": "7216 Applewood Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "32",
     "subdivision": "Johnson's Creek *DR *London",
     "builder": "DR Horton",
@@ -17212,7 +17828,7 @@
     "reclean": "3",
     "windows": "7",
     "address": "5923 Pitch Pine Drive",
-    "lastUpdated": "2026-06-16"
+    "lastUpdated": "2026-07-02"
   },
   {
     "lotNumber": "61",
@@ -18917,7 +19533,7 @@
     "reclean": "3",
     "windows": "8",
     "address": "155 Lorrimore Drive",
-    "lastUpdated": "2026-06-16"
+    "lastUpdated": "2026-07-02"
   },
   {
     "lotNumber": "5271",
@@ -19808,7 +20424,7 @@
     "reclean": "4",
     "windows": "8",
     "address": "2520 Farmhouse Lane",
-    "lastUpdated": "2026-06-16"
+    "lastUpdated": "2026-07-02"
   },
   {
     "lotNumber": "19",
@@ -20557,6 +21173,83 @@
     "windows": "",
     "address": "10462 Arches Loop",
     "lastUpdated": "2026-06-16"
+  },
+  {
+    "lotNumber": "25",
+    "subdivision": "Maygrass *Del Webb *Plain City",
+    "builder": "Del Webb",
+    "floorplan": "Mystique II",
+    "original": "8",
+    "reclean": "3",
+    "windows": "6",
+    "address": "9064 Zion Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "68",
+    "subdivision": "Maygrass *Del Webb *Plain City",
+    "builder": "Del Webb",
+    "floorplan": "Mystique II",
+    "original": "8",
+    "reclean": "3",
+    "windows": "6",
+    "address": "10520 Caribou Court",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "106",
+    "subdivision": "Maygrass *Del Webb *Plain City",
+    "builder": "Del Webb",
+    "floorplan": "Prestige II",
+    "original": "8",
+    "reclean": "3",
+    "windows": "5",
+    "address": "10561 Caribou Court",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "107",
+    "subdivision": "Maygrass *Del Webb *Plain City",
+    "builder": "Del Webb",
+    "floorplan": "Prestige II",
+    "original": "8",
+    "reclean": "3",
+    "windows": "5",
+    "address": "10571 Caribou Court",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "43",
+    "subdivision": "Maygrass *Del Webb *Plain City",
+    "builder": "Del Webb",
+    "floorplan": "Stellar",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "10422 Arches Loop",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "61",
+    "subdivision": "Maygrass *Del Webb *Plain City",
+    "builder": "Del Webb",
+    "floorplan": "Renown",
+    "original": "11",
+    "reclean": "4",
+    "windows": "7",
+    "address": "10403 Arches Loop",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "63",
+    "subdivision": "Maygrass *Del Webb *Plain City",
+    "builder": "Del Webb",
+    "floorplan": "Stellar",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "10443 Arches Loop",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "234",
@@ -22899,7 +23592,7 @@
     "reclean": "3",
     "windows": "7",
     "address": "355 Buck Valley Drive",
-    "lastUpdated": "1/0/00"
+    "lastUpdated": "1/0/1900"
   },
   {
     "lotNumber": "474",
@@ -23373,6 +24066,50 @@
     "windows": "",
     "address": "115 Swan Valley Place",
     "lastUpdated": "2026-06-11"
+  },
+  {
+    "lotNumber": "523",
+    "subdivision": "Miller Farm *MI *Galena",
+    "builder": "MI Homes",
+    "floorplan": "Bexley",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
+    "address": "402 Osprey Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "569",
+    "subdivision": "Miller Farm *MI *Galena",
+    "builder": "MI Homes",
+    "floorplan": "Emory",
+    "original": "12",
+    "reclean": "4",
+    "windows": "",
+    "address": "395 Fawn Valley Place",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "575",
+    "subdivision": "Miller Farm *MI *Galena",
+    "builder": "MI Homes",
+    "floorplan": "Citadel",
+    "original": "9",
+    "reclean": "3.5",
+    "windows": "",
+    "address": "390 Fawn Valley Place",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "396",
+    "subdivision": "Millers Cove *Drees *Sunbury",
+    "builder": "Drees",
+    "floorplan": "Custom",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "396 Millers Cove",
+    "lastUpdated": "2026-06-23"
   },
   {
     "lotNumber": "9",
@@ -24260,7 +24997,7 @@
     "builder": "Bob Webb",
     "floorplan": "Custom",
     "original": "18",
-    "reclean": "",
+    "reclean": "9",
     "windows": "18",
     "address": "6075 Victory Lane",
     "lastUpdated": "2026-06-08"
@@ -24574,6 +25311,61 @@
     "lastUpdated": "2026-06-16"
   },
   {
+    "lotNumber": "382",
+    "subdivision": "Northstar *Del Webb *Sunbury",
+    "builder": "Del Webb",
+    "floorplan": "Mystique II",
+    "original": "8",
+    "reclean": "3",
+    "windows": "6",
+    "address": "9410 Pimento Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "407",
+    "subdivision": "Northstar *Del Webb *Sunbury",
+    "builder": "Del Webb",
+    "floorplan": "Mystique II",
+    "original": "8",
+    "reclean": "3",
+    "windows": "6",
+    "address": "9367 Alister Street",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "412",
+    "subdivision": "Northstar *Del Webb *Sunbury",
+    "builder": "Del Webb",
+    "floorplan": "Prestige II",
+    "original": "8",
+    "reclean": "3",
+    "windows": "5",
+    "address": "9442 Alister Street",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "320",
+    "subdivision": "Northstar *Del Webb *Sunbury",
+    "builder": "Del Webb",
+    "floorplan": "Renown",
+    "original": "11",
+    "reclean": "4",
+    "windows": "7",
+    "address": "2173 Pampas Street",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "326",
+    "subdivision": "Northstar *Del Webb *Sunbury",
+    "builder": "Del Webb",
+    "floorplan": "Renown",
+    "original": "11",
+    "reclean": "4",
+    "windows": "7",
+    "address": "2172 Pampas Street",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "5738",
     "subdivision": "Northwood *MI *Delaware",
     "builder": "MI Homes",
@@ -24748,6 +25540,61 @@
     "windows": "8",
     "address": "1164 Brittany Drive",
     "lastUpdated": "2026-06-11"
+  },
+  {
+    "lotNumber": "5735",
+    "subdivision": "Northwood *MI *Delaware",
+    "builder": "MI Homes",
+    "floorplan": "New Castle",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "1093 Brittany Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "5736",
+    "subdivision": "Northwood *MI *Delaware",
+    "builder": "MI Homes",
+    "floorplan": "Hinkle",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "1099 Brittany Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "5737",
+    "subdivision": "Northwood *MI *Delaware",
+    "builder": "MI Homes",
+    "floorplan": "Hickory",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "1105 Brittany Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "5760",
+    "subdivision": "Northwood *MI *Delaware",
+    "builder": "MI Homes",
+    "floorplan": "Spring Valley",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "1158 Brittany Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "5762",
+    "subdivision": "Northwood *MI *Delaware",
+    "builder": "MI Homes",
+    "floorplan": "Spring Valley",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "1146 Brittany Drive",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "181",
@@ -25069,6 +25916,50 @@
     "lastUpdated": "2026-06-16"
   },
   {
+    "lotNumber": "192",
+    "subdivision": "Nottingham Trace *Pulte *New Albany",
+    "builder": "Pulte",
+    "floorplan": "Ascend",
+    "original": "8",
+    "reclean": "3",
+    "windows": "5",
+    "address": "7633 Brinsley Lane",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "199",
+    "subdivision": "Nottingham Trace *Pulte *New Albany",
+    "builder": "Pulte",
+    "floorplan": "Martin Ray",
+    "original": "8",
+    "reclean": "3",
+    "windows": "5",
+    "address": "7422 Linden Lane",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "230",
+    "subdivision": "Nottingham Trace *Pulte *New Albany",
+    "builder": "Pulte",
+    "floorplan": "Abbeyville",
+    "original": "5",
+    "reclean": "2",
+    "windows": "9",
+    "address": "7348 Winterbek Avenue North",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "231",
+    "subdivision": "Nottingham Trace *Pulte *New Albany",
+    "builder": "Pulte",
+    "floorplan": "Martin Ray",
+    "original": "8",
+    "reclean": "3",
+    "windows": "5",
+    "address": "7354 Winterbek Avenue North",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "83",
     "subdivision": "Old Heritage *Arbor *Shelbyville",
     "builder": "Arbor Homes",
@@ -25385,7 +26276,7 @@
     "reclean": "3",
     "windows": "8",
     "address": "2275 Overlook Way",
-    "lastUpdated": "2026-06-16"
+    "lastUpdated": "2026-07-02"
   },
   {
     "lotNumber": "13795",
@@ -25463,6 +26354,17 @@
     "windows": "4",
     "address": "2110 Overlook Way",
     "lastUpdated": "2026-04-03"
+  },
+  {
+    "lotNumber": "13770",
+    "subdivision": "Overlook *DR *Newark",
+    "builder": "DR Horton",
+    "floorplan": "X426",
+    "original": "8",
+    "reclean": "3",
+    "windows": "9",
+    "address": "2295 Overlook Way",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "13638",
@@ -25675,7 +26577,7 @@
   },
   {
     "lotNumber": "13628",
-    "subdivision": "ParkView *DR *Delaware",
+    "subdivision": "Park View *DR *Delaware",
     "builder": "DR Horton",
     "floorplan": "X450",
     "original": "6",
@@ -25686,7 +26588,7 @@
   },
   {
     "lotNumber": "13419",
-    "subdivision": "ParkView *DR *Delaware",
+    "subdivision": "Park View *DR *Delaware",
     "builder": "DR Horton",
     "floorplan": "X429",
     "original": "8",
@@ -25703,6 +26605,17 @@
     "original": "",
     "reclean": "",
     "windows": "",
+    "address": "2766 Aldengate Ln",
+    "lastUpdated": "2026-05-05"
+  },
+  {
+    "lotNumber": "2717",
+    "subdivision": "Piatt Preserve *DR *Delaware",
+    "builder": "DR Horton",
+    "floorplan": "Model",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
     "address": "2766 Aldengate Ln",
     "lastUpdated": "2026-05-05"
   },
@@ -26323,6 +27236,28 @@
     "lastUpdated": "2026-06-11"
   },
   {
+    "lotNumber": "51",
+    "subdivision": "Pinnacle *MI *Grove City",
+    "builder": "MI Homes",
+    "floorplan": "Findlay",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "1095 Jeffrey Lane",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "57",
+    "subdivision": "Pinnacle *MI *Grove City",
+    "builder": "MI Homes",
+    "floorplan": "Bexley",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "1143 Jeffrey Lane",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "137",
     "subdivision": "Pioneer *Pulte *Plain City",
     "builder": "Pulte",
@@ -26706,6 +27641,17 @@
     "windows": "8",
     "address": "10768 Trail Dust Street",
     "lastUpdated": "2026-06-11"
+  },
+  {
+    "lotNumber": "173",
+    "subdivision": "Pioneer *Pulte *Plain City",
+    "builder": "Pulte",
+    "floorplan": "Continental II",
+    "original": "12",
+    "reclean": "4",
+    "windows": "8",
+    "address": "9475 Goldenrod Road",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "60",
@@ -27852,6 +28798,28 @@
     "lastUpdated": "2026-05-20"
   },
   {
+    "lotNumber": "15",
+    "subdivision": "River Ridge *DR *Circleville",
+    "builder": "DR Horton",
+    "floorplan": "X422",
+    "original": "7",
+    "reclean": "3",
+    "windows": "4",
+    "address": "1795 Pumpkin Ridge Road",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "19",
+    "subdivision": "River Ridge *DR *Circleville",
+    "builder": "DR Horton",
+    "floorplan": "X422",
+    "original": "7",
+    "reclean": "3",
+    "windows": "4",
+    "address": "1774 Pumpkin Ridge Road",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "5373",
     "subdivision": "Rutherford *Ryan *Delaware",
     "builder": "Ryan",
@@ -28216,8 +29184,8 @@
   },
   {
     "lotNumber": "364",
-    "subdivision": "Salt Run Preserve",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Salt Run Preserve *Fischer *Maineville",
+    "builder": "Fischer Homes",
     "floorplan": "Blair / Clay",
     "original": "",
     "reclean": "",
@@ -28227,8 +29195,8 @@
   },
   {
     "lotNumber": "243",
-    "subdivision": "Salt Run Preserve",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Salt Run Preserve *Fischer *Maineville",
+    "builder": "Fischer Homes",
     "floorplan": "Breckenridge",
     "original": "",
     "reclean": "",
@@ -28238,8 +29206,8 @@
   },
   {
     "lotNumber": "9",
-    "subdivision": "Salt Run Preserve",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Salt Run Preserve *Fischer *Maineville",
+    "builder": "Fischer Homes",
     "floorplan": "Calvin / Teagan",
     "original": "",
     "reclean": "",
@@ -28249,8 +29217,8 @@
   },
   {
     "lotNumber": "4",
-    "subdivision": "Salt Run Preserve",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Salt Run Preserve *Fischer *Maineville",
+    "builder": "Fischer Homes",
     "floorplan": "Carrington",
     "original": "",
     "reclean": "",
@@ -28260,8 +29228,8 @@
   },
   {
     "lotNumber": "362",
-    "subdivision": "Salt Run Preserve",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Salt Run Preserve *Fischer *Maineville",
+    "builder": "Fischer Homes",
     "floorplan": "Charles / Finley",
     "original": "",
     "reclean": "",
@@ -28271,8 +29239,8 @@
   },
   {
     "lotNumber": "242",
-    "subdivision": "Salt Run Preserve",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Salt Run Preserve *Fischer *Maineville",
+    "builder": "Fischer Homes",
     "floorplan": "Fairfax",
     "original": "",
     "reclean": "",
@@ -28282,8 +29250,8 @@
   },
   {
     "lotNumber": "244",
-    "subdivision": "Salt Run Preserve",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Salt Run Preserve *Fischer *Maineville",
+    "builder": "Fischer Homes",
     "floorplan": "Fairfax",
     "original": "",
     "reclean": "",
@@ -28293,8 +29261,8 @@
   },
   {
     "lotNumber": "257",
-    "subdivision": "Salt Run Preserve",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Salt Run Preserve *Fischer *Maineville",
+    "builder": "Fischer Homes",
     "floorplan": "Wesley",
     "original": "",
     "reclean": "",
@@ -28304,8 +29272,8 @@
   },
   {
     "lotNumber": "240",
-    "subdivision": "Salt Run Preserve",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Salt Run Preserve *Fischer *Maineville",
+    "builder": "Fischer Homes",
     "floorplan": "Wesley",
     "original": "",
     "reclean": "",
@@ -28315,8 +29283,8 @@
   },
   {
     "lotNumber": "11",
-    "subdivision": "Salt Run Preserve",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Salt Run Preserve *Fischer *Maineville",
+    "builder": "Fischer Homes",
     "floorplan": "Wyatt",
     "original": "",
     "reclean": "",
@@ -28664,6 +29632,50 @@
     "windows": "12",
     "address": "9597 Rosemont Road",
     "lastUpdated": "2026-06-11"
+  },
+  {
+    "lotNumber": "164",
+    "subdivision": "Scotts *Pulte *Plain City",
+    "builder": "Pulte",
+    "floorplan": "Willwood",
+    "original": "12",
+    "reclean": "4",
+    "windows": "12",
+    "address": "9590 Glenfield Avenue",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "234",
+    "subdivision": "Scotts *Pulte *Plain City",
+    "builder": "Pulte",
+    "floorplan": "Allison II",
+    "original": "12",
+    "reclean": "4",
+    "windows": "10",
+    "address": "9577 Rosemont Road",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "241",
+    "subdivision": "Scotts *Pulte *Plain City",
+    "builder": "Pulte",
+    "floorplan": "Allison II",
+    "original": "12",
+    "reclean": "4",
+    "windows": "10",
+    "address": "9647 Rosemont Road",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "737",
+    "subdivision": "Shanahan Rd *Lewis Center",
+    "builder": "Andrew Meyer",
+    "floorplan": "Custom",
+    "original": "10",
+    "reclean": "4",
+    "windows": "8",
+    "address": "737 Shanahan Rd",
+    "lastUpdated": "2026-06-18"
   },
   {
     "lotNumber": "30006",
@@ -29291,6 +30303,39 @@
     "windows": "5",
     "address": "6313 Montauk Road",
     "lastUpdated": "2026-06-11"
+  },
+  {
+    "lotNumber": "30047",
+    "subdivision": "Slate *Pulte *Lewis Center",
+    "builder": "Pulte",
+    "floorplan": "Mirage",
+    "original": "6",
+    "reclean": "2",
+    "windows": "4",
+    "address": "6482 Graphite Lane",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "30052",
+    "subdivision": "Slate *Pulte *Lewis Center",
+    "builder": "Pulte",
+    "floorplan": "Mirage",
+    "original": "6",
+    "reclean": "2",
+    "windows": "4",
+    "address": "6429 Graphite Lane",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "4586",
+    "subdivision": "Starret Rd *Sierra *Columbus",
+    "builder": "Sierra",
+    "floorplan": "Custom",
+    "original": "16",
+    "reclean": "8",
+    "windows": "16",
+    "address": "4586 Starrett Rd",
+    "lastUpdated": "2026-06-23"
   },
   {
     "lotNumber": "52",
@@ -30501,6 +31546,72 @@
     "windows": "8",
     "address": "2092 Pesca Drive",
     "lastUpdated": "2026-06-16"
+  },
+  {
+    "lotNumber": "379",
+    "subdivision": "Sugar Farms *Pulte *Hillard",
+    "builder": "Pulte",
+    "floorplan": "Riverton II",
+    "original": "12",
+    "reclean": "4",
+    "windows": "8",
+    "address": "6118 Dever Lane",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "384",
+    "subdivision": "Sugar Farms *Pulte *Hillard",
+    "builder": "Pulte",
+    "floorplan": "Allison II",
+    "original": "12",
+    "reclean": "4",
+    "windows": "10",
+    "address": "6070 Dever Lane",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "173",
+    "subdivision": "Sugar Farms *Pulte *Hillard",
+    "builder": "Pulte",
+    "floorplan": "Mystique",
+    "original": "8",
+    "reclean": "3",
+    "windows": "6",
+    "address": "1883 Zucchina Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "447",
+    "subdivision": "Sugar Farms *Pulte *Hillard",
+    "builder": "Pulte",
+    "floorplan": "Mercer II",
+    "original": "9",
+    "reclean": "4",
+    "windows": "10",
+    "address": "2089 Pesca Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "449",
+    "subdivision": "Sugar Farms *Pulte *Hillard",
+    "builder": "Pulte",
+    "floorplan": "Newberry II",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
+    "address": "2101 Pesca Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "490",
+    "subdivision": "Sugar Farms *Pulte *Hillard",
+    "builder": "Pulte",
+    "floorplan": "Newberry II",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
+    "address": "2104 Pesca Drive",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "1",
@@ -31889,6 +33000,17 @@
     "lastUpdated": "2026-04-03"
   },
   {
+    "lotNumber": "1106",
+    "subdivision": "Towns on the Greenway *Pulte *Westerville",
+    "builder": "Pulte",
+    "floorplan": "Closed",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "366 Hockberry Avenue",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "102",
     "subdivision": "Towns on the Greenway *Pulte *Westerville",
     "builder": "Pulte",
@@ -32395,6 +33517,39 @@
     "lastUpdated": "2026-06-11"
   },
   {
+    "lotNumber": "300",
+    "subdivision": "Towns on the Greenway *Pulte *Westerville",
+    "builder": "Pulte",
+    "floorplan": "Building Shell",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "Shell 3",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "800",
+    "subdivision": "Towns on the Greenway *Pulte *Westerville",
+    "builder": "Pulte",
+    "floorplan": "Building Shell",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "Shell 8",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "900",
+    "subdivision": "Towns on the Greenway *Pulte *Westerville",
+    "builder": "Pulte",
+    "floorplan": "Building Shell",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "Shell 9",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "804",
     "subdivision": "Towns On The Parkway *Pulte *Dublin",
     "builder": "Pulte",
@@ -32813,9 +33968,53 @@
     "lastUpdated": "2026-04-03"
   },
   {
+    "lotNumber": "2300",
+    "subdivision": "Towns On The Parkway *Pulte *Dublin",
+    "builder": "Pulte",
+    "floorplan": "Building Shell",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "6892 Seville Street",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "2400",
+    "subdivision": "Towns On The Parkway *Pulte *Dublin",
+    "builder": "Pulte",
+    "floorplan": "Building Shell",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "4100 McCune Avenue",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "2800",
+    "subdivision": "Towns On The Parkway *Pulte *Dublin",
+    "builder": "Pulte",
+    "floorplan": "Building Shell",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "4107 Tuller Road",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "2900",
+    "subdivision": "Towns On The Parkway *Pulte *Dublin",
+    "builder": "Pulte",
+    "floorplan": "Building Shell",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "4127 Tuller Road",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "156",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Breckenridge",
     "original": "",
     "reclean": "",
@@ -32825,8 +34024,8 @@
   },
   {
     "lotNumber": "248",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Calvin / Teagan",
     "original": "",
     "reclean": "",
@@ -32836,8 +34035,8 @@
   },
   {
     "lotNumber": "217",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Charles / Finley",
     "original": "",
     "reclean": "",
@@ -32847,8 +34046,8 @@
   },
   {
     "lotNumber": "107",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "DaVinci",
     "original": "",
     "reclean": "",
@@ -32858,8 +34057,8 @@
   },
   {
     "lotNumber": "191",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "DaVinci",
     "original": "",
     "reclean": "",
@@ -32869,8 +34068,8 @@
   },
   {
     "lotNumber": "88",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "DaVinci",
     "original": "",
     "reclean": "",
@@ -32880,8 +34079,8 @@
   },
   {
     "lotNumber": "236",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Emmett",
     "original": "",
     "reclean": "",
@@ -32891,8 +34090,8 @@
   },
   {
     "lotNumber": "65",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Fairfax",
     "original": "",
     "reclean": "",
@@ -32902,8 +34101,8 @@
   },
   {
     "lotNumber": "155",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Jensen",
     "original": "",
     "reclean": "",
@@ -32913,8 +34112,8 @@
   },
   {
     "lotNumber": "196",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Jensen",
     "original": "",
     "reclean": "",
@@ -32924,8 +34123,8 @@
   },
   {
     "lotNumber": "192",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Jensen",
     "original": "",
     "reclean": "",
@@ -32935,8 +34134,8 @@
   },
   {
     "lotNumber": "190",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Jensen",
     "original": "",
     "reclean": "",
@@ -32946,8 +34145,8 @@
   },
   {
     "lotNumber": "150",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Jensen",
     "original": "",
     "reclean": "",
@@ -32957,8 +34156,8 @@
   },
   {
     "lotNumber": "102",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Wesley",
     "original": "",
     "reclean": "",
@@ -32968,8 +34167,8 @@
   },
   {
     "lotNumber": "225",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Wyatt",
     "original": "",
     "reclean": "",
@@ -32979,8 +34178,8 @@
   },
   {
     "lotNumber": "163",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Yosemite",
     "original": "",
     "reclean": "",
@@ -32990,8 +34189,8 @@
   },
   {
     "lotNumber": "186",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Yosemite",
     "original": "",
     "reclean": "",
@@ -33001,8 +34200,8 @@
   },
   {
     "lotNumber": "197",
-    "subdivision": "Trailhead",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Trailhead *Fischer *Harrison",
+    "builder": "Fischer Homes",
     "floorplan": "Yosemite",
     "original": "",
     "reclean": "",
@@ -33275,9 +34474,75 @@
     "lastUpdated": "2026-05-20"
   },
   {
+    "lotNumber": "130",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6386 Silver Canoe Way",
+    "lastUpdated": "2026-06-25"
+  },
+  {
+    "lotNumber": "131",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6382 Silver Canoe Way",
+    "lastUpdated": "2026-06-30"
+  },
+  {
+    "lotNumber": "132",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6380 Silver Canoe Way",
+    "lastUpdated": "2026-06-30"
+  },
+  {
+    "lotNumber": "133",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6378 Silver Canoe Way",
+    "lastUpdated": "2026-06-30"
+  },
+  {
+    "lotNumber": "134",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6376 Silver Canoe Way",
+    "lastUpdated": "2026-06-30"
+  },
+  {
+    "lotNumber": "135",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6372 Silver Canoe Way",
+    "lastUpdated": "2026-06-30"
+  },
+  {
     "lotNumber": "469",
-    "subdivision": "Villages Classicway",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Villages of Classicway *Fischer *Morrow",
+    "builder": "Fischer Homes",
     "floorplan": "Beacon",
     "original": "",
     "reclean": "",
@@ -33287,8 +34552,8 @@
   },
   {
     "lotNumber": "494",
-    "subdivision": "Villages Classicway",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Villages of Classicway *Fischer *Morrow",
+    "builder": "Fischer Homes",
     "floorplan": "Beacon",
     "original": "",
     "reclean": "",
@@ -33298,8 +34563,8 @@
   },
   {
     "lotNumber": "470",
-    "subdivision": "Villages Classicway",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Villages of Classicway *Fischer *Morrow",
+    "builder": "Fischer Homes",
     "floorplan": "Breckenridge",
     "original": "",
     "reclean": "",
@@ -33309,8 +34574,8 @@
   },
   {
     "lotNumber": "502",
-    "subdivision": "Villages Classicway",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Villages of Classicway *Fischer *Morrow",
+    "builder": "Fischer Homes",
     "floorplan": "Breckenridge",
     "original": "",
     "reclean": "",
@@ -33320,8 +34585,8 @@
   },
   {
     "lotNumber": "519",
-    "subdivision": "Villages Classicway",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Villages of Classicway *Fischer *Morrow",
+    "builder": "Fischer Homes",
     "floorplan": "Fairfax",
     "original": "",
     "reclean": "",
@@ -33331,8 +34596,8 @@
   },
   {
     "lotNumber": "503",
-    "subdivision": "Villages Classicway",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Villages of Classicway *Fischer *Morrow",
+    "builder": "Fischer Homes",
     "floorplan": "Jensen",
     "original": "",
     "reclean": "",
@@ -33342,8 +34607,8 @@
   },
   {
     "lotNumber": "474",
-    "subdivision": "Villages Classicway",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Villages of Classicway *Fischer *Morrow",
+    "builder": "Fischer Homes",
     "floorplan": "Jensen",
     "original": "",
     "reclean": "",
@@ -33353,8 +34618,8 @@
   },
   {
     "lotNumber": "490",
-    "subdivision": "Villages Classicway",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Villages of Classicway *Fischer *Morrow",
+    "builder": "Fischer Homes",
     "floorplan": "Jensen",
     "original": "",
     "reclean": "",
@@ -33364,8 +34629,8 @@
   },
   {
     "lotNumber": "497",
-    "subdivision": "Villages Classicway",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Villages of Classicway *Fischer *Morrow",
+    "builder": "Fischer Homes",
     "floorplan": "Wesley",
     "original": "",
     "reclean": "",
@@ -33375,8 +34640,8 @@
   },
   {
     "lotNumber": "465",
-    "subdivision": "Villages Classicway",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Villages of Classicway *Fischer *Morrow",
+    "builder": "Fischer Homes",
     "floorplan": "Yosemite",
     "original": "",
     "reclean": "",
@@ -33386,8 +34651,8 @@
   },
   {
     "lotNumber": "522",
-    "subdivision": "Villages Classicway",
-    "builder": "Fischer Homes Cincinnati",
+    "subdivision": "Villages of Classicway *Fischer *Morrow",
+    "builder": "Fischer Homes",
     "floorplan": "Yosemite",
     "original": "",
     "reclean": "",
@@ -33789,7 +35054,29 @@
     "reclean": "3",
     "windows": "8",
     "address": "607 Eastman Avenue",
-    "lastUpdated": "2026-06-16"
+    "lastUpdated": "2026-07-02"
+  },
+  {
+    "lotNumber": "103",
+    "subdivision": "Walnut Mill *DR *Ashville",
+    "builder": "DR Horton",
+    "floorplan": "X490",
+    "original": "9",
+    "reclean": "4",
+    "windows": "6",
+    "address": "13 Water Mill Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "129",
+    "subdivision": "Walnut Mill *DR *Ashville",
+    "builder": "DR Horton",
+    "floorplan": "X423",
+    "original": "7",
+    "reclean": "3",
+    "windows": "6",
+    "address": "18 Water Mill Drive",
+    "lastUpdated": "2026-06-29"
   },
   {
     "lotNumber": "0",
@@ -36256,13 +37543,35 @@
     "lastUpdated": "2026-06-11"
   },
   {
+    "lotNumber": "7373",
+    "subdivision": "Woodcrest Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Worthington",
+    "original": "8",
+    "reclean": "3",
+    "windows": "9",
+    "address": "3608 Maize View Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
+    "lotNumber": "7402",
+    "subdivision": "Woodcrest Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Evanston",
+    "original": "9",
+    "reclean": "3",
+    "windows": "8",
+    "address": "3749 Maize View Drive",
+    "lastUpdated": "2026-06-29"
+  },
+  {
     "lotNumber": "1",
     "subdivision": "Woodhaven *Bob Webb *New Albany",
     "builder": "Bob Webb",
     "floorplan": "Custom",
-    "original": "30",
+    "original": "18",
     "reclean": "10",
-    "windows": "30",
+    "windows": "18",
     "address": "8610 Steeple Wood Dr",
     "lastUpdated": "2026-06-11"
   },
@@ -36342,5 +37651,401 @@
     "windows": "20",
     "address": "1863 Preserve Court",
     "lastUpdated": "2026-05-01"
+  },
+  {
+    "lotNumber": "234",
+    "subdivision": "Salt Run Preserve *Fischer *Maineville",
+    "builder": "Fischer Homes",
+    "floorplan": "Wesley",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "7893 HORIZON BEND",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "10",
+    "subdivision": "Chase Landings *Fischer *Galloway",
+    "builder": "Fischer Homes",
+    "floorplan": "Wesley",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "6236 Encosta Way",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "11",
+    "subdivision": "Chase Landings *Fischer *Galloway",
+    "builder": "Fischer Homes",
+    "floorplan": "Fairfax",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "6230 Encosta Way",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "256",
+    "subdivision": "Chase Landings *Fischer *Galloway",
+    "builder": "Fischer Homes",
+    "floorplan": "Yosemite",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "6227 Encosta Way",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "6",
+    "subdivision": "Glacier Pointe *Fischer *Canal",
+    "builder": "Fischer Homes",
+    "floorplan": "Breckenridge",
+    "original": "8",
+    "reclean": "3",
+    "windows": "8",
+    "address": "4569 BALTORO RD",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7040",
+    "subdivision": "Bordeaux Ct *Heinlin *Dublin",
+    "builder": "Heinlin",
+    "floorplan": "Custom",
+    "original": "40",
+    "reclean": "20",
+    "windows": "25",
+    "address": "7040 Bordeaux Ct",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "35",
+    "subdivision": "Arabella *WPLand *Blue Ash",
+    "builder": "WPLand",
+    "floorplan": "Custom",
+    "original": "12",
+    "reclean": "6",
+    "windows": "12",
+    "address": "No Address Listed",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "182",
+    "subdivision": "Amrine *Pulte *Marysville",
+    "builder": "Pulte",
+    "floorplan": "Hampton II - Bsmt",
+    "original": "9",
+    "reclean": "4",
+    "windows": "7",
+    "address": "2545 Red Winter Avenue",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "48",
+    "subdivision": "Maygrass *Del Webb *Plain City",
+    "builder": "Del Webb",
+    "floorplan": "Stellar",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "10372 Arches Loop",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "2951",
+    "subdivision": "Eagle *Pulte *Galena",
+    "builder": "Pulte",
+    "floorplan": "Crisfield",
+    "original": "8",
+    "reclean": "4",
+    "windows": "7",
+    "address": "7159 Crown Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "13927",
+    "subdivision": "Glenross *Pulte *Delaware",
+    "builder": "Pulte",
+    "floorplan": "Waverly III",
+    "original": "10",
+    "reclean": "4",
+    "windows": "",
+    "address": "112 East Wind Road",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "2630",
+    "subdivision": "Price Ponds *Pulte *Sunbury",
+    "builder": "Pulte",
+    "floorplan": "Hilltop II",
+    "original": "10",
+    "reclean": "3.5",
+    "windows": "7",
+    "address": "827 Fairway Loop",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "380",
+    "subdivision": "Sugar Farms *Pulte *Hillard",
+    "builder": "Pulte",
+    "floorplan": "Allison II",
+    "original": "12",
+    "reclean": "4",
+    "windows": "10",
+    "address": "6110 Dever Lane",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "3721",
+    "subdivision": "Berlin Farm *MI *Delaware",
+    "builder": "MI Homes",
+    "floorplan": "Findlay",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "1657 Kenneth Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7472",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Petoskey",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "5900 Creekview Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7475",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Oxford",
+    "original": "9",
+    "reclean": "3",
+    "windows": "8",
+    "address": "5882 Creekview Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7476",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Westerville",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "5876 Creekview Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7477",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Petoskey",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "5866 Creekview Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7478",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Westerville",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "5856 Creekview Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7479",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Oxford",
+    "original": "9",
+    "reclean": "3",
+    "windows": "8",
+    "address": "5848 Creekview Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7480",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Saugatuck",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "5840 Creekview Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7481",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Westerville",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "5832 Creekview Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7482",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Saugatuck",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "5822 Creekview Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7483",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Naperville",
+    "original": "6",
+    "reclean": "2",
+    "windows": "",
+    "address": "5810 Creekview Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7489",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Saugatuck",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "2790 Poplar Ridge Road",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7490",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Saugatuck",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "2780 Poplar Ridge Road",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7491",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Petoskey",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "2768 Poplar Ridge Road",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7492",
+    "subdivision": "Clarkshaw Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Westerville",
+    "original": "8",
+    "reclean": "3",
+    "windows": "",
+    "address": "2756 Poplar Ridge Road",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "1017",
+    "subdivision": "Hill Farm *MI *Hillard",
+    "builder": "MI Homes",
+    "floorplan": "Charleston",
+    "original": "8",
+    "reclean": "3",
+    "windows": "5",
+    "address": "4532 Nonius Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "1018",
+    "subdivision": "Hill Farm *MI *Hillard",
+    "builder": "MI Homes",
+    "floorplan": "Augusta",
+    "original": "6",
+    "reclean": "2",
+    "windows": "8",
+    "address": "4530 Nonius Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "478",
+    "subdivision": "Miller Farm *MI *Galena",
+    "builder": "MI Homes",
+    "floorplan": "Emory",
+    "original": "12",
+    "reclean": "4",
+    "windows": "",
+    "address": "323 River Birch Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "5761",
+    "subdivision": "Northwood *MI *Delaware",
+    "builder": "MI Homes",
+    "floorplan": "New Castle",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "1152 Brittany Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "5763",
+    "subdivision": "Northwood *MI *Delaware",
+    "builder": "MI Homes",
+    "floorplan": "Hinkle",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "1140 Brittany Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "5764",
+    "subdivision": "Northwood *MI *Delaware",
+    "builder": "MI Homes",
+    "floorplan": "Hickory",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "1134 Brittany Drive",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "5559",
+    "subdivision": "Winterbrooke Place *MI *Lewis Center",
+    "builder": "MI Homes",
+    "floorplan": "Worthington",
+    "original": "8",
+    "reclean": "3",
+    "windows": "9",
+    "address": "381 Royal Fern Lane",
+    "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "7364",
+    "subdivision": "Woodcrest Crossing *MI *Powell",
+    "builder": "MI Homes",
+    "floorplan": "Madison",
+    "original": "8",
+    "reclean": "3",
+    "windows": "7",
+    "address": "3697 Colts Reign Drive",
+    "lastUpdated": "2026-07-01"
   }
 ]
