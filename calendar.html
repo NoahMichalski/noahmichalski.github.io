@@ -46,7 +46,7 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .wrap { width: min(1920px, calc(100% - 18px)); margin: 0 auto; }
+    .wrap { width: calc(100% - 16px); margin: 0 auto; }
 
     .topbar {
       display: flex;
@@ -73,8 +73,8 @@
 
     .grid {
       display: grid;
-      grid-template-columns: 390px 390px minmax(0, 1fr);
-      gap: 18px;
+      grid-template-columns: 350px 340px minmax(900px, 1fr);
+      gap: 12px;
       align-items: start;
     }
 
@@ -312,6 +312,7 @@
     .tag.windows { background: rgba(14,165,233,.14); color: #bae6fd; border: 1px solid rgba(14,165,233,.34); }
     .tag.am { background: rgba(251,191,36,.14); color: #fde68a; border: 1px solid rgba(251,191,36,.35); }
     .tag.pm { background: rgba(168,85,247,.14); color: #e9d5ff; border: 1px solid rgba(168,85,247,.35); }
+    .tag.timeflag { background: rgba(14,165,233,.14); color: #bae6fd; border: 1px solid rgba(14,165,233,.34); }
     .tag.dupe { background: rgba(251,191,36,.14); color: #fde68a; border: 1px solid rgba(251,191,36,.35); }
 
     .dateBanner {
@@ -745,7 +746,7 @@
 
     .previewTable {
       width: 100%;
-      min-width: 980px;
+      min-width: 1180px;
       table-layout: fixed;
       border-collapse: collapse;
       font-size: 12px;
@@ -757,13 +758,14 @@
       vertical-align: middle;
     }
 
-    .previewTable th:nth-child(1), .previewTable td:nth-child(1) { width: 76px; }
-    .previewTable th:nth-child(2), .previewTable td:nth-child(2) { width: 42px; }
-    .previewTable th:nth-child(3), .previewTable td:nth-child(3) { width: 118px; }
-    .previewTable th:nth-child(4), .previewTable td:nth-child(4) { width: 170px; }
-    .previewTable th:nth-child(5), .previewTable td:nth-child(5) { width: 32%; }
-    .previewTable th:nth-child(6), .previewTable td:nth-child(6) { width: 34%; }
-    .previewTable th:nth-child(7), .previewTable td:nth-child(7) { width: 130px; }
+    .previewTable th:nth-child(1), .previewTable td:nth-child(1) { width: 72px; }
+    .previewTable th:nth-child(2), .previewTable td:nth-child(2) { width: 38px; }
+    .previewTable th:nth-child(3), .previewTable td:nth-child(3) { width: 112px; }
+    .previewTable th:nth-child(4), .previewTable td:nth-child(4) { width: 150px; }
+    .previewTable th:nth-child(5), .previewTable td:nth-child(5) { width: 30%; }
+    .previewTable th:nth-child(6), .previewTable td:nth-child(6) { width: 30%; }
+    .previewTable th:nth-child(7), .previewTable td:nth-child(7) { width: 150px; }
+    .previewTable th:nth-child(8), .previewTable td:nth-child(8) { width: 155px; }
 
     .previewMeta {
       margin-top: 5px;
@@ -849,7 +851,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows/Cincinnati → preview/edit → export or import to Google Calendar.</div>
       </div>
-      <div class="version">v2.02</div>
+      <div class="version">v2.03</div>
     </div>
   </header>
 
@@ -1399,16 +1401,22 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
       if (/^(originals?|recleans?|cleaning|thursday|friday|monday|tuesday|wednesday|saturday|sunday)$/i.test(raw)) return null;
 
-      const isAM = /(^|\s|\*)AM(\s|\*|:|-|$)/i.test(raw);
-      const isPM = /(^|\s|\*)PM(\s|\*|:|-|$)/i.test(raw);
+      let timePrefix = '';
+      const timePrefixMatch = raw.match(/^\s*(\d{1,2})(?::?00)?\s*([AP])M?\b\s*[-:—–]?\s*/i);
+      if (timePrefixMatch) {
+        timePrefix = `${Number(timePrefixMatch[1])}${timePrefixMatch[2].toUpperCase()}M`;
+        raw = raw.slice(timePrefixMatch[0].length).trim();
+      }
+
+      let isAM = Boolean(timePrefix && /AM$/i.test(timePrefix)) || /(^|\s|\*)AM(\s|\*|:|-|$)/i.test(raw);
+      let isPM = Boolean(timePrefix && /PM$/i.test(timePrefix)) || /(^|\s|\*)PM(\s|\*|:|-|$)/i.test(raw);
 
       raw = raw
-        // Remove AM/PM from beginning or end so it only appears once in front.
-        // Handles: AM 206 MD, 206 MD**AM, PM 206 MD, 206 MD**PM, 206 MD *PM*
+        // Remove AM/PM markers wherever they appear, but keep 7AM/8PM as a front label only.
+        // Handles: AM 206 MD, 206 MD AM*, 206 MD *AM* 1st, PM 206 MD, 7AM 206 MD.
         .replace(/^\*?(AM|PM)\*?\s*[-:—–]?\s*/i, '')
-        .replace(/\s*\*+\s*(AM|PM)\s*\*+\s*$/i, '')
-        .replace(/\s*\*+\s*(AM|PM)\s*$/i, '')
-        .replace(/\s*(AM|PM)\s*$/i, '')
+        .replace(/\s*\*+\s*(AM|PM)\s*\*+/ig, ' ')
+        .replace(/\s+\*?(AM|PM)\*?(?=\s|$)/ig, ' ')
         .replace(/\s+/g, ' ')
         .trim();
 
@@ -1441,13 +1449,15 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         subjectCore += ` - ${lookup.floorplan}`;
       }
 
-      const subject = `${isAM ? '*AM* ' : isPM ? '*PM* ' : ''}${subjectCore}${note ? ' ' + note : ''}`.replace(/\s+/g, ' ').trim();
+      const prefixLabel = timePrefix ? `${timePrefix} ` : (isAM ? '*AM* ' : isPM ? '*PM* ' : '');
+      const subject = `${prefixLabel}${subjectCore}${note ? ' ' + note : ''}`.replace(/\s+/g, ' ').trim();
 
       return {
         type,
         typeLabel,
         isAM,
         isPM,
+        timePrefix,
         lot,
         typedSub,
         shortcutSubdivision: shortcutMatch?.subdivision || '',
@@ -1667,7 +1677,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
                     <option value="windows" ${row.type === 'windows' ? 'selected' : ''}>Windows</option>
                     <option value="cincinnati" ${row.type === 'cincinnati' ? 'selected' : ''}>Cincinnati</option>
                   </select>
-                  ${row.isAM ? '<span class="tag am">AM</span>' : ''}${row.isPM ? '<span class="tag pm">PM</span>' : ''}${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : ''}
+                  ${row.timePrefix ? '<span class="tag timeflag">' + escapeHTML(row.timePrefix) + '</span>' : (row.isAM ? '<span class="tag am">AM</span>' : '')}${row.isPM && !row.timePrefix ? '<span class="tag pm">PM</span>' : ''}${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : ''}
                 </td>
                 <td><input class="editInput timeEdit" data-edit-row="${idx}" data-edit-field="start" value="${escapeHTML(row.start)}" oninput="updateParsedRow(${idx}, 'start', this.value)" /></td>
                 <td><input class="editInput timeEdit" data-edit-row="${idx}" data-edit-field="end" value="${escapeHTML(row.end)}" oninput="updateParsedRow(${idx}, 'end', this.value)" /></td>
@@ -1689,12 +1699,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
     function renderLastTaskHTML(row) {
       if (!row.lastTaskChecked) return '<div class="lastTaskBox">Last task: not checked</div>';
-
-      const recleanLine = row.recleanTotalIncludingImport !== undefined
-        ? `<br>Recleans: ${escapeHTML(row.recleanTotalIncludingImport)} total (${escapeHTML(row.recleanHistoryCount || 0)} prior + ${escapeHTML(row.recleanPendingCount || 0)} pending import)`
-        : '';
-
-      if (!row.lastTaskFound) return `<div class="lastTaskBox">Last task: none found in 30 days${recleanLine}</div>`;
+      if (!row.lastTaskFound) return '<div class="lastTaskBox">Last task: none found in 30 days</div>';
 
       const cls = row.lastTaskDuplicateOriginal || row.lastTaskPreviousDay ? 'danger' : (row.lastTaskDryClean ? 'warn' : '');
       const flags = [];
@@ -1703,7 +1708,16 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       else if (row.lastTaskDryClean) flags.push('⚠ Last was Dry Clean');
 
       const flagText = flags.length ? ' — ' + flags.join(' · ') : '';
-      return `<div class="lastTaskBox ${cls}">Last: ${escapeHTML(row.lastTaskType || '')} — ${escapeHTML(row.lastTaskDate || '')}${flagText}<br>${escapeHTML(row.lastTaskSubject || '')}${recleanLine}</div>`;
+      return `<div class="lastTaskBox ${cls}">Last: ${escapeHTML(row.lastTaskType || '')} — ${escapeHTML(row.lastTaskDate || '')}${flagText}<br>${escapeHTML(row.lastTaskSubject || '')}</div>`;
+    }
+
+    function renderRecleanCountHTML(row) {
+      if (!row.lastTaskChecked) return '<div class="lastTaskBox">Not checked</div>';
+      const total = row.recleanTotalIncludingImport ?? 0;
+      const prior = row.recleanHistoryCount ?? 0;
+      const pending = row.recleanPendingCount ?? 0;
+      const cls = total >= 2 ? 'warn' : '';
+      return `<div class="lastTaskBox ${cls}"><b>${escapeHTML(total)}</b> total<br>${escapeHTML(prior)} prior + ${escapeHTML(pending)} pending</div>`;
     }
 
     function parsePreviewFromRows() {
@@ -1713,6 +1727,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       const originalCount = parsedRows.filter(r => r.type === 'original').length;
       const recleanCount = parsedRows.filter(r => r.type === 'reclean').length;
       const windowsCount = parsedRows.filter(r => r.type === 'windows').length;
+      const cincinnatiCount = parsedRows.filter(r => r.type === 'cincinnati').length;
       const amCount = parsedRows.filter(r => r.isAM).length;
       const pmCount = parsedRows.filter(r => r.isPM).length;
       const matchedCount = parsedRows.filter(r => r.matched).length;
@@ -1722,10 +1737,12 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       byId('originalCount').textContent = `${originalCount} job${originalCount === 1 ? '' : 's'}`;
       byId('recleanCount').textContent = `${recleanCount} job${recleanCount === 1 ? '' : 's'}`;
       byId('windowsCount').textContent = `${windowsCount} job${windowsCount === 1 ? '' : 's'}`;
+      byId('cincinnatiCount').textContent = `${cincinnatiCount} job${cincinnatiCount === 1 ? '' : 's'}`;
       byId('totalJobs').textContent = parsedRows.length;
       byId('originalJobs').textContent = originalCount;
       byId('recleanJobs').textContent = recleanCount;
       byId('windowsJobs').textContent = windowsCount;
+      byId('cincinnatiJobs').textContent = cincinnatiCount;
       byId('matchedJobs').textContent = matchedCount;
       byId('missingJobs').textContent = missingCount;
       byId('duplicateJobs').textContent = duplicateCount;
@@ -1751,6 +1768,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
               <th>Time</th>
               <th>Subject</th>
               <th>Location</th>
+              <th>Recleans</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -1788,6 +1806,9 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
                 </td>
                 <td>
                   <input class="editInput locationEdit" data-edit-row="${idx}" data-edit-field="locationOverride" value="${escapeHTML(getRowLocation(row))}" oninput="updateParsedRow(${idx}, 'locationOverride', this.value)" />
+                </td>
+                <td>
+                  ${renderRecleanCountHTML(row)}
                 </td>
                 <td>
                   ${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : (row.matched ? '<span class="tag original">Matched</span>' : '<span class="tag miss">' + escapeHTML(row.matchStatus) + '</span>')}
