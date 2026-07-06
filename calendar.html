@@ -849,7 +849,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows/Cincinnati → preview/edit → export or import to Google Calendar.</div>
       </div>
-      <div class="version">v2.01</div>
+      <div class="version">v2.02</div>
     </div>
   </header>
 
@@ -1689,7 +1689,12 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
     function renderLastTaskHTML(row) {
       if (!row.lastTaskChecked) return '<div class="lastTaskBox">Last task: not checked</div>';
-      if (!row.lastTaskFound) return '<div class="lastTaskBox">Last task: none found in 30 days</div>';
+
+      const recleanLine = row.recleanTotalIncludingImport !== undefined
+        ? `<br>Recleans: ${escapeHTML(row.recleanTotalIncludingImport)} total (${escapeHTML(row.recleanHistoryCount || 0)} prior + ${escapeHTML(row.recleanPendingCount || 0)} pending import)`
+        : '';
+
+      if (!row.lastTaskFound) return `<div class="lastTaskBox">Last task: none found in 30 days${recleanLine}</div>`;
 
       const cls = row.lastTaskDuplicateOriginal || row.lastTaskPreviousDay ? 'danger' : (row.lastTaskDryClean ? 'warn' : '');
       const flags = [];
@@ -1698,7 +1703,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       else if (row.lastTaskDryClean) flags.push('⚠ Last was Dry Clean');
 
       const flagText = flags.length ? ' — ' + flags.join(' · ') : '';
-      return `<div class="lastTaskBox ${cls}">Last: ${escapeHTML(row.lastTaskType || '')} — ${escapeHTML(row.lastTaskDate || '')}${flagText}<br>${escapeHTML(row.lastTaskSubject || '')}</div>`;
+      return `<div class="lastTaskBox ${cls}">Last: ${escapeHTML(row.lastTaskType || '')} — ${escapeHTML(row.lastTaskDate || '')}${flagText}<br>${escapeHTML(row.lastTaskSubject || '')}${recleanLine}</div>`;
     }
 
     function parsePreviewFromRows() {
@@ -3252,6 +3257,19 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       return histSub === curSub || histSub.includes(curSub) || curSub.includes(histSub);
     }
 
+    function parsedRowsSameLotSubdivision(a, b) {
+      const aa = rowReportDetails(a);
+      const bb = rowReportDetails(b);
+      if (!aa.lot || !bb.lot) return false;
+      if (normalizeKey(aa.lot) !== normalizeKey(bb.lot)) return false;
+
+      const aSub = aa.subdivisionKey;
+      const bSub = bb.subdivisionKey;
+      if (!aSub || !bSub) return false;
+
+      return aSub === bSub || aSub.includes(bSub) || bSub.includes(aSub);
+    }
+
     function isOriginalLikeTask(taskType) {
       return taskType === 'Original' || taskType === 'Dry Clean';
     }
@@ -3307,6 +3325,18 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           row.lastTaskDryClean = last?.TaskType === 'Dry Clean';
           row.lastTaskPreviousDay = Boolean(last && last.Date === endDate);
           row.lastTaskDuplicateOriginal = row.type === 'original' && isOriginalLikeTask(last?.TaskType || '');
+
+          const historyRecleans = history.filter(hist =>
+            reportRowMatchesParsedRow(hist, row) && hist.TaskType === 'Reclean'
+          ).length;
+
+          const pendingRecleans = parsedRows.filter(other =>
+            other.type === 'reclean' && parsedRowsSameLotSubdivision(other, row)
+          ).length;
+
+          row.recleanHistoryCount = historyRecleans;
+          row.recleanPendingCount = pendingRecleans;
+          row.recleanTotalIncludingImport = historyRecleans + pendingRecleans;
         });
 
         parsePreviewFromRows();
@@ -3314,7 +3344,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         const flagged = parsedRows.filter(r => r.lastTaskDuplicateOriginal).length;
         const dryFlags = parsedRows.filter(r => r.lastTaskDryClean).length;
         const previousDayFlags = parsedRows.filter(r => r.lastTaskPreviousDay).length;
-        showToast(`Last task check complete. ${flagged} duplicate-original flag(s), ${dryFlags} dry-clean flag(s), ${previousDayFlags} previous-day flag(s).`);
+        showToast(`Last task check complete. ${flagged} duplicate-original flag(s), ${dryFlags} dry-clean flag(s), ${previousDayFlags} previous-day flag(s). Reclean totals are shown per row.`);
       } catch (err) {
         console.error(err);
         showToast(err.message || 'Could not check last tasks.');
