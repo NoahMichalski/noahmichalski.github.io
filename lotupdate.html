@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Builder New Lot Checker - All Builders + DR Schedule</title>
-<!-- Version: 2026-06-18 settings-save-apply-no-overwrite-fix -->
+<!-- Version: v1.12 DR schedule CSV parser visibility + Excel formula cleanup -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -47,7 +47,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Builder New Lot Checker <span class="version-pill">All builders + fixed saved settings</span></h1>
+  <h1>Builder New Lot Checker <span class="version-pill">Version 1.12</span></h1>
   <p class="sub">Upload your <b>Floor Plans</b> sheet, optionally upload your <b>Subdivisions</b> sheet for exact names, pick the builder/export type, then upload that builder export. The tool compares lots by <b>subdivision + lot</b>, with an address fallback, and shows anything missing from the Floor Plans sheet.</p>
 
   <div class="grid">
@@ -335,9 +335,14 @@ function cleanMIPlan(v){ return cleanText(v).replace(/\s+\d{3,5}\b.*$/, '').trim
 function cleanDRCommunity(v){ return cleanText(v).replace(/\s+-\s*\d+\s*$/, '').trim(); }
 function cleanExcelCsvCell(v){
   let s = cleanText(v);
-  const m = s.match(/^=\"(.*)\"$/);
-  if (m) s = m[1];
-  return cleanText(s.replace(/^\"|\"$/g, ''));
+  // DR Horton CSV exports often wrap text cells as Excel formulas, for example:
+  // ="6396 Silver Canoe Way" or, after CSV parsing, =6396 Silver Canoe Way.
+  // Strip both forms so rows do not get skipped or compared with a leading equals sign.
+  const formulaQuoted = s.match(/^=\"(.*)\"$/);
+  if (formulaQuoted) s = formulaQuoted[1];
+  else if (s.startsWith('=')) s = s.slice(1);
+  s = s.replace(/^\"|\"$/g, '');
+  return cleanText(s);
 }
 function cleanDRScheduleCommunity(v){ return cleanDRCommunity(cleanExcelCsvCell(v)); }
 function deriveEpconLotFromHouseNumber(v){
@@ -664,7 +669,12 @@ async function loadBuilderExport(files){
   rawRows = rows.slice(h+1).map(r => rowObj(headers,r));
   normalizeJobsFromRaw();
   const label = sourceType === 'mi' ? 'MI Homes job rows' : (sourceType === 'dr' ? 'DR Horton lot rows' : (sourceType === 'drschedule' ? 'DR Horton schedule rows' : 'Pulte job rows'));
-  $('jobsStatus').innerHTML = `<span class="ok">Loaded ${rawRows.length} ${label}. Parsed ${jobRows.length} usable rows.</span>`;
+  if (sourceType === 'drschedule') {
+    const uniqueImportedLots = new Set(jobRows.map(r => `${norm(r.Community)}|${cleanLot(r.Lot)}|${cleanAddress(r.Address) || norm(r.Plan)}`)).size;
+    $('jobsStatus').innerHTML = `<span class="ok">Loaded ${rawRows.length} ${label}. Parsed ${jobRows.length} usable task rows / ${uniqueImportedLots} unique lots. If a lot is parsed but does not appear below, it already matched your Floor Plans sheet.</span>`;
+  } else {
+    $('jobsStatus').innerHTML = `<span class="ok">Loaded ${rawRows.length} ${label}. Parsed ${jobRows.length} usable rows.</span>`;
+  }
   $('jobCount').textContent = rawRows.length;
   addMissingMappingsFromJobs(); checkReady();
 }
@@ -715,18 +725,24 @@ function normalizeJobsFromRaw(){
         Status: cleanText(r.HouseType)
       });
     } else if (sourceType === 'drschedule') {
-      const community = cleanDRScheduleCommunity(r.Project);
-      const lot = cleanLot(cleanExcelCsvCell(r['Plat Lot/Block/Phase'])) || cleanLot(cleanExcelCsvCell(r['Job Number']));
+      // Schedule CSV path only. Keep other builders untouched.
+      // Some DR exports have exact headers, but this also tolerates slight header variations.
+      const communityRaw = r.Project ?? r.Community ?? r['Project Name'] ?? '';
+      const addressRaw = r.Address ?? r['Street Address'] ?? '';
+      const platRaw = r['Plat Lot/Block/Phase'] ?? r['Plat/Lot/Block/Phase'] ?? r['Lot/Block/Phase'] ?? r.Lot ?? '';
+      const jobRaw = r['Job Number'] ?? r['Job #'] ?? '';
+      const community = cleanDRScheduleCommunity(communityRaw);
+      const lot = cleanLot(cleanExcelCsvCell(platRaw)) || cleanLot(cleanExcelCsvCell(jobRaw));
       if (!community || !lot) continue;
       jobRows.push({
         RawCommunity: community,
         Community: community,
         Lot: lot,
         Plan: cleanExcelCsvCell(r.Plan),
-        Address: cleanExcelCsvCell(r.Address),
+        Address: cleanExcelCsvCell(addressRaw),
         City: '',
         Elevation: cleanExcelCsvCell(r.Elevation),
-        Phase: cleanExcelCsvCell(r['Plat Lot/Block/Phase']),
+        Phase: cleanExcelCsvCell(platRaw),
         Task: cleanExcelCsvCell(r.Description),
         TaskCode: '',
         Status: cleanExcelCsvCell(r['House Type'])
@@ -1008,7 +1024,7 @@ function updateSourceUI(){
     $('sourceHelp').textContent = 'DR Horton active lots CSV columns: Community, Address, City, State, Zip, Plan, Lot. Community codes like “Bishop Estates - 97800” are cleaned to “Bishop Estates”.';
     $('jobCountLabel').textContent = 'DR Horton lot rows';
   } else if (sourceType === 'drschedule') {
-    $('sourceHelp').textContent = 'DR Horton schedule CSV columns: Date, Project, Address, Job Number, Plat Lot/Block/Phase, Plan, Elevation, Description. The lot comes from the first number in Plat Lot/Block/Phase, and repeated task rows are deduped into one lot.';
+    $('sourceHelp').textContent = 'DR Horton schedule CSV columns: Date, Project, Address, Job Number, Plat Lot/Block/Phase, Plan, Elevation, Description. Version 1.12 reads the CSV as text and strips Excel formula wrappers like ="6396 Silver...". If a parsed lot does not show as new, it already matched Floor Plans.';
     $('jobCountLabel').textContent = 'DR Horton schedule rows';
   } else if (sourceType === 'epcon') {
     $('sourceHelp').textContent = 'Epcon: upload one or more monthly schedule files. Block/Lot uses the number after the slash as the lot. If Block/Lot is missing, the tool derives the lot from the House number code. Epcon has no floorplan in this schedule, so Floorplan is left blank.';
