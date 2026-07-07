@@ -16057,7 +16057,7 @@
     "reclean": "10",
     "windows": "25",
     "address": "9026 Fox Field Path",
-    "lastUpdated": "2026-07-02"
+    "lastUpdated": "2026-07-07"
   },
   {
     "lotNumber": "7",
@@ -17828,7 +17828,7 @@
     "reclean": "3",
     "windows": "7",
     "address": "5923 Pitch Pine Drive",
-    "lastUpdated": "2026-07-02"
+    "lastUpdated": "2026-07-07"
   },
   {
     "lotNumber": "61",
@@ -19533,7 +19533,7 @@
     "reclean": "3",
     "windows": "8",
     "address": "155 Lorrimore Drive",
-    "lastUpdated": "2026-07-02"
+    "lastUpdated": "2026-07-07"
   },
   {
     "lotNumber": "5271",
@@ -20424,7 +20424,7 @@
     "reclean": "4",
     "windows": "8",
     "address": "2520 Farmhouse Lane",
-    "lastUpdated": "2026-07-02"
+    "lastUpdated": "2026-07-07"
   },
   {
     "lotNumber": "19",
@@ -26276,7 +26276,7 @@
     "reclean": "3",
     "windows": "8",
     "address": "2275 Overlook Way",
-    "lastUpdated": "2026-07-02"
+    "lastUpdated": "2026-07-07"
   },
   {
     "lotNumber": "13795",
@@ -34540,6 +34540,116 @@
     "lastUpdated": "2026-06-30"
   },
   {
+    "lotNumber": "120",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6420 Silver Canoe Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "121",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6416 Silver Canoe Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "122",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6414 Silver Canoe Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "123",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6410 Silver Canoe Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "124",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6404 Silver Canoe Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "125",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6400 Silver Canoe Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "126",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6398 Silver Canoe Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "127",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6396 Silver Canoe Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "128",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6394 Silver Canoe Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "129",
+    "subdivision": "Villages at Galloway *DR *Galloway",
+    "builder": "DR Horton",
+    "floorplan": "XT05",
+    "original": "5",
+    "reclean": "3",
+    "windows": "4",
+    "address": "6390 Silver Canoe Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
     "lotNumber": "469",
     "subdivision": "Villages of Classicway *Fischer *Morrow",
     "builder": "Fischer Homes",
@@ -35054,7 +35164,7 @@
     "reclean": "3",
     "windows": "8",
     "address": "607 Eastman Avenue",
-    "lastUpdated": "2026-07-02"
+    "lastUpdated": "2026-07-07"
   },
   {
     "lotNumber": "103",
@@ -38047,5 +38157,467 @@
     "windows": "7",
     "address": "3697 Colts Reign Drive",
     "lastUpdated": "2026-07-01"
+  },
+  {
+    "lotNumber": "241",
+    "subdivision": "Old Haritage *Arbor *Shelbyville,Kentucky",
+    "builder": "Arbor Homes",
+    "floorplan": "Aspen II",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "5010 Irwin Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "184",
+    "subdivision": "Maren Reserve *Arbor *Plain City",
+    "builder": "Arbor Homes",
+    "floorplan": "Ironwood",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "2597 Owens Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "3",
+    "subdivision": "Old Haritage *Arbor *Shelbyville,Kentucky",
+    "builder": "Arbor Homes",
+    "floorplan": "Aspen II",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "2009 Carnegie Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "242",
+    "subdivision": "Old Haritage *Arbor *Shelbyville,Kentucky",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "10",
+    "address": "5014 Irwin Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "251",
+    "subdivision": "Old Haritage *Arbor *Shelbyville,Kentucky",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "10",
+    "address": "5050 Irwin Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "268",
+    "subdivision": "Old Haritage *Arbor *Shelbyville,Kentucky",
+    "builder": "Arbor Homes",
+    "floorplan": "Juniper",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "5009 Irwin Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "269",
+    "subdivision": "Old Haritage *Arbor *Shelbyville,Kentucky",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "10",
+    "address": "5005 Irwin Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "279",
+    "subdivision": "Old Haritage *Arbor *Shelbyville,Kentucky",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "10",
+    "address": "4197 Tingle Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "286",
+    "subdivision": "Old Haritage *Arbor *Shelbyville,Kentucky",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "10",
+    "address": "4151 Tingle Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "300",
+    "subdivision": "Old Haritage *Arbor *Shelbyville,Kentucky",
+    "builder": "Arbor Homes",
+    "floorplan": "Chestnut",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "4190 Tingle Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "304",
+    "subdivision": "Old Haritage *Arbor *Shelbyville,Kentucky",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "10",
+    "address": "2004 Petty Lane",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "307",
+    "subdivision": "Old Haritage *Arbor *Shelbyville,Kentucky",
+    "builder": "Arbor Homes",
+    "floorplan": "Empress",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "4216 Tingle Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "322",
+    "subdivision": "Old Haritage *Arbor *Shelbyville,Kentucky",
+    "builder": "Arbor Homes",
+    "floorplan": "Aspen II",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "4275 Tingle Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "15",
+    "subdivision": "Trailside Landing *Arbor *Jeffersonville",
+    "builder": "Arbor Homes",
+    "floorplan": "Victoria",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "1651 Riverton Lane",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "16",
+    "subdivision": "Trailside Landing *Arbor *Jeffersonville",
+    "builder": "Arbor Homes",
+    "floorplan": "Berlin",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "1649 Riverton Lane",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "17",
+    "subdivision": "Trailside Landing *Arbor *Jeffersonville",
+    "builder": "Arbor Homes",
+    "floorplan": "Coach",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "1647 Riverton Lane",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "58",
+    "subdivision": "Trailside Landing *Arbor *Jeffersonville",
+    "builder": "Arbor Homes",
+    "floorplan": "Berlin",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "1650 Riverton Lane",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "59",
+    "subdivision": "Trailside Landing *Arbor *Jeffersonville",
+    "builder": "Arbor Homes",
+    "floorplan": "Berlin",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "1652 Riverton Lane",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "61",
+    "subdivision": "Trailside Landing *Arbor *Jeffersonville",
+    "builder": "Arbor Homes",
+    "floorplan": "Gladstone",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "1656 Riverton Lane",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "22",
+    "subdivision": "Edgewood Farms *Arbor *Canal",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "10",
+    "address": "435 Garrett Trail",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "215",
+    "subdivision": "London Landing *Arbor *London",
+    "builder": "Arbor Homes",
+    "floorplan": "Ashton",
+    "original": "8",
+    "reclean": "4",
+    "windows": "5",
+    "address": "221 Maddoxx Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "245",
+    "subdivision": "London Landing *Arbor *London",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "8",
+    "address": "329 Nixon Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "246",
+    "subdivision": "London Landing *Arbor *London",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "8",
+    "address": "327 Nixon Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "273",
+    "subdivision": "London Landing *Arbor *London",
+    "builder": "Arbor Homes",
+    "floorplan": "Cooper",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "431 Lukes Circle",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "44",
+    "subdivision": "Maren Reserve *Arbor *Plain City",
+    "builder": "Arbor Homes",
+    "floorplan": "Ironwood",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "1892 Estate Road",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "53",
+    "subdivision": "Maren Reserve *Arbor *Plain City",
+    "builder": "Arbor Homes",
+    "floorplan": "Spruce",
+    "original": "10",
+    "reclean": "4",
+    "windows": "8",
+    "address": "1336 Owens Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "62",
+    "subdivision": "Maren Reserve *Arbor *Plain City",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "10",
+    "address": "1722 Owens Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "173",
+    "subdivision": "Maren Reserve *Arbor *Plain City",
+    "builder": "Arbor Homes",
+    "floorplan": "Norway",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "3074 Sanctuary Road",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "181",
+    "subdivision": "Maren Reserve *Arbor *Plain City",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "10",
+    "address": "2777 Owens Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "186",
+    "subdivision": "Maren Reserve *Arbor *Plain City",
+    "builder": "Arbor Homes",
+    "floorplan": "Aspen II",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "2477 Owens Way",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "5432",
+    "subdivision": "Maris *Arbor *Bellefontaine",
+    "builder": "Arbor Homes",
+    "floorplan": "Juniper",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "333 Dylan Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "5434",
+    "subdivision": "Maris *Arbor *Bellefontaine",
+    "builder": "Arbor Homes",
+    "floorplan": "Chestnut",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "337 Dylan Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "77",
+    "subdivision": "Old Heritage *Arbor *Shelbyville",
+    "builder": "Arbor Homes",
+    "floorplan": "Aspen II",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "2141 Carnegie Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "79",
+    "subdivision": "Old Heritage *Arbor *Shelbyville",
+    "builder": "Arbor Homes",
+    "floorplan": "Chestnut",
+    "original": "8",
+    "reclean": "4",
+    "windows": "8",
+    "address": "2149 Carnegie Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "278",
+    "subdivision": "Old Heritage *Arbor *Shelbyville",
+    "builder": "Arbor Homes",
+    "floorplan": "Cooper",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "4201 Tingle Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "281",
+    "subdivision": "Old Heritage *Arbor *Shelbyville",
+    "builder": "Arbor Homes",
+    "floorplan": "Norway",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "4189 Tingle Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "285",
+    "subdivision": "Old Heritage *Arbor *Shelbyville",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "10",
+    "address": "4159 Tingle Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "329",
+    "subdivision": "Old Heritage *Arbor *Shelbyville",
+    "builder": "Arbor Homes",
+    "floorplan": "Cooper",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "3153 Opal Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "332",
+    "subdivision": "Old Heritage *Arbor *Shelbyville",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "10",
+    "address": "3141 Opal Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "60",
+    "subdivision": "Trailside Landing *Arbor *Jeffersonville",
+    "builder": "Arbor Homes",
+    "floorplan": "Victoria",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "1654 Riverton Lane",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "42",
+    "subdivision": "Trotter's Pointe *Arbor *Washington Courthouse",
+    "builder": "Arbor Homes",
+    "floorplan": "Norway",
+    "original": "",
+    "reclean": "",
+    "windows": "",
+    "address": "1162 Andrick Drive",
+    "lastUpdated": "2026-07-07"
+  },
+  {
+    "lotNumber": "66",
+    "subdivision": "Trotter's Pointe *Arbor *Washington Courthouse",
+    "builder": "Arbor Homes",
+    "floorplan": "Bradford",
+    "original": "10",
+    "reclean": "4",
+    "windows": "10",
+    "address": "1252 Andrick Drive",
+    "lastUpdated": "2026-07-07"
   }
 ]
