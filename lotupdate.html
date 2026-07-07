@@ -577,6 +577,39 @@ function rowObj(headers, row){ const o = {}; headers.forEach((h,i)=>{ if(cleanTe
 async function readWorkbook(file){ const buf = await file.arrayBuffer(); return XLSX.read(buf, {type:'array', cellDates:true}); }
 function sheetRows(wb){ const ws = wb.Sheets[wb.SheetNames[0]]; return XLSX.utils.sheet_to_json(ws, {header:1, defval:''}); }
 
+function parseCsvText(text){
+  const rows = [];
+  let row = [], cell = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const next = text[i + 1];
+    if (ch === '"') {
+      if (inQuotes && next === '"') { cell += '"'; i++; }
+      else { inQuotes = !inQuotes; }
+    } else if (ch === ',' && !inQuotes) {
+      row.push(cell); cell = '';
+    } else if ((ch === '\n' || ch === '\r') && !inQuotes) {
+      if (ch === '\r' && next === '\n') i++;
+      row.push(cell);
+      if (row.some(v => cleanText(v))) rows.push(row);
+      row = []; cell = '';
+    } else {
+      cell += ch;
+    }
+  }
+  row.push(cell);
+  if (row.some(v => cleanText(v))) rows.push(row);
+  return rows;
+}
+function isCsvFile(file){ return /\.csv$/i.test(file?.name || ''); }
+function rowsToObjectsFromHeader(rows, required, errorMessage){
+  const h = findHeaderRow(rows, required);
+  if (h < 0) throw new Error(errorMessage);
+  const headers = rows[h].map(h => cleanExcelCsvCell(h));
+  return rows.slice(h+1).map(r => rowObj(headers,r));
+}
+
+
 async function loadFloor(file){
   const wb = await readWorkbook(file); const rows = sheetRows(wb);
   const h = findHeaderRow(rows, ['Builder','Subdivision','Lot']);
@@ -616,11 +649,18 @@ async function loadBuilderExport(files){
   }
 
   const file = fileList[0];
-  const wb = await readWorkbook(file); const rows = sheetRows(wb);
+  let rows;
+  if (sourceType === 'drschedule' && isCsvFile(file)) {
+    // DR's schedule export often stores cells as Excel text formulas like ="6400 Silver...".
+    // SheetJS can treat those as formulas, so for this source we parse the CSV text directly.
+    rows = parseCsvText(await file.text());
+  } else {
+    const wb = await readWorkbook(file); rows = sheetRows(wb);
+  }
   const required = sourceType === 'mi' ? ['Account','Subdivision','Lot/Block','Plan','Job'] : (sourceType === 'dr' ? ['Community','Address','Plan','Lot'] : (sourceType === 'drschedule' ? ['Project','Address','Plat Lot/Block/Phase','Plan','Description'] : ['Community','Job #','Street Address']));
   const h = findHeaderRow(rows, required);
-  if (h < 0) throw new Error(sourceType === 'mi' ? 'Could not find MI Homes 90-day job headers.' : (sourceType === 'dr' ? 'Could not find DR Horton active lots CSV headers.' : (sourceType === 'drschedule' ? 'Could not find DR Horton schedule CSV headers.' : 'Could not find Pulte export headers.')));
-  const headers = rows[h];
+  if (h < 0) throw new Error(sourceType === 'mi' ? 'Could not find MI Homes 90-day job headers.' : (sourceType === 'dr' ? 'Could not find DR Horton active lots CSV headers.' : (sourceType === 'drschedule' ? 'Could not find DR Horton schedule CSV headers. Make sure the selected builder/export type is “DR Horton schedule CSV”, not the active lots CSV option.' : 'Could not find Pulte export headers.')));
+  const headers = rows[h].map(h => cleanExcelCsvCell(h));
   rawRows = rows.slice(h+1).map(r => rowObj(headers,r));
   normalizeJobsFromRaw();
   const label = sourceType === 'mi' ? 'MI Homes job rows' : (sourceType === 'dr' ? 'DR Horton lot rows' : (sourceType === 'drschedule' ? 'DR Horton schedule rows' : 'Pulte job rows'));
