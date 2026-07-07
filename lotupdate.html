@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Builder New Lot Checker - All Builders + DR Schedule</title>
-<!-- Version: v1.12 DR schedule CSV parser visibility + Excel formula cleanup -->
+<title>Builder New Lot Checker - All Builders + DR Schedule v1.13</title>
+<!-- Version: v1.13 DR schedule pulled-lots debug box + stricter DR address matching -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -41,14 +41,16 @@
   .newlot-item{border:1px solid #2f3d52;background:rgba(15,23,42,.78);border-radius:14px;padding:12px}
   .newlot-title{font-weight:900;color:#f8fafc}.newlot-meta{color:#cbd5e1;font-size:13px;margin-top:4px}.newlot-address{color:#93c5fd;font-size:13px;margin-top:6px}
   .empty-newlots{border:1px dashed #334155;border-radius:14px;padding:16px;color:var(--muted);background:rgba(15,23,42,.55)}
+  .pulled-card{margin-top:14px;border:1px solid rgba(56,189,248,.45);background:rgba(15,23,42,.75)}
+  .pulled-card h2{display:flex;align-items:center;justify-content:space-between;gap:12px}.pulled-table-wrap{max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:14px;margin-top:10px}.status-new{color:#86efac;font-weight:800}.status-match{color:#fbbf24;font-weight:800}.status-skip{color:#94a3b8;font-weight:800}
   .source-box{display:grid;grid-template-columns:220px 1fr;gap:12px;align-items:end;margin-bottom:12px}.source-box label{display:block;font-size:12px;color:#bfdbfe;font-weight:800;margin-bottom:5px}
   @media(max-width:900px){.grid,.two,.filters,.newlots-list,.source-box{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:14px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Builder New Lot Checker <span class="version-pill">Version 1.12</span></h1>
-  <p class="sub">Upload your <b>Floor Plans</b> sheet, optionally upload your <b>Subdivisions</b> sheet for exact names, pick the builder/export type, then upload that builder export. The tool compares lots by <b>subdivision + lot</b>, with an address fallback, and shows anything missing from the Floor Plans sheet.</p>
+  <h1>Builder New Lot Checker <span class="version-pill">Version 1.13</span></h1>
+  <p class="sub">Upload your <b>Floor Plans</b> sheet, optionally upload your <b>Subdivisions</b> sheet for exact names, pick the builder/export type, then upload that builder export. The tool compares lots by <b>subdivision + lot</b>, with an address fallback, and shows anything missing from the Floor Plans sheet. Version 1.13 adds an <b>All pulled lots</b> box so you can verify exactly what the import parsed.</p>
 
   <div class="grid">
     <div class="card">
@@ -106,6 +108,12 @@
     <div class="stat"><b id="jobCount">0</b><span id="jobCountLabel">Export rows</span></div>
     <div class="stat"><b id="floorCount">0</b><span>Floorplan rows</span></div>
     <div class="stat"><b id="commCount">0</b><span>Communities checked</span></div>
+  </div>
+
+  <div class="card pulled-card" id="allPulledBox">
+    <h2>All lots pulled from selected import <span class="badge" id="pulledLotsBadge">0</span></h2>
+    <p class="muted">This debug box shows every unique lot the selected builder import parsed, before it is filtered into new vs. matched. Use it to confirm DR schedule rows are actually being read.</p>
+    <div class="pulled-table-wrap"><table id="pulledLotsTable"><thead></thead><tbody><tr><td class="muted">Upload a builder export, then compare.</td></tr></tbody></table></div>
   </div>
 
   <div class="card newlots-card" id="newLotsBox">
@@ -247,7 +255,7 @@ const DEFAULT_MAPPINGS = {
   }
 };
 
-let floorRows = [], subdivisionRows = [], rawRows = [], jobRows = [], resultRows = [];
+let floorRows = [], subdivisionRows = [], rawRows = [], jobRows = [], resultRows = [], allPulledRows = [];
 let sourceType = 'pulte';
 let mappings = loadMappings(sourceType);
 const $ = id => document.getElementById(id);
@@ -804,13 +812,13 @@ function normalizeJobsFromRaw(){
 function checkReady(){ $('compareBtn').disabled = !(floorRows.length && jobRows.length); }
 
 function buildIndexes(){
-  const bySubLot = new Map(), byAddress = new Map(), hoursBySubPlan = new Map(), hoursByPlan = new Map(), subTemplate = new Map();
+  const bySubLot = new Map(), byAddress = new Map(), bySubAddress = new Map(), hoursBySubPlan = new Map(), hoursByPlan = new Map(), subTemplate = new Map();
   for (const r of floorRows) {
     if (!isFloorBuilderMatch(r)) continue;
     const base = baseSubdivision(r.Subdivision);
     const key = `${norm(base)}|${cleanLot(r.Lot)}`;
     bySubLot.set(key, r);
-    const addr = cleanAddress(r.Address); if (addr) byAddress.set(addr, r);
+    const addr = cleanAddress(r.Address); if (addr) { byAddress.set(addr, r); bySubAddress.set(`${norm(base)}|${addr}`, r); }
     const floorPlanClean = sourceType === 'mi' ? cleanMIPlan(r.Floorplan) : cleanText(r.Floorplan);
     const planKey = `${norm(base)}|${norm(floorPlanClean)}`;
     const hours = {Original:r.Original ?? '', Reclean:r.Reclean ?? '', Windows:r.Windows ?? ''};
@@ -818,12 +826,12 @@ function buildIndexes(){
     if (norm(floorPlanClean) && !hoursByPlan.has(norm(floorPlanClean))) hoursByPlan.set(norm(floorPlanClean), hours);
     if (!subTemplate.has(norm(base))) subTemplate.set(norm(base), r.Subdivision);
   }
-  return {bySubLot, byAddress, hoursBySubPlan, hoursByPlan, subTemplate};
+  return {bySubLot, byAddress, bySubAddress, hoursBySubPlan, hoursByPlan, subTemplate};
 }
 function compare(){
   const idx = buildIndexes();
   const subIdx = buildSubdivisionTruthIndex();
-  let matched = 0; resultRows = [];
+  let matched = 0; resultRows = []; allPulledRows = [];
   const seenLots = new Set();
   for (const j of jobRows) {
     const community = cleanText(j.Community);
@@ -835,14 +843,32 @@ function compare(){
     if (seenLots.has(uniqueKey)) continue;
     seenLots.add(uniqueKey);
     const subLotKey = `${norm(mappedBase)}|${lot}`;
-    const match = idx.bySubLot.get(subLotKey) || idx.byAddress.get(addrKey);
-    if (match) { matched++; continue; }
+    const subAddressKey = `${norm(mappedBase)}|${addrKey}`;
+    const subLotMatch = idx.bySubLot.get(subLotKey);
+    // For DR Horton schedule CSV, address fallback is intentionally stricter.
+    // It only matches an address inside the same resolved subdivision base so a renamed/nearby community
+    // does not hide a new lot just because the address exists under another old subdivision name.
+    const addressMatch = sourceType === 'drschedule' ? idx.bySubAddress.get(subAddressKey) : idx.byAddress.get(addrKey);
+    const match = subLotMatch || addressMatch;
     const city = cleanText(j.City);
     const plan = sourceType === 'mi' ? cleanMIPlan(j.Plan) : cleanText(j.Plan);
     const builder = guessBuilder(mappedBase);
     const subdivisionBuilder = sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : (sourceType === 'epcon' ? 'Epcon' : builder));
     const subdivision = resolved.displaySubdivision || subdivisionWithStars(mappedBase, subdivisionBuilder, city);
     const hours = idx.hoursBySubPlan.get(`${norm(mappedBase)}|${norm(plan)}`) || idx.hoursByPlan.get(norm(plan)) || {Original:'',Reclean:'',Windows:''};
+    allPulledRows.push({
+      Source: sourceType === 'mi' ? 'MI Homes' : (sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : ((sourceType === 'dr' || sourceType === 'drschedule') ? 'DR Horton' : (sourceType === 'epcon' ? 'Epcon' : 'Pulte')))),
+      Community: community,
+      Subdivision: subdivision,
+      NameSource: resolved.source,
+      Lot: lot,
+      Floorplan: plan,
+      Address: cleanText(j.Address),
+      Task: cleanText(j.Task),
+      MatchStatus: match ? (subLotMatch ? 'matched by subdivision + lot' : 'matched by same-subdivision address') : 'NEW / missing',
+      IsNew: !match
+    });
+    if (match) { matched++; continue; }
     resultRows.push({
       Source: sourceType === 'mi' ? 'MI Homes' : (sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : ((sourceType === 'dr' || sourceType === 'drschedule') ? 'DR Horton' : (sourceType === 'epcon' ? 'Epcon' : 'Pulte')))),
       Community: community,
@@ -865,7 +891,19 @@ function compare(){
   $('matchedCount').textContent = matched;
   $('commCount').textContent = new Set(jobRows.map(r=>cleanText(r.Community))).size;
   $('copyBtn').disabled = $('csvBtn').disabled = $('xlsxBtn').disabled = resultRows.length === 0;
-  refreshCommunityFilter(); renderResults();
+  refreshCommunityFilter(); renderResults(); renderAllPulledLots();
+}
+function renderAllPulledLots(){
+  const rows = allPulledRows || [];
+  const badge = $('pulledLotsBadge'); if (badge) badge.textContent = rows.length;
+  const table = $('pulledLotsTable'); if (!table) return;
+  const cols = ['MatchStatus','Community','Subdivision','NameSource','Lot','Floorplan','Address','Task'];
+  const labels = {MatchStatus:'Status', NameSource:'Name Source'};
+  table.querySelector('thead').innerHTML = `<tr>${cols.map(c=>`<th>${labels[c] || c}</th>`).join('')}</tr>`;
+  table.querySelector('tbody').innerHTML = rows.map(r => `<tr>${cols.map(c=>{
+    const cls = c === 'MatchStatus' ? (r.IsNew ? 'status-new' : 'status-match') : '';
+    return `<td class="${cls}">${escapeHtml(r[c] ?? '')}</td>`;
+  }).join('')}</tr>`).join('') || `<tr><td colspan="${cols.length}" class="muted">No lots parsed yet. Load an export and click Compare lots.</td></tr>`;
 }
 function filteredRows(){
   const q = norm($('search').value); const c = $('communityFilter').value; const hf = $('hoursFilter').value;
@@ -1024,7 +1062,7 @@ function updateSourceUI(){
     $('sourceHelp').textContent = 'DR Horton active lots CSV columns: Community, Address, City, State, Zip, Plan, Lot. Community codes like “Bishop Estates - 97800” are cleaned to “Bishop Estates”.';
     $('jobCountLabel').textContent = 'DR Horton lot rows';
   } else if (sourceType === 'drschedule') {
-    $('sourceHelp').textContent = 'DR Horton schedule CSV columns: Date, Project, Address, Job Number, Plat Lot/Block/Phase, Plan, Elevation, Description. Version 1.12 reads the CSV as text and strips Excel formula wrappers like ="6396 Silver...". If a parsed lot does not show as new, it already matched Floor Plans.';
+    $('sourceHelp').textContent = 'DR Horton schedule CSV columns: Date, Project, Address, Job Number, Plat Lot/Block/Phase, Plan, Elevation, Description. Version 1.13 reads the CSV as text, strips Excel formula wrappers like ="6396 Silver...", and shows every parsed lot in the All pulled lots box. DR schedule address matching is now same-subdivision only.';
     $('jobCountLabel').textContent = 'DR Horton schedule rows';
   } else if (sourceType === 'epcon') {
     $('sourceHelp').textContent = 'Epcon: upload one or more monthly schedule files. Block/Lot uses the number after the slash as the lot. If Block/Lot is missing, the tool derives the lot from the House number code. Epcon has no floorplan in this schedule, so Floorplan is left blank.';
