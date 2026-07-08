@@ -1,292 +1,645 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Subdivision List Builder v1.1</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Subdivision Links</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #657083;
+      --line: #e1e6ef;
+      --primary: #1769ff;
+      --primary-dark: #0f55d5;
+      --danger: #d73333;
+      --shadow: 0 12px 30px rgba(23, 32, 51, 0.10);
+      --radius: 18px;
+    }
 
-<style>
-body {
-  background:#111;
-  color:#fff;
-  font-family:Arial;
-  margin:0;
-  padding:20px;
-}
+    * { box-sizing: border-box; }
 
-h1 {
-  margin-bottom:5px;
-}
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
 
-.version {
-  color:#666;
-  margin-bottom:15px;
-}
+    body { padding-bottom: env(safe-area-inset-bottom); }
 
-.topbar {
-  display:flex;
-  gap:10px;
-  margin-bottom:15px;
-}
+    .app {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      padding: 14px;
+    }
 
-input {
-  padding:8px;
-  border-radius:5px;
-  border:none;
-  width:260px;
-}
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      margin: -14px -14px 14px;
+      padding: calc(12px + env(safe-area-inset-top)) 14px 12px;
+      background: rgba(244, 246, 251, 0.94);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(225, 230, 239, 0.9);
+    }
 
-button {
-  padding:8px 12px;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-  background:#2a2a2a;
-  color:#fff;
-}
+    .hero {
+      background: linear-gradient(135deg, #101a33, #1d376e);
+      color: white;
+      border-radius: 0 0 22px 22px;
+      padding: 18px 16px 16px;
+      box-shadow: var(--shadow);
+    }
 
-button:hover {
-  background:#444;
-}
+    h1 {
+      margin: 0;
+      font-size: clamp(1.45rem, 5vw, 2.1rem);
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
 
-.section {
-  margin-bottom:20px;
-}
+    .subtitle {
+      margin: 8px 0 0;
+      color: rgba(255,255,255,0.82);
+      font-size: 0.94rem;
+    }
 
-.box {
-  border:1px solid #333;
-  padding:10px;
-  border-radius:6px;
-  background:#1a1a1a;
-}
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
 
-.table-container {
-  max-height:60vh;
-  overflow:auto;
-  border:1px solid #333;
-}
+    .searchWrap {
+      position: relative;
+    }
 
-table {
-  width:100%;
-  border-collapse:collapse;
-}
+    #search {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      padding: 14px 44px 14px 16px;
+      font-size: 16px;
+      outline: none;
+      background: rgba(255,255,255,0.96);
+      color: var(--text);
+    }
 
-th {
-  position:sticky;
-  top:0;
-  background:#222;
-  padding:10px;
-  border-bottom:1px solid #444;
-}
+    #clearSearch {
+      position: absolute;
+      right: 7px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      border-radius: 999px;
+      width: 34px;
+      height: 34px;
+      background: #edf1f8;
+      color: #4b5668;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
 
-td {
-  padding:8px;
-  border-bottom:1px solid #333;
-}
+    .stats {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
 
-.count {
-  margin-bottom:10px;
-  color:#aaa;
-}
+    .stat {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.9);
+    }
 
-.builder-row {
-  display:flex;
-  justify-content:space-between;
-  padding:6px 0;
-  border-bottom:1px solid #333;
-}
+    .filtersCard {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 18px rgba(23, 32, 51, 0.06);
+    }
 
-.builder-row:last-child {
-  border-bottom:none;
-}
+    .filterTop {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
 
-</style>
+    .filterTitle {
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    .tinyBtns {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .tinyBtn {
+      border: 1px solid var(--line);
+      background: #f8faff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-weight: 700;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    .builderFilters {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 3px;
+      scrollbar-width: thin;
+    }
+
+    .builderChip {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--line);
+      background: white;
+      border-radius: 999px;
+      padding: 9px 11px;
+      font-weight: 800;
+      font-size: 0.84rem;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .builderChip.off {
+      opacity: 0.42;
+      filter: grayscale(1);
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--chip-color, #777);
+      box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 18px rgba(23, 32, 51, 0.06);
+      overflow: hidden;
+    }
+
+    .cardHead {
+      display: grid;
+      grid-template-columns: 5px 1fr;
+      gap: 0;
+    }
+
+    .stripe { background: var(--builder-color, #777); }
+
+    .cardBody { padding: 13px; }
+
+    .builder {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      font-weight: 900;
+      color: var(--builder-color, #555);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 5px;
+    }
+
+    .subdivision {
+      font-size: 1.05rem;
+      line-height: 1.2;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .detail {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.35;
+      margin: 6px 0;
+      word-break: break-word;
+    }
+
+    .detail strong {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .coordsLink {
+      color: var(--primary);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .coordsLink:hover { text-decoration: underline; }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 13px;
+      padding: 12px 10px;
+      font-size: 0.92rem;
+      font-weight: 900;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+    }
+
+    .btn.primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn.primary:active { background: var(--primary-dark); }
+
+    .btn.secondary {
+      background: #eef3ff;
+      color: #164fb7;
+      border: 1px solid #d8e3ff;
+    }
+
+    .btn.lotmap {
+      grid-column: 1 / -1;
+      background: #f4f6fa;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .empty, .error {
+      text-align: center;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px 16px;
+      color: var(--muted);
+      box-shadow: 0 8px 18px rgba(23, 32, 51, 0.06);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(16px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(120px);
+      z-index: 50;
+      background: #111827;
+      color: white;
+      padding: 12px 14px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      box-shadow: var(--shadow);
+      transition: transform 0.22s ease;
+      pointer-events: none;
+      max-width: calc(100vw - 28px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (min-width: 680px) {
+      .app { padding: 18px; }
+      .top { margin: -18px -18px 18px; padding-left: 18px; padding-right: 18px; }
+      .hero { border-radius: 0 0 26px 26px; padding: 24px; }
+      .controls { grid-template-columns: 1fr; }
+      .list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .cardBody { padding: 15px; }
+    }
+
+    @media (min-width: 1000px) {
+      .list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="app">
+    <header class="top">
+      <section class="hero">
+        <h1>Subdivision Links</h1>
+        <p class="subtitle">Open a subdivision in Google Maps or copy the Maps link.</p>
+        <div class="controls">
+          <div class="searchWrap">
+            <input id="search" type="search" placeholder="Search builder, subdivision, address..." autocomplete="off" />
+            <button id="clearSearch" title="Clear search" aria-label="Clear search">×</button>
+          </div>
+        </div>
+        <div class="stats" id="stats"></div>
+      </section>
+    </header>
 
-<h1>Subdivision List Builder</h1>
-<div class="version">v1.1</div>
+    <section class="filtersCard">
+      <div class="filterTop">
+        <div class="filterTitle">Builders</div>
+        <div class="tinyBtns">
+          <button class="tinyBtn" id="showAll">Show All</button>
+          <button class="tinyBtn" id="hideAll">Hide All</button>
+        </div>
+      </div>
+      <div class="builderFilters" id="builderFilters"></div>
+    </section>
 
-<div class="topbar">
-  <input id="search" placeholder="Search builder or subdivision...">
-  <button onclick="copyData()">Copy</button>
-  <button onclick="exportCSV()">Export CSV</button>
-</div>
-
-<!-- BUILDER COUNTS -->
-<div class="section">
-  <h3>Subdivisions Per Builder</h3>
-  <div class="box" id="builderCounts"></div>
-</div>
-
-<!-- TABLE -->
-<div class="section">
-  <div class="count" id="count">Loading...</div>
-
-  <div class="table-container">
-    <table id="table">
-      <thead>
-        <tr>
-          <th>Builder</th>
-          <th>Subdivision</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <main class="list" id="list"></main>
   </div>
-</div>
+
+  <div class="toast" id="toast">Copied</div>
 
 <script>
+const DATA_FILE = 'subdivisions.json';
 
-let DATA = [];
-let FULL_DATA = [];
+const BUILDER_COLORS = {
+  'Pulte': '#24843f',
+  'Centex': '#24843f',
+  'Del Webb': '#24843f',
+  'DR Horton': '#111111',
+  'Ryan': '#7a3db8',
+  'Epcon': '#c79616',
+  'Schottenstein': '#d42d2d',
+  'Shottenstein': '#d42d2d',
+  'Rockford': '#246bd1',
+  '3 Pillar': '#e37624',
+  'MI Homes': '#6f7682',
+  'American Homes 4 Rent': '#5f9ea0',
+  'American Homes 4 Rent ': '#5f9ea0',
+  'Bob Webb': '#7a5230',
+  'Arbor Homes': '#0f8b8d',
+  'Fischer Homes': '#6a8f23',
+  'WPLand Company': '#8d5fd3',
+  'Tuckerman': '#a0522d',
+  'Drees': '#b0578d',
+  'Manor': '#374151',
+  'VIP': '#ff5a1f'
+};
 
-// ---------- NORMALIZE ----------
-function normalize(str){
-  return (str || "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g," ");
+let allData = [];
+let activeBuilders = new Set();
+let toastTimer = null;
+
+const $ = sel => document.querySelector(sel);
+const listEl = $('#list');
+const searchEl = $('#search');
+const statsEl = $('#stats');
+const filtersEl = $('#builderFilters');
+
+function normalizeBuilder(builder) {
+  return (builder || 'Unknown').trim();
 }
 
-function toTitleCase(str){
-  return str.replace(/\w\S*/g, w =>
-    w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
-  );
+function builderColor(builder) {
+  return BUILDER_COLORS[builder] || BUILDER_COLORS[normalizeBuilder(builder)] || '#667085';
 }
 
-// ---------- LOAD ----------
-async function loadData(){
+function mapsUrl(item) {
+  const lat = item?.coords?.lat;
+  const lon = item?.coords?.lon;
+  const address = (item.address || '').trim();
+  const labelParts = [item.subdivision, item.builder, address].filter(Boolean).join(' ');
+  if (Number.isFinite(Number(lat)) && Number.isFinite(Number(lon))) {
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${lat},${lon}`)}`;
+  }
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(labelParts)}`;
+}
+
+function mapsDirectionsUrl(item) {
+  const lat = item?.coords?.lat;
+  const lon = item?.coords?.lon;
+  const address = (item.address || '').trim();
+  const dest = Number.isFinite(Number(lat)) && Number.isFinite(Number(lon)) ? `${lat},${lon}` : address;
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}`;
+}
+
+function coordsText(item) {
+  const lat = item?.coords?.lat;
+  const lon = item?.coords?.lon;
+  if (!Number.isFinite(Number(lat)) || !Number.isFinite(Number(lon))) return 'No coordinates';
+  return `${Number(lat).toFixed(6)}, ${Number(lon).toFixed(6)}`;
+}
+
+function showToast(message) {
+  const toast = $('#toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+}
+
+async function copyText(text) {
   try {
-    const res = await fetch("lots(1).json");
-    const json = await res.json();
-
-    let map = new Map();
-
-    json.forEach(lot => {
-      let builderRaw = normalize(lot.builder);
-      let subdivisionRaw = normalize(lot.subdivision);
-
-      if(!builderRaw || !subdivisionRaw) return;
-
-      let key = builderRaw + "|" + subdivisionRaw;
-
-      map.set(key, {
-        builder: toTitleCase(builderRaw),
-        subdivision: toTitleCase(subdivisionRaw)
-      });
-    });
-
-    FULL_DATA = Array.from(map.values())
-      .sort((a,b) => {
-        if(a.builder === b.builder){
-          return a.subdivision.localeCompare(b.subdivision);
-        }
-        return a.builder.localeCompare(b.builder);
-      });
-
-    DATA = [...FULL_DATA];
-
-    render(DATA);
-    renderBuilderCounts(FULL_DATA);
-
-  } catch(err){
-    document.getElementById("count").innerText = "Error loading lots(1).json";
-    console.error(err);
+    await navigator.clipboard.writeText(text);
+    showToast('Google Maps link copied');
+  } catch (err) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    showToast('Google Maps link copied');
   }
 }
 
-// ---------- RENDER TABLE ----------
-function render(data){
-  const tbody = document.querySelector("#table tbody");
-  tbody.innerHTML = "";
-
-  data.forEach(row => {
-    let tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${row.builder}</td>
-      <td>${row.subdivision}</td>
-    `;
-
-    tbody.appendChild(tr);
-  });
-
-  document.getElementById("count").innerText =
-    `Total Unique Subdivisions: ${data.length}`;
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
-// ---------- BUILDER COUNTS ----------
-function renderBuilderCounts(data){
-  let counts = {};
-
-  data.forEach(r => {
-    counts[r.builder] = (counts[r.builder] || 0) + 1;
+function sortData(data) {
+  return [...data].sort((a, b) => {
+    const ab = normalizeBuilder(a.builder).localeCompare(normalizeBuilder(b.builder));
+    if (ab !== 0) return ab;
+    return String(a.subdivision || '').localeCompare(String(b.subdivision || ''));
   });
+}
 
-  let container = document.getElementById("builderCounts");
-  container.innerHTML = "";
+function renderStats(filtered) {
+  const builders = new Set(filtered.map(x => normalizeBuilder(x.builder)));
+  statsEl.innerHTML = `
+    <span class="stat">${filtered.length} shown</span>
+    <span class="stat">${allData.length} total</span>
+    <span class="stat">${builders.size} builders</span>
+  `;
+}
 
-  Object.keys(counts)
-    .sort((a,b)=>a.localeCompare(b))
-    .forEach(builder => {
+function renderFilters() {
+  const counts = new Map();
+  for (const item of allData) {
+    const b = normalizeBuilder(item.builder);
+    counts.set(b, (counts.get(b) || 0) + 1);
+  }
 
-      let div = document.createElement("div");
-      div.className = "builder-row";
+  const builders = [...counts.keys()].sort((a, b) => a.localeCompare(b));
+  filtersEl.innerHTML = builders.map(builder => `
+    <button class="builderChip ${activeBuilders.has(builder) ? '' : 'off'}" data-builder="${escapeHtml(builder)}" style="--chip-color:${builderColor(builder)}">
+      <span class="dot"></span>
+      <span>${escapeHtml(builder)} (${counts.get(builder)})</span>
+    </button>
+  `).join('');
 
-      div.innerHTML = `
-        <div>${builder}</div>
-        <div><b>${counts[builder]}</b></div>
-      `;
-
-      container.appendChild(div);
+  filtersEl.querySelectorAll('.builderChip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const builder = btn.dataset.builder;
+      if (activeBuilders.has(builder)) activeBuilders.delete(builder);
+      else activeBuilders.add(builder);
+      renderFilters();
+      renderList();
     });
+  });
 }
 
-// ---------- SEARCH ----------
-document.getElementById("search").addEventListener("input", e => {
-  let val = e.target.value.toLowerCase();
+function cardHtml(item, index) {
+  const builder = normalizeBuilder(item.builder);
+  const color = builderColor(builder);
+  const address = (item.address || '').trim() || 'No model address listed';
+  const mapLink = mapsUrl(item);
+  const directionsLink = mapsDirectionsUrl(item);
+  const coord = coordsText(item);
+  const lotMap = item.lotMap ? String(item.lotMap).trim() : '';
 
-  let filtered = FULL_DATA.filter(r =>
-    r.builder.toLowerCase().includes(val) ||
-    r.subdivision.toLowerCase().includes(val)
-  );
+  return `
+    <article class="card" style="--builder-color:${color}">
+      <div class="cardHead">
+        <div class="stripe"></div>
+        <div class="cardBody">
+          <div class="builder"><span class="dot" style="--chip-color:${color}"></span>${escapeHtml(builder)}</div>
+          <div class="subdivision">${escapeHtml(item.subdivision || 'Unnamed Subdivision')}</div>
+          <p class="detail"><strong>Model address:</strong> ${escapeHtml(address)}</p>
+          <p class="detail"><strong>Lat/Long:</strong> <a class="coordsLink" href="${mapLink}" target="_blank" rel="noopener">${escapeHtml(coord)}</a></p>
+          <div class="actions">
+            <a class="btn primary" href="${directionsLink}" target="_blank" rel="noopener">Open in Maps</a>
+            <button class="btn secondary copyBtn" data-copy-index="${index}">Copy Link</button>
+            ${lotMap ? `<a class="btn lotmap" href="${escapeHtml(lotMap)}" target="_blank" rel="noopener">Open Lot Map</a>` : ''}
+          </div>
+        </div>
+      </div>
+    </article>
+  `;
+}
 
-  DATA = filtered;
-  render(DATA);
+function getFiltered() {
+  const q = searchEl.value.trim().toLowerCase();
+  return sortData(allData).filter(item => {
+    const builder = normalizeBuilder(item.builder);
+    if (!activeBuilders.has(builder)) return false;
+    if (!q) return true;
+    const haystack = [
+      item.builder,
+      item.subdivision,
+      item.address,
+      item?.coords?.lat,
+      item?.coords?.lon
+    ].join(' ').toLowerCase();
+    return haystack.includes(q);
+  });
+}
+
+function renderList() {
+  const filtered = getFiltered();
+  renderStats(filtered);
+
+  if (!filtered.length) {
+    listEl.innerHTML = `<div class="empty">No subdivisions match that search/filter.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = filtered.map((item, visibleIndex) => {
+    const originalIndex = allData.indexOf(item);
+    return cardHtml(item, originalIndex);
+  }).join('');
+
+  listEl.querySelectorAll('.copyBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = allData[Number(btn.dataset.copyIndex)];
+      copyText(mapsUrl(item));
+    });
+  });
+}
+
+async function loadData() {
+  try {
+    const res = await fetch(DATA_FILE, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`Could not load ${DATA_FILE}`);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error(`${DATA_FILE} must be a JSON array`);
+
+    allData = data.filter(item => item && item.subdivision && item.builder);
+    activeBuilders = new Set(allData.map(item => normalizeBuilder(item.builder)));
+    renderFilters();
+    renderList();
+  } catch (err) {
+    console.error(err);
+    listEl.innerHTML = `
+      <div class="error">
+        <strong>Could not load subdivisions.json.</strong><br><br>
+        Make sure this HTML file is in the same GitHub Pages folder as <code>subdivisions.json</code>.
+      </div>
+    `;
+    statsEl.innerHTML = `<span class="stat">Load error</span>`;
+  }
+}
+
+searchEl.addEventListener('input', renderList);
+$('#clearSearch').addEventListener('click', () => {
+  searchEl.value = '';
+  searchEl.focus();
+  renderList();
+});
+$('#showAll').addEventListener('click', () => {
+  activeBuilders = new Set(allData.map(item => normalizeBuilder(item.builder)));
+  renderFilters();
+  renderList();
+});
+$('#hideAll').addEventListener('click', () => {
+  activeBuilders.clear();
+  renderFilters();
+  renderList();
 });
 
-// ---------- COPY ----------
-function copyData(){
-  let text = "Builder\tSubdivision\n";
-
-  DATA.forEach(r => {
-    text += `${r.builder}\t${r.subdivision}\n`;
-  });
-
-  navigator.clipboard.writeText(text);
-  alert("Copied!");
-}
-
-// ---------- EXPORT ----------
-function exportCSV(){
-  let csv = "Builder,Subdivision\n";
-
-  DATA.forEach(r => {
-    csv += `"${r.builder}","${r.subdivision}"\n`;
-  });
-
-  let blob = new Blob([csv], {type:"text/csv"});
-  let a = document.createElement("a");
-
-  a.href = URL.createObjectURL(blob);
-  a.download = "subdivisions.csv";
-  a.click();
-}
-
 loadData();
-
 </script>
-
 </body>
 </html>
