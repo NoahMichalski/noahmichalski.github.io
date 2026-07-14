@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lot Converter v2.5</title>
+<title>Lot Converter v2.6</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
@@ -10,7 +10,7 @@ body { font-family: Arial; background:#111; color:white; padding:20px;}
 .box { background:#1a1a1a; padding:15px; margin-bottom:15px; border-radius:8px;}
 button { padding:8px; margin:5px; background:white; color:black; cursor:pointer;}
 td, th { border:1px solid #333; padding:4px; font-size:12px;}
-table { border-collapse: collapse; width:100%; overflow-x:auto; display:block;}
+table { border-collapse: collapse; width:100%; display:block; overflow-x:auto;}
 textarea { width:100%; height:250px; background:black; color:#0f0;}
 .errorRow { background:#3a0000;}
 .goodRow { background:#003300;}
@@ -20,7 +20,7 @@ textarea { width:100%; height:250px; background:black; color:#0f0;}
 <body>
 
 <h1>Lot Converter</h1>
-<div>Version 2.5</div>
+<div>Version 2.6 (Date Fixed)</div>
 
 <div class="box">
 <input type="file" id="fileInput">
@@ -62,7 +62,10 @@ function processFile(){
         const sheet = wb.Sheets[wb.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, {defval:""});
 
-        headers = Object.keys(rows[0]).filter(h => !h.includes("Unnamed"));
+        // 🔥 REMOVE lastUpdated + junk columns
+        headers = Object.keys(rows[0]).filter(h => 
+            !h.includes("Unnamed") && h !== "lastUpdated"
+        );
 
         data = rows.map(r=>{
             let obj = {};
@@ -112,11 +115,13 @@ function edit(i,key,val){
 }
 
 function validate(){
-    const date = document.getElementById("dateInput").value;
+    let rawDate = document.getElementById("dateInput").value;
+    let date = new Date(rawDate).toISOString().split("T")[0];
+
     let output = [];
 
     data.forEach((row,i)=>{
-        let valid = row.Builder && row.Subdivision && row.Address;
+        let valid = row.Builder && row.Subdivision && row.Address && row.Address !== "No Address Listed";
 
         row.valid = valid;
 
