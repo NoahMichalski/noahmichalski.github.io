@@ -851,7 +851,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows/Cincinnati → preview/edit → export or import to Google Calendar.</div>
       </div>
-      <div class="version">v2.04</div>
+      <div class="version">v2.05</div>
     </div>
   </header>
 
@@ -1720,6 +1720,18 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       return `<div class="lastTaskBox ${cls}"><b>${escapeHTML(total)}</b> total<br>${escapeHTML(prior)} prior + ${escapeHTML(pending)} pending</div>`;
     }
 
+    function renderCompletionHistoryHTML(row) {
+      if (!row.lastTaskChecked) return '';
+      const originalLine = row.originalHistoryFound
+        ? `Original: Yes — ${escapeHTML(row.originalHistoryDate || '')}`
+        : 'Original: No in 90 days';
+      const windowsLine = row.windowsHistoryFound
+        ? `Windows: Complete — ${escapeHTML(row.windowsHistoryDate || '')}`
+        : 'Windows: Not found in 90 days';
+      const cls = row.originalHistoryFound && row.windowsHistoryFound ? '' : 'warn';
+      return `<div class="lastTaskBox ${cls}">${originalLine}<br>${windowsLine}</div>`;
+    }
+
     function parsePreviewFromRows() {
       parsedRows = markDuplicates(parsedRows);
       updateDateBanner();
@@ -1813,6 +1825,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
                 <td>
                   ${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : (row.matched ? '<span class="tag original">Matched</span>' : '<span class="tag miss">' + escapeHTML(row.matchStatus) + '</span>')}
                   ${renderLastTaskHTML(row)}
+                  ${renderCompletionHistoryHTML(row)}
                 </td>
               </tr>
             `).join('')}
@@ -3347,17 +3360,33 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           row.lastTaskPreviousDay = Boolean(last && last.Date === endDate);
           row.lastTaskDuplicateOriginal = row.type === 'original' && isOriginalLikeTask(last?.TaskType || '');
 
-          const historyRecleans = history.filter(hist =>
-            reportRowMatchesParsedRow(hist, row) && hist.TaskType === 'Reclean'
-          ).length;
+          const matchingHistory = history.filter(hist => reportRowMatchesParsedRow(hist, row));
+
+          const historyRecleans = matchingHistory.filter(hist => hist.TaskType === 'Reclean').length;
 
           const pendingRecleans = parsedRows.filter(other =>
             other.type === 'reclean' && parsedRowsSameLotSubdivision(other, row)
           ).length;
 
+          const originalHistory = matchingHistory
+            .filter(hist => isOriginalLikeTask(hist.TaskType))
+            .sort((a, b) => `${b.Date} ${b.Start}`.localeCompare(`${a.Date} ${a.Start}`));
+
+          const windowsHistory = matchingHistory
+            .filter(hist => hist.CalendarType === 'Windows' || hist.TaskType === 'Windows')
+            .sort((a, b) => `${b.Date} ${b.Start}`.localeCompare(`${a.Date} ${a.Start}`));
+
           row.recleanHistoryCount = historyRecleans;
           row.recleanPendingCount = pendingRecleans;
           row.recleanTotalIncludingImport = historyRecleans + pendingRecleans;
+
+          row.originalHistoryFound = Boolean(originalHistory[0]);
+          row.originalHistoryDate = originalHistory[0]?.Date || '';
+          row.originalHistorySubject = originalHistory[0]?.Subject || '';
+
+          row.windowsHistoryFound = Boolean(windowsHistory[0]);
+          row.windowsHistoryDate = windowsHistory[0]?.Date || '';
+          row.windowsHistorySubject = windowsHistory[0]?.Subject || '';
         });
 
         parsePreviewFromRows();
@@ -3365,7 +3394,9 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
         const flagged = parsedRows.filter(r => r.lastTaskDuplicateOriginal).length;
         const dryFlags = parsedRows.filter(r => r.lastTaskDryClean).length;
         const previousDayFlags = parsedRows.filter(r => r.lastTaskPreviousDay).length;
-        showToast(`Last task check complete. ${flagged} duplicate-original flag(s), ${dryFlags} dry-clean flag(s), ${previousDayFlags} previous-day flag(s). Reclean totals are shown per row.`);
+        const originalFound = parsedRows.filter(r => r.originalHistoryFound).length;
+        const windowsFound = parsedRows.filter(r => r.windowsHistoryFound).length;
+        showToast(`Last task check complete. ${flagged} duplicate-original flag(s), ${dryFlags} dry-clean flag(s), ${previousDayFlags} previous-day flag(s). Originals found: ${originalFound}. Windows complete: ${windowsFound}.`);
       } catch (err) {
         console.error(err);
         showToast(err.message || 'Could not check last tasks.');
