@@ -33,6 +33,10 @@ th { background:#d9d9d9; color:#000; }
 .warning { background:#ffd966; color:#000; }
 .overtime { background:#ff1a1a; color:#fff; }
 .predicted { background:#ff4da6; }
+
+td[contenteditable="true"] {
+    outline:2px solid #4da6ff;
+}
 </style>
 </head>
 
@@ -104,15 +108,14 @@ function loadExcel(){
         rows.forEach(r=>{
 
             let name = r[1];
-
             if(typeof name !== "string" || !name.includes(",")) return;
 
             let days = [
-                clean(r[4]),  // Mon
-                clean(r[6]),  // Tue
-                clean(r[7]),  // Wed
-                clean(r[9]),  // Thu
-                clean(r[11])  // Fri
+                clean(r[4]),
+                clean(r[6]),
+                clean(r[7]),
+                clean(r[9]),
+                clean(r[11])
             ];
 
             allData.push({ name, days });
@@ -126,8 +129,8 @@ function loadExcel(){
 
 function render(){
 
-    let week = parseInt(document.getElementById("weekSelect").value);
-    let day = parseInt(document.getElementById("daySelect").value);
+    let week = parseInt(weekSelect.value);
+    let day = parseInt(daySelect.value);
 
     let midpoint = Math.floor(allData.length / 2);
 
@@ -138,7 +141,7 @@ function render(){
     let tbody = table.querySelector("tbody");
     tbody.innerHTML="";
 
-    let rows = currentData.map(r=>{
+    let rows = currentData.map((r,index)=>{
 
         let projected=0,running=0,hit="-";
 
@@ -155,7 +158,7 @@ function render(){
         let actual=r.days.reduce((a,b)=>a+b,0);
         let ot=projected>40?projected-40:0;
 
-        return {...r,projected,actual,ot,hit};
+        return {...r,projected,actual,ot,hit,index};
     });
 
     rows.sort((a,b)=>b.projected-a.projected);
@@ -168,11 +171,23 @@ function render(){
         else if(r.projected>=38) tr.className="warning";
         else tr.className="normal";
 
+        let cells = r.days.map((d,i)=>{
+
+            let editable = i <= day;
+
+            return `
+            <td 
+                contenteditable="${editable}"
+                onblur="updateCell(${r.index}, ${i}, this.innerText)"
+                class="${i>day?'predicted':''}"
+            >
+                ${i>day ? 8 : d}
+            </td>`;
+        }).join("");
+
         tr.innerHTML=`
         <td>${r.name}</td>
-        ${r.days.map((d,i)=>`
-            <td class="${i>day?'predicted':''}">${i>day?8:d}</td>
-        `).join("")}
+        ${cells}
         <td>${r.actual.toFixed(1)}</td>
         <td>${r.projected.toFixed(1)}</td>
         <td>${r.ot.toFixed(1)}</td>
@@ -181,6 +196,18 @@ function render(){
 
         tbody.appendChild(tr);
     });
+}
+
+/* 🔥 UPDATE CELL */
+function updateCell(rowIndex, dayIndex, value){
+
+    let num = parseFloat(value);
+
+    if(isNaN(num)) num = 0;
+
+    allData[rowIndex].days[dayIndex] = num;
+
+    render();
 }
 
 function emailPreview(){
