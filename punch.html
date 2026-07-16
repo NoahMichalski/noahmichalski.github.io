@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Punch Report Analyzer</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs" type="module"></script>
+
+  <style>
+    :root{
+      --bg:#f3f6fa;
+      --panel:#ffffff;
+      --ink:#172033;
+      --muted:#657087;
+      --line:#dbe2ec;
+      --blue:#2457d6;
+      --blue-dark:#173c9a;
+      --green:#157347;
+      --green-bg:#e9f8f0;
+      --amber:#9a6500;
+      --amber-bg:#fff4d6;
+      --red:#b42318;
+      --red-bg:#ffebe9;
+      --purple:#6f42c1;
+      --purple-bg:#f1eaff;
+      --gray-bg:#eef1f5;
+      --shadow:0 10px 30px rgba(24,39,75,.08);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+    }
+
+    .app{
+      max-width:1600px;
+      margin:0 auto;
+      padding:24px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:20px;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(1.55rem,2.6vw,2.35rem);
+      line-height:1.1;
+    }
+
+    .subtitle{
+      color:var(--muted);
+      margin:7px 0 0;
+      max-width:850px;
+    }
+
+    .version{
+      white-space:nowrap;
+      color:var(--muted);
+      font-size:.82rem;
+      padding-top:6px;
+    }
+
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+    }
+
+    .controls{
+      padding:18px;
+      display:grid;
+      grid-template-columns:minmax(240px,1.4fr) repeat(2,minmax(160px,.65fr)) auto;
+      gap:14px;
+      align-items:end;
+    }
+
+    label{
+      display:block;
+      font-size:.82rem;
+      font-weight:700;
+      color:#3d485d;
+      margin-bottom:6px;
+    }
+
+    input,select,button{
+      font:inherit;
+    }
+
+    input[type="file"],
+    input[type="time"],
+    input[type="number"],
+    input[type="search"],
+    select{
+      width:100%;
+      min-height:44px;
+      border:1px solid #cbd5e1;
+      border-radius:10px;
+      padding:9px 11px;
+      background:#fff;
+      color:var(--ink);
+    }
+
+    input:focus, select:focus{
+      outline:3px solid rgba(36,87,214,.14);
+      border-color:var(--blue);
+    }
+
+    button{
+      min-height:44px;
+      border:0;
+      border-radius:10px;
+      padding:10px 15px;
+      font-weight:750;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+
+    button:hover{transform:translateY(-1px)}
+    button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+    .primary{
+      color:#fff;
+      background:var(--blue);
+    }
+    .primary:hover{background:var(--blue-dark)}
+
+    .secondary{
+      color:#263248;
+      background:#e8edf5;
+    }
+
+    .danger-lite{
+      color:var(--red);
+      background:var(--red-bg);
+    }
+
+    .statusbar{
+      margin-top:12px;
+      min-height:45px;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#40506a;
+    }
+
+    .spinner{
+      display:none;
+      width:18px;
+      height:18px;
+      border:3px solid #cdd7e8;
+      border-top-color:var(--blue);
+      border-radius:50%;
+      animation:spin .8s linear infinite;
+    }
+    .loading .spinner{display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .hidden{display:none !important}
+
+    .summary{
+      margin-top:20px;
+      display:grid;
+      grid-template-columns:repeat(6,minmax(145px,1fr));
+      gap:12px;
+    }
+
+    .card{
+      padding:15px;
+      min-height:104px;
+    }
+
+    .card .kicker{
+      color:var(--muted);
+      font-size:.76rem;
+      text-transform:uppercase;
+      letter-spacing:.055em;
+      font-weight:800;
+    }
+
+    .card .value{
+      font-size:1.8rem;
+      line-height:1;
+      font-weight:850;
+      margin-top:10px;
+    }
+
+    .card .small{
+      color:var(--muted);
+      margin-top:7px;
+      font-size:.82rem;
+    }
+
+    .late-card{border-color:#f1b8b2}
+    .late-card .value{color:var(--red)}
+    .supervisor-card{border-color:#d9c8f8}
+    .supervisor-card .value{color:var(--purple)}
+
+    .method-grid{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(150px,1fr));
+      gap:12px;
+      margin-top:12px;
+    }
+
+    .method{
+      padding:14px 16px;
+    }
+
+    .method h3{
+      margin:0 0 9px;
+      font-size:1rem;
+    }
+
+    .method-line{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      color:#48556b;
+      font-size:.88rem;
+      margin-top:5px;
+    }
+
+    .method-line strong{color:var(--ink)}
+
+    .toolbar{
+      margin-top:20px;
+      padding:14px;
+      display:grid;
+      grid-template-columns:minmax(220px,1fr) minmax(160px,.45fr) minmax(160px,.45fr) auto auto auto;
+      gap:10px;
+      align-items:center;
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      margin-top:18px;
+      flex-wrap:wrap;
+    }
+
+    .tab{
+      background:#e6ebf3;
+      color:#344157;
+    }
+
+    .tab.active{
+      background:var(--blue);
+      color:#fff;
+    }
+
+    .table-wrap{
+      margin-top:12px;
+      overflow:auto;
+      max-height:68vh;
+    }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      min-width:1100px;
+    }
+
+    th,td{
+      padding:10px 11px;
+      text-align:left;
+      border-bottom:1px solid var(--line);
+      vertical-align:middle;
+      font-size:.86rem;
+    }
+
+    th{
+      position:sticky;
+      top:0;
+      z-index:3;
+      background:#edf2f8;
+      color:#35425a;
+      font-size:.76rem;
+      text-transform:uppercase;
+      letter-spacing:.035em;
+      white-space:nowrap;
+    }
+
+    tbody tr:hover td{background:#f6f8fc}
+    tbody tr.late td{background:var(--red-bg)}
+    tbody tr.late:hover td{background:#ffe0dc}
+    tbody tr.buffer td{background:var(--amber-bg)}
+    tbody tr.missing td{background:#f4edff}
+
+    .name{
+      font-weight:780;
+      white-space:nowrap;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:4px 8px;
+      font-size:.74rem;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .badge-late{color:var(--red);background:#ffd8d3}
+    .badge-ontime{color:var(--green);background:#d9f2e5}
+    .badge-buffer{color:var(--amber);background:#ffe8a8}
+    .badge-missing{color:var(--purple);background:#e7dbff}
+    .badge-mobile{color:#1556a8;background:#dfeeff}
+    .badge-kiosk{color:#4b5563;background:#e4e8ed}
+    .badge-supervisor{color:var(--purple);background:var(--purple-bg)}
+    .badge-unknown{color:#5f6673;background:#eceef1}
+    .badge-excluded{color:#374151;background:#e5e7eb}
+
+    .modifier{
+      display:block;
+      color:var(--muted);
+      font-size:.72rem;
+      margin-top:3px;
+      max-width:250px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .empty{
+      text-align:center;
+      padding:55px 20px;
+      color:var(--muted);
+    }
+
+    .footnote{
+      color:var(--muted);
+      font-size:.78rem;
+      margin:12px 3px 0;
+      line-height:1.5;
+    }
+
+    .warning{
+      color:var(--red);
+      font-weight:700;
+    }
+
+    @media (max-width:1050px){
+      .controls{grid-template-columns:1fr 1fr}
+      .controls .file-field{grid-column:1 / -1}
+      .summary{grid-template-columns:repeat(3,1fr)}
+      .method-grid{grid-template-columns:repeat(2,1fr)}
+      .toolbar{grid-template-columns:1fr 1fr 1fr}
+    }
+
+    @media (max-width:650px){
+      .app{padding:14px}
+      .topbar{display:block}
+      .version{margin-top:7px}
+      .controls{grid-template-columns:1fr}
+      .controls .file-field{grid-column:auto}
+      .summary{grid-template-columns:repeat(2,1fr)}
+      .method-grid{grid-template-columns:1fr}
+      .toolbar{grid-template-columns:1fr 1fr}
+      .toolbar input[type="search"]{grid-column:1 / -1}
+      .card .value{font-size:1.5rem}
+    }
+
+    @media print{
+      body{background:#fff}
+      .app{max-width:none;padding:0}
+      .controls,.statusbar,.toolbar,.tabs,.footnote,.topbar .subtitle,.version{display:none !important}
+      .panel{box-shadow:none;border-color:#bbb}
+      .summary{grid-template-columns:repeat(6,1fr)}
+      .method-grid{grid-template-columns:repeat(4,1fr)}
+      .table-wrap{max-height:none;overflow:visible}
+      table{min-width:0}
+      th{position:static}
+      th,td{font-size:8pt;padding:5px}
+      .modifier{white-space:normal}
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <h1>Punch Report Analyzer</h1>
+        <p class="subtitle">Upload a Punch Detail Report PDF, choose the required start time and grace period, then review late arrivals and how each punch was entered.</p>
+      </div>
+      <div class="version">Version 1.6</div>
+    </header>
+
+    <section class="panel controls">
+      <div class="file-field">
+        <label for="pdfFile">Punch Detail PDF</label>
+        <input id="pdfFile" type="file" accept="application/pdf,.pdf" />
+      </div>
+
+      <div>
+        <label for="scheduledTime">Required clock-in time</label>
+        <input id="scheduledTime" type="time" value="08:00" />
+      </div>
+
+      <div>
+        <label for="bufferMinutes">Allowed buffer (minutes)</label>
+        <input id="bufferMinutes" type="number" min="0" max="240" step="1" value="5" />
+      </div>
+
+      <button id="analyzeBtn" class="primary">Analyze PDF</button>
+    </section>
+
+    <section id="statusbar" class="panel statusbar">
+      <span class="spinner"></span>
+      <span id="statusText">Choose a PDF to begin.</span>
+    </section>
+
+    <div id="results" class="hidden">
+      <section class="summary">
+        <article class="panel card">
+          <div class="kicker">Employees</div>
+          <div class="value" id="employeeCount">0</div>
+          <div class="small">unique employees</div>
+        </article>
+        <article class="panel card">
+          <div class="kicker">Punch Days</div>
+          <div class="value" id="recordCount">0</div>
+          <div class="small">employee/date records</div>
+        </article>
+        <article class="panel card late-card">
+          <div class="kicker">Late Clock-ins</div>
+          <div class="value" id="lateCount">0</div>
+          <div class="small" id="lateRate">0% of clock-ins</div>
+        </article>
+        <article class="panel card">
+          <div class="kicker">Minutes Late</div>
+          <div class="value" id="lateMinutes">0</div>
+          <div class="small">past required time</div>
+        </article>
+        <article class="panel card supervisor-card">
+          <div class="kicker">Supervisor Entries</div>
+          <div class="value" id="supervisorTotal">0</div>
+          <div class="small">clock-ins and clock-outs</div>
+        </article>
+        <article class="panel card">
+          <div class="kicker">Incomplete Days</div>
+          <div class="value" id="incompleteCount">0</div>
+          <div class="small">missing in or out</div>
+        </article>
+      </section>
+
+      <section class="method-grid">
+        <article class="panel method">
+          <h3>Mobile App</h3>
+          <div class="method-line"><span>Clock-ins</span><strong id="mobileIn">0</strong></div>
+          <div class="method-line"><span>Clock-outs</span><strong id="mobileOut">0</strong></div>
+        </article>
+        <article class="panel method">
+          <h3>Kiosk / Attendance</h3>
+          <div class="method-line"><span>Clock-ins</span><strong id="kioskIn">0</strong></div>
+          <div class="method-line"><span>Clock-outs</span><strong id="kioskOut">0</strong></div>
+        </article>
+        <article class="panel method">
+          <h3>Supervisor Entered</h3>
+          <div class="method-line"><span>Clock-ins</span><strong id="supervisorIn">0</strong></div>
+          <div class="method-line"><span>Clock-outs</span><strong id="supervisorOut">0</strong></div>
+        </article>
+        <article class="panel method">
+          <h3>Unknown / Not Found</h3>
+          <div class="method-line"><span>Clock-ins</span><strong id="unknownIn">0</strong></div>
+          <div class="method-line"><span>Clock-outs</span><strong id="unknownOut">0</strong></div>
+        </article>
+      </section>
+
+      <section class="tabs">
+        <button class="tab active" data-view="details">All Punches</button>
+        <button class="tab" data-view="late">Late Only</button>
+        <button class="tab" data-view="employees">Employee Summary</button>
+      </section>
+
+      <section class="panel toolbar">
+        <input id="searchBox" type="search" placeholder="Search employee, date, or modifier…" />
+        <select id="methodFilter">
+          <option value="all">All punch methods</option>
+          <option value="Mobile App">Mobile App</option>
+          <option value="Kiosk">Kiosk / Attendance</option>
+          <option value="Supervisor">Supervisor</option>
+          <option value="Unknown">Unknown</option>
+        </select>
+        <select id="statusFilter">
+          <option value="all">All statuses</option>
+          <option value="Late">Late</option>
+          <option value="Within Buffer">Within Buffer</option>
+          <option value="On Time">On Time / Early</option>
+          <option value="Missing">Incomplete</option>
+          <option value="Excluded">11 AM or Later</option>
+        </select>
+        <button id="csvBtn" class="secondary">Export CSV</button>
+        <button id="bossReportBtn" class="primary">Export Email Summary</button>
+        <button id="printBtn" class="secondary">Print</button>
+        <button id="clearBtn" class="danger-lite">Clear</button>
+      </section>
+
+      <section id="detailPanel" class="panel table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Date</th>
+              <th>Clock In</th>
+              <th>Clock Out</th>
+              <th>Required</th>
+              <th>Status</th>
+              <th>Late By</th>
+              <th>Clock-in Method</th>
+              <th>Clock-out Method</th>
+              <th>Paid Hours</th>
+            </tr>
+          </thead>
+          <tbody id="detailBody"></tbody>
+        </table>
+      </section>
+
+      <section id="employeePanel" class="panel table-wrap hidden">
+        <table>
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Days</th>
+              <th>Late</th>
+              <th>Total Minutes Late</th>
+              <th>Average Late</th>
+              <th>Mobile In</th>
+              <th>Kiosk In</th>
+              <th>Supervisor In</th>
+              <th>Supervisor Out</th>
+              <th>Incomplete</th>
+            </tr>
+          </thead>
+          <tbody id="employeeBody"></tbody>
+        </table>
+      </section>
+
+      <p class="footnote">
+        A clock-in is marked late only when it is after the required time plus the allowed buffer.
+        “Late By” shows minutes after the required time itself. Supervisor entries are counted only when the modifier matches Patty Mora, Becky, Jeff, or Rudy M.
+        Attendance service accounts and text containing “kiosk” are classified as kiosk entries.
+      </p>
+    </div>
+  </main>
+
+  <script type="module">
+    import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
+
+    const $ = id => document.getElementById(id);
+    const state = {
+      records: [],
+      filtered: [],
+      employeeSummary: [],
+      activeView: "details",
+      filename: ""
+    };
+
+    const DATE = String.raw`\d{1,2}\/\d{1,2}\/\d{4}`;
+    const TIME = String.raw`\d{1,2}:\d{2}(?::\d{2})?\s*[AP]M`;
+    const DT_RE = new RegExp(`${DATE}\\s+${TIME}`, "gi");
+    const EMPLOYEE_RE = /^(.+?)\s+\((\d+)\)\s*$/;
+    const DAY_RE = /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s+(\d{1,2}\/\d{1,2}\/\d{4})$/i;
+
+    $("analyzeBtn").addEventListener("click", analyzeSelectedFile);
+    $("scheduledTime").addEventListener("change", recalculate);
+    $("bufferMinutes").addEventListener("input", recalculate);
+    $("searchBox").addEventListener("input", applyFilters);
+    $("methodFilter").addEventListener("change", applyFilters);
+    $("statusFilter").addEventListener("change", applyFilters);
+    $("csvBtn").addEventListener("click", exportCSV);
+    $("bossReportBtn").addEventListener("click", createBossReport);
+    $("printBtn").addEventListener("click", () => window.print());
+    $("clearBtn").addEventListener("click", clearAll);
+
+    document.querySelectorAll(".tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+        btn.classList.add("active");
+        state.activeView = btn.dataset.view;
+        $("employeePanel").classList.toggle("hidden", state.activeView !== "employees");
+        $("detailPanel").classList.toggle("hidden", state.activeView === "employees");
+        applyFilters();
+      });
+    });
+
+    function setStatus(message, loading=false, isError=false){
+      $("statusbar").classList.toggle("loading", loading);
+      $("statusText").textContent = message;
+      $("statusText").classList.toggle("warning", isError);
+    }
+
+    async function analyzeSelectedFile(){
+      const file = $("pdfFile").files[0];
+      if(!file){
+        setStatus("Please choose a PDF first.", false, true);
+        return;
+      }
+
+      $("analyzeBtn").disabled = true;
+      state.filename = file.name;
+
+      try{
+        setStatus("Reading PDF…", true);
+        const buffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({data: buffer}).promise;
+        const pages = [];
+
+        for(let pageNumber=1; pageNumber<=pdf.numPages; pageNumber++){
+          setStatus(`Reading page ${pageNumber} of ${pdf.numPages}…`, true);
+          const page = await pdf.getPage(pageNumber);
+          const content = await page.getTextContent();
+          pages.push(itemsToLines(content.items));
+        }
+
+        setStatus("Parsing employee punches…", true);
+        const records = parsePages(pages);
+
+        if(!records.length){
+          throw new Error("No employee punch records were found. Confirm this is a Punch Detail Report PDF.");
+        }
+
+        state.records = records;
+        recalculate();
+        $("results").classList.remove("hidden");
+
+        const incompleteMethods = records.filter(r =>
+          (r.actualIn && r.inMethod === "Unknown") ||
+          (r.actualOut && r.outMethod === "Unknown")
+        ).length;
+
+        setStatus(
+          `Loaded ${records.length} employee-day records from ${pdf.numPages} pages.` +
+          (incompleteMethods ? ` ${incompleteMethods} record(s) had a punch method that could not be identified.` : ""),
+          false
+        );
+      }catch(error){
+        console.error(error);
+        state.records = [];
+        $("results").classList.add("hidden");
+        setStatus(error?.message || "The PDF could not be read.", false, true);
+      }finally{
+        $("analyzeBtn").disabled = false;
+      }
+    }
+
+    function itemsToLines(items){
+      const rows = [];
+
+      for(const item of items){
+        const text = String(item.str || "").trim();
+        if(!text) continue;
+
+        const x = item.transform[4];
+        const y = item.transform[5];
+        let row = rows.find(r => Math.abs(r.y - y) <= 2.2);
+
+        if(!row){
+          row = {y, items:[]};
+          rows.push(row);
+        }
+        row.items.push({x, text});
+      }
+
+      rows.sort((a,b) => b.y-a.y);
+
+      return rows.map(row => {
+        row.items.sort((a,b) => a.x-b.x);
+        return row.items.map(x => x.text).join(" ").replace(/\s+/g," ").trim();
+      });
+    }
+
+    function parsePages(pages){
+      const records = [];
+      let currentEmployee = null;
+
+      for(const lines of pages){
+        for(let i=0; i<lines.length; i++){
+          const line = cleanLine(lines[i]);
+          if(!line) continue;
+
+          const emp = line.match(EMPLOYEE_RE);
+          if(emp && !/Page|Duration|Report/i.test(emp[1])){
+            currentEmployee = {
+              name: titleCaseName(emp[1]),
+              id: emp[2]
+            };
+            continue;
+          }
+
+          const day = line.match(DAY_RE);
+          if(!day || !currentEmployee) continue;
+
+          const record = {
+            employee: currentEmployee.name,
+            employeeId: currentEmployee.id,
+            dayName: capitalize(day[1]),
+            date: day[2],
+            actualIn: "",
+            actualOut: "",
+            paidHours: "",
+            inMethod: "Unknown",
+            outMethod: "Unknown",
+            inModifier: "",
+            outModifier: "",
+            inAction: "",
+            outAction: ""
+          };
+
+          let end = i+1;
+          while(end < lines.length){
+            const next = cleanLine(lines[end]);
+            if(DAY_RE.test(next) || EMPLOYEE_RE.test(next) || /Report Generated on:/i.test(next)) break;
+            end++;
+          }
+
+          const block = lines.slice(i+1,end).map(cleanLine).filter(Boolean);
+          parseDayBlock(block, record);
+
+          if(record.actualIn || record.actualOut){
+            records.push(record);
+          }
+
+          i = end-1;
+        }
+      }
+
+      return dedupeRecords(records);
+    }
+
+    function parseDayBlock(block, record){
+      const actualHeader = block.findIndex(x => /Actual Time In/i.test(x) && /Actual Time Out/i.test(x));
+
+      if(actualHeader >= 0){
+        for(let j=actualHeader+1; j<Math.min(block.length, actualHeader+5); j++){
+          const matches = [...block[j].matchAll(DT_RE)].map(m => m[0]);
+          if(matches.length >= 4){
+            record.actualIn = normalizeDateTime(matches[0]);
+            record.actualOut = normalizeDateTime(matches[1]);
+            record.paidHours = findPaidHours(block[j], matches);
+            break;
+          }
+          if(matches.length === 2){
+            // With no clock-out, reports normally show Actual In and Rounded In only.
+            record.actualIn = normalizeDateTime(matches[0]);
+            record.actualOut = "";
+            record.paidHours = findPaidHours(block[j], matches);
+            break;
+          }
+          if(matches.length === 1){
+            record.actualIn = normalizeDateTime(matches[0]);
+            record.actualOut = "";
+            record.paidHours = findPaidHours(block[j], matches);
+            break;
+          }
+        }
+      }
+
+      const changesIndex = block.findIndex(x => /^Recent Changes$/i.test(x));
+      if(changesIndex >= 0){
+        const changes = [];
+
+        for(let j=changesIndex+1; j<block.length; j++){
+          const parsed = parseChangeLine(block[j]);
+          if(parsed) changes.push(parsed);
+        }
+
+        const inChanges = changes.filter(c => c.type === "IN");
+        const outChanges = changes.filter(c => c.type === "OUT");
+
+        const finalIn = chooseFinalChange(inChanges, record.actualIn);
+        const finalOut = chooseFinalChange(outChanges, record.actualOut);
+
+        if(finalIn){
+          record.inModifier = finalIn.modifier;
+          record.inAction = finalIn.status;
+          record.inMethod = classifyMethod(record.employee, finalIn.modifier);
+        }
+
+        if(finalOut){
+          record.outModifier = finalOut.modifier;
+          record.outAction = finalOut.status;
+          record.outMethod = classifyMethod(record.employee, finalOut.modifier);
+        }
+      }
+    }
+
+    function parseChangeLine(line){
+      if(!/\b(IN|OUT)\b/i.test(line) || !/\b(Add|Update|Delete)\b/i.test(line)) return null;
+
+      const typeMatch = line.match(/\b(IN|OUT)\b/i);
+      const statusMatch = line.match(/\b(Add|Update|Delete)\b/i);
+      if(!typeMatch || !statusMatch) return null;
+
+      const typeIndex = typeMatch.index;
+      const statusIndex = statusMatch.index;
+      if(statusIndex < typeIndex) return null;
+
+      const afterStatus = line.slice(statusIndex + statusMatch[0].length).trim();
+      const lastDateIndex = afterStatus.search(new RegExp(`\\s${DATE}\\s+${TIME}\\s*$`, "i"));
+      let modifier = lastDateIndex >= 0 ? afterStatus.slice(0,lastDateIndex).trim() : afterStatus;
+
+      modifier = modifier
+        .replace(/\s+\d{1,2}\/\d{1,2}\/\d{4}.*$/,"")
+        .replace(/\s+/g," ")
+        .trim();
+
+      const datetimes = [...line.matchAll(DT_RE)].map(m => normalizeDateTime(m[0]));
+      const adjusted = datetimes.length >= 2 ? datetimes[1] : datetimes[0] || "";
+
+      if(!modifier) return null;
+
+      return {
+        type: typeMatch[1].toUpperCase(),
+        status: capitalize(statusMatch[1]),
+        modifier,
+        adjusted
+      };
+    }
+
+    function chooseFinalChange(changes, actual){
+      if(!changes.length) return null;
+
+      const exact = changes.filter(c =>
+        c.adjusted && actual && minuteKey(c.adjusted) === minuteKey(actual)
+      );
+
+      const pool = exact.length ? exact : changes;
+      return pool[pool.length-1];
+    }
+
+    function classifyMethod(employeeName, modifier){
+      const raw = String(modifier || "").trim();
+      if(!raw) return "Unknown";
+
+      if(/SERVICE_USER|ATTEND|KIOSK|TIME\s*CLOCK|CLOCK\s*DEVICE/i.test(raw)){
+        return "Kiosk";
+      }
+
+      const modifierName = raw
+        // PDF extraction sometimes truncates "(via Mobile)" to "(via M",
+        // "(via Mo)", "(via Mobil", etc. Remove any trailing "(via..." text,
+        // whether or not the closing parenthesis survived extraction.
+        .replace(/\s*\(via\b.*$/i," ")
+        .replace(/\s+/g," ")
+        .trim();
+
+      const employeeComparable = normalizePerson(employeeName);
+      const modifierComparable = normalizePerson(modifierName);
+
+      // Only these people are treated as supervisors/editors.
+      const supervisorAliases = [
+        "patty mora",
+        "mora patty",
+        "becky",
+        "jeff",
+        "rudy m",
+        "rudy"
+      ].map(normalizePerson);
+
+      const isSupervisor = supervisorAliases.some(alias =>
+        alias && (
+          modifierComparable === alias ||
+          modifierComparable.includes(alias) ||
+          alias.includes(modifierComparable)
+        )
+      );
+
+      if(isSupervisor){
+        return "Supervisor";
+      }
+
+      if(employeeComparable && modifierComparable && employeeComparable === modifierComparable){
+        if(/via\s+Kiosk/i.test(raw)) return "Kiosk";
+        return "Mobile App";
+      }
+
+      if(/\(via\s+M(?:o(?:b(?:i(?:l(?:e)?)?)?)?)?/i.test(raw)) return "Mobile App";
+      if(/via\s+Kiosk/i.test(raw)) return "Kiosk";
+
+      // Non-whitelisted web/service entries are left unknown rather than
+      // incorrectly counting them as supervisor punches.
+      return "Unknown";
+    }
+
+    function normalizePerson(value){
+      let text = String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g,"")
+        .replace(/[^a-z,\s'-]/g," ")
+        .replace(/\s+/g," ")
+        .trim();
+
+      if(text.includes(",")){
+        const parts = text.split(",").map(x => x.trim()).filter(Boolean);
+        text = [...parts.slice(1), parts[0]].join(" ");
+      }
+
+      return text
+        .replace(/[^a-z]/g," ")
+        .split(/\s+/)
+        .filter(Boolean)
+        .sort()
+        .join(" ");
+    }
+
+    function dedupeRecords(records){
+      const map = new Map();
+      for(const r of records){
+        const key = `${r.employeeId}|${r.date}`;
+        const existing = map.get(key);
+        if(!existing || scoreRecord(r) >= scoreRecord(existing)){
+          map.set(key,r);
+        }
+      }
+      return [...map.values()].sort((a,b) =>
+        parseUSDate(a.date)-parseUSDate(b.date) ||
+        a.employee.localeCompare(b.employee)
+      );
+    }
+
+    function scoreRecord(r){
+      return [r.actualIn,r.actualOut,r.inModifier,r.outModifier,r.paidHours].filter(Boolean).length;
+    }
+
+    function recalculate(){
+      if(!state.records.length) return;
+
+      const schedule = $("scheduledTime").value || "08:00";
+      const buffer = Math.max(0, Number($("bufferMinutes").value) || 0);
+
+      for(const record of state.records){
+        const arrival = record.actualIn ? minutesOfDay(record.actualIn) : null;
+        const required = timeInputToMinutes(schedule);
+
+        record.requiredTime = formatMinutes(required);
+        record.minutesAfterRequired = arrival === null ? null : arrival-required;
+        record.minutesLate = arrival === null ? 0 : Math.max(0, arrival-required);
+        record.lateBeyondBuffer = arrival === null ? 0 : Math.max(0, arrival-(required+buffer));
+
+        const lateCutoff = 11 * 60;
+
+        if(!record.actualIn){
+          record.status = "Missing";
+        }else if(arrival >= lateCutoff){
+          record.status = "Excluded";
+          record.minutesLate = 0;
+          record.lateBeyondBuffer = 0;
+        }else if(arrival > required+buffer){
+          record.status = "Late";
+        }else if(arrival > required){
+          record.status = "Within Buffer";
+        }else{
+          record.status = "On Time";
+        }
+
+        record.incomplete = !record.actualIn || !record.actualOut;
+      }
+
+      buildEmployeeSummary();
+      renderSummary();
+      applyFilters();
+    }
+
+    function buildEmployeeSummary(){
+      const groups = new Map();
+
+      for(const r of state.records){
+        if(!groups.has(r.employee)){
+          groups.set(r.employee,{
+            employee:r.employee,
+            days:0,
+            late:0,
+            minutesLate:0,
+            mobileIn:0,
+            kioskIn:0,
+            supervisorIn:0,
+            supervisorOut:0,
+            incomplete:0
+          });
+        }
+
+        const g = groups.get(r.employee);
+        g.days++;
+        if(r.status === "Late"){
+          g.late++;
+          g.minutesLate += r.minutesLate;
+        }
+        if(r.inMethod === "Mobile App") g.mobileIn++;
+        if(r.inMethod === "Kiosk") g.kioskIn++;
+        if(r.inMethod === "Supervisor") g.supervisorIn++;
+        if(r.outMethod === "Supervisor") g.supervisorOut++;
+        if(r.incomplete) g.incomplete++;
+      }
+
+      state.employeeSummary = [...groups.values()].sort((a,b) =>
+        b.late-a.late || b.minutesLate-a.minutesLate || a.employee.localeCompare(b.employee)
+      );
+    }
+
+    function renderSummary(){
+      const rows = state.records;
+      const employees = new Set(rows.map(r => r.employee)).size;
+      const clockIns = rows.filter(r => r.actualIn).length;
+      const late = rows.filter(r => r.status === "Late");
+      const totalLateMinutes = late.reduce((n,r) => n+r.minutesLate,0);
+      const incomplete = rows.filter(r => r.incomplete).length;
+
+      const countMethod = (method,type) =>
+        rows.filter(r => r[`${type}Method`] === method && r[`actual${type === "in" ? "In" : "Out"}`]).length;
+
+      const supervisorIn = countMethod("Supervisor","in");
+      const supervisorOut = countMethod("Supervisor","out");
+
+      $("employeeCount").textContent = employees;
+      $("recordCount").textContent = rows.length;
+      $("lateCount").textContent = late.length;
+      $("lateRate").textContent = `${clockIns ? Math.round(late.length/clockIns*100) : 0}% of clock-ins`;
+      $("lateMinutes").textContent = totalLateMinutes;
+      $("supervisorTotal").textContent = supervisorIn+supervisorOut;
+      $("incompleteCount").textContent = incomplete;
+
+      $("mobileIn").textContent = countMethod("Mobile App","in");
+      $("mobileOut").textContent = countMethod("Mobile App","out");
+      $("kioskIn").textContent = countMethod("Kiosk","in");
+      $("kioskOut").textContent = countMethod("Kiosk","out");
+      $("supervisorIn").textContent = supervisorIn;
+      $("supervisorOut").textContent = supervisorOut;
+      $("unknownIn").textContent = countMethod("Unknown","in");
+      $("unknownOut").textContent = countMethod("Unknown","out");
+    }
+
+    function applyFilters(){
+      if(!state.records.length) return;
+
+      const search = $("searchBox").value.trim().toLowerCase();
+      const method = $("methodFilter").value;
+      const status = $("statusFilter").value;
+
+      let rows = state.records.filter(r => {
+        const haystack = [
+          r.employee,r.date,r.dayName,r.inModifier,r.outModifier,
+          r.inMethod,r.outMethod,r.status
+        ].join(" ").toLowerCase();
+
+        const searchOK = !search || haystack.includes(search);
+        const methodOK = method === "all" || r.inMethod === method || r.outMethod === method;
+        const statusOK =
+          status === "all" ||
+          (status === "Missing" ? r.incomplete : r.status === status);
+
+        return searchOK && methodOK && statusOK;
+      });
+
+      if(state.activeView === "late"){
+        rows = rows.filter(r => r.status === "Late");
+      }
+
+      state.filtered = rows;
+      renderDetails(rows);
+      renderEmployees(search);
+    }
+
+    function renderDetails(rows){
+      const body = $("detailBody");
+      body.innerHTML = "";
+
+      if(!rows.length){
+        body.innerHTML = `<tr><td colspan="10" class="empty">No punch records match the current filters.</td></tr>`;
+        return;
+      }
+
+      const fragment = document.createDocumentFragment();
+
+      for(const r of rows){
+        const tr = document.createElement("tr");
+        if(r.status === "Late") tr.className = "late";
+        else if(r.status === "Within Buffer") tr.className = "buffer";
+        else if(r.incomplete) tr.className = "missing";
+
+        tr.innerHTML = `
+          <td><span class="name">${escapeHTML(r.employee)}</span><span class="modifier">ID ${escapeHTML(r.employeeId)}</span></td>
+          <td>${escapeHTML(r.dayName)}<span class="modifier">${escapeHTML(r.date)}</span></td>
+          <td>${r.actualIn ? escapeHTML(timeOnly(r.actualIn)) : "—"}</td>
+          <td>${r.actualOut ? escapeHTML(timeOnly(r.actualOut)) : '<span class="badge badge-missing">Missing</span>'}</td>
+          <td>${escapeHTML(r.requiredTime)}</td>
+          <td>${statusBadge(r)}</td>
+          <td>${r.actualIn ? (r.minutesLate ? `${r.minutesLate} min` : "0 min") : "—"}</td>
+          <td>${methodCell(r.inMethod,r.inModifier,r.inAction)}</td>
+          <td>${r.actualOut ? methodCell(r.outMethod,r.outModifier,r.outAction) : "—"}</td>
+          <td>${escapeHTML(r.paidHours || "—")}</td>
+        `;
+        fragment.appendChild(tr);
+      }
+
+      body.appendChild(fragment);
+    }
+
+    function renderEmployees(search){
+      const body = $("employeeBody");
+      body.innerHTML = "";
+
+      let rows = state.employeeSummary;
+      if(search){
+        rows = rows.filter(r => r.employee.toLowerCase().includes(search));
+      }
+
+      if(!rows.length){
+        body.innerHTML = `<tr><td colspan="10" class="empty">No employees match the current search.</td></tr>`;
+        return;
+      }
+
+      for(const r of rows){
+        const tr = document.createElement("tr");
+        if(r.late) tr.className = "late";
+        tr.innerHTML = `
+          <td class="name">${escapeHTML(r.employee)}</td>
+          <td>${r.days}</td>
+          <td>${r.late}</td>
+          <td>${r.minutesLate}</td>
+          <td>${r.late ? Math.round(r.minutesLate/r.late) + " min" : "0 min"}</td>
+          <td>${r.mobileIn}</td>
+          <td>${r.kioskIn}</td>
+          <td>${r.supervisorIn}</td>
+          <td>${r.supervisorOut}</td>
+          <td>${r.incomplete}</td>
+        `;
+        body.appendChild(tr);
+      }
+    }
+
+    function statusBadge(r){
+      if(r.status === "Late") return `<span class="badge badge-late">Late</span>`;
+      if(r.status === "Within Buffer") return `<span class="badge badge-buffer">Within Buffer</span>`;
+      if(r.status === "Missing") return `<span class="badge badge-missing">Missing In</span>`;
+      if(r.status === "Excluded") return `<span class="badge badge-excluded">11 AM+ Excluded</span>`;
+      return `<span class="badge badge-ontime">On Time</span>`;
+    }
+
+    function methodCell(method,modifier,action){
+      const cls = {
+        "Mobile App":"badge-mobile",
+        "Kiosk":"badge-kiosk",
+        "Supervisor":"badge-supervisor",
+        "Unknown":"badge-unknown"
+      }[method] || "badge-unknown";
+
+      const label = method === "Kiosk" ? "Kiosk / Attendance" : method;
+
+      return `<span class="badge ${cls}">${escapeHTML(label)}</span>` +
+        (modifier ? `<span class="modifier" title="${escapeHTML(modifier)}">${escapeHTML(modifier)}${action ? ` · ${escapeHTML(action)}` : ""}</span>` : "");
+    }
+
+    function exportCSV(){
+      const rows = state.activeView === "employees" ? state.employeeSummary : state.filtered;
+      if(!rows.length) return;
+
+      let headers, data;
+
+      if(state.activeView === "employees"){
+        headers = ["Employee","Days","Late Clock-ins","Total Minutes Late","Average Minutes Late","Mobile Clock-ins","Kiosk Clock-ins","Supervisor Clock-ins","Supervisor Clock-outs","Incomplete Days"];
+        data = rows.map(r => [
+          r.employee,r.days,r.late,r.minutesLate,
+          r.late ? Math.round(r.minutesLate/r.late) : 0,
+          r.mobileIn,r.kioskIn,r.supervisorIn,r.supervisorOut,r.incomplete
+        ]);
+      }else{
+        headers = ["Employee","Employee ID","Day","Date","Clock In","Clock Out","Required Time","Buffer Minutes","Status","Minutes After Required","Minutes Late","Clock-in Method","Clock-in Modifier","Clock-out Method","Clock-out Modifier","Paid Hours","Incomplete"];
+        data = rows.map(r => [
+          r.employee,r.employeeId,r.dayName,r.date,timeOnly(r.actualIn),timeOnly(r.actualOut),
+          r.requiredTime,Number($("bufferMinutes").value)||0,r.status,
+          r.minutesAfterRequired ?? "",r.minutesLate,r.inMethod,r.inModifier,
+          r.outMethod,r.outModifier,r.paidHours,r.incomplete ? "Yes" : "No"
+        ]);
+      }
+
+      const csv = [headers,...data]
+        .map(row => row.map(csvCell).join(","))
+        .join("\r\n");
+
+      const blob = new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const base = state.filename.replace(/\.pdf$/i,"") || "punch-report";
+      a.href = url;
+      a.download = `${base}-${state.activeView === "employees" ? "employee-summary" : "late-punch-report"}.csv`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url),1000);
+    }
+
+
+    function createBossReport(){
+      if(!state.records.length) return;
+
+      const schedule = $("scheduledTime").value || "08:00";
+      const buffer = Math.max(0, Number($("bufferMinutes").value) || 0);
+      const rows = state.records;
+      const lateRows = rows.filter(r => r.status === "Late");
+      const incompleteRows = rows.filter(r => r.incomplete);
+      const excludedRows = rows.filter(r => r.status === "Excluded");
+      const employees = [...new Set(rows.map(r => r.employee))];
+
+      const methodCount = (method, side) =>
+        rows.filter(r => r[`${side}Method`] === method && r[`actual${side === "in" ? "In" : "Out"}`]).length;
+
+      const rankings = state.employeeSummary.map(summary => {
+        const empRows = rows.filter(r =>
+          r.employee === summary.employee &&
+          r.actualIn &&
+          r.status !== "Excluded"
+        );
+        const onTime = empRows.filter(r => r.status === "On Time" || r.status === "Within Buffer").length;
+        const late = empRows.filter(r => r.status === "Late").length;
+        const counted = onTime + late;
+
+        return {
+          ...summary,
+          onTime,
+          late,
+          counted,
+          onTimeRate: counted ? Math.round(onTime / counted * 100) : 0
+        };
+      }).sort((a,b) =>
+        b.onTimeRate-a.onTimeRate ||
+        b.onTime-a.onTime ||
+        a.late-b.late ||
+        a.employee.localeCompare(b.employee)
+      );
+
+      function rankColor(rate){
+        if(rate >= 95) return "#d9f2e5";
+        if(rate >= 85) return "#fff0b8";
+        return "#ffd8d3";
+      }
+
+      function methodColors(method){
+        if(method === "Mobile App") return ["#dfeeff","#1556a8"];
+        if(method === "Kiosk") return ["#e4e8ed","#4b5563"];
+        if(method === "Supervisor") return ["#f1eaff","#6f42c1"];
+        return ["#eceef1","#5f6673"];
+      }
+
+      const esc = escapeHTML;
+      const generated = new Date().toLocaleString("en-US");
+      const dates = rows.map(r => parseUSDate(r.date)).sort((a,b)=>a-b);
+      const dateRange = dates.length
+        ? `${dates[0].toLocaleDateString("en-US")} – ${dates[dates.length-1].toLocaleDateString("en-US")}`
+        : "";
+
+      const rankingRows = rankings.length ? rankings.map((r,index) => `
+        <tr style="background:${rankColor(r.onTimeRate)}">
+          <td style="font-weight:700">${index+1}. ${esc(r.employee)}</td>
+          <td>${r.onTimeRate}%</td>
+          <td>${r.onTime}</td>
+          <td>${r.late}</td>
+          <td>${r.counted}</td>
+          <td>${r.minutesLate}</td>
+        </tr>`).join("") :
+        `<tr><td colspan="6">No employee records found.</td></tr>`;
+
+      const lateCountRows = rankings
+        .filter(r => r.late > 0)
+        .sort((a,b) => b.late-a.late || b.minutesLate-a.minutesLate || a.employee.localeCompare(b.employee));
+
+      const lateCountTable = lateCountRows.length ? lateCountRows.map(r => `
+        <tr>
+          <td style="font-weight:700">${esc(r.employee)}</td>
+          <td style="font-weight:700;color:#b42318">${r.late}</td>
+          <td>${r.minutesLate}</td>
+          <td>${r.late ? Math.round(r.minutesLate/r.late) : 0} min</td>
+          <td>${r.onTimeRate}%</td>
+        </tr>`).join("") :
+        `<tr><td colspan="5">No employees were late.</td></tr>`;
+
+      const lateByEmployeeDetail = lateCountRows.length ? lateCountRows.map(summary => {
+        const employeeLateRows = lateRows
+          .filter(r => r.employee === summary.employee)
+          .sort((a,b) => parseUSDate(a.date)-parseUSDate(b.date));
+
+        const dayLines = employeeLateRows.map(r => `
+          <div style="margin:3px 0">
+            <strong>${esc(r.dayName)}</strong> ${esc(timeOnly(r.actualIn))}
+            <span style="color:#b42318">(${r.minutesLate} min late)</span>
+          </div>`).join("");
+
+        return `
+          <tr>
+            <td style="font-weight:700;vertical-align:top">${esc(summary.employee)}</td>
+            <td style="vertical-align:top">${summary.late}</td>
+            <td>${dayLines}</td>
+          </tr>`;
+      }).join("") :
+      `<tr><td colspan="3">No employees were late.</td></tr>`;
+
+      const lateDetailRows = lateRows.length ? lateRows
+        .sort((a,b) => parseUSDate(a.date)-parseUSDate(b.date) || b.minutesLate-a.minutesLate)
+        .map(r => {
+          const [bg,fg] = methodColors(r.inMethod);
+          return `
+          <tr>
+            <td>${esc(r.employee)}</td>
+            <td>${esc(r.dayName)}, ${esc(r.date)}</td>
+            <td>${esc(timeOnly(r.actualIn))}</td>
+            <td style="font-weight:700;color:#b42318">${r.minutesLate} min</td>
+            <td><span style="display:inline-block;padding:4px 8px;border-radius:999px;background:${bg};color:${fg};font-weight:700">${esc(r.inMethod)}</span></td>
+            <td>${esc(r.inModifier || "—")}</td>
+          </tr>`;
+        }).join("") :
+        `<tr><td colspan="6">No late clock-ins found.</td></tr>`;
+
+      const subject = `Punch Attendance Summary - ${dateRange || generated.split(",")[0]}`;
+
+      const plainText = [
+        subject,
+        "",
+        `Required clock-in: ${formatMinutes(timeInputToMinutes(schedule))}`,
+        `Allowed buffer: ${buffer} minute(s)`,
+        `Employees: ${employees.length}`,
+        `Punch days: ${rows.length}`,
+        `Late clock-ins: ${lateRows.length}`,
+        `Incomplete days: ${incompleteRows.length}`,
+        "",
+        "LATE COUNT BY EMPLOYEE",
+        ...lateCountRows.flatMap(r => {
+          const employeeDays = lateRows
+            .filter(x => x.employee === r.employee)
+            .sort((a,b) => parseUSDate(a.date)-parseUSDate(b.date))
+            .map(x => `  ${x.dayName}: ${timeOnly(x.actualIn)} (${x.minutesLate} min late)`);
+          return [
+            `${r.employee}: ${r.late} time(s) late`,
+            ...employeeDays
+          ];
+        }),
+        "",
+        "ALL LATE CLOCK-INS",
+        ...lateRows.map(r => `${r.employee} — ${r.date} — ${timeOnly(r.actualIn)} — ${r.minutesLate} min late — ${r.inMethod}`)
+      ].join("\n");
+
+      const report = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(subject)}</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#eef2f7;color:#1f2937}
+.wrap{max-width:1000px;margin:0 auto;background:white;padding:28px}
+h1{margin:0 0 4px;font-size:27px}
+h2{margin:30px 0 10px;font-size:20px}
+.meta{color:#6b7280;margin-bottom:18px;line-height:1.5}
+.intro{background:#f8fafc;border-left:4px solid #2457d6;padding:13px 15px;margin:18px 0}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(135px,1fr));gap:12px;margin:20px 0}
+.card{border:1px solid #d1d5db;border-radius:9px;padding:14px 12px;text-align:center;font-size:12px;color:#6b7280;line-height:1.35}
+.card strong{display:block;font-size:24px;line-height:1.1;color:#1f2937;margin-top:8px}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th,td{border:1px solid #d1d5db;padding:8px;text-align:left;font-size:13px}
+th{background:#edf2f7}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;margin:8px 0 12px}
+.legend span{padding:4px 8px;border-radius:999px}
+.note{margin-top:26px;color:#6b7280;font-size:12px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+button{padding:10px 14px;border:0;border-radius:8px;background:#2457d6;color:white;font-weight:bold;cursor:pointer}
+.secondary{background:#e8edf5;color:#263248}
+textarea{position:fixed;left:-9999px;top:-9999px}
+@media print{.actions{display:none}.cards{grid-template-columns:repeat(4,1fr)}body{background:white}.wrap{padding:0}}
+@media(max-width:700px){.cards{grid-template-columns:repeat(2,1fr)}.wrap{padding:16px}}
+</style>
+</head>
+<body>
+<div class="wrap" style="max-width:1000px;margin:0 auto;background:#ffffff;padding:28px;font-family:Arial,Helvetica,sans-serif;color:#1f2937;font-size:14px;line-height:1.4;">
+  <div class="actions">
+    <button onclick="copyForOutlook()">Copy for Outlook</button>
+    <button class="secondary" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+
+  <h1 style="font-family:Arial,Helvetica,sans-serif;font-size:26px;line-height:1.2;margin:0 0 8px;color:#111827;font-weight:700;">Punch Attendance Summary</h1>
+  <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;color:#6b7280;margin-bottom:16px;">
+    ${esc(dateRange)}<br>
+    Generated ${esc(generated)}
+  </div>
+
+  <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;background:#f8fafc;border-left:4px solid #2457d6;padding:12px 14px;margin:16px 0;color:#1f2937;">
+    Required clock-in: <strong>${esc(formatMinutes(timeInputToMinutes(schedule)))}</strong>
+    &nbsp; | &nbsp; Allowed buffer: <strong>${buffer} minute(s)</strong>
+  </div>
+
+  <table role="presentation" style="width:100%;border-collapse:separate;border-spacing:10px 0;margin:20px 0;">
+    <tr>
+      <td style="width:25%;border:1px solid #d1d5db;border-radius:8px;padding:14px;text-align:center;background:#ffffff;">
+        <div style="font-size:12px;color:#6b7280;line-height:1.3;">Employees</div>
+        <div style="font-size:24px;font-weight:700;line-height:1.2;margin-top:7px;color:#1f2937;">${employees.length}</div>
+      </td>
+      <td style="width:25%;border:1px solid #d1d5db;border-radius:8px;padding:14px;text-align:center;background:#ffffff;">
+        <div style="font-size:12px;color:#6b7280;line-height:1.3;">Punch Days</div>
+        <div style="font-size:24px;font-weight:700;line-height:1.2;margin-top:7px;color:#1f2937;">${rows.length}</div>
+      </td>
+      <td style="width:25%;border:1px solid #d1d5db;border-radius:8px;padding:14px;text-align:center;background:#ffffff;">
+        <div style="font-size:12px;color:#6b7280;line-height:1.3;">Late Clock-ins</div>
+        <div style="font-size:24px;font-weight:700;line-height:1.2;margin-top:7px;color:#b42318;">${lateRows.length}</div>
+      </td>
+      <td style="width:25%;border:1px solid #d1d5db;border-radius:8px;padding:14px;text-align:center;background:#ffffff;">
+        <div style="font-size:12px;color:#6b7280;line-height:1.3;">Incomplete Days</div>
+        <div style="font-size:24px;font-weight:700;line-height:1.2;margin-top:7px;color:#1f2937;">${incompleteRows.length}</div>
+      </td>
+    </tr>
+  </table>
+
+  <h2 style="font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.25;margin:28px 0 10px;color:#111827;">On-Time Ranking</h2>
+  <div class="legend">
+    <span style="background:#d9f2e5">95–100% on time</span>
+    <span style="background:#fff0b8">85–94% on time</span>
+    <span style="background:#ffd8d3">Below 85% on time</span>
+  </div>
+  <table>
+    <thead><tr><th>Employee</th><th>On-Time Rate</th><th>On Time</th><th>Late</th><th>Counted Days</th><th>Total Minutes Late</th></tr></thead>
+    <tbody>${rankingRows}</tbody>
+  </table>
+
+  <h2 style="font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.25;margin:28px 0 10px;color:#111827;">Late Count by Employee</h2>
+  <table>
+    <thead><tr><th>Employee</th><th>Times Late</th><th>Total Minutes Late</th><th>Average Late</th><th>On-Time Rate</th></tr></thead>
+    <tbody>${lateCountTable}</tbody>
+  </table>
+
+  <h2 style="font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.25;margin:28px 0 10px;color:#111827;">Late Clock-ins by Employee</h2>
+  <table>
+    <thead><tr><th>Employee</th><th>Times Late</th><th>Late Days and Clock-in Times</th></tr></thead>
+    <tbody>${lateByEmployeeDetail}</tbody>
+  </table>
+
+  <h2 style="font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.25;margin:28px 0 10px;color:#111827;">All Late Clock-ins</h2>
+  <table>
+    <thead><tr><th>Employee</th><th>Date</th><th>Clock In</th><th>Late By</th><th>Method</th><th>Entered / Modified By</th></tr></thead>
+    <tbody>${lateDetailRows}</tbody>
+  </table>
+
+  <h2 style="font-family:Arial,Helvetica,sans-serif;font-size:20px;line-height:1.25;margin:28px 0 10px;color:#111827;">Punch Method Summary</h2>
+  <table>
+    <thead><tr><th>Method</th><th>Clock-ins</th><th>Clock-outs</th><th>Total</th></tr></thead>
+    <tbody>
+      <tr><td>Mobile App</td><td>${methodCount("Mobile App","in")}</td><td>${methodCount("Mobile App","out")}</td><td>${methodCount("Mobile App","in")+methodCount("Mobile App","out")}</td></tr>
+      <tr><td>Kiosk / Attendance</td><td>${methodCount("Kiosk","in")}</td><td>${methodCount("Kiosk","out")}</td><td>${methodCount("Kiosk","in")+methodCount("Kiosk","out")}</td></tr>
+      <tr><td>Supervisor</td><td>${methodCount("Supervisor","in")}</td><td>${methodCount("Supervisor","out")}</td><td>${methodCount("Supervisor","in")+methodCount("Supervisor","out")}</td></tr>
+      <tr><td>Unknown</td><td>${methodCount("Unknown","in")}</td><td>${methodCount("Unknown","out")}</td><td>${methodCount("Unknown","in")+methodCount("Unknown","out")}</td></tr>
+    </tbody>
+  </table>
+
+
+</div>
+
+<textarea id="emailText">${esc(plainText)}</textarea>
+<script>
+async function copyForOutlook(){
+  const button = document.querySelector(".actions button");
+  const old = button.textContent;
+
+  try{
+    const source = document.querySelector(".wrap").cloneNode(true);
+    const actions = source.querySelector(".actions");
+    if(actions) actions.remove();
+
+    source.style.maxWidth = "900px";
+    source.style.margin = "0";
+    source.style.padding = "0";
+    source.style.background = "#ffffff";
+    source.style.fontFamily = "Arial, Helvetica, sans-serif";
+    source.style.color = "#1f2937";
+
+    source.querySelectorAll("table").forEach(table => {
+      table.style.width = "100%";
+      table.style.borderCollapse = "collapse";
+      table.style.marginTop = "8px";
+    });
+
+    source.querySelectorAll("th").forEach(cell => {
+      cell.style.border = "1px solid #cbd5e1";
+      cell.style.padding = "8px";
+      cell.style.textAlign = "left";
+      cell.style.fontSize = "13px";
+      cell.style.background = "#edf2f7";
+    });
+
+    source.querySelectorAll("td").forEach(cell => {
+      cell.style.border = "1px solid #cbd5e1";
+      cell.style.padding = "8px";
+      cell.style.textAlign = "left";
+      cell.style.fontSize = "13px";
+    });
+
+    source.querySelectorAll("h1").forEach(h => {
+      h.style.fontSize = "26px";
+      h.style.margin = "0 0 4px";
+    });
+
+    source.querySelectorAll("h2").forEach(h => {
+      h.style.fontSize = "20px";
+      h.style.margin = "28px 0 10px";
+    });
+
+    const html = '<div style="font-family:Arial,Helvetica,sans-serif;color:#1f2937;background:#ffffff;">' +
+      source.innerHTML + '</div>';
+    const plain = document.getElementById("emailText").value;
+
+    if(navigator.clipboard && window.ClipboardItem){
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([html], {type:"text/html"}),
+          "text/plain": new Blob([plain], {type:"text/plain"})
+        })
+      ]);
+    }else{
+      const range = document.createRange();
+      range.selectNodeContents(source);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      document.execCommand("copy");
+      selection.removeAllRanges();
+    }
+
+    button.textContent = "Copied for Outlook!";
+  }catch(error){
+    console.error(error);
+    try{
+      await navigator.clipboard.writeText(document.getElementById("emailText").value);
+      button.textContent = "Copied as Text";
+    }catch{
+      button.textContent = "Copy Failed";
+    }
+  }
+
+  setTimeout(() => button.textContent = old, 1800);
+}
+<\/script>
+</body>
+</html>`;
+
+      const reportWindow = window.open("", "_blank");
+      if(!reportWindow){
+        alert("Your browser blocked the email summary tab. Please allow pop-ups for this page and try again.");
+        return;
+      }
+
+      reportWindow.document.open();
+      reportWindow.document.write(report);
+      reportWindow.document.close();
+      reportWindow.focus();
+    }
+
+    function clearAll(){
+      state.records = [];
+      state.filtered = [];
+      state.employeeSummary = [];
+      $("pdfFile").value = "";
+      $("searchBox").value = "";
+      $("methodFilter").value = "all";
+      $("statusFilter").value = "all";
+      $("results").classList.add("hidden");
+      setStatus("Choose a PDF to begin.");
+    }
+
+    function findPaidHours(line,matches){
+      let temp = line;
+      for(const dt of matches) temp = temp.replace(dt," ");
+      const nums = temp.match(/\b\d+\.\d{1,2}\b/g);
+      return nums ? nums[nums.length-1] : "";
+    }
+
+    function normalizeDateTime(value){
+      return String(value).replace(/\s+/g," ").trim().replace(/(\d)(AM|PM)$/i,"$1 $2");
+    }
+
+    function minuteKey(value){
+      const d = parseDateTime(value);
+      return d ? `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}-${d.getHours()}-${d.getMinutes()}` : "";
+    }
+
+    function minutesOfDay(value){
+      const d = parseDateTime(value);
+      return d ? d.getHours()*60+d.getMinutes() : null;
+    }
+
+    function parseDateTime(value){
+      const m = String(value || "").match(/(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::\d{2})?\s*([AP]M)/i);
+      if(!m) return null;
+      let hour = Number(m[4]);
+      const minute = Number(m[5]);
+      const ap = m[6].toUpperCase();
+      if(ap === "PM" && hour !== 12) hour += 12;
+      if(ap === "AM" && hour === 12) hour = 0;
+      return new Date(Number(m[3]),Number(m[1])-1,Number(m[2]),hour,minute);
+    }
+
+    function parseUSDate(value){
+      const m = String(value).match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+      return m ? new Date(Number(m[3]),Number(m[1])-1,Number(m[2])) : new Date(0);
+    }
+
+    function timeOnly(value){
+      const d = parseDateTime(value);
+      return d ? d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}) : "";
+    }
+
+    function timeInputToMinutes(value){
+      const [h,m] = value.split(":").map(Number);
+      return h*60+m;
+    }
+
+    function formatMinutes(total){
+      const h24 = Math.floor(total/60)%24;
+      const m = total%60;
+      const ap = h24 >= 12 ? "PM" : "AM";
+      const h = h24%12 || 12;
+      return `${h}:${String(m).padStart(2,"0")} ${ap}`;
+    }
+
+    function titleCaseName(value){
+      return String(value).trim().replace(/\b([A-Za-zÀ-ÿ])([A-Za-zÀ-ÿ'-]*)/g,
+        (_,a,b) => a.toUpperCase()+b.toLowerCase()
+      );
+    }
+
+    function cleanLine(value){
+      return String(value || "").replace(/\s+/g," ").trim();
+    }
+
+    function capitalize(value){
+      value = String(value || "");
+      return value.charAt(0).toUpperCase()+value.slice(1).toLowerCase();
+    }
+
+    function csvCell(value){
+      const text = String(value ?? "");
+      return `"${text.replace(/"/g,'""')}"`;
+    }
+
+    function escapeHTML(value){
+      return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+    }
+  </script>
+</body>
+</html>
