@@ -34,8 +34,9 @@ th { background:#d9d9d9; color:#000; }
 .overtime { background:#ff1a1a; color:#fff; }
 .predicted { background:#ff4da6; }
 
+/* 🔥 removed blue outline */
 td[contenteditable="true"] {
-    outline:2px solid #4da6ff;
+    outline:none;
 }
 </style>
 </head>
@@ -86,6 +87,7 @@ td[contenteditable="true"] {
 
 let allData = [];
 let currentData = [];
+let futureSelections = {}; // 🔥 stores dropdown values
 
 function clean(v){
     let n = parseFloat(v);
@@ -104,6 +106,7 @@ function loadExcel(){
         let rows = XLSX.utils.sheet_to_json(sheet,{header:1});
 
         allData = [];
+        futureSelections = {};
 
         rows.forEach(r=>{
 
@@ -146,7 +149,20 @@ function render(){
         let projected=0,running=0,hit="-";
 
         for(let i=0;i<5;i++){
-            let val = i<=day ? r.days[i] : 8;
+
+            let val;
+
+            if(i <= day){
+                val = r.days[i];
+            } else {
+                let key = `${index}-${i}`;
+                let selected = futureSelections[key];
+
+                if(selected === "OFF") val = 0;
+                else if(selected) val = parseFloat(selected);
+                else val = 8;
+            }
+
             projected+=val;
             running+=val;
 
@@ -171,19 +187,34 @@ function render(){
         else if(r.projected>=38) tr.className="warning";
         else tr.className="normal";
 
-        let cells = r.days.map((d,i)=>{
+        let cells = "";
 
-            let editable = i <= day;
+        for(let i=0;i<5;i++){
 
-            return `
-            <td 
-                contenteditable="${editable}"
-                onblur="updateCell(${r.index}, ${i}, this.innerText)"
-                class="${i>day?'predicted':''}"
-            >
-                ${i>day ? 8 : d}
-            </td>`;
-        }).join("");
+            if(i <= day){
+
+                cells += `
+                <td contenteditable="true"
+                    onblur="updateCell(${r.index}, ${i}, this.innerText)">
+                    ${r.days[i]}
+                </td>`;
+
+            } else {
+
+                let key = `${r.index}-${i}`;
+                let val = futureSelections[key] || "8";
+
+                cells += `
+                <td class="predicted">
+                    <select onchange="updateFuture(${r.index}, ${i}, this.value)">
+                        <option value="8" ${val=="8"?"selected":""}>8</option>
+                        <option value="4" ${val=="4"?"selected":""}>4</option>
+                        <option value="0" ${val=="0"?"selected":""}>0</option>
+                        <option value="OFF" ${val=="OFF"?"selected":""}>OFF</option>
+                    </select>
+                </td>`;
+            }
+        }
 
         tr.innerHTML=`
         <td>${r.name}</td>
@@ -198,18 +229,21 @@ function render(){
     });
 }
 
-/* 🔥 UPDATE CELL */
+/* edit past days */
 function updateCell(rowIndex, dayIndex, value){
-
     let num = parseFloat(value);
-
     if(isNaN(num)) num = 0;
-
     allData[rowIndex].days[dayIndex] = num;
-
     render();
 }
 
+/* dropdown future */
+function updateFuture(rowIndex, dayIndex, value){
+    futureSelections[`${rowIndex}-${dayIndex}`] = value;
+    render();
+}
+
+/* email */
 function emailPreview(){
 
     let rows = document.querySelectorAll("#table tr");
@@ -220,6 +254,8 @@ function emailPreview(){
         html+="<tr>";
 
         tr.querySelectorAll("th,td").forEach(td=>{
+
+            let text = td.querySelector("select") ? td.querySelector("select").value : td.innerText;
 
             let style="border:1px solid #000;padding:6px;text-align:center;";
 
@@ -242,7 +278,7 @@ function emailPreview(){
                 }
             }
 
-            html+=`<td style="${style}">${td.innerText}</td>`;
+            html+=`<td style="${style}">${text}</td>`;
         });
 
         html+="</tr>";
