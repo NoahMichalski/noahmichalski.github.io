@@ -746,7 +746,7 @@
 
     .previewTable {
       width: 100%;
-      min-width: 1180px;
+      min-width: 1280px;
       table-layout: fixed;
       border-collapse: collapse;
       font-size: 12px;
@@ -762,10 +762,11 @@
     .previewTable th:nth-child(2), .previewTable td:nth-child(2) { width: 38px; }
     .previewTable th:nth-child(3), .previewTable td:nth-child(3) { width: 112px; }
     .previewTable th:nth-child(4), .previewTable td:nth-child(4) { width: 150px; }
-    .previewTable th:nth-child(5), .previewTable td:nth-child(5) { width: 30%; }
-    .previewTable th:nth-child(6), .previewTable td:nth-child(6) { width: 30%; }
-    .previewTable th:nth-child(7), .previewTable td:nth-child(7) { width: 150px; }
-    .previewTable th:nth-child(8), .previewTable td:nth-child(8) { width: 155px; }
+    .previewTable th:nth-child(5), .previewTable td:nth-child(5) { width: 28%; }
+    .previewTable th:nth-child(6), .previewTable td:nth-child(6) { width: 28%; }
+    .previewTable th:nth-child(7), .previewTable td:nth-child(7) { width: 140px; }
+    .previewTable th:nth-child(8), .previewTable td:nth-child(8) { width: 130px; text-align:center; }
+    .previewTable th:nth-child(9), .previewTable td:nth-child(9) { width: 150px; }
 
     .previewMeta {
       margin-top: 5px;
@@ -807,6 +808,11 @@
     .lastTaskBox { margin-top:7px; font-size:11px; line-height:1.35; color:var(--muted); }
     .lastTaskBox.warn { color:#fde68a; font-weight:850; }
     .lastTaskBox.danger { color:#fecdd3; font-weight:900; }
+    .completionChecks { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
+    .checkPill { display:inline-flex; align-items:center; gap:4px; padding:4px 7px; border-radius:999px; border:1px solid rgba(255,255,255,.14); color:var(--muted); font-size:12px; font-weight:850; }
+    .checkPill.done { color:#bbf7d0; border-color:rgba(34,197,94,.35); background:rgba(34,197,94,.12); }
+    .checkPill.miss { color:#fecdd3; border-color:rgba(244,63,94,.28); background:rgba(244,63,94,.08); }
+
     .shortcutEditorWrap { max-height:380px; overflow:auto; border:1px solid var(--border); border-radius:14px; margin-top:12px; }
     .shortcutEditorTable { width:100%; min-width:720px; table-layout:fixed; border-collapse:collapse; font-size:12px; }
     .shortcutEditorTable th, .shortcutEditorTable td { padding:8px; border-bottom:1px solid rgba(255,255,255,.08); }
@@ -851,7 +857,7 @@
         <h1>Google Calendar Cleaning CSV Parser</h1>
         <div class="sub">Paste originals/recleans/windows/Cincinnati → preview/edit → export or import to Google Calendar.</div>
       </div>
-      <div class="version">v2.05</div>
+      <div class="version">v2.06</div>
     </div>
   </header>
 
@@ -1721,15 +1727,14 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     }
 
     function renderCompletionHistoryHTML(row) {
-      if (!row.lastTaskChecked) return '';
-      const originalLine = row.originalHistoryFound
-        ? `Original: Yes — ${escapeHTML(row.originalHistoryDate || '')}`
-        : 'Original: No in 90 days';
-      const windowsLine = row.windowsHistoryFound
-        ? `Windows: Complete — ${escapeHTML(row.windowsHistoryDate || '')}`
-        : 'Windows: Not found in 90 days';
-      const cls = row.originalHistoryFound && row.windowsHistoryFound ? '' : 'warn';
-      return `<div class="lastTaskBox ${cls}">${originalLine}<br>${windowsLine}</div>`;
+      if (!row.lastTaskChecked) return '<div class="lastTaskBox">Not checked</div>';
+      const original = row.originalHistoryFound
+        ? `<span class="checkPill done" title="Original found ${escapeHTML(row.originalHistoryDate || '')}">✓ O</span>`
+        : `<span class="checkPill miss" title="No Original found in 90 days">O</span>`;
+      const windows = row.windowsHistoryFound
+        ? `<span class="checkPill done" title="Windows complete ${escapeHTML(row.windowsHistoryDate || '')}">✓ W</span>`
+        : `<span class="checkPill miss" title="Windows not found in 90 days">W</span>`;
+      return `<div class="completionChecks">${original}${windows}</div>`;
     }
 
     function parsePreviewFromRows() {
@@ -1781,6 +1786,7 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
               <th>Subject</th>
               <th>Location</th>
               <th>Recleans</th>
+              <th>O / W</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -1823,9 +1829,11 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
                   ${renderRecleanCountHTML(row)}
                 </td>
                 <td>
+                  ${renderCompletionHistoryHTML(row)}
+                </td>
+                <td>
                   ${row.duplicate ? '<span class="tag dupe">Duplicate</span>' : (row.matched ? '<span class="tag original">Matched</span>' : '<span class="tag miss">' + escapeHTML(row.matchStatus) + '</span>')}
                   ${renderLastTaskHTML(row)}
-                  ${renderCompletionHistoryHTML(row)}
                 </td>
               </tr>
             `).join('')}
