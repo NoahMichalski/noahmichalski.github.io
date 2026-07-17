@@ -396,7 +396,7 @@
         <h1>Punch Report Analyzer</h1>
         <p class="subtitle">Upload a Punch Detail Report PDF, choose the required start time and grace period, then review late arrivals and how each punch was entered.</p>
       </div>
-      <div class="version">Version 1.6</div>
+      <div class="version">Version 1.7</div>
     </header>
 
     <section class="panel controls">
@@ -484,6 +484,7 @@
         <button class="tab active" data-view="details">All Punches</button>
         <button class="tab" data-view="late">Late Only</button>
         <button class="tab" data-view="employees">Employee Summary</button>
+        <button class="tab" data-view="flexible">Flexible / Excluded</button>
       </section>
 
       <section class="panel toolbar">
@@ -505,6 +506,7 @@
         </select>
         <button id="csvBtn" class="secondary">Export CSV</button>
         <button id="bossReportBtn" class="primary">Export Email Summary</button>
+        <button id="flexReportBtn" class="secondary">Export Flexible Report</button>
         <button id="printBtn" class="secondary">Print</button>
         <button id="clearBtn" class="danger-lite">Clear</button>
       </section>
@@ -543,9 +545,27 @@
               <th>Supervisor In</th>
               <th>Supervisor Out</th>
               <th>Incomplete</th>
+              <th>Flexible</th>
             </tr>
           </thead>
           <tbody id="employeeBody"></tbody>
+        </table>
+      </section>
+
+      <section id="flexiblePanel" class="panel table-wrap hidden">
+        <table>
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Date</th>
+              <th>Clock In</th>
+              <th>Clock Out</th>
+              <th>Paid Hours</th>
+              <th>Punch-in Method</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="flexibleBody"></tbody>
         </table>
       </section>
 
@@ -568,7 +588,8 @@
       filtered: [],
       employeeSummary: [],
       activeView: "details",
-      filename: ""
+      filename: "",
+      excludedEmployees: new Set(JSON.parse(localStorage.getItem("punchFlexibleEmployees") || "[]"))
     };
 
     const DATE = String.raw`\d{1,2}\/\d{1,2}\/\d{4}`;
@@ -585,6 +606,7 @@
     $("statusFilter").addEventListener("change", applyFilters);
     $("csvBtn").addEventListener("click", exportCSV);
     $("bossReportBtn").addEventListener("click", createBossReport);
+    $("flexReportBtn").addEventListener("click", createFlexibleReport);
     $("printBtn").addEventListener("click", () => window.print());
     $("clearBtn").addEventListener("click", clearAll);
 
@@ -594,10 +616,33 @@
         btn.classList.add("active");
         state.activeView = btn.dataset.view;
         $("employeePanel").classList.toggle("hidden", state.activeView !== "employees");
-        $("detailPanel").classList.toggle("hidden", state.activeView === "employees");
+        $("flexiblePanel").classList.toggle("hidden", state.activeView !== "flexible");
+        $("detailPanel").classList.toggle("hidden", state.activeView === "employees" || state.activeView === "flexible");
         applyFilters();
       });
     });
+
+    function employeeKey(recordOrSummary){
+      return String(recordOrSummary.employeeId || recordOrSummary.employee || "").trim();
+    }
+
+    function isFlexible(recordOrSummary){
+      return state.excludedEmployees.has(employeeKey(recordOrSummary));
+    }
+
+    function saveFlexibleEmployees(){
+      localStorage.setItem("punchFlexibleEmployees", JSON.stringify([...state.excludedEmployees]));
+    }
+
+    function toggleFlexibleEmployee(key){
+      if(state.excludedEmployees.has(key)){
+        state.excludedEmployees.delete(key);
+      }else{
+        state.excludedEmployees.add(key);
+      }
+      saveFlexibleEmployees();
+      recalculate();
+    }
 
     function setStatus(message, loading=false, isError=false){
       $("statusbar").classList.toggle("loading", loading);
@@ -985,6 +1030,7 @@
         if(!groups.has(r.employee)){
           groups.set(r.employee,{
             employee:r.employee,
+            employeeId:r.employeeId,
             days:0,
             late:0,
             minutesLate:0,
@@ -1015,7 +1061,7 @@
     }
 
     function renderSummary(){
-      const rows = state.records;
+      const rows = state.records.filter(r => !isFlexible(r));
       const employees = new Set(rows.map(r => r.employee)).size;
       const clockIns = rows.filter(r => r.actualIn).length;
       const late = rows.filter(r => r.status === "Late");
@@ -1054,6 +1100,7 @@
       const status = $("statusFilter").value;
 
       let rows = state.records.filter(r => {
+        if(state.activeView !== "flexible" && isFlexible(r)) return false;
         const haystack = [
           r.employee,r.date,r.dayName,r.inModifier,r.outModifier,
           r.inMethod,r.outMethod,r.status
@@ -1075,6 +1122,7 @@
       state.filtered = rows;
       renderDetails(rows);
       renderEmployees(search);
+      renderFlexible(search);
     }
 
     function renderDetails(rows){
@@ -1116,13 +1164,13 @@
       const body = $("employeeBody");
       body.innerHTML = "";
 
-      let rows = state.employeeSummary;
+      let rows = state.employeeSummary.filter(r => !isFlexible(r));
       if(search){
         rows = rows.filter(r => r.employee.toLowerCase().includes(search));
       }
 
       if(!rows.length){
-        body.innerHTML = `<tr><td colspan="10" class="empty">No employees match the current search.</td></tr>`;
+        body.innerHTML = `<tr><td colspan="11" class="empty">No employees match the current search.</td></tr>`;
         return;
       }
 
@@ -1140,6 +1188,49 @@
           <td>${r.supervisorIn}</td>
           <td>${r.supervisorOut}</td>
           <td>${r.incomplete}</td>
+          <td><button class="secondary flexible-toggle" data-key="${escapeHTML(employeeKey(r))}">Exclude Person</button></td>
+        `;
+        body.appendChild(tr);
+      }
+    }
+
+    document.addEventListener("click", event => {
+      const button = event.target.closest(".flexible-toggle");
+      if(!button) return;
+      toggleFlexibleEmployee(button.dataset.key);
+    });
+
+    function renderFlexible(search){
+      const body = $("flexibleBody");
+      body.innerHTML = "";
+
+      let rows = state.records.filter(r => isFlexible(r));
+      if(search){
+        rows = rows.filter(r => [
+          r.employee,r.date,r.dayName,r.inModifier,r.outModifier
+        ].join(" ").toLowerCase().includes(search));
+      }
+
+      rows.sort((a,b) =>
+        a.employee.localeCompare(b.employee) ||
+        parseUSDate(a.date)-parseUSDate(b.date)
+      );
+
+      if(!rows.length){
+        body.innerHTML = `<tr><td colspan="7" class="empty">No flexible employees have been excluded yet. Use “Exclude Person” in Employee Summary.</td></tr>`;
+        return;
+      }
+
+      for(const r of rows){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="name">${escapeHTML(r.employee)}</span><span class="modifier">ID ${escapeHTML(r.employeeId)}</span></td>
+          <td>${escapeHTML(r.dayName)}<span class="modifier">${escapeHTML(r.date)}</span></td>
+          <td>${r.actualIn ? escapeHTML(timeOnly(r.actualIn)) : "—"}</td>
+          <td>${r.actualOut ? escapeHTML(timeOnly(r.actualOut)) : "—"}</td>
+          <td>${escapeHTML(r.paidHours || "—")}</td>
+          <td>${methodCell(r.inMethod,r.inModifier,r.inAction)}</td>
+          <td><button class="secondary flexible-toggle" data-key="${escapeHTML(employeeKey(r))}">Include Again</button></td>
         `;
         body.appendChild(tr);
       }
@@ -1210,7 +1301,7 @@
 
       const schedule = $("scheduledTime").value || "08:00";
       const buffer = Math.max(0, Number($("bufferMinutes").value) || 0);
-      const rows = state.records;
+      const rows = state.records.filter(r => !isFlexible(r));
       const lateRows = rows.filter(r => r.status === "Late");
       const incompleteRows = rows.filter(r => r.incomplete);
       const excludedRows = rows.filter(r => r.status === "Excluded");
@@ -1219,7 +1310,7 @@
       const methodCount = (method, side) =>
         rows.filter(r => r[`${side}Method`] === method && r[`actual${side === "in" ? "In" : "Out"}`]).length;
 
-      const rankings = state.employeeSummary.map(summary => {
+      const rankings = state.employeeSummary.filter(summary => !isFlexible(summary)).map(summary => {
         const empRows = rows.filter(r =>
           r.employee === summary.employee &&
           r.actualIn &&
@@ -1557,6 +1648,123 @@ async function copyForOutlook(){
         return;
       }
 
+      reportWindow.document.open();
+      reportWindow.document.write(report);
+      reportWindow.document.close();
+      reportWindow.focus();
+    }
+
+
+    function createFlexibleReport(){
+      const rows = state.records.filter(r => isFlexible(r));
+      if(!rows.length){
+        alert("No flexible employees are currently excluded.");
+        return;
+      }
+
+      const esc = escapeHTML;
+      const generated = new Date().toLocaleString("en-US");
+      const dates = rows.map(r => parseUSDate(r.date)).sort((a,b)=>a-b);
+      const dateRange = dates.length
+        ? `${dates[0].toLocaleDateString("en-US")} – ${dates[dates.length-1].toLocaleDateString("en-US")}`
+        : "";
+
+      const grouped = [...new Set(rows.map(r => r.employee))].sort().map(employee => ({
+        employee,
+        rows: rows.filter(r => r.employee === employee).sort((a,b) => parseUSDate(a.date)-parseUSDate(b.date))
+      }));
+
+      const groupedHTML = grouped.map(group => `
+        <h2 style="font-family:Arial,Helvetica,sans-serif;font-size:18px;margin:24px 0 8px;color:#111827;">${esc(group.employee)}</h2>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+          <thead><tr>
+            <th style="border:1px solid #cbd5e1;padding:8px;background:#edf2f7;text-align:left;">Day</th>
+            <th style="border:1px solid #cbd5e1;padding:8px;background:#edf2f7;text-align:left;">Date</th>
+            <th style="border:1px solid #cbd5e1;padding:8px;background:#edf2f7;text-align:left;">Clock In</th>
+            <th style="border:1px solid #cbd5e1;padding:8px;background:#edf2f7;text-align:left;">Clock Out</th>
+            <th style="border:1px solid #cbd5e1;padding:8px;background:#edf2f7;text-align:left;">Paid Hours</th>
+            <th style="border:1px solid #cbd5e1;padding:8px;background:#edf2f7;text-align:left;">Method</th>
+          </tr></thead>
+          <tbody>${group.rows.map(r => `
+            <tr>
+              <td style="border:1px solid #cbd5e1;padding:8px;">${esc(r.dayName)}</td>
+              <td style="border:1px solid #cbd5e1;padding:8px;">${esc(r.date)}</td>
+              <td style="border:1px solid #cbd5e1;padding:8px;">${esc(timeOnly(r.actualIn) || "—")}</td>
+              <td style="border:1px solid #cbd5e1;padding:8px;">${esc(timeOnly(r.actualOut) || "—")}</td>
+              <td style="border:1px solid #cbd5e1;padding:8px;">${esc(r.paidHours || "—")}</td>
+              <td style="border:1px solid #cbd5e1;padding:8px;">${esc(r.inMethod)}</td>
+            </tr>`).join("")}</tbody>
+        </table>`).join("");
+
+      const plainText = [
+        `Flexible Employee Punch Summary - ${dateRange}`,
+        "",
+        ...grouped.flatMap(group => [
+          group.employee,
+          ...group.rows.map(r => `  ${r.dayName} ${r.date}: ${timeOnly(r.actualIn) || "No clock-in"} – ${timeOnly(r.actualOut) || "No clock-out"} (${r.paidHours || "—"} hours)`),
+          ""
+        ])
+      ].join("\n");
+
+      const report = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flexible Employee Punch Summary</title>
+<style>
+body{margin:0;background:#eef2f7;color:#1f2937;font-family:Arial,Helvetica,sans-serif}
+.wrap{max-width:950px;margin:0 auto;background:#fff;padding:28px}
+.actions{display:flex;gap:10px;margin-bottom:20px}
+button{padding:10px 14px;border:0;border-radius:8px;background:#2457d6;color:#fff;font-weight:700;cursor:pointer}
+.secondary{background:#e8edf5;color:#263248}
+textarea{position:fixed;left:-9999px}
+@media print{.actions{display:none}.wrap{padding:0}}
+</style>
+</head>
+<body>
+<div class="wrap" id="copyArea">
+  <div class="actions">
+    <button onclick="copyForOutlook()">Copy for Outlook</button>
+    <button class="secondary" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+  <h1 style="font-size:26px;margin:0 0 8px;">Flexible Employee Punch Summary</h1>
+  <div style="color:#6b7280;line-height:1.5;margin-bottom:18px;">${esc(dateRange)}<br>Generated ${esc(generated)}</div>
+  ${groupedHTML}
+</div>
+<textarea id="plainText">${esc(plainText)}</textarea>
+<script>
+async function copyForOutlook(){
+  const button = document.querySelector(".actions button");
+  const old = button.textContent;
+  try{
+    const source = document.getElementById("copyArea").cloneNode(true);
+    source.querySelector(".actions")?.remove();
+    const html = '<div style="font-family:Arial,Helvetica,sans-serif;color:#1f2937;background:#ffffff;">' + source.innerHTML + '</div>';
+    const plain = document.getElementById("plainText").value;
+    if(navigator.clipboard && window.ClipboardItem){
+      await navigator.clipboard.write([new ClipboardItem({
+        "text/html": new Blob([html], {type:"text/html"}),
+        "text/plain": new Blob([plain], {type:"text/plain"})
+      })]);
+    }else{
+      await navigator.clipboard.writeText(plain);
+    }
+    button.textContent = "Copied for Outlook!";
+  }catch(error){
+    button.textContent = "Copy Failed";
+  }
+  setTimeout(() => button.textContent = old, 1800);
+}
+<\/script>
+</body>
+</html>`;
+
+      const reportWindow = window.open("", "_blank");
+      if(!reportWindow){
+        alert("Your browser blocked the flexible report tab. Please allow pop-ups and try again.");
+        return;
+      }
       reportWindow.document.open();
       reportWindow.document.write(report);
       reportWindow.document.close();
