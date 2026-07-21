@@ -71,7 +71,7 @@
 <body>
 <header>
   <div class="wrap">
-    <h1>VIP Schedule → Styled Excel Exporter <span class="pill">v1.13</span></h1>
+    <h1>VIP Schedule → Styled Excel Exporter <span class="pill">v1.15</span></h1>
     <div class="sub">Paste the new schedule format, upload the floorplans sheet, fill budgets, enter times, and export a clean copy/paste-friendly Excel block.</div>
   </div>
 </header>
@@ -94,6 +94,7 @@ Arabella *WPLand *Blue Ash - https://maps.app.goo.gl/RX3AMZE8NCZjuVdp9</textarea
         <button onclick="parseAndRender()">Parse schedule</button>
         <button class="secondary" onclick="applyBudgets(false)">Fill budgets from sheet</button>
         <button class="secondary" onclick="applyBudgets(true)">Re-fill / overwrite budgets</button>
+        <button class="blue" onclick="copyExcelBlock()">Copy block</button>
         <button class="blue" onclick="exportExcel()">Export Excel</button>
       </div>
 
@@ -118,7 +119,7 @@ Arabella *WPLand *Blue Ash - https://maps.app.goo.gl/RX3AMZE8NCZjuVdp9</textarea
         <br><b>Budget matching:</b> subdivision is carried down from the line above the lot/task/address. The matcher tries subdivision+lot, builder+lot, unique lot, and address.
         <br><b>Fixed rules:</b> Dry Clean = 2 hours, Floors-only/Hardwood & Carpet ONLY = 2 hours, Models = 2 hours.
         <br><b>Manual entry:</b> type the full In/Out/Budget value, then press <b>Enter</b> or click out. It will not recalculate after the first digit.
-        <br><b>Export:</b> In/Out are real Excel time values. Actual MH and Est. Complete are real Excel formulas. No red over-budget formatting.
+        <br><b>Copy / Export:</b> Copy block now copies plain Excel TSV so formulas paste as working formulas instead of text. Export downloads the styled .xlsx. No red over-budget formatting.
       </p>
       <div id="status" class="status"></div>
       <div id="debugBox" class="debugBox"></div>
@@ -740,6 +741,117 @@ function renderDebug(){
   </tr></thead><tbody>${rows || '<tr><td colspan="9">No jobs parsed.</td></tr>'}</tbody></table>`;
 }
 
+
+
+function statusFillForJob(r){
+  if (r.outTime) return '#92d050';
+  if (r.inTime && !r.outTime) return '#d9d9d9';
+  if (r.budgetFlag || r.budget === '' || r.budget == null) return '#f4b183';
+  return '#ffffff';
+}
+
+function excelFormulaActual(rowNumber){
+  return `=IF(OR(C${rowNumber}="",D${rowNumber}="",B${rowNumber}=""),"",ROUND((D${rowNumber}-C${rowNumber})*24*B${rowNumber},1))`;
+}
+
+function excelFormulaEst(rowNumber){
+  return `=IF(OR(C${rowNumber}="",F${rowNumber}="",B${rowNumber}=""),"",C${rowNumber}+F${rowNumber}/B${rowNumber}/24)`;
+}
+
+function buildCopyRows(){
+  const rows = [];
+  let needSpacer = false;
+
+  parsed.forEach(r => {
+    if (r.kind === 'crew') {
+      if (needSpacer) rows.push({type:'blank', cells:['','','','','','','']});
+      rows.push({type:'crew', cells:[r.crew,'','','','','','']});
+      needSpacer = true;
+    } else if (r.kind === 'day') {
+      rows.push({type:'day', cells:[r.day,'People','In','Out','Actual Man Hours','Budget','Est. Complete']});
+    } else if (r.kind === 'sub') {
+      rows.push({type:'sub', cells:[r.raw,'','','','','','']});
+    } else if (r.kind === 'job') {
+      const rowNum = rows.length + 1;
+      rows.push({
+        type:'job',
+        job:r,
+        cells:[
+          jobDisplay(r),
+          Number(r.people || 1),
+          r.inTime || '',
+          r.outTime || '',
+          excelFormulaActual(rowNum),
+          r.budget === '' ? '' : Number(r.budget),
+          excelFormulaEst(rowNum)
+        ]
+      });
+    }
+  });
+
+  rows.push({type:'blank', cells:['','','','','','','']});
+  const totalRow = rows.length + 1;
+  rows.push({type:'total', cells:['Totals','','','',`=SUM(E1:E${totalRow-1})`,`=SUM(F1:F${totalRow-1})`,'']});
+  return rows;
+}
+
+function buildClipboardHtml(rows){
+  const tdBase = 'border:1px solid #d9d9d9;padding:3px 6px;font-family:Arial;font-size:10pt;vertical-align:middle;';
+  let tableHtml = '<table cellspacing="0" cellpadding="0" style="border-collapse:collapse;font-family:Arial;font-size:10pt;">';
+
+  rows.forEach(r => {
+    tableHtml += '<tr>';
+    r.cells.forEach((cell, i) => {
+      let style = tdBase;
+      if (r.type === 'blank') style += 'border-color:#ffffff;background:#ffffff;height:18px;';
+      if (r.type === 'crew' || r.type === 'sub') style += 'border-color:#ffffff;background:#ffffff;';
+      if (r.type === 'day' && i > 0) style += 'background:#e7e6e6;font-weight:bold;text-align:center;';
+      if (r.type === 'job' && i === 0) style += `background:${statusFillForJob(r.job)};`;
+      if (r.type === 'job' && i === 4) style += 'font-weight:bold;text-align:center;border:2px solid #000000;';
+      if (r.type === 'job' && i === 5) style += `background:${(r.job.budgetFlag || r.job.budget === '' || r.job.budget == null) ? '#f4b183' : '#fff2cc'};text-align:center;`;
+      if (r.type === 'total') style += 'background:#e7e6e6;font-weight:bold;';
+      if ([1,2,3,4,5,6].includes(i)) style += 'text-align:center;';
+      tableHtml += `<td style="${style}">${escapeHtml(cell)}</td>`;
+    });
+    tableHtml += '</tr>';
+  });
+
+  tableHtml += '</table>';
+  return tableHtml;
+}
+
+function buildClipboardText(rows){
+  return rows.map(r => r.cells.map(c => String(c ?? '')).join('\t')).join('\n');
+}
+
+async function copyExcelBlock(){
+  if (!parsed.length) parseAndRender();
+
+  if (missingBudgetJobs().length) {
+    showFixModal();
+    return;
+  }
+
+  const rows = buildCopyRows();
+  const text = buildClipboardText(rows);
+
+  // Important: copy TSV only. When HTML is included, Excel may paste formulas as visible text.
+  // TSV formulas paste as actual Excel formulas as long as the destination cells are General format.
+  try {
+    await navigator.clipboard.writeText(text);
+    setStatus('Copied Excel block as formulas. Paste into your main sheet. If formulas show as text, set those cells to General and paste again.');
+  } catch (err) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    setStatus('Copied Excel block as formulas. Paste into your main sheet. If formulas show as text, set those cells to General and paste again.');
+  }
+}
 
 function missingBudgetJobs(){
   return parsed
