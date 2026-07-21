@@ -1,882 +1,967 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VIP Schedule Budget Exporter</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>VIP Schedule Excel Exporter</title>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 <style>
-:root{
-  --bg:#0b1020;--panel:#111a2e;--line:#26344d;--text:#e5edf8;--muted:#9fb0c7;
-  --blue:#4ea8ff;--green:#92d050;--gray:#d9d9d9;--orange:#f4b183;--yellow:#fff2cc;
-}
-*{box-sizing:border-box}
-body{margin:0;background:linear-gradient(180deg,#08101f,#111827);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
-header{position:sticky;top:0;z-index:5;background:rgba(8,15,28,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
-.wrap{max-width:1500px;margin:0 auto;padding:16px}
-h1{font-size:22px;margin:0 0 4px}
-.sub{color:var(--muted);font-size:13px}
-.grid{display:grid;grid-template-columns:430px 1fr;gap:16px;align-items:start}
-@media(max-width:1050px){.grid{grid-template-columns:1fr}}
-.card{background:rgba(17,26,46,.96);border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.28);overflow:hidden}
-.card h2{font-size:15px;margin:0;padding:13px 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.025)}
-.body{padding:14px}
-textarea{width:100%;height:470px;resize:vertical;border:1px solid var(--line);border-radius:12px;background:#07101f;color:var(--text);padding:12px;font:13px/1.4 Consolas,monospace;outline:none}
-button{border:0;border-radius:11px;padding:10px 13px;font-weight:700;cursor:pointer;color:#06101f;background:var(--blue)}
-button.secondary{background:#22314b;color:var(--text);border:1px solid #33445f}
-button.good{background:#92d050}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.row+.row{margin-top:10px}
-label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
-input{background:#07101f;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;outline:none;min-width:0}
-.wide{width:220px}.mini{width:95px}
-.help{font-size:12px;color:var(--muted);line-height:1.45}
-.status{font-size:13px;color:#b9ffc0;margin-top:10px}
-.statbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-.stat{background:#0b1426;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
-.stat b{display:block;color:#fff;font-size:18px}.stat span{color:var(--muted);font-size:12px}
-.previewWrap{overflow:auto;max-height:72vh}
-table{border-collapse:collapse;width:100%;min-width:1160px;background:white;color:#111;font-family:Arial,sans-serif}
-td,th{border:1px solid #d8d8d8;padding:4px 6px;height:22px;font-size:14px;vertical-align:middle}
-th{position:sticky;top:0;background:#ececec;z-index:2;font-weight:700;text-align:left}
-.crewRow td,.dayRow td,.subRow td{border:0;background:#fff}
-.crewRow td{height:30px;font-size:16px}
-.subRow td{font-size:15px}
-.jobText{background:var(--green)}
-.jobText.gray{background:var(--gray)}
-.jobText.flag{background:var(--orange)}
-.editable{background:#fff7cc}
-.num{text-align:center}
-.mh{font-weight:700;text-align:center;border:2px solid #111}
-.debugBox{display:none;margin-top:12px;border:1px solid var(--line);border-radius:12px;background:#07101f;max-height:300px;overflow:auto;padding:8px}
-.debugBox.show{display:block}
-.debugTable{width:100%;min-width:1100px;border-collapse:collapse;background:#07101f;color:#e5edf8;font-size:12px}
-.debugTable th,.debugTable td{border:1px solid #22314b;padding:5px;vertical-align:top}
-.debugTable th{position:static;background:#17233a;color:#fff}
-.goodText{color:#9dff9d;font-weight:700}.badText{color:#ffb86b;font-weight:700}
-.settingsPanel{display:none;margin-top:10px;border:1px solid var(--line);border-radius:14px;background:#07101f;padding:12px}
-.settingsPanel.show{display:block}
-.settingsPanel h3{margin:0 0 10px;font-size:14px}
-.settingsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:10px}
-.settingsGrid label{color:var(--muted);font-size:12px}
-.settingsGrid input{display:block;width:100%;margin-top:5px}
-.gearBtn{font-size:13px}
-.missingBudgetPanel{display:none;margin-bottom:12px;border:1px solid #5b4024;border-radius:14px;background:#21150d;padding:12px}
-.missingBudgetPanel.show{display:block}
-.missingBudgetPanel h3{margin:0 0 8px;font-size:14px;color:#ffd7a3}
-.missingBudgetList{display:grid;gap:8px}
-.missingBudgetItem{display:grid;grid-template-columns:1fr 95px;gap:8px;align-items:center;border:1px solid #5b4024;border-radius:10px;padding:8px;background:#160e08}
-.missingBudgetItem .jobTitle{font-size:13px;color:#fff}
-.missingBudgetItem .jobMeta{font-size:12px;color:#d7b98f;margin-top:2px}
-.missingBudgetItem input{width:100%}
-@media(max-width:700px){.missingBudgetItem{grid-template-columns:1fr}}
+  :root{
+    --bg:#0b1020; --panel:#111a2e; --text:#e5edf8; --muted:#9fb0c7;
+    --line:#26344d; --green:#92d050; --gray:#d9d9d9; --orange:#f4b183;
+    --blue:#4ea8ff; --yellow:#fff2cc;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#08101f,#111827);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+  header{position:sticky;top:0;z-index:5;background:rgba(10,16,30,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .wrap{max-width:1500px;margin:0 auto;padding:16px}
+  h1{font-size:22px;margin:0 0 4px}.sub{color:var(--muted);font-size:13px}
+  .grid{display:grid;grid-template-columns:430px 1fr;gap:16px;align-items:start}
+  @media(max-width:1050px){.grid{grid-template-columns:1fr}}
+  .card{background:rgba(17,26,46,.94);border:1px solid var(--line);border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.25);overflow:hidden}
+  .card h2{font-size:15px;margin:0;padding:13px 14px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.025)}
+  .body{padding:14px}
+  textarea{width:100%;height:500px;resize:vertical;border:1px solid var(--line);border-radius:12px;background:#07101f;color:var(--text);padding:12px;font:13px/1.4 Consolas,monospace;outline:none}
+  button{border:0;border-radius:11px;padding:10px 13px;font-weight:700;cursor:pointer;color:#06101f;background:var(--green);box-shadow:0 8px 24px rgba(118,211,79,.18)}
+  button.secondary{background:#22314b;color:var(--text);box-shadow:none;border:1px solid #33445f}
+  button.blue{background:var(--blue);box-shadow:0 8px 24px rgba(78,168,255,.16)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}.row + .row{margin-top:10px}
+  label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
+  input,select{background:#07101f;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:9px 10px;outline:none;min-width:0}
+  .mini{width:95px}.wide{width:180px}
+  .pill{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:7px 10px;color:var(--muted);font-size:12px;background:#0b1426}
+  .previewWrap{overflow:auto;max-height:72vh}
+  table{border-collapse:collapse;width:100%;min-width:1180px;background:white;color:#111;font-family:Arial,sans-serif}
+  td,th{border:1px solid #d8d8d8;padding:4px 6px;height:22px;font-size:14px;vertical-align:middle}
+  th{position:sticky;top:0;background:#ececec;z-index:2;font-weight:700;text-align:left}
+  .crewRow td{border:0;background:#fff;height:30px;font-weight:400;font-size:16px}
+  .dayRow td{border:0;background:#fff;height:22px;font-size:14px}
+  .subRow td{border:0;background:#fff;height:22px;font-size:15px}
+  .jobGreen{background:var(--green)}
+  .jobGray{background:var(--gray)}
+  .jobFlag{background:var(--orange)}
+  .num{text-align:center}.mh{font-weight:700;text-align:center;border:2px solid #111}
+  .budgetCell input{background:#07101f;color:#fff}
+  .statbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .stat{background:#0b1426;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stat b{display:block;color:#fff;font-size:18px}.stat span{color:var(--muted);font-size:12px}
+  .help{font-size:12px;color:var(--muted);line-height:1.45}
+  .status{font-size:13px;color:#b9ffc0;margin-top:10px}
+  .debugBox{display:none;margin-top:12px;border:1px solid var(--line);border-radius:12px;background:#07101f;max-height:300px;overflow:auto;padding:8px}
+  .debugBox.show{display:block}
+  .debugTable{width:100%;min-width:1100px;border-collapse:collapse;background:#07101f;color:#e5edf8;font-size:12px}
+  .debugTable th,.debugTable td{border:1px solid #22314b;padding:5px;vertical-align:top}
+  .debugTable th{position:static;background:#17233a;color:#fff}
+  .debugBad{color:#ffb86b;font-weight:700}.debugGood{color:#9dff9d;font-weight:700}
+  .modalOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:20;align-items:center;justify-content:center;padding:18px}
+  .modalOverlay.show{display:flex}
+  .modal{width:min(1000px,96vw);max-height:88vh;overflow:auto;background:#111a2e;border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.45)}
+  .modalHead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .modalHead h3{margin:0;font-size:17px}
+  .modalBody{padding:14px 16px}
+  .fixTable{width:100%;min-width:900px;border-collapse:collapse;background:#07101f;color:#e5edf8}
+  .fixTable th,.fixTable td{border:1px solid #26344d;padding:6px;font-size:12px;vertical-align:middle}
+  .fixTable th{position:static;background:#17233a;color:#fff}
+  .fixTable input{width:95px;background:#fff;color:#111}
+  .fixBtns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}
+  .tinyMuted{color:#9fb0c7;font-size:12px;line-height:1.4}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <h1>VIP Schedule → Budget Excel Exporter <span style="font-size:12px;color:#9fb0c7">v2.05</span></h1>
-    <div class="sub">Paste schedule, upload Floor Plans sheet, fill budgets, then export a clean Excel file or copy-ready table.</div>
+    <h1>VIP Schedule → Styled Excel Exporter <span class="pill">v1.13</span></h1>
+    <div class="sub">Paste the new schedule format, upload the floorplans sheet, fill budgets, enter times, and export a clean copy/paste-friendly Excel block.</div>
   </div>
 </header>
 
 <main class="wrap grid">
-<section class="card">
-<h2>1) Paste schedule + upload budget sheet</h2>
-<div class="body">
-<textarea id="scheduleInput" spellcheck="false" placeholder="Paste schedule here..."></textarea>
+  <section class="card">
+    <h2>1) Paste schedule</h2>
+    <div class="body">
+      <textarea id="scheduleInput" spellcheck="false">CARMEN/ARLEEN/HELENA
+Tuesday
+*Old Harritage *Arbor *Shelbyville Kentucky
+AM * 269 Original & Windows - 5005 Irwin Way
+*Arabella *WPLand *Blue Ash 
+3B-Original & Windows  
 
-<div class="row">
-  <button class="good" onclick="parseAndRender()">Parse / Refresh</button>
-  <button onclick="exportXlsx()">Export Excel XLSX</button>
-  <button class="secondary" onclick="exportCopyableHtml()">Export copyable XLS</button>
-  <button class="secondary" onclick="copyTable()">Copy table</button>
-</div>
+*Old Harritage *Arbor *Shelbyville Kentucky https://maps.app.goo.gl/4E742K492V8KN1kJ6
+Arabella *WPLand *Blue Ash - https://maps.app.goo.gl/RX3AMZE8NCZjuVdp9</textarea>
 
-<div class="row">
-  <div>
-    <label>Budget / Floor Plans Excel</label>
-    <input class="wide" id="floorplanFile" type="file" accept=".xlsx,.xls,.csv" onchange="loadBudgetFile(this.files[0])">
-  </div>
-  <div>
-    <label>Saved budget sheet</label>
-    <input class="wide" id="savedBudgetStatus" value="Not loaded" readonly>
-  </div>
-  <div>
-    <label>File name</label>
-    <input class="wide" id="fileName" value="VIP Schedule Export">
-  </div>
-  <div>
-    <label>Paste start row</label>
-    <input class="mini" id="pasteStartRow" type="number" min="1" value="1">
-  </div>
-</div>
+      <div class="row">
+        <button onclick="parseAndRender()">Parse schedule</button>
+        <button class="secondary" onclick="applyBudgets(false)">Fill budgets from sheet</button>
+        <button class="secondary" onclick="applyBudgets(true)">Re-fill / overwrite budgets</button>
+        <button class="blue" onclick="exportExcel()">Export Excel</button>
+      </div>
 
-<div class="row">
-  <button class="secondary" onclick="fillBudgets(false)">Fill missing budgets</button>
-  <button class="secondary" onclick="fillBudgets(true)">Overwrite budgets</button>
-  <button class="secondary" onclick="clearSavedBudgetSheet()">Clear saved budget sheet</button>
-  <button class="secondary" onclick="toggleDebug()">Toggle debug</button>
-</div>
+      <div class="row">
+        <div>
+          <label>Floorplans / lot-hours Excel</label>
+          <input class="wide" id="floorplanFile" type="file" accept=".xlsx,.xls,.csv" onchange="loadBudgetFile(this.files[0])">
+        </div>
+        <div>
+          <label>File name</label>
+          <input class="wide" id="fileName" value="VIP Schedule Export">
+        </div>
+      </div>
 
-<div class="row" style="margin-top:12px">
-  <button class="secondary gearBtn" onclick="toggleSettings()">⚙ Default hour settings</button>
-</div>
+      <div class="row">
+        <button class="secondary" onclick="toggleDebug()">Toggle debug</button>
+        <button class="secondary" onclick="clearTimesBudgets()">Clear times/budgets</button>
+      </div>
 
-<div id="settingsPanel" class="settingsPanel">
-  <h3>Default hours</h3>
-  <div class="settingsGrid">
-    <label>Dry Clean <input id="ruleDryClean" type="number" step="0.25" value="2"></label>
-    <label>Floors Only <input id="ruleFloors" type="number" step="0.25" value="2"></label>
-    <label>Hardwood & Carpet Only <input id="ruleHardwoodCarpet" type="number" step="0.25" value="2"></label>
-    <label>Model <input id="ruleModel" type="number" step="0.25" value="2"></label>
-  </div>
-  <div class="row">
-    <button class="good" onclick="saveDefaultRules()">Save defaults</button>
-    <button class="secondary" onclick="resetDefaultRules()">Reset defaults</button>
-  </div>
-</div>
+      <p class="help">
+        <b>Ignored lines:</b> any line containing <code>http</code>, <code>maps.app</code>, or <code>maps.google</code> is ignored while parsing.
+        <br><b>Budget matching:</b> subdivision is carried down from the line above the lot/task/address. The matcher tries subdivision+lot, builder+lot, unique lot, and address.
+        <br><b>Fixed rules:</b> Dry Clean = 2 hours, Floors-only/Hardwood & Carpet ONLY = 2 hours, Models = 2 hours.
+        <br><b>Manual entry:</b> type the full In/Out/Budget value, then press <b>Enter</b> or click out. It will not recalculate after the first digit.
+        <br><b>Export:</b> In/Out are real Excel time values. Actual MH and Est. Complete are real Excel formulas. No red over-budget formatting.
+      </p>
+      <div id="status" class="status"></div>
+      <div id="debugBox" class="debugBox"></div>
+    </div>
+  </section>
 
-<div id="status" class="status"></div>
-<div id="debugBox" class="debugBox"></div>
-</div>
-</section>
-
-<section class="card">
-<h2>2) Preview / edit before export</h2>
-<div class="body">
-  <div class="statbar">
-    <div class="stat"><b id="crewCount">0</b><span>Crews</span></div>
-    <div class="stat"><b id="jobCount">0</b><span>Jobs</span></div>
-    <div class="stat"><b id="budgetCount">0</b><span>Budgets filled</span></div>
-    <div class="stat"><b id="flagCount">0</b><span>Needs manual budget</span></div>
-  </div>
-  <div id="missingBudgetPanel" class="missingBudgetPanel"></div>
-  <div class="previewWrap">
-    <table id="previewTable"></table>
-  </div>
-</div>
-</section>
+  <section class="card">
+    <h2>2) Preview / edit before export</h2>
+    <div class="body">
+      <div class="statbar">
+        <div class="stat"><b id="crewCount">0</b><span>Crews</span></div>
+        <div class="stat"><b id="jobCount">0</b><span>Jobs</span></div>
+        <div class="stat"><b id="peopleTotal">0</b><span>Total people rows</span></div>
+        <div class="stat"><b id="budgetTotal">0.0</b><span>Total budget hours</span></div>
+      </div>
+      <div class="previewWrap">
+        <table id="previewTable"></table>
+      </div>
+    </div>
+  </section>
 </main>
+
+<div id="fixModal" class="modalOverlay">
+  <div class="modal">
+    <div class="modalHead">
+      <h3>Fix missing budgets before export</h3>
+      <button class="secondary" onclick="closeFixModal()">Close</button>
+    </div>
+    <div class="modalBody">
+      <div class="tinyMuted">
+        These rows did not match a budget from the uploaded sheet. Fill the Budget boxes here, then click <b>Apply fixes</b>.
+      </div>
+      <div style="overflow:auto;margin-top:10px">
+        <table id="fixTable" class="fixTable"></table>
+      </div>
+      <div class="fixBtns">
+        <button class="secondary" onclick="exportAnyway()">Export anyway</button>
+        <button onclick="applyFixesFromModal()">Apply fixes</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 let parsed = [];
+let floorplanBudgetMap = new Map();   // builder|floorplan or floorplan
+let directLotBudgetMap = new Map();   // builder|sub|lot or sub|lot
+let builderLotBudgetMap = new Map();  // builder|lot, only when unique
+let lotOnlyBudgetMap = new Map();     // lot, only when unique
+let addressBudgetMap = new Map();     // normalized address, only when unique
 let debugMode = false;
-let exactMap = new Map();
-let subLotMap = new Map();
-let builderLotMap = new Map();
-let lotOnlyMap = new Map();
-let addressMap = new Map();
-let sheetRowsLoaded = 0;
-let budgetRecords = [];
-const BUDGET_STORAGE_KEY = 'vipScheduleBudgetRecords_v204';
-const RULES_STORAGE_KEY = 'vipScheduleDefaultHourRules_v205';
-let defaultRules = {
-  dryclean: 2,
-  floors: 2,
-  hardwoodcarpet: 2,
-  model: 2
-};
 
 function clean(v){
   if (v === null || v === undefined) return '';
   if (typeof v === 'object') {
     if ('result' in v) v = v.result;
     else if ('text' in v) v = v.text;
-    else if ('richText' in v && Array.isArray(v.richText)) v = v.richText.map(x=>x.text||'').join('');
+    else if ('richText' in v && Array.isArray(v.richText)) v = v.richText.map(x => x.text || '').join('');
     else if (v instanceof Date) v = v.toLocaleDateString();
     else v = String(v);
   }
   return String(v).replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim();
 }
-function esc(v){return String(v ?? '').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-function norm(v){return clean(v).toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'');}
-function isDay(s){return /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)$/i.test(clean(s));}
-
-function builderAliases(b){
-  const x = norm(b), out = new Set([x]);
-  if (x.includes('drhorton') || x === 'dr') out.add('drhorton');
-  if (x.includes('ryan')) out.add('ryan');
-  if (x.includes('pulte')) out.add('pulte');
-  if (x.includes('mihomes') || x === 'mi') out.add('mihomes');
-  if (x.includes('fischer')) out.add('fischer');
-  if (x.includes('wpland') || x === 'wp') out.add('wpland');
-  if (x.includes('rockford')) out.add('rockford');
-  if (x.includes('epcon')) out.add('epcon');
-  return [...out].filter(Boolean);
-}
-function subAliases(s){
-  const raw = clean(s);
-  const x = norm(raw);
-  const out = new Set([x]);
-
-  const removeWords = raw.replace(/\b(the|at|park|bluffs|trace|preserve|reserve|highlands|meadows|village)\b/ig,' ');
-  out.add(norm(removeWords));
-
-  const hard = {
-    townsgreenway:['townsonthegreenway','townsgreenway'],
-    townsonthegreenway:['townsgreenway'],
-    berlinbluffs:['berlin'],
-    berlin:['berlinbluffs'],
-    eagle:['eaglecreek'],
-    eaglecreek:['eagle'],
-    piattpreserve:['piatts','piattspreserve'],
-    piattspreserve:['piattpreserve','piatts'],
-    slate:['slateridge'],
-    slateridge:['slate'],
-    arrowheadatevansfarms:['arrowhead'],
-    arrowhead:['arrowheadatevansfarms'],
-    sugarfarms:['sugar'],
-    addisonfarms:['addison'],
-    rutherford:['rutherford'],
-    trailhead:['trailhead'],
-    deerrun:['deerrun'],
-    foundry:['foundry']
-  };
-  if (hard[x]) hard[x].forEach(a=>out.add(norm(a)));
-  return [...out].filter(Boolean);
-}
-function lotAliases(lot){
-  const raw = clean(lot);
-  const out = new Set([norm(raw)]);
-  const num = (raw.match(/\d+/)||[''])[0];
-  if (num) out.add(norm(num.replace(/^0+/,'')));
-  out.add(norm(raw.replace(/^0+/,'')));
-  return [...out].filter(Boolean);
-}
-function normAddress(a){
-  return clean(a).toLowerCase()
+function escapeHtml(s){ return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function isDayLine(s){ return /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)$/i.test(clean(s)); }
+function isLinkLine(s){ return /(https?:\/\/|maps\.app\.goo\.gl|maps\.google\.com|goo\.gl\/maps)/i.test(clean(s)); }
+function normKey(s){ return clean(s).toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,''); }
+function normAddress(s){
+  return clean(s).toLowerCase()
     .replace(/\bohio\b|\boh\b|\boh\.\b/g,'')
+    .replace(/\bkentucky\b|\bky\b|\bky\.\b/g,'')
     .replace(/\bdrive\b/g,'dr').replace(/\broad\b/g,'rd').replace(/\blane\b/g,'ln')
     .replace(/\bstreet\b/g,'st').replace(/\bavenue\b/g,'ave').replace(/\bplace\b/g,'pl')
-    .replace(/[^a-z0-9]+/g,'');
+    .replace(/\bcourt\b/g,'ct').replace(/\bcircle\b/g,'cir').replace(/\bway\b/g,'wy')
+    .replace(/[^a-z0-9]+/g,'').trim();
 }
-function addUnique(map,key,rec){
-  if(!key) return;
-  if(!map.has(key)) map.set(key,rec);
-  else {
-    const old = map.get(key);
-    if (!old) return;
-    if (norm(old.builder)!==norm(rec.builder) || norm(old.subdivision)!==norm(rec.subdivision) || norm(old.lot)!==norm(rec.lot)) map.set(key,null);
-  }
-}
-
-function setSavedBudgetStatus(text){
-  const el = document.getElementById('savedBudgetStatus');
-  if (el) el.value = text;
+function addressCandidates(addr){
+  const out = new Set();
+  const a = clean(addr);
+  if (a) out.add(normAddress(a));
+  const beforeDash = a.split(/\s+-\s+/)[0];
+  if (beforeDash) out.add(normAddress(beforeDash));
+  return [...out].filter(Boolean);
 }
 
-function toggleSettings(){
-  const p = document.getElementById('settingsPanel');
-  if (p) p.classList.toggle('show');
-}
-function loadDefaultRules(){
-  try{
-    const raw = localStorage.getItem(RULES_STORAGE_KEY);
-    if(raw) defaultRules = {...defaultRules, ...JSON.parse(raw)};
-  }catch(e){}
-  syncRuleInputs();
-}
-function syncRuleInputs(){
-  const ids = {ruleDryClean:'dryclean', ruleFloors:'floors', ruleHardwoodCarpet:'hardwoodcarpet', ruleModel:'model'};
-  Object.entries(ids).forEach(([id,key])=>{
-    const el = document.getElementById(id);
-    if(el) el.value = defaultRules[key] ?? 2;
-  });
-}
-function readRuleInputs(){
-  const val = id => {
-    const n = parseFloat(document.getElementById(id)?.value || '');
-    return Number.isFinite(n) ? n : 2;
-  };
-  defaultRules = {
-    dryclean: val('ruleDryClean'),
-    floors: val('ruleFloors'),
-    hardwoodcarpet: val('ruleHardwoodCarpet'),
-    model: val('ruleModel')
-  };
-}
-function saveDefaultRules(){
-  readRuleInputs();
-  localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify(defaultRules));
-  fillBudgets(true);
-  document.getElementById('status').textContent = 'Default hour settings saved and applied.';
-}
-function resetDefaultRules(){
-  defaultRules = {dryclean:2, floors:2, hardwoodcarpet:2, model:2};
-  localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify(defaultRules));
-  syncRuleInputs();
-  fillBudgets(true);
-  document.getElementById('status').textContent = 'Default hour settings reset and applied.';
-}
-function saveBudgetRecords(){
-  try{
-    localStorage.setItem(BUDGET_STORAGE_KEY, JSON.stringify({
-      savedAt: new Date().toISOString(),
-      records: budgetRecords
-    }));
-    setSavedBudgetStatus(`${budgetRecords.length} rows saved`);
-  }catch(e){
-    alert('Budget sheet loaded, but local storage save failed. It may be too large for this browser.');
-  }
-}
-function loadSavedBudgetRecords(){
-  try{
-    const raw = localStorage.getItem(BUDGET_STORAGE_KEY);
-    if(!raw){ setSavedBudgetStatus('Not loaded'); return false; }
-    const data = JSON.parse(raw);
-    if(!data || !Array.isArray(data.records)){ setSavedBudgetStatus('Saved data invalid'); return false; }
-    loadBudgetRecords(data.records);
-    const date = data.savedAt ? new Date(data.savedAt).toLocaleDateString() : '';
-    setSavedBudgetStatus(`${budgetRecords.length} rows saved${date ? ' • '+date : ''}`);
-    return true;
-  }catch(e){
-    setSavedBudgetStatus('Saved data error');
-    return false;
-  }
-}
-function clearSavedBudgetSheet(){
-  localStorage.removeItem(BUDGET_STORAGE_KEY);
-  exactMap.clear(); subLotMap.clear(); builderLotMap.clear(); lotOnlyMap.clear(); addressMap.clear();
-  budgetRecords = [];
-  sheetRowsLoaded = 0;
-  parsed.forEach(r => {
-    if(r.kind === 'job'){
-      r.budget = '';
-      r.budgetFlag = false;
-      r.budgetSource = '';
-      r.matchType = '';
-      r.debugAttempts = [];
-    }
-  });
-  setSavedBudgetStatus('Not loaded');
-  renderPreview();
-  document.getElementById('status').textContent = 'Saved budget sheet cleared from this browser.';
-}
-function registerBudgetRecord(rec){
-  builderAliases(rec.builder).forEach(b=>subAliases(rec.subdivision).forEach(s=>lotAliases(rec.lot).forEach(l=>{
-    exactMap.set(`${b}|${s}|${l}`,rec);
-  })));
-  subAliases(rec.subdivision).forEach(s=>lotAliases(rec.lot).forEach(l=>subLotMap.set(`${s}|${l}`,rec)));
-  builderAliases(rec.builder).forEach(b=>lotAliases(rec.lot).forEach(l=>addUnique(builderLotMap,`${b}|${l}`,rec)));
-  lotAliases(rec.lot).forEach(l=>addUnique(lotOnlyMap,l,rec));
-  const addr = normAddress(rec.address);
-  if(addr) addUnique(addressMap,addr,rec);
-}
-function loadBudgetRecords(records){
-  exactMap.clear(); subLotMap.clear(); builderLotMap.clear(); lotOnlyMap.clear(); addressMap.clear();
-  budgetRecords = Array.isArray(records) ? records.map(r => ({
-    builder: clean(r.builder),
-    subdivision: clean(r.subdivision),
-    lot: clean(r.lot),
-    floorplan: clean(r.floorplan),
-    address: clean(r.address),
-    original: numOrBlank(r.original),
-    reclean: numOrBlank(r.reclean),
-    windows: numOrBlank(r.windows)
-  })).filter(r => r.subdivision && r.lot) : [];
-  sheetRowsLoaded = budgetRecords.length;
-  budgetRecords.forEach(registerBudgetRecord);
-}
-function keysFor(builder, subdivision, lot){
-  const keys = [];
-  builderAliases(builder).forEach(b=>subAliases(subdivision).forEach(s=>lotAliases(lot).forEach(l=>keys.push(`${b}|${s}|${l}`))));
-  subAliases(subdivision).forEach(s=>lotAliases(lot).forEach(l=>keys.push(`${s}|${l}`)));
-  return [...new Set(keys)];
-}
-
-function displayCrewName(name){
-  return clean(name)
-    .replace(/\s*\/\s*/g, ' / ')
-    .replace(/\s*&\s*/g, ' & ')
-    .replace(/\s*\+\s*/g, ' + ');
-}
-function crewSize(name){
-  const plus = clean(name).match(/\+\s*(\d+)/);
+function crewSizeFromName(name){
+  const s = clean(name);
+  const plus = s.match(/\+\s*(\d+)/);
   if (plus) return 1 + Number(plus[1]);
-  if (name.includes('/')) return name.split('/').map(clean).filter(Boolean).length;
-  if (name.includes('&')) return name.split('&').map(clean).filter(Boolean).length;
+  if (s.includes('/')) return s.split('/').map(clean).filter(Boolean).length;
+  if (s.includes('&')) return s.split('&').map(clean).filter(Boolean).length;
   return 1;
 }
-function looksCrew(line,next){ return clean(line) && isDay(next); }
-function looksSub(line){
+function looksLikeCrew(line, nextLine){
   const s = clean(line);
-  if (!s || isDay(s)) return false;
-  if (/^(AM\s+)?[A-Za-z0-9]+\s*[-–\s]/i.test(s) && /\d/.test(s)) return false;
-  if (s.includes('*')) return true;
-  return !/^\d/.test(s) && !/^AM\b/i.test(s);
+  if (!s || isDayLine(s) || isLinkLine(s)) return false;
+  return isDayLine(nextLine);
 }
-function parseSub(line){
+function looksLikeSubdivision(line){
+  const s = clean(line);
+  if (!s || isDayLine(s) || isLinkLine(s)) return false;
+  if (/^\d/.test(s) || /^(AM|PM)\s*(\*|-)?\s*/i.test(s)) return false;
+  return s.includes('*');
+}
+function parseSubdivision(line){
   const raw = clean(line);
   const parts = raw.split('*').map(clean).filter(Boolean);
-  return {raw, subdivision:parts[0] || raw.replace(/\*/g,'').trim(), builder:parts[1] || '', city:parts[2] || ''};
+  return {
+    raw,
+    subdivision: parts[0] || raw.replace(/\*/g,'').trim(),
+    builder: parts[1] || '',
+    city: parts.slice(2).join(' ') || ''
+  };
 }
-function parseJobLine(line){
-  const raw = clean(line);
-  const am = /^AM\b/i.test(raw);
-  const s = raw.replace(/^AM\s+/i,'').trim();
-  let lot='', task='', address='';
+function parseJob(line){
+  let raw = clean(line);
+  let tag = '';
+  let lot = '', task = '', address = '';
 
-  let m = s.match(/^([A-Za-z0-9]+)\s*[-–]\s*(.+)$/) || s.match(/^([A-Za-z0-9]+)\s+(.+)$/);
+  let tagMatch = raw.match(/^(AM|PM)\s*(?:\*)?\s*(.+)$/i);
+  if (tagMatch) {
+    tag = tagMatch[1].toUpperCase();
+    raw = clean(tagMatch[2]);
+  }
+
+  // Remove a stray leading star in job rows.
+  raw = raw.replace(/^\*\s*/, '');
+
+  let m = raw.match(/^([A-Za-z0-9]+)\s*[-–]\s*(.+)$/);
+  if (!m) m = raw.match(/^([A-Za-z0-9]+)\s+(.+)$/);
+
   if (m) {
     lot = clean(m[1]);
-    let rest = clean(m[2]);
-    let parts = rest.split(/\s*[-–]\s*/).map(clean).filter(Boolean);
+    const rest = clean(m[2]);
+    const parts = rest.split(/\s*[-–]\s*/).map(clean).filter(Boolean);
     if (parts.length >= 2) {
-      task = parts.shift();
-      address = parts.join(' - ');
+      task = clean(parts.shift());
+      address = clean(parts.join(' - '));
     } else {
-      let mm = rest.match(/^(.+?)\s+(\d{2,}.*)$/);
+      const mm = rest.match(/^(.+?)\s+(\d{2,}.*)$/);
       if (mm) { task = clean(mm[1]); address = clean(mm[2]); }
       else task = rest;
     }
-  } else task = s;
-  return {raw, am, lot, task, address};
-}
-function parseSchedule(){
-  const lines = document.getElementById('scheduleInput').value.split(/\r?\n/).map(clean).filter(Boolean);
-  const out = [];
-  let crew = {name:'', people:1}, day='', sub = {raw:'', subdivision:'', builder:'', city:''};
+  } else {
+    task = raw;
+  }
 
-  for(let i=0;i<lines.length;i++){
-    const line = lines[i], next = lines[i+1] || '';
-    if (looksCrew(line,next)) {
-      crew = {name:displayCrewName(line), people:crewSize(line)};
-      day=''; sub={raw:'',subdivision:'',builder:'',city:''};
+  // PM can also be at the end of a job line.
+  if (!tag && /\bPM\b$/i.test(address)) {
+    tag = 'PM';
+    address = clean(address.replace(/\bPM\b$/i,''));
+  } else if (!tag && /\bPM\b$/i.test(task)) {
+    tag = 'PM';
+    task = clean(task.replace(/\bPM\b$/i,''));
+  }
+
+  return {raw, tag, lot, task, address};
+}
+function parseScheduleText(text){
+  const rawLines = text.split(/\r?\n/).map(clean);
+  const lines = rawLines.filter(s => s && !isLinkLine(s));
+  const out = [];
+  let crew = null, day = '', sub = null;
+
+  for (let i=0; i<lines.length; i++){
+    const line = lines[i];
+    const next = lines[i+1] || '';
+
+    if (looksLikeCrew(line, next)) {
+      crew = {name: line, people: crewSizeFromName(line)};
+      day = ''; sub = null;
       out.push({kind:'crew', crew:crew.name, people:crew.people});
-    } else if (isDay(line)) {
-      day=line;
-      out.push({kind:'day', day, crew:crew.name, people:crew.people});
-    } else if (looksSub(line)) {
-      sub=parseSub(line);
-      out.push({kind:'sub', ...sub, crew:crew.name, day, people:crew.people});
-    } else {
-      const j = parseJobLine(line);
-      out.push({
-        kind:'job', crew:crew.name, day, people:crew.people,
-        subdivision:sub.subdivision, builder:sub.builder, city:sub.city, subRaw:sub.raw,
-        ...j, inTime:'', outTime:'', budget:'', budgetFlag:false, budgetSource:'', matchType:'', debugAttempts:[]
-      });
+      continue;
     }
+    if (isDayLine(line)) {
+      day = line;
+      out.push({kind:'day', day, crew:crew?.name || '', people:crew?.people || 1});
+      continue;
+    }
+    if (looksLikeSubdivision(line)) {
+      sub = parseSubdivision(line);
+      out.push({kind:'sub', ...sub, crew:crew?.name || '', day, people:crew?.people || 1});
+      continue;
+    }
+
+    const job = parseJob(line);
+    out.push({
+      kind:'job',
+      crew:crew?.name || '',
+      day,
+      people:crew?.people || 1,
+      subdivision:sub?.subdivision || '',
+      builder:sub?.builder || '',
+      city:sub?.city || '',
+      subRaw:sub?.raw || '',
+      ...job,
+      inTime:'',
+      outTime:'',
+      budget:'',
+      floorplan:'',
+      budgetSource:'',
+      budgetFlag:false,
+      matchType:'',
+      debugAttempts:[],
+      note:''
+    });
   }
   return out;
 }
-function parseAndRender(){
-  const existing = parsed.filter(x=>x.kind==='job');
-  const keep = new Map(existing.map(x => [`${norm(x.crew)}|${norm(x.subdivision)}|${norm(x.lot)}|${norm(x.task)}|${norm(x.address)}`, x]));
-  parsed = parseSchedule();
-  parsed.forEach(r=>{
-    if(r.kind==='job'){
-      const old = keep.get(`${norm(r.crew)}|${norm(r.subdivision)}|${norm(r.lot)}|${norm(r.task)}|${norm(r.address)}`);
-      if(old){ r.inTime=old.inTime; r.outTime=old.outTime; r.budget=old.budget; r.budgetFlag=old.budgetFlag; r.budgetSource=old.budgetSource; }
+
+function builderAliases(builder){
+  const b = normKey(builder);
+  const out = new Set([b]);
+  if (!b) return [];
+  if (b === 'dr' || b.includes('drhorton')) out.add('drhorton');
+  if (b === 'schott' || b.includes('schottenstein')) out.add('schottenstein');
+  if (b === 'mi' || b.includes('mihomes')) out.add('mihomes');
+  if (b.includes('pulte')) out.add('pulte');
+  if (b.includes('ryan')) out.add('ryanhomes'), out.add('ryan');
+  if (b.includes('fischer')) out.add('fischer');
+  if (b.includes('arbor')) out.add('arbor'), out.add('arborhomes');
+  if (b.includes('epcon')) out.add('epcon');
+  if (b.includes('wpland') || b === 'wp') out.add('wpland');
+  if (b.includes('bobwebb')) out.add('bobwebb');
+  if (b.includes('rockford')) out.add('rockford');
+  return [...out].filter(Boolean);
+}
+function subdivisionAliases(sub){
+  const s = normKey(sub);
+  const out = new Set([s]);
+  const raw = clean(sub).toLowerCase();
+  out.add(normKey(raw.replace(/\b(the|at|on)\b/g,'')));
+  const map = {
+    slate:['slate','slateridge'],
+    piattpreserve:['piattpreserve','piatts','piattspreserve'],
+    townsgreenway:['townsonthegreenway','townsgreenway'],
+    townsonthegreenway:['townsgreenway','townsonthegreenway'],
+    townsontheparkway:['townsontheparkway','townsparkway'],
+    berlinbluffs:['berlin','berlinbluffs'],
+    eagle:['eagle','eaglecreek'],
+    sugarfarms:['sugarfarms','sugar'],
+    madisonmeadows:['madisonmeadows','madison'],
+    oldharritage:['oldharritage','oldheritage'],
+    oldheritage:['oldharritage','oldheritage'],
+    villagesclassicway:['villagesclassicway','classicway'],
+    libertycrossing:['libertycrossing'],
+    villagesatgalloway:['villagesatgalloway','villagesgalloway'],
+    gallowayeast:['gallowayeast'],
+    johnsonscreek:['johnsonscreek'],
+    nottinghamtrace:['nottinghamtrace'],
+    hainescreek:['hainescreek'],
+    jeromeaster:['jeromeaster'],
+    hyattsmeadows:['hyattsmeadows','hyatts'],
+    millerfarm:['millerfarm'],
+    deeprun:['deeprun'],
+    wagnalls:['wagnalls']
+  };
+  if (map[s]) map[s].forEach(x => out.add(normKey(x)));
+  return [...out].filter(Boolean);
+}
+function lotAliases(lot){
+  const l = clean(lot);
+  const out = new Set([normKey(l)]);
+  const noLead = l.replace(/^0+/,'');
+  if (noLead) out.add(normKey(noLead));
+  const numeric = (l.match(/\d+/) || [''])[0];
+  if (numeric) out.add(normKey(numeric.replace(/^0+/,'')));
+  return [...out].filter(Boolean);
+}
+function makeLotKeys(builder, subdivision, lot){
+  const keys = [];
+  const bs = builderAliases(builder);
+  const ss = subdivisionAliases(subdivision);
+  const ls = lotAliases(lot);
+  bs.forEach(b => ss.forEach(s => ls.forEach(l => keys.push(`${b}|${s}|${l}`))));
+  ss.forEach(s => ls.forEach(l => keys.push(`${s}|${l}`)));
+  return [...new Set(keys)].filter(Boolean);
+}
+function addUniqueMap(map, key, rec){
+  if (!key) return;
+  if (!map.has(key)) map.set(key, rec);
+  else {
+    const old = map.get(key);
+    if (!old) return;
+    if (normKey(old.builder) !== normKey(rec.builder) || normKey(old.subdivision) !== normKey(rec.subdivision) || normKey(old.lot) !== normKey(rec.lot)) {
+      map.set(key, null);
     }
-  });
-  if (sheetRowsLoaded) fillBudgets(false, true);
-  renderPreview();
+  }
 }
 
-function taskType(task){
-  const t = clean(task).toLowerCase();
-  if (t.includes('dry clean') || t.includes('dryclean') || t.includes('dry-clean')) return 'dryclean';
+function taskTypes(task){
+  const t = String(task || '').toLowerCase();
+  if (t.includes('dry clean') || t.includes('dryclean') || t.includes('dry-clean')) return ['fixed:dryclean'];
+  if (t.includes('hardwood & carpet only') || t.includes('hardwood and carpet only') || t.includes('floors only') || t.includes('floor only')) return ['fixed:floors'];
+  if (t.includes('model')) return ['fixed:model'];
 
-  const hasOnly = /\bonly\b/.test(t);
-  const hasHardwood = t.includes('hardwood') || t.includes('hard wood');
-  const hasCarpet = t.includes('carpet');
-  if (hasOnly && hasHardwood && hasCarpet) return 'hardwoodcarpet';
-
-  if (
-    t.includes('floor only') ||
-    t.includes('floors only') ||
-    t.includes('floor-only') ||
-    t.includes('floors-only') ||
-    t === 'floor' ||
-    t === 'floors'
-  ) return 'floors';
-
-  if (t.includes('model')) return 'model';
-  if (t.includes('window')) return 'windows';
-  if (t.includes('original') || t.includes('full clean') || t.includes('first clean')) return 'original';
-  if (t.includes('reclean') || t.includes('final clean') || t.includes('qc') || t.includes('buff')) return 'reclean';
-  return '';
+  const types = [];
+  if (t.includes('original') || t.includes('full clean') || t.includes('day 1')) types.push('original');
+  if (t.includes('reclean') || t.includes('1st w/water') || t.includes('first w/water')) types.push('reclean');
+  if (t.includes('window') || t.includes('rewash')) types.push('windows');
+  return [...new Set(types)];
 }
-function fixedBudget(type){
-  if (Object.prototype.hasOwnProperty.call(defaultRules, type)) return Number(defaultRules[type]);
-  return null;
+function displayTaskType(task){ return taskTypes(task).join(' + ') || 'unknown'; }
+
+function fixedBudgetForTypes(types){
+  let total = 0, used = false;
+  for (const t of types) {
+    if (t === 'fixed:dryclean' || t === 'fixed:floors' || t === 'fixed:model') { total += 2; used = true; }
+  }
+  return used ? total : null;
 }
-function findBudget(job){
-  const type = taskType(job.task);
+
+function valuesFromRec(rec, types, source){
+  if (!rec) return null;
+  const fixed = fixedBudgetForTypes(types);
+  if (fixed !== null) return {budget:fixed, floorplan:rec.floorplan || '', source:`Fixed rule / ${source}`, flagged:false};
+
+  if (!types.length) return {budget:'', floorplan:rec.floorplan || '', source:'TASK NOT FOUND - fill budget manually', flagged:true};
+
+  let total = 0, missing = [];
+  for (const t of types) {
+    if (rec[t] !== '' && rec[t] != null && !isNaN(Number(rec[t]))) total += Number(rec[t]);
+    else missing.push(t);
+  }
+  if (!missing.length) return {budget:total, floorplan:rec.floorplan || '', source, flagged:false};
+  return {budget:'', floorplan:rec.floorplan || '', source:`${missing.join('+').toUpperCase()} BLANK ON MATCHED ROW - fill manually (${source})`, flagged:true};
+}
+function lookupBudget(job){
+  const types = taskTypes(job.task);
+  const fixed = fixedBudgetForTypes(types);
+  if (fixed !== null) return {budget:fixed, floorplan:'', source:`Fixed rule / ${displayTaskType(job.task)} / 2 hours`, flagged:false, attempts:[]};
+  if (!types.length) return {budget:'', floorplan:'', source:'TASK NOT FOUND - fill budget manually', flagged:true, attempts:[]};
+
   const attempts = [];
-  if (!type) return {budget:'', flag:true, source:'Unknown task type', type:'unknown', attempts};
-
-  const fixed = fixedBudget(type);
-  if (fixed !== null) return {budget:fixed, flag:false, source:`Default ${type}=${fixed}`, type, attempts};
-
-  for (const k of keysFor(job.builder, job.subdivision, job.lot)) {
-    attempts.push(k);
-    let rec = exactMap.get(k) || subLotMap.get(k);
-    if (rec) return recBudget(rec,type,`exact ${k}`,attempts);
+  for (const k of makeLotKeys(job.builder, job.subdivision, job.lot)) {
+    attempts.push(`exact:${k}`);
+    const rec = directLotBudgetMap.get(k);
+    if (rec) return {...valuesFromRec(rec, types, `Exact lot match [${k}]`), attempts};
   }
   for (const b of builderAliases(job.builder)) {
     for (const l of lotAliases(job.lot)) {
       const k = `${b}|${l}`;
-      attempts.push(k);
-      const rec = builderLotMap.get(k);
-      if (rec) return recBudget(rec,type,`builder+lot ${k}`,attempts);
+      attempts.push(`builder+lot:${k}`);
+      const rec = builderLotBudgetMap.get(k);
+      if (rec) return {...valuesFromRec(rec, types, `Builder+lot fallback [${k}]`), attempts};
+      if (builderLotBudgetMap.has(k) && builderLotBudgetMap.get(k) === null) attempts.push(`ambiguous:${k}`);
     }
   }
   for (const l of lotAliases(job.lot)) {
-    attempts.push(l);
-    const rec = lotOnlyMap.get(l);
-    if (rec) return recBudget(rec,type,`unique lot ${l}`,attempts);
+    attempts.push(`lot:${l}`);
+    const rec = lotOnlyBudgetMap.get(l);
+    if (rec) return {...valuesFromRec(rec, types, `Unique lot fallback [${l}]`), attempts};
+    if (lotOnlyBudgetMap.has(l) && lotOnlyBudgetMap.get(l) === null) attempts.push(`ambiguous lot:${l}`);
   }
-  const a = normAddress(job.address);
-  if (a) {
-    attempts.push(`addr:${a}`);
-    const rec = addressMap.get(a);
-    if (rec) return recBudget(rec,type,`address ${a}`,attempts);
+  for (const a of addressCandidates(job.address)) {
+    attempts.push(`address:${a}`);
+    const rec = addressBudgetMap.get(a);
+    if (rec) return {...valuesFromRec(rec, types, `Address fallback [${a}]`), attempts};
+    if (addressBudgetMap.has(a) && addressBudgetMap.get(a) === null) attempts.push(`ambiguous address:${a}`);
   }
-  return {budget:'', flag:true, source:'No matching lot/budget row', type, attempts};
-}
-function recBudget(rec,type,source,attempts){
-  if (!rec) return {budget:'', flag:true, source:'Ambiguous fallback match', type, attempts};
-  const val = rec[type];
-  if (val !== '' && val !== null && val !== undefined && !isNaN(Number(val))) {
-    return {budget:Number(val), flag:false, source, type, attempts};
-  }
-  return {budget:'', flag:true, source:`Matched row but ${type} is blank`, type, attempts};
-}
-function fillBudgets(overwrite=false, quiet=false){
-  let filled=0, flagged=0;
-  parsed.forEach(r=>{
-    if(r.kind!=='job') return;
-    const m = findBudget(r);
-    r.budgetFlag = !!m.flag;
-    r.budgetSource = m.source;
-    r.matchType = m.type;
-    r.debugAttempts = m.attempts || [];
-    if (m.budget !== '' && (overwrite || r.budget === '' || r.budget === null || r.budget === undefined)) {
-      r.budget = m.budget;
-      r.budgetFlag = false;
-      filled++;
-    } else if (m.flag) flagged++;
-  });
-  if(!quiet) {
-    renderPreview();
-    document.getElementById('status').textContent = `Budget fill complete: ${filled} filled, ${flagged} flagged. Sheet rows loaded: ${sheetRowsLoaded}.`;
-  }
+
+  return {budget:'', floorplan:'', source:'LOT/SUBDIVISION NOT FOUND - fill budget manually', flagged:true, attempts};
 }
 
-function numOrBlank(v){
-  if (v===null || v===undefined || v==='') return '';
+function toNumOrBlank(v){
+  if (v === null || v === undefined || v === '') return '';
   const n = parseFloat(String(v).replace(/[^\d.-]/g,''));
   return isNaN(n) ? '' : n;
 }
-function colIndex(headers,names){
-  const wanted = names.map(norm);
-  return headers.findIndex(h=>wanted.includes(h));
+function idxAny(headers, names){
+  const wanted = names.map(normKey);
+  return headers.findIndex(h => wanted.includes(h));
+}
+function loadRowsIntoMaps(rows){
+  floorplanBudgetMap.clear();
+  directLotBudgetMap.clear();
+  builderLotBudgetMap.clear();
+  lotOnlyBudgetMap.clear();
+  addressBudgetMap.clear();
+
+  const headerIndex = rows.findIndex(r => r.some(c => normKey(c)==='builder') && r.some(c => normKey(c)==='floorplan') && r.some(c => normKey(c)==='original'));
+  if (headerIndex < 0) throw new Error('Could not find headers. Expected Builder, Subdivision, Lot, Floorplan, Original, Reclean, Windows.');
+
+  const headers = rows[headerIndex].map(normKey);
+  const bI = idxAny(headers, ['Builder']);
+  const subI = idxAny(headers, ['Subdivision','Community','Neighborhood','Project']);
+  const lotI = idxAny(headers, ['Lot','LotNumber','Lot Number']);
+  const fpI = idxAny(headers, ['FloorPlan','Floorplan','Plan']);
+  const oI = idxAny(headers, ['Original']);
+  const rI = idxAny(headers, ['Reclean']);
+  const wI = idxAny(headers, ['Windows','Window']);
+  const addrI = idxAny(headers, ['Address','Street Address']);
+
+  for (let i=headerIndex+1; i<rows.length; i++){
+    const row = rows[i] || [];
+    const rec = {
+      builder: clean(row[bI]),
+      subdivision: subI >= 0 ? clean(row[subI]) : '',
+      lot: lotI >= 0 ? clean(row[lotI]) : '',
+      floorplan: clean(row[fpI]),
+      original: toNumOrBlank(row[oI]),
+      reclean: toNumOrBlank(row[rI]),
+      windows: toNumOrBlank(row[wI]),
+      address: addrI >= 0 ? clean(row[addrI]) : ''
+    };
+    if (!rec.builder && !rec.subdivision && !rec.lot && !rec.floorplan) continue;
+
+    if (rec.floorplan) {
+      builderAliases(rec.builder).forEach(b => floorplanBudgetMap.set(`${b}|${normKey(rec.floorplan)}`, rec));
+      if (!floorplanBudgetMap.has(normKey(rec.floorplan))) floorplanBudgetMap.set(normKey(rec.floorplan), rec);
+    }
+    if (rec.subdivision && rec.lot) {
+      makeLotKeys(rec.builder, rec.subdivision, rec.lot).forEach(k => directLotBudgetMap.set(k, rec));
+      builderAliases(rec.builder).forEach(b => lotAliases(rec.lot).forEach(l => addUniqueMap(builderLotBudgetMap, `${b}|${l}`, rec)));
+      lotAliases(rec.lot).forEach(l => addUniqueMap(lotOnlyBudgetMap, l, rec));
+      addressCandidates(rec.address).forEach(a => addUniqueMap(addressBudgetMap, a, rec));
+    }
+  }
+}
+function csvToRows(text){
+  const rows=[]; let row=[], cell='', q=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i], next=text[i+1];
+    if(ch==='"' && q && next==='"'){cell+='"';i++;}
+    else if(ch==='"'){q=!q;}
+    else if(ch===',' && !q){row.push(cell);cell='';}
+    else if((ch==='\n'||ch==='\r') && !q){if(ch==='\r'&&next==='\n')i++; row.push(cell); rows.push(row); row=[]; cell='';}
+    else cell+=ch;
+  }
+  row.push(cell); rows.push(row);
+  return rows;
 }
 async function loadBudgetFile(file){
-  if(!file) return;
+  if (!file) return;
   try{
-    let rows=[];
-    if(file.name.toLowerCase().endsWith('.csv')) rows = csvRows(await file.text());
-    else {
+    let rows = [];
+    if (file.name.toLowerCase().endsWith('.csv')) {
+      rows = csvToRows(await file.text());
+    } else {
       const wb = new ExcelJS.Workbook();
       await wb.xlsx.load(await file.arrayBuffer());
       const ws = wb.worksheets[0];
       ws.eachRow({includeEmpty:false}, row => rows.push(row.values.slice(1).map(clean)));
     }
-    loadBudgetRows(rows);
-    saveBudgetRecords();
-    fillBudgets(true);
-    document.getElementById('status').textContent = `Loaded ${sheetRowsLoaded} rows from budget sheet, saved locally, and filled budgets.`;
-  }catch(e){ alert('Could not read budget file: '+e.message); }
-}
-function csvRows(text){
-  const rows=[]; let row=[], cell='', q=false;
-  for(let i=0;i<text.length;i++){
-    const ch=text[i], nx=text[i+1];
-    if(ch === '"' && q && nx === '"'){cell+='"';i++;}
-    else if(ch === '"') q=!q;
-    else if(ch === ',' && !q){row.push(cell);cell='';}
-    else if((ch === '\n'||ch === '\r')&&!q){ if(ch==='\r'&&nx==='\n')i++; row.push(cell); rows.push(row); row=[]; cell='';}
-    else cell+=ch;
+    loadRowsIntoMaps(rows);
+    applyBudgets(false);
+    setStatus(`Loaded budget sheet. Exact lot keys: ${directLotBudgetMap.size}. Builder+lot fallback keys: ${builderLotBudgetMap.size}. Unique lot keys: ${lotOnlyBudgetMap.size}. Address keys: ${addressBudgetMap.size}.`);
+  }catch(err){
+    alert('Could not read floorplans/budget file: ' + err.message);
   }
-  row.push(cell); rows.push(row); return rows;
-}
-function loadBudgetRows(rows){
-  const hi = rows.findIndex(r => r.some(c=>norm(c)==='builder') && r.some(c=>norm(c)==='lot') && r.some(c=>norm(c)==='original'));
-  if(hi < 0) throw new Error('Could not find headers: Builder, Subdivision, Lot, Original, Reclean, Windows.');
-  const h = rows[hi].map(norm);
-  const bI=colIndex(h,['Builder']), sI=colIndex(h,['Subdivision','Community','Neighborhood']), lI=colIndex(h,['Lot','LotNumber','Lot Number']);
-  const fpI=colIndex(h,['Floorplan','FloorPlan','Plan']), aI=colIndex(h,['Address']);
-  const oI=colIndex(h,['Original']), rI=colIndex(h,['Reclean']), wI=colIndex(h,['Windows','Window']);
-  if(bI<0 || sI<0 || lI<0) throw new Error('Budget sheet needs Builder, Subdivision, and Lot columns.');
-
-  const records = [];
-  for(let i=hi+1;i<rows.length;i++){
-    const row=rows[i];
-    const rec = {
-      builder:clean(row[bI]), subdivision:clean(row[sI]), lot:clean(row[lI]),
-      floorplan:fpI>=0?clean(row[fpI]):'', address:aI>=0?clean(row[aI]):'',
-      original:numOrBlank(row[oI]), reclean:numOrBlank(row[rI]), windows:numOrBlank(row[wI])
-    };
-    if(!rec.subdivision || !rec.lot) continue;
-    records.push(rec);
-  }
-  loadBudgetRecords(records);
 }
 
-
-function renderMissingBudgets(){
-  const panel = document.getElementById('missingBudgetPanel');
-  if(!panel) return;
-
-  const missing = parsed
-    .map((r, idx) => ({...r, idx}))
-    .filter(r => r.kind === 'job' && (r.budget === '' || r.budget === null || r.budget === undefined || r.budgetFlag));
-
-  if(!missing.length){
-    panel.classList.remove('show');
-    panel.innerHTML = '';
-    return;
-  }
-
-  panel.classList.add('show');
-  panel.innerHTML = `
-    <h3>Jobs missing budget</h3>
-    <div class="missingBudgetList">
-      ${missing.map(r => `
-        <div class="missingBudgetItem">
-          <div>
-            <div class="jobTitle">${esc(jobText(r))}</div>
-            <div class="jobMeta">${esc(r.subdivision)}${r.builder ? ' • '+esc(r.builder) : ''}${r.budgetSource ? ' • '+esc(r.budgetSource) : ''}</div>
-          </div>
-          <input type="number" step="0.25" placeholder="Hours" value="${esc(r.budget)}" oninput="setRow(${r.idx},'budget',this.value)">
-        </div>
-      `).join('')}
-    </div>`;
-}
-function renderPreview(){
-  const table=document.getElementById('previewTable');
-  table.innerHTML=`<thead><tr>
-    <th style="width:520px">Schedule / Job</th><th style="width:65px">People</th><th style="width:105px">In</th>
-    <th style="width:105px">Out</th><th style="width:90px">Actual MH</th><th style="width:90px">Budget</th><th style="width:135px">Est. Complete</th><th style="width:180px">Notes</th>
-  </tr></thead><tbody></tbody>`;
-  const body=table.querySelector('tbody');
-  let crews=new Set(), jobs=0, budgets=0, flags=0;
-
-  parsed.forEach((r,idx)=>{
-    if(r.kind==='crew'){ crews.add(r.crew); body.insertAdjacentHTML('beforeend',`<tr class="crewRow"><td colspan="8">${esc(r.crew)}</td></tr>`); }
-    else if(r.kind==='day') body.insertAdjacentHTML('beforeend',`<tr class="dayRow"><td colspan="8">${esc(r.day)}</td></tr>`);
-    else if(r.kind==='sub') body.insertAdjacentHTML('beforeend',`<tr class="subRow"><td colspan="8">${esc(r.raw)}</td></tr>`);
-    else if(r.kind==='job'){
-      jobs++; if(r.budget !== '' && r.budget !== null && r.budget !== undefined) budgets++; if(r.budgetFlag) flags++;
-      const mh=actualMH(r), est=estComplete(r);
-      let cls=''; if(r.outTime) cls='jobText'; else if(r.inTime&&!r.outTime) cls='jobText gray'; else if(r.budgetFlag) cls='jobText flag';
-      body.insertAdjacentHTML('beforeend',`<tr>
-        <td class="${cls}" title="${esc(r.budgetSource||'')}">${esc(jobText(r))}</td>
-        <td class="num">${r.people}</td>
-        <td><input class="mini" value="${esc(r.inTime)}" oninput="setRow(${idx},'inTime',this.value)"></td>
-        <td><input class="mini" value="${esc(r.outTime)}" oninput="setRow(${idx},'outTime',this.value)"></td>
-        <td class="mh">${mh===''?'':mh.toFixed(1)}</td>
-        <td><input class="mini" type="number" step="0.1" value="${esc(r.budget)}" oninput="setRow(${idx},'budget',this.value)"></td>
-        <td>${esc(est)}</td>
-        <td><input class="wide" placeholder="${r.budgetFlag?'Budget not found':''}" value="${esc(r.note||'')}" oninput="setRow(${idx},'note',this.value)"></td>
-      </tr>`);
-    }
-  });
-  document.getElementById('crewCount').textContent=crews.size;
-  document.getElementById('jobCount').textContent=jobs;
-  document.getElementById('budgetCount').textContent=budgets;
-  document.getElementById('flagCount').textContent=flags;
-  renderMissingBudgets();
-  renderDebug();
-}
-function setRow(idx,field,val){
-  parsed[idx][field]=val;
-  if(field==='budget'){
-    parsed[idx].budgetFlag = (val==='');
-    if(val !== '') parsed[idx].budgetSource = 'Manual budget entry';
-  }
+function parseAndRender(){
+  parsed = parseScheduleText(document.getElementById('scheduleInput').value);
+  applyBudgets(false, true);
   renderPreview();
+  const missing = missingBudgetJobs().length;
+  setStatus(`Parsed ${getJobs().length} jobs. Link lines were ignored. ${missing ? missing + ' budget(s) need fixing before export.' : 'Budgets look good.'} Type values, then press Enter or click out.`);
 }
-function jobText(r){return `${r.am?'AM ':''}${r.lot? r.lot+' ':''}${r.task||''}${r.address?' - '+r.address:''}`;}
-function timeMin(v){
-  if(!v) return null; const s=clean(v).toUpperCase();
-  const m=s.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?$/); if(!m) return null;
-  let h=Number(m[1]), mn=Number(m[2]||0), ap=m[3];
-  if(ap==='PM'&&h!==12)h+=12; if(ap==='AM'&&h===12)h=0;
-  return h*60+mn;
+function getJobs(){ return parsed.filter(x => x.kind === 'job'); }
+function setStatus(msg){ document.getElementById('status').textContent = msg; }
+
+function applyBudgets(overwrite=false, silent=false){
+  let filled = 0, flagged = 0;
+  parsed.forEach(r => {
+    if (r.kind !== 'job') return;
+    const m = lookupBudget(r);
+    r.budgetFlag = !!m.flagged;
+    r.budgetSource = m.source || '';
+    r.matchType = displayTaskType(r.task);
+    r.debugAttempts = m.attempts || [];
+    if (m.floorplan) r.floorplan = m.floorplan;
+    if (m.budget !== '' && (overwrite || r.budget === '' || r.budget == null)) {
+      r.budget = m.budget;
+      r.budgetFlag = false;
+      filled++;
+    } else if (m.flagged) flagged++;
+  });
+  if (!silent) {
+    renderPreview();
+    setStatus(`Budget match complete: ${filled} filled, ${flagged} flagged for manual fill. Export will prompt you to fix missing budgets.`);
+  }
 }
-function excelTime(v){const m=timeMin(v); return m===null?null:m/1440;}
-function timeText(mins){
-  if(mins===null||isNaN(mins))return''; mins=Math.round(mins)%1440; if(mins<0)mins+=1440;
-  let h=Math.floor(mins/60), m=mins%60, ap=h>=12?'PM':'AM', hh=h%12; if(hh===0)hh=12;
+
+function timeToMinutes(v){
+  if (!v) return null;
+  const s = clean(v).toUpperCase();
+  const m = s.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?$/);
+  if (!m) return null;
+  let h = Number(m[1]), min = Number(m[2] || 0), ap = m[3];
+  if (ap === 'PM' && h !== 12) h += 12;
+  if (ap === 'AM' && h === 12) h = 0;
+  return h*60 + min;
+}
+function minutesToTime(mins){
+  if (mins == null || isNaN(mins)) return '';
+  mins = Math.round(mins) % 1440; if (mins < 0) mins += 1440;
+  let h = Math.floor(mins/60), m = mins%60, ap = h >= 12 ? 'PM' : 'AM';
+  let hh = h % 12; if (hh === 0) hh = 12;
   return `${hh}:${String(m).padStart(2,'0')} ${ap}`;
 }
-function actualMH(r){const a=timeMin(r.inTime), b=timeMin(r.outTime); if(a===null||b===null)return''; return ((b-a)/60)*Number(r.people||1);}
-function estComplete(r){const a=timeMin(r.inTime), bud=Number(r.budget), p=Number(r.people||1); if(a===null||!bud||!p)return''; return timeText(a+(bud/p)*60);}
-
-function toggleDebug(){debugMode=!debugMode; document.getElementById('debugBox').classList.toggle('show',debugMode); renderDebug();}
-function renderDebug(){
-  const box=document.getElementById('debugBox'); if(!box || !debugMode)return;
-  const rows=parsed.filter(x=>x.kind==='job').map((j,i)=>`<tr>
-    <td>${i+1}</td><td>${esc(j.subdivision)}</td><td>${esc(j.builder)}</td><td>${esc(j.lot)}</td><td>${esc(j.task)}</td>
-    <td>${esc(j.matchType||taskType(j.task))}</td><td class="${j.budget!==''&&!j.budgetFlag?'goodText':'badText'}">${esc(j.budget!==''?j.budget:'FLAG')}</td>
-    <td>${esc(j.budgetSource)}</td><td>${esc((j.debugAttempts||[]).slice(0,12).join(' | '))}</td>
-  </tr>`).join('');
-  box.innerHTML=`<table class="debugTable"><thead><tr><th>#</th><th>Subdivision</th><th>Builder</th><th>Lot</th><th>Task</th><th>Type</th><th>Budget</th><th>Source</th><th>Keys tried</th></tr></thead><tbody>${rows||'<tr><td colspan="9">No jobs parsed.</td></tr>'}</tbody></table>`;
+function excelTimeNumber(t){ const mins = timeToMinutes(t); return mins == null ? null : mins/1440; }
+function calcActualMH(r){
+  const s = timeToMinutes(r.inTime), e = timeToMinutes(r.outTime);
+  if (s == null || e == null) return '';
+  return ((e-s)/60) * Number(r.people || 1);
+}
+function calcEstComplete(r){
+  const s = timeToMinutes(r.inTime), b = Number(r.budget), p = Number(r.people || 1);
+  if (s == null || !b || !p) return '';
+  return minutesToTime(s + (b/p)*60);
+}
+function jobDisplay(r){
+  const prefix = r.tag ? `${r.tag} ` : '';
+  const lot = r.lot ? `${r.lot} ` : '';
+  const addr = r.address ? ` - ${r.address}` : '';
+  return `${prefix}${lot}${r.task || r.raw}${addr}`;
 }
 
-
-function pasteStartRow(){
-  const n = parseInt(document.getElementById('pasteStartRow')?.value || '1', 10);
-  return Number.isFinite(n) && n > 0 ? n : 1;
-}
-function actualFormulaForRow(row){
-  return `=IF(OR(C${row}="",D${row}="",B${row}=""),"",ROUND((D${row}-C${row})*24*B${row},1))`;
-}
-function estFormulaForRow(row){
-  return `=IF(OR(C${row}="",F${row}="",B${row}=""),"",C${row}+F${row}/B${row}/24)`;
-}
-function exportRows(){
-  let rows=[];
-  let seenCrew = false;
-  parsed.forEach(r=>{
-    if(r.kind==='crew') {
-      if (seenCrew) rows.push({type:'blank', cells:['','','','','','','']});
-      seenCrew = true;
-      rows.push({type:'crew', cells:[r.crew,'','','','','','']});
-    }
-    else if(r.kind==='day') rows.push({type:'day', cells:[r.day,'People','In','Out','Actual Man Hours','Budget','Est. Complete']});
-    else if(r.kind==='sub') rows.push({type:'sub', cells:[r.raw,'','','','','','']});
-    else if(r.kind==='job') rows.push({type:'job', r});
-  });
-  return rows;
-}
-async function exportXlsx(){
-  if(!parsed.length) parseAndRender();
-  const wb=new ExcelJS.Workbook();
-  wb.creator='VIP Schedule Budget Exporter';
-  wb.created=new Date();
-  const ws=wb.addWorksheet('Schedule');
-  ws.columns=[
-    {width:64},{width:9},{width:12},{width:12},{width:15},{width:11},{width:18}
-  ];
-  const thin={style:'thin',color:{argb:'FFD9D9D9'}};
-  const white={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFFFF'}};
-  const green={type:'pattern',pattern:'solid',fgColor:{argb:'FF92D050'}};
-  const gray={type:'pattern',pattern:'solid',fgColor:{argb:'FFD9D9D9'}};
-  const orange={type:'pattern',pattern:'solid',fgColor:{argb:'FFF4B183'}};
-  const yellow={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF2CC'}};
-  const header={type:'pattern',pattern:'solid',fgColor:{argb:'FFE7E6E6'}};
-
-  let excelRow=1, budgetCount=0;
-  for(const item of exportRows()){
-    const row=ws.getRow(excelRow);
-    if(item.type==='blank'){
-      row.height=18;
-    } else if(item.type==='crew' || item.type==='sub'){
-      row.getCell(1).value=item.cells[0];
-      row.height=item.type==='crew'?24:20;
-    } else if(item.type==='day'){
-      item.cells.forEach((v,i)=>row.getCell(i+1).value=v);
-      for(let c=2;c<=7;c++){ row.getCell(c).fill=header; row.getCell(c).font={bold:true}; row.getCell(c).alignment={horizontal:'center'}; }
-    } else if(item.type==='job'){
-      const r=item.r;
-      row.getCell(1).value=jobText(r);
-      row.getCell(2).value=Number(r.people||1);
-      const it=excelTime(r.inTime), ot=excelTime(r.outTime);
-      row.getCell(3).value=it===null?'':it;
-      row.getCell(4).value=ot===null?'':ot;
-      row.getCell(5).value={formula:`IF(OR(C${excelRow}="",D${excelRow}="",B${excelRow}=""),"",ROUND((D${excelRow}-C${excelRow})*24*B${excelRow},1))`};
-
-      const b = (r.budget === '' || r.budget === null || r.budget === undefined) ? '' : Number(r.budget);
-      row.getCell(6).value = b;
-      if(b !== '') budgetCount++;
-
-      row.getCell(7).value={formula:`IF(OR(C${excelRow}="",F${excelRow}="",B${excelRow}=""),"",C${excelRow}+F${excelRow}/B${excelRow}/24)`};
-
-      let fill=white;
-      if(r.outTime) fill=green;
-      else if(r.inTime&&!r.outTime) fill=gray;
-      else if(r.budgetFlag || b==='') fill=orange;
-      row.getCell(1).fill=fill;
-      row.getCell(6).fill=(r.budgetFlag || b==='')?orange:yellow;
-
-      [2,3,4,5,6,7].forEach(c=>row.getCell(c).alignment={horizontal:'center',vertical:'middle'});
-      row.getCell(1).alignment={vertical:'middle',wrapText:true};
-      row.getCell(3).numFmt='h:mm AM/PM';
-      row.getCell(4).numFmt='h:mm AM/PM';
-      row.getCell(5).numFmt='0.0';
-      row.getCell(6).numFmt='0.0';
-      row.getCell(7).numFmt='h:mm AM/PM';
-      row.getCell(5).font={bold:true};
-      row.height=22;
-    }
-    for(let c=1;c<=7;c++){
-      row.getCell(c).border={top:thin,left:thin,bottom:thin,right:thin};
-      row.getCell(c).font=row.getCell(c).font || {name:'Arial',size:10};
-    }
-    excelRow++;
+function inputKey(event, idx, field){
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    commitEdit(idx, field, event.target.value);
+    event.target.blur();
   }
-  const name=clean(document.getElementById('fileName').value)||'VIP Schedule Export';
-  const buffer=await wb.xlsx.writeBuffer();
-  saveAs(new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),`${name}.xlsx`);
-  document.getElementById('status').textContent=`Exported XLSX with ${budgetCount} budget values.`;
 }
-function exportCopyableHtml(){
-  if(!parsed.length) parseAndRender();
-  let excelRow=pasteStartRow(), htmlRows=[];
-  for(const item of exportRows()){
-    if(item.type==='blank'){
-      htmlRows.push(`<tr><td colspan="7">&nbsp;</td></tr>`);
-    } else if(item.type==='crew' || item.type==='sub'){
-      htmlRows.push(`<tr><td colspan="7">${esc(item.cells[0])}</td></tr>`);
-    } else if(item.type==='day'){
-      htmlRows.push(`<tr><td>${esc(item.cells[0])}</td><td>People</td><td>In</td><td>Out</td><td>Actual Man Hours</td><td>Budget</td><td>Est. Complete</td></tr>`);
-    } else {
-      const r=item.r, b=(r.budget===''||r.budget==null)?'':Number(r.budget);
-      const fill=r.outTime?'#92d050':(r.inTime&&!r.outTime?'#d9d9d9':((r.budgetFlag||b==='')?'#f4b183':'#ffffff'));
-      htmlRows.push(`<tr>
-        <td style="background:${fill}">${esc(jobText(r))}</td>
-        <td>${Number(r.people||1)}</td>
-        <td>${esc(r.inTime)}</td>
-        <td>${esc(r.outTime)}</td>
-        <td>${actualFormulaForRow(excelRow)}</td>
-        <td>${b}</td>
-        <td>${estFormulaForRow(excelRow)}</td>
+function commitEdit(idx, field, val){
+  if (!parsed[idx]) return;
+  parsed[idx][field] = val;
+  renderPreview();
+}
+function clearTimesBudgets(){
+  parsed.forEach(r => {
+    if (r.kind === 'job') {
+      r.inTime=''; r.outTime=''; r.budget=''; r.budgetFlag=false; r.budgetSource=''; r.note='';
+    }
+  });
+  renderPreview();
+}
+
+function renderPreview(){
+  const table = document.getElementById('previewTable');
+  table.innerHTML = `<thead><tr>
+    <th style="width:520px">Schedule / Job</th>
+    <th style="width:55px">People</th>
+    <th style="width:105px">In</th>
+    <th style="width:105px">Out</th>
+    <th style="width:90px">Actual MH</th>
+    <th style="width:90px">Budget</th>
+    <th style="width:135px">Est. Complete</th>
+    <th style="width:190px">Notes</th>
+  </tr></thead><tbody></tbody>`;
+  const tbody = table.querySelector('tbody');
+  let crewSet = new Set(), people = 0, budgetTotal = 0;
+
+  parsed.forEach((r, idx) => {
+    if (r.kind === 'crew') {
+      crewSet.add(r.crew);
+      tbody.insertAdjacentHTML('beforeend', `<tr class="crewRow"><td colspan="8">${escapeHtml(r.crew)}</td></tr>`);
+    } else if (r.kind === 'day') {
+      tbody.insertAdjacentHTML('beforeend', `<tr class="dayRow"><td colspan="8">${escapeHtml(r.day)}</td></tr>`);
+    } else if (r.kind === 'sub') {
+      tbody.insertAdjacentHTML('beforeend', `<tr class="subRow"><td colspan="8">${escapeHtml(r.raw)}</td></tr>`);
+    } else if (r.kind === 'job') {
+      people += Number(r.people || 0);
+      budgetTotal += Number(r.budget || 0);
+      const mh = calcActualMH(r);
+      const est = calcEstComplete(r);
+      let cls = '';
+      if (r.outTime) cls = 'jobGreen';
+      else if (r.inTime && !r.outTime) cls = 'jobGray';
+      else if (r.budgetFlag) cls = 'jobFlag';
+
+      tbody.insertAdjacentHTML('beforeend', `<tr>
+        <td class="${cls}" title="${escapeHtml(r.budgetSource || '')}">${escapeHtml(jobDisplay(r))}${r.floorplan ? ` <span style="color:#555;font-size:12px">[${escapeHtml(r.floorplan)}]</span>` : ''}</td>
+        <td class="num">${r.people}</td>
+        <td><input class="mini" value="${escapeHtml(r.inTime)}" onkeydown="inputKey(event,${idx},'inTime')" onblur="commitEdit(${idx},'inTime',this.value)"></td>
+        <td><input class="mini" value="${escapeHtml(r.outTime)}" onkeydown="inputKey(event,${idx},'outTime')" onblur="commitEdit(${idx},'outTime',this.value)"></td>
+        <td class="mh">${mh === '' ? '' : mh.toFixed(1)}</td>
+        <td class="budgetCell"><input class="mini" type="number" step="0.1" value="${escapeHtml(r.budget)}" onkeydown="inputKey(event,${idx},'budget')" onblur="commitEdit(${idx},'budget',this.value)"></td>
+        <td>${escapeHtml(est)}</td>
+        <td><input class="wide" placeholder="${r.budgetFlag ? 'Budget not found - fill manually' : ''}" value="${escapeHtml(r.note)}" onkeydown="inputKey(event,${idx},'note')" onblur="commitEdit(${idx},'note',this.value)"></td>
       </tr>`);
     }
-    excelRow++;
-  }
-  const doc=`<!doctype html><html><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Arial;font-size:10pt}td{border:1px solid #d9d9d9;padding:4px 6px}</style></head><body><table>${htmlRows.join('\n')}</table></body></html>`;
-  const name=clean(document.getElementById('fileName').value)||'VIP Schedule Export';
-  saveAs(new Blob([doc],{type:'application/vnd.ms-excel;charset=utf-8'}),`${name} copyable.xls`);
-}
-async function copyTable(){
-  if(!parsed.length) parseAndRender();
-  let excelRow=pasteStartRow(), lines=[];
-  for(const item of exportRows()){
-    if(item.type==='blank') lines.push(['','','','','','',''].join('\t'));
-    else if(item.type==='crew' || item.type==='sub') lines.push([item.cells[0],'','','','','',''].join('\t'));
-    else if(item.type==='day') lines.push([item.cells[0],'People','In','Out','Actual Man Hours','Budget','Est. Complete'].join('\t'));
-    else {
-      const r=item.r, b=(r.budget===''||r.budget==null)?'':Number(r.budget);
-      lines.push([jobText(r),Number(r.people||1),r.inTime,r.outTime,`${actualFormulaForRow(excelRow)}`,b,`${estFormulaForRow(excelRow)}`].join('\t'));
-    }
-    excelRow++;
-  }
-  await navigator.clipboard.writeText(lines.join('\n'));
-  document.getElementById('status').textContent=`Copied table to clipboard with formulas targeting row ${pasteStartRow()} and down. Paste into Excel starting on that row.`;
+  });
+
+  document.getElementById('crewCount').textContent = crewSet.size;
+  document.getElementById('jobCount').textContent = getJobs().length;
+  document.getElementById('peopleTotal').textContent = people;
+  document.getElementById('budgetTotal').textContent = budgetTotal.toFixed(1);
+  renderDebug();
 }
 
-loadDefaultRules();
-if (loadSavedBudgetRecords()) {
-  document.getElementById('status').textContent = `Loaded saved budget sheet from this browser (${sheetRowsLoaded} rows).`;
+function toggleDebug(){
+  debugMode = !debugMode;
+  const box = document.getElementById('debugBox');
+  box.classList.toggle('show', debugMode);
+  renderDebug();
 }
+function renderDebug(){
+  const box = document.getElementById('debugBox');
+  if (!box || !debugMode) return;
+  const rows = getJobs().map((j,i) => {
+    const ok = j.budget !== '' && !j.budgetFlag;
+    return `<tr>
+      <td>${i+1}</td>
+      <td>${escapeHtml(j.subdivision)}</td>
+      <td>${escapeHtml(j.builder)}</td>
+      <td>${escapeHtml(j.lot)}</td>
+      <td>${escapeHtml(j.task)}</td>
+      <td>${escapeHtml(j.matchType)}</td>
+      <td class="${ok ? 'debugGood':'debugBad'}">${ok ? escapeHtml(j.budget) : 'FLAG'}</td>
+      <td>${escapeHtml(j.budgetSource)}</td>
+      <td>${escapeHtml((j.debugAttempts || []).join(' | '))}</td>
+    </tr>`;
+  }).join('');
+  box.innerHTML = `<table class="debugTable"><thead><tr>
+    <th>#</th><th>Subdivision carried down</th><th>Builder</th><th>Lot</th><th>Task</th><th>Task type</th><th>Budget</th><th>Match / issue</th><th>Keys tried</th>
+  </tr></thead><tbody>${rows || '<tr><td colspan="9">No jobs parsed.</td></tr>'}</tbody></table>`;
+}
+
+
+function missingBudgetJobs(){
+  return parsed
+    .map((r, idx) => ({...r, _idx:idx}))
+    .filter(r => r.kind === 'job' && (r.budgetFlag || r.budget === '' || r.budget == null));
+}
+
+function showFixModal(){
+  const missing = missingBudgetJobs();
+  const modal = document.getElementById('fixModal');
+  const table = document.getElementById('fixTable');
+
+  if (!missing.length) return false;
+
+  table.innerHTML = `<thead>
+    <tr>
+      <th>#</th>
+      <th>Crew</th>
+      <th>Subdivision</th>
+      <th>Builder</th>
+      <th>Lot</th>
+      <th>Task</th>
+      <th>Issue</th>
+      <th>Budget</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${missing.map((r, i) => `<tr>
+      <td>${i+1}</td>
+      <td>${escapeHtml(r.crew)}</td>
+      <td>${escapeHtml(r.subdivision)}</td>
+      <td>${escapeHtml(r.builder)}</td>
+      <td>${escapeHtml(r.lot)}</td>
+      <td>${escapeHtml(r.task)}</td>
+      <td>${escapeHtml(r.budgetSource || 'Budget missing')}</td>
+      <td><input type="number" step="0.1" min="0" data-fix-idx="${r._idx}" value="${escapeHtml(r.budget || '')}" onkeydown="if(event.key==='Enter'){event.preventDefault();applyFixesFromModal();}"></td>
+    </tr>`).join('')}
+  </tbody>`;
+
+  modal.classList.add('show');
+  setStatus(`${missing.length} job(s) need a budget before export.`);
+  return true;
+}
+
+function closeFixModal(){
+  document.getElementById('fixModal').classList.remove('show');
+}
+
+function applyFixesFromModal(){
+  let fixed = 0;
+  document.querySelectorAll('#fixTable input[data-fix-idx]').forEach(input => {
+    const idx = Number(input.dataset.fixIdx);
+    const val = clean(input.value);
+    if (parsed[idx] && val !== '' && !isNaN(Number(val))) {
+      parsed[idx].budget = Number(val);
+      parsed[idx].budgetFlag = false;
+      parsed[idx].budgetSource = 'Manually fixed before export';
+      fixed++;
+    }
+  });
+  closeFixModal();
+  renderPreview();
+
+  const stillMissing = missingBudgetJobs().length;
+  if (stillMissing) {
+    setStatus(`${fixed} fixed. ${stillMissing} still missing a budget.`);
+    showFixModal();
+  } else {
+    setStatus(`${fixed} budget(s) fixed. Ready to export.`);
+  }
+}
+
+let allowExportWithMissingBudgets = false;
+function exportAnyway(){
+  allowExportWithMissingBudgets = true;
+  closeFixModal();
+  exportExcel();
+}
+
+async function exportExcel(){
+  if (!parsed.length) parseAndRender();
+
+  if (!allowExportWithMissingBudgets && missingBudgetJobs().length) {
+    showFixModal();
+    return;
+  }
+  allowExportWithMissingBudgets = false;
+
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'VIP Schedule Excel Exporter';
+  wb.created = new Date();
+  const ws = wb.addWorksheet('Schedule', {
+    views: [{state:'frozen', ySplit:0}],
+    pageSetup: {orientation:'landscape', fitToPage:true, fitToWidth:1, fitToHeight:0}
+  });
+
+  ws.columns = [
+    {key:'job', width:64},
+    {key:'people', width:9},
+    {key:'in', width:12},
+    {key:'out', width:12},
+    {key:'actual', width:15},
+    {key:'budget', width:11},
+    {key:'est', width:18}
+  ];
+
+  const thin = {style:'thin', color:{argb:'FFD9D9D9'}};
+  const black = {style:'thin', color:{argb:'FF000000'}};
+  const noBorder = {top:{style:'thin', color:{argb:'FFFFFFFF'}},left:{style:'thin', color:{argb:'FFFFFFFF'}},bottom:{style:'thin', color:{argb:'FFFFFFFF'}},right:{style:'thin', color:{argb:'FFFFFFFF'}}};
+  const fillGreen = {type:'pattern', pattern:'solid', fgColor:{argb:'FF92D050'}};
+  const fillGray = {type:'pattern', pattern:'solid', fgColor:{argb:'FFD9D9D9'}};
+  const fillHeader = {type:'pattern', pattern:'solid', fgColor:{argb:'FFE7E6E6'}};
+  const fillYellow = {type:'pattern', pattern:'solid', fgColor:{argb:'FFFFF2CC'}};
+  const fillOrange = {type:'pattern', pattern:'solid', fgColor:{argb:'FFF4B183'}};
+  const fillWhite = {type:'pattern', pattern:'solid', fgColor:{argb:'FFFFFFFF'}};
+
+  function styleBlankRow(row){
+    for (let c=1;c<=7;c++){ row.getCell(c).border = noBorder; row.getCell(c).fill = fillWhite; }
+    row.height = 18;
+  }
+  function styleDayHeader(row){
+    row.getCell(1).font = {bold:false, size:11, color:{argb:'FF000000'}};
+    for (let c=2;c<=7;c++){
+      row.getCell(c).font = {bold:true, color:{argb:'FF000000'}};
+      row.getCell(c).fill = fillHeader;
+      row.getCell(c).alignment = {vertical:'middle', horizontal:'center'};
+      row.getCell(c).border = {top:thin,left:thin,bottom:thin,right:thin};
+    }
+    row.height = 21;
+  }
+  function styleJobRow(row, r){
+    let firstFill = fillWhite;
+    if (r.outTime) firstFill = fillGreen;
+    else if (r.inTime && !r.outTime) firstFill = fillGray;
+    else if (r.budgetFlag || r.budget === '' || r.budget == null) firstFill = fillOrange;
+
+    row.getCell(1).fill = firstFill;
+    row.getCell(1).alignment = {vertical:'middle', wrapText:true};
+
+    for (let c=1;c<=7;c++){
+      row.getCell(c).border = {top:thin,left:thin,bottom:thin,right:thin};
+      row.getCell(c).alignment = row.getCell(c).alignment || {vertical:'middle'};
+      row.getCell(c).font = {name:'Arial', size:10, color:{argb:'FF000000'}};
+    }
+
+    [2,3,4,5,6,7].forEach(c => row.getCell(c).alignment = {vertical:'middle', horizontal:'center'});
+    row.getCell(3).numFmt = 'h:mm AM/PM';
+    row.getCell(4).numFmt = 'h:mm AM/PM';
+    row.getCell(5).numFmt = '0.0';
+    row.getCell(6).numFmt = '0.0';
+    row.getCell(7).numFmt = 'h:mm AM/PM';
+    row.getCell(5).font = {name:'Arial', size:10, bold:true, color:{argb:'FF000000'}};
+    row.getCell(5).border = {top:black,left:black,bottom:black,right:black};
+    row.getCell(6).fill = (r.budgetFlag || r.budget === '' || r.budget == null) ? fillOrange : fillYellow;
+    row.height = 22;
+  }
+
+  let rowNum = 1;
+  let needSpacer = false;
+
+  parsed.forEach(r => {
+    if (r.kind === 'crew') {
+      if (needSpacer) styleBlankRow(ws.getRow(rowNum++));
+      const row = ws.getRow(rowNum++);
+      row.getCell(1).value = r.crew;
+      row.getCell(1).font = {name:'Arial', size:12, color:{argb:'FF000000'}};
+      for (let c=1;c<=7;c++) row.getCell(c).border = noBorder;
+      row.height = 22;
+      needSpacer = true;
+    } else if (r.kind === 'day') {
+      const row = ws.getRow(rowNum++);
+      row.getCell(1).value = r.day;
+      row.getCell(2).value = 'People';
+      row.getCell(3).value = 'In';
+      row.getCell(4).value = 'Out';
+      row.getCell(5).value = 'Actual Man Hours';
+      row.getCell(6).value = 'Budget';
+      row.getCell(7).value = 'Est. Complete';
+      styleDayHeader(row);
+    } else if (r.kind === 'sub') {
+      const row = ws.getRow(rowNum++);
+      row.getCell(1).value = r.raw;
+      row.getCell(1).font = {name:'Arial', size:11, color:{argb:'FF000000'}};
+      for (let c=1;c<=7;c++) row.getCell(c).border = noBorder;
+      row.height = 20;
+    } else if (r.kind === 'job') {
+      const row = ws.getRow(rowNum++);
+      const er = row.number;
+
+      row.getCell(1).value = jobDisplay(r);
+      row.getCell(2).value = Number(r.people || 1);
+      const inv = excelTimeNumber(r.inTime), outv = excelTimeNumber(r.outTime);
+      row.getCell(3).value = inv == null ? '' : inv;
+      row.getCell(4).value = outv == null ? '' : outv;
+      row.getCell(5).value = {formula:`IF(OR(C${er}="",D${er}="",B${er}=""),"",ROUND((D${er}-C${er})*24*B${er},1))`};
+      row.getCell(6).value = r.budget === '' ? '' : Number(r.budget);
+      row.getCell(7).value = {formula:`IF(OR(C${er}="",F${er}="",B${er}=""),"",C${er}+F${er}/B${er}/24)`};
+      styleJobRow(row, r);
+    }
+  });
+
+  styleBlankRow(ws.getRow(rowNum++));
+  const totalRow = ws.getRow(rowNum);
+  totalRow.getCell(1).value = 'Totals';
+  totalRow.getCell(1).font = {name:'Arial', size:10, bold:true, color:{argb:'FF000000'}};
+  totalRow.getCell(5).value = {formula:`SUM(E1:E${rowNum-1})`};
+  totalRow.getCell(6).value = {formula:`SUM(F1:F${rowNum-1})`};
+  totalRow.getCell(5).numFmt = '0.0';
+  totalRow.getCell(6).numFmt = '0.0';
+  for (let c=1;c<=7;c++){
+    const cell = totalRow.getCell(c);
+    cell.border = {top:thin,left:thin,bottom:thin,right:thin};
+    cell.fill = fillHeader;
+    cell.alignment = {vertical:'middle', horizontal:c>=2?'center':'left'};
+  }
+
+  const buffer = await wb.xlsx.writeBuffer();
+  const name = clean(document.getElementById('fileName').value) || 'VIP Schedule Export';
+  saveAs(new Blob([buffer], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), `${name}.xlsx`);
+  setStatus('Excel file exported.');
+}
+
 parseAndRender();
 </script>
 </body>
