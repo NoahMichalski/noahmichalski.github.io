@@ -182,7 +182,7 @@
         <h1>Next-Day Job Comparator</h1>
         <p class="subtitle">Compare morning and afternoon schedule exports to catch jobs added, removed, moved, or otherwise changed during the day.</p>
       </div>
-      <div class="version">Version 2.0 · Pulte + DR Horton</div>
+      <div class="version">Version 2.1 · Supervisor Movement Tally</div>
     </header>
 
     <section class="panel">
@@ -275,6 +275,31 @@
       </section>
     </section>
   </main>
+
+  <section class="panel super-panel" id="superTallyPanel">
+    <div class="section-header" data-target="superTallyBody">
+      <div>
+        <h2>Supervisor Movement Tally</h2>
+        <small>Saved only in this browser using localStorage</small>
+      </div>
+      <span class="badge neutral" id="superCountBadge">0 supers</span>
+    </div>
+    <div class="section-body" id="superTallyBody">
+      <div class="toolbar">
+        <div class="super-actions">
+          <button class="secondary" id="exportTallyBtn" type="button">Export Tally CSV</button>
+          <button class="danger" id="clearTallyBtn" type="button">Clear Tally</button>
+          <span class="saved-tag" id="tallySaveStatus">No comparison recorded yet</span>
+        </div>
+      </div>
+      <div id="superTallyTable"></div>
+      <div class="super-note">
+        “Jobs moved” counts jobs removed from the selected next-day schedule or changed to a different scheduled date.
+        “Days with moves” counts each schedule date only once per superintendent, even when they moved several jobs that day.
+      </div>
+    </div>
+  </section>
+
   <div class="toast" id="toast"></div>
 
 
@@ -291,6 +316,171 @@
     comparison: null,
     availableDates: []
   };
+
+  const TALLY_KEY = 'nextDayJobComparator.supervisorMoveTally.v1';
+  const RECORDED_KEY = 'nextDayJobComparator.recordedComparisons.v1';
+
+  function loadJson(key, fallback) {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(key));
+      return parsed && typeof parsed === 'object' ? parsed : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function saveJson(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function normalizedSupervisor(job) {
+    const value = cleanExcelText(job.fieldManager || '');
+    return value || 'Unassigned / Unknown';
+  }
+
+  function scheduleDateKey() {
+    if (state.mode === 'drhorton') return selectedDate() || 'unknown-date';
+    const raw = state.morning?.reportDate || state.afternoon?.reportDate || '';
+    return isoDate(raw) || cleanExcelText(raw) || new Date().toISOString().slice(0, 10);
+  }
+
+  function movedJobsForTally() {
+    if (!state.comparison) return [];
+    const moved = [...state.comparison.removed];
+
+    for (const item of state.comparison.changed) {
+      const dateChange = item.changes.some(change =>
+        change.field === 'Start Date' || change.field === 'Scheduled Start'
+      );
+      if (dateChange) moved.push(item.before);
+    }
+    return moved;
+  }
+
+  function comparisonFingerprint() {
+    const moved = movedJobsForTally()
+      .map(job => [normalize(job.jobNumber), normalize(job.description), normalizedSupervisor(job)].join('|'))
+      .sort()
+      .join('~');
+    return [state.mode, scheduleDateKey(), moved].join('::');
+  }
+
+  function recordSupervisorTally() {
+    const moved = movedJobsForTally();
+    if (!moved.length) {
+      $('tallySaveStatus').textContent = 'No moved jobs to record';
+      renderSupervisorTally();
+      return;
+    }
+
+    const recorded = loadJson(RECORDED_KEY, {});
+    const fingerprint = comparisonFingerprint();
+    if (recorded[fingerprint]) {
+      $('tallySaveStatus').textContent = 'Already recorded';
+      renderSupervisorTally();
+      return;
+    }
+
+    const tally = loadJson(TALLY_KEY, {});
+    const dateKey = scheduleDateKey();
+    const counts = {};
+
+    moved.forEach(job => {
+      const supervisor = normalizedSupervisor(job);
+      counts[supervisor] = (counts[supervisor] || 0) + 1;
+    });
+
+    Object.entries(counts).forEach(([supervisor, count]) => {
+      const current = tally[supervisor] || { totalJobsMoved: 0, moveDates: {}, lastMoveDate: '' };
+      current.totalJobsMoved += count;
+      current.moveDates[dateKey] = (current.moveDates[dateKey] || 0) + count;
+      current.lastMoveDate = dateKey;
+      tally[supervisor] = current;
+    });
+
+    recorded[fingerprint] = {
+      date: dateKey,
+      mode: state.mode,
+      movedJobs: moved.length,
+      savedAt: new Date().toISOString()
+    };
+
+    saveJson(TALLY_KEY, tally);
+    saveJson(RECORDED_KEY, recorded);
+    $('tallySaveStatus').textContent = `Recorded ${moved.length} moved job${moved.length === 1 ? '' : 's'}`;
+    renderSupervisorTally();
+  }
+
+  function tallyRows() {
+    const tally = loadJson(TALLY_KEY, {});
+    return Object.entries(tally).map(([name, data]) => {
+      const days = Object.keys(data.moveDates || {}).length;
+      const total = Number(data.totalJobsMoved || 0);
+      return {
+        name,
+        total,
+        days,
+        average: days ? total / days : 0,
+        lastMoveDate: data.lastMoveDate || ''
+      };
+    }).sort((a, b) => b.total - a.total || b.days - a.days || a.name.localeCompare(b.name));
+  }
+
+  function renderSupervisorTally() {
+    const rows = tallyRows();
+    $('superCountBadge').textContent = `${rows.length} super${rows.length === 1 ? '' : 's'}`;
+
+    if (!rows.length) {
+      $('superTallyTable').innerHTML = '<div class="empty">No supervisor movement history has been recorded yet.</div>';
+      return;
+    }
+
+    $('superTallyTable').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr>
+        <th>Rank</th><th>Superintendent</th><th>Total Jobs Moved</th>
+        <th>Days With Moves</th><th>Jobs per Move Day</th><th>Most Recent Date</th>
+      </tr></thead>
+      <tbody>${rows.map((row, index) => `<tr>
+        <td class="rank">#${index + 1}</td>
+        <td class="super-name">${escapeHtml(row.name)}</td>
+        <td class="danger-count">${row.total}</td>
+        <td class="day-count">${row.days}</td>
+        <td class="rate-count">${row.average.toFixed(1)}</td>
+        <td>${escapeHtml(prettyDate(row.lastMoveDate) || row.lastMoveDate || '—')}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  }
+
+  function clearSupervisorTally() {
+    const okay = confirm('Clear all saved supervisor movement history from this browser?');
+    if (!okay) return;
+    localStorage.removeItem(TALLY_KEY);
+    localStorage.removeItem(RECORDED_KEY);
+    $('tallySaveStatus').textContent = 'Tally cleared';
+    renderSupervisorTally();
+    showToast('Supervisor tally cleared.');
+  }
+
+  function exportSupervisorTally() {
+    const rows = tallyRows();
+    if (!rows.length) {
+      showToast('No supervisor tally to export.');
+      return;
+    }
+    const output = [
+      ['Rank','Superintendent','Total Jobs Moved','Days With Moves','Jobs per Move Day','Most Recent Date'],
+      ...rows.map((row, index) => [
+        index + 1, row.name, row.total, row.days, row.average.toFixed(2), row.lastMoveDate
+      ])
+    ];
+    const csv = '\uFEFF' + output.map(row => row.map(csvEscape).join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Supervisor_Movement_Tally_${new Date().toISOString().slice(0,10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
 
   const $ = id => document.getElementById(id);
 
@@ -716,6 +906,7 @@
       state.afternoon = afternoon;
       state.comparison = compareSchedules(morning, afternoon);
       setCounts();
+      recordSupervisorTally();
       reportDateText();
       renderResults();
       $('results').classList.add('show');
@@ -836,6 +1027,9 @@
   $('categoryFilter').addEventListener('change', renderResults);
   $('copyBtn').addEventListener('click', copySummary);
   $('csvBtn').addEventListener('click', exportCsv);
+  $('exportTallyBtn').addEventListener('click', exportSupervisorTally);
+  $('clearTallyBtn').addEventListener('click', clearSupervisorTally);
+  renderSupervisorTally();
   document.querySelectorAll('.section-header').forEach(header => header.addEventListener('click', () => {
     $(header.dataset.target).classList.toggle('collapsed');
   }));
