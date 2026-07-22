@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>VIP Import Tool v17</title>
+  <title>VIP Import Tool v29</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
@@ -161,7 +161,7 @@
       color:#6ee07c;
     }
 
-    .columns { display:flex; gap:20px; }
+    .columns { display:grid; grid-template-columns: 1.1fr .9fr 1.1fr .9fr; gap:14px; }
 
     .column {
       flex:1;
@@ -213,6 +213,27 @@
       padding:5px 0;
       border-bottom:1px solid #202532;
       line-height:1.3;
+    }
+
+    .raw-job {
+      padding:5px 0;
+      border-bottom:1px solid #202532;
+      line-height:1.25;
+      color:#96a0b3;
+      font-family:Consolas, Monaco, monospace;
+      font-size:12px;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .raw-job small {
+      color:#697386;
+      display:block;
+      font-family:Arial, Helvetica, sans-serif;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      margin-bottom:2px;
     }
 
     .original { color:var(--green); }
@@ -332,9 +353,9 @@
       margin-top:8px;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1100px) {
       .grid { grid-template-columns:1fr; }
-      .columns { flex-direction:column; gap:12px; }
+      .columns { grid-template-columns:1fr; gap:12px; }
     }
   </style>
 </head>
@@ -343,7 +364,7 @@
 
 <div class="topbar">
   <div>
-    <h2>VIP Import Tool <span class="pill">v27 Epcon reclean fix</span></h2>
+    <h2>VIP Import Tool <span class="pill">v29 split raw columns</span></h2>
     <p>Upload builder Excel files or paste copied vendor-site table text. Use the checkboxes to choose which imports are visible in the output.</p>
     <button class="gear-btn inline-gear" onclick="openSettings()" title="Short name settings">⚙️ Short Names / Subdivision Fixes</button>
   </div>
@@ -418,7 +439,7 @@
     <div class="settings-help">
       Format: <code>Builder Name = Short Name</code><br>
       Example: <code>Piatt P West = Piatts</code><br>
-      Matching is case-insensitive and works when the source text contains the left side. These are saved in this browser.
+      Matching is case-insensitive. Short codes like <code>CO</code> only match as whole tokens, so they will not change words like Scotts. Subdivision fixes ignore values named "ignore" so you do not accidentally create entries like "300 ignore"; use Job / Task Fixes to ignore tasks.
     </div>
 
     <label class="row" style="gap:8px; margin-top:10px; align-items:center;">
@@ -616,6 +637,25 @@ function parseShortcutRules(text) {
     .filter(rule => rule.from && rule.to);
 }
 
+function isIgnoredShortcutValue(value) {
+  return ["ignore", "skip", "hide", "none", "null"].includes((value || "").toString().trim().toLowerCase());
+}
+
+function shortcutMatchesText(source, from) {
+  const src = (source || "").toString().toLowerCase();
+  const needle = (from || "").toString().trim().toLowerCase();
+  if (!needle) return false;
+
+  // Short code fixes like CO = Concord must match whole tokens only.
+  // This prevents CO from matching sCOtts.
+  if (/^[a-z0-9]{1,3}$/.test(needle)) {
+    const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp(`(^|[^a-z0-9])${escaped}($|[^a-z0-9])`, "i").test(source || "");
+  }
+
+  return src.includes(needle);
+}
+
 function applyShortcutName(value) {
   const original = (value || "").toString().trim();
   if (!original) return "";
@@ -626,16 +666,16 @@ function applyShortcutName(value) {
 
   // First try the exact full displayed text. This fixes rules like:
   // London Landing at Brooksedge *Arbor = London Landing *Arbor
-  const originalLower = original.toLowerCase();
   for (const rule of shortcutRules) {
-    if (originalLower.includes(rule.from.toLowerCase())) return rule.to;
+    if (isIgnoredShortcutValue(rule.to)) continue; // use Job Fixes to ignore tasks, not subdivision fixes
+    if (shortcutMatchesText(original, rule.from)) return rule.to;
   }
 
   // Then try just the base subdivision, preserving Fischer/Arbor suffix when the result has no builder suffix.
-  const baseLower = base.toLowerCase();
   for (const rule of shortcutRules) {
-    const fromClean = rule.from.replace(/\s\*(Fischer|Arbor)\s*$/i, "").trim().toLowerCase();
-    if (fromClean && baseLower.includes(fromClean)) {
+    if (isIgnoredShortcutValue(rule.to)) continue;
+    const fromClean = rule.from.replace(/\s\*(Fischer|Arbor)\s*$/i, "").trim();
+    if (fromClean && shortcutMatchesText(base, fromClean)) {
       return rule.to.includes("*") ? rule.to : rule.to + suffix;
     }
   }
@@ -847,11 +887,12 @@ function dateLabel(date) {
 
 // ===== TASK CLASSIFIER =====
 function classifyTask(task) {
-  let t = (task || "").toLowerCase().trim();
+  const originalTaskText = taskText(task);
+  let t = originalTaskText.toLowerCase().trim();
 
   if (!t) return null;
 
-  const customTask = applyJobShortcutName(task);
+  const customTask = applyJobShortcutName(originalTaskText);
   if (customTask) {
     return normalizeJobShortcutResult(customTask);
   }
@@ -874,6 +915,7 @@ function classifyTask(task) {
   // Epcon
   if (t.includes("qm clean")) return "original";
   if (t.includes("rough clean")) return "car";
+  if (t.includes("nho clean")) return "reclean";
 
   // Existing builders / general
   if (t.includes("full clean") || t.includes("pre-drywall clean")) return "original";
@@ -1090,7 +1132,22 @@ function makeGroupedJobs() {
   return {};
 }
 
-function addTaskToMap(map, lot, subdivision, date, task) {
+function taskText(taskObj) {
+  if (taskObj && typeof taskObj === "object") return (taskObj.task || taskObj.display || taskObj.rawTask || "").toString();
+  return (taskObj || "").toString();
+}
+
+function taskRawText(taskObj) {
+  if (taskObj && typeof taskObj === "object") return (taskObj.raw || taskObj.rawRow || taskObj.rawTask || taskObj.task || "").toString();
+  return (taskObj || "").toString();
+}
+
+function formatRawData(raw) {
+  if (Array.isArray(raw)) return raw.map(x => x === null || x === undefined ? "" : x).join(" | ");
+  return (raw || "").toString();
+}
+
+function addTaskToMap(map, lot, subdivision, date, task, rawData = null) {
   if (!lot || !subdivision || !date || isNaN(date.getTime())) return;
   const key = `${dateKey(date)}_${lot}_${subdivision}`;
   if (!map[key]) {
@@ -1103,7 +1160,11 @@ function addTaskToMap(map, lot, subdivision, date, task) {
       tasks: []
     };
   }
-  map[key].tasks.push(task || "");
+  map[key].tasks.push({
+    task: task || "",
+    rawTask: task || "",
+    raw: rawData === null || rawData === undefined ? (task || "") : formatRawData(rawData)
+  });
 }
 
 function mapToArray(map) {
@@ -1130,7 +1191,7 @@ function processPulte(rows) {
     if (isNaN(lot)) return;
 
     let date = parsePulteDate(dateRaw);
-    addTaskToMap(jobs, lot, cleanSubdivision(community), date, task);
+    addTaskToMap(jobs, lot, cleanSubdivision(community), date, task, row);
   });
 
   return mapToArray(jobs);
@@ -1168,7 +1229,7 @@ function processDRHorton(rows) {
     if (lot > 100000) return;
 
     let date = parseWorkbookDate(dateRaw);
-    addTaskToMap(jobs, lot, cleanSubdivision(project), date, task);
+    addTaskToMap(jobs, lot, cleanSubdivision(project), date, task, row);
   });
 
   return mapToArray(jobs);
@@ -1209,7 +1270,7 @@ function processRyan(rows) {
     let lot = parseInt(lotRaw, 10);
     let date = parseWorkbookDate(dateRaw);
 
-    addTaskToMap(jobs, lot, cleanSubdivision(subdivision), date, taskRaw);
+    addTaskToMap(jobs, lot, cleanSubdivision(subdivision), date, taskRaw, row);
   });
 
   return mapToArray(jobs);
@@ -1231,7 +1292,7 @@ function processDrees(rows) {
 
     let lot = parseInt(lotMatch[1], 10);
     let date = parseWorkbookDate(dateRaw);
-    addTaskToMap(jobs, lot, cleanSubdivision(subdivisionRaw), date, taskRaw);
+    addTaskToMap(jobs, lot, cleanSubdivision(subdivisionRaw), date, taskRaw, row);
   });
 
   return mapToArray(jobs);
@@ -1376,7 +1437,7 @@ function processFischerPaste(text) {
 
     const date = findStartDateAfter(f, activityIndex);
     if (!community || isNaN(lot) || !activity || !date) return;
-    addTaskToMap(jobs, lot, cleanFischerCommunity(community), date, activity);
+    addTaskToMap(jobs, lot, cleanFischerCommunity(community), date, activity, record);
   });
 
   return mapToArray(jobs);
@@ -1426,7 +1487,7 @@ function processArborPaste(text) {
     const date = pickStartDateFromFields(f, offset + 14);
 
     if (!community || isNaN(lot) || !activity || !date) return;
-    addTaskToMap(jobs, lot, cleanArborCommunity(community), date, activity);
+    addTaskToMap(jobs, lot, cleanArborCommunity(community), date, activity, record);
   });
 
   return mapToArray(jobs);
@@ -1441,6 +1502,29 @@ function cleanEpconCommunity(codeOrName) {
 }
 
 
+
+function getEpconLotFromBlock(text, houseLine) {
+  // Epcon uses Block/Lot when present. In "Block/Lot: 2/36", the lot is 36.
+  const blockLotMatch = (text || "").match(/Block\s*\/\s*Lot:\s*\d+\s*\/\s*(\d+)/i);
+  if (blockLotMatch) {
+    const blockLot = parseInt(blockLotMatch[1], 10);
+    if (!isNaN(blockLot)) return blockLot;
+  }
+
+  // If Block/Lot is missing, pull lot from the House job code.
+  // Example: House: 123 CO 10540000 => lot 54. House number 123 is NOT the lot.
+  const parts = (houseLine || "").trim().split(/\s+/);
+  const jobCode = (parts[2] || "").replace(/\D/g, "");
+  if (jobCode.length >= 4) {
+    const fromJobCode = parseInt(jobCode.slice(2, 4), 10);
+    if (!isNaN(fromJobCode)) return fromJobCode;
+  }
+
+  // Last-resort fallback for odd older exports only.
+  const fallback = parseInt(parts[0], 10);
+  return isNaN(fallback) ? null : fallback;
+}
+
 function parseEpconScheduleBlock(block) {
   const text = (block || "").toString();
   const houseMatch = text.match(/House:\s*([^\r\n]+)/i);
@@ -1448,13 +1532,14 @@ function parseEpconScheduleBlock(block) {
   const startMatch = text.match(/Start:\s*([^\r\n]+)/i);
   if (!houseMatch || !taskMatch || !startMatch) return null;
 
-  const houseParts = houseMatch[1].trim().split(/\s+/);
-  const lot = parseInt(houseParts[0], 10);
+  const houseLine = houseMatch[1].trim();
+  const houseParts = houseLine.split(/\s+/);
+  const lot = getEpconLotFromBlock(text, houseLine);
   const code = houseParts[1] || "";
   const task = taskMatch[1].trim();
   const date = parseFlexibleDate(startMatch[1].trim());
 
-  if (isNaN(lot) || !code || !task || !date) return null;
+  if (lot === null || isNaN(lot) || !code || !task || !date) return null;
   return { lot, subdivision: cleanEpconCommunity(code), date, task };
 }
 
@@ -1488,43 +1573,29 @@ function processEpconRows(rows) {
 
   blocks.forEach(block => {
     const rec = parseEpconScheduleBlock(block);
-    if (rec) addTaskToMap(jobs, rec.lot, rec.subdivision, rec.date, rec.task);
+    if (rec) addTaskToMap(jobs, rec.lot, rec.subdivision, rec.date, rec.task, block);
   });
 
   return mapToArray(jobs);
 }
+
 
 function processEpconPaste(text) {
   let jobs = makeGroupedJobs();
   const blocks = (text || "").split(/\[one\s+Day\s+Schedule\]/i).map(b => b.trim()).filter(Boolean);
 
   blocks.forEach(block => {
-    const houseMatch = block.match(/House:\s*([^\r\n]+)/i);
-    const taskMatch = block.match(/Task:\s*([^\r\n]+)/i);
-    const startMatch = block.match(/Start:\s*([^\r\n]+)/i);
-    if (!houseMatch || !taskMatch || !startMatch) return;
-
-    const houseParts = houseMatch[1].trim().split(/\s+/);
-    const lot = parseInt(houseParts[0], 10);
-    const code = houseParts[1] || "";
-    const task = taskMatch[1].trim();
-    const date = parseFlexibleDate(startMatch[1].trim());
-
-    if (isNaN(lot) || !code || !task || !date) return;
-    addTaskToMap(jobs, lot, cleanEpconCommunity(code), date, task);
+    const rec = parseEpconScheduleBlock(block);
+    if (rec) addTaskToMap(jobs, rec.lot, rec.subdivision, rec.date, rec.task, block);
   });
 
   // Fallback: handle text copied without the [one Day Schedule] separators.
   if (!Object.keys(jobs).length) {
     const matches = [...(text || "").matchAll(/House:\s*([^\r\n]+)[\s\S]*?Task:\s*([^\r\n]+)[\s\S]*?Start:\s*([^\r\n]+)/gi)];
     matches.forEach(m => {
-      const houseParts = m[1].trim().split(/\s+/);
-      const lot = parseInt(houseParts[0], 10);
-      const code = houseParts[1] || "";
-      const task = m[2].trim();
-      const date = parseFlexibleDate(m[3].trim());
-      if (isNaN(lot) || !code || !task || !date) return;
-      addTaskToMap(jobs, lot, cleanEpconCommunity(code), date, task);
+      const chunk = `House: ${m[1]}\nTask: ${m[2]}\nStart: ${m[3]}`;
+      const rec = parseEpconScheduleBlock(chunk);
+      if (rec) addTaskToMap(jobs, rec.lot, rec.subdivision, rec.date, rec.task, chunk);
     });
   }
 
@@ -1828,20 +1899,25 @@ function renderOutput() {
 
       job.tasks.forEach(rawTask => {
         let type = classifyTask(rawTask);
+        const rawDisplay = taskRawText(rawTask);
 
-        if (type === "original") hasOriginal = true;
-        else if (type === "reclean") hasReclean = true;
+        if (type === "original") {
+          hasOriginal = true;
+          cleaning.push({...job, type:"original", rawDisplay, taskName:taskText(rawTask)});
+        }
+        else if (type === "reclean") {
+          hasReclean = true;
+          cleaning.push({...job, type:"reclean", rawDisplay, taskName:taskText(rawTask)});
+        }
         else if (type) labor.push({
           lot: job.lot,
           subdivision: job.subdivision,
           type,
-          raw: rawTask,
+          raw: rawDisplay,
+          rawTask: taskText(rawTask),
           sourceName: job.sourceName
         });
       });
-
-      if (hasOriginal) cleaning.push({...job, type:"original"});
-      if (hasReclean) cleaning.push({...job, type:"reclean"});
     });
 
     cleaning.sort((a,b) => {
@@ -1867,14 +1943,26 @@ function renderOutput() {
             `).join("") : '<div class="muted">No cleaning jobs</div>'}
           </div>
           <div class="column">
+            <div class="col-title">Cleaning Raw</div>
+            ${cleaning.length ? cleaning.map(job => `
+              <div class="raw-job"><small>${escapeHtml(job.lot)} ${escapeHtml(job.subdivision)}</small>${escapeHtml(job.rawDisplay)}</div>
+            `).join("") : '<div class="muted">No cleaning raw data</div>'}
+          </div>
+          <div class="column">
             <div class="col-title">Labor / Other</div>
             ${labor.length ? labor.map(job => {
               const typeClass = job.type === "unknown" ? "unknown" : "labor";
               const text = job.type === "unknown"
-                ? `${job.lot} ${job.subdivision}-${job.raw}`
+                ? `${job.lot} ${job.subdivision}-${job.rawTask || job.raw}`
                 : `${job.lot} ${job.subdivision}-${job.type}`;
               return `<div class="job ${typeClass}">${escapeHtml(text)} <button class="delete-btn" aria-label="Remove item" title="Remove item" onclick="this.parentElement.remove()"></button></div>`;
             }).join("") : '<div class="muted">No labor items</div>'}
+          </div>
+          <div class="column">
+            <div class="col-title">Labor Raw</div>
+            ${labor.length ? labor.map(job => `
+              <div class="raw-job"><small>${escapeHtml(job.lot)} ${escapeHtml(job.subdivision)}-${escapeHtml(job.type)}</small>${escapeHtml(job.raw)}</div>
+            `).join("") : '<div class="muted">No labor raw data</div>'}
           </div>
         </div>
       </div>
