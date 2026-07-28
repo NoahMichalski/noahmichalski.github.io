@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VIP Crew Efficiency & Travel Report v2.3</title>
+<style>
+:root{
+  --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
+  --border:#2a3953;--accent:#4da3ff;--good:#2ecc71;--warn:#f1c40f;--bad:#ff6b6b;
+  --neutral:#7f8da3;--purple:#b08cff;--shadow:0 18px 45px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(180deg,#09101d,#0d1626 40%,#0b1220);color:var(--text)}
+.wrap{max-width:1500px;margin:0 auto;padding:24px}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:18px}
+h1,h2,h3{margin:0}.brand p{margin:6px 0 0;color:var(--muted)}
+.version{color:var(--muted);font-size:13px}
+.panel{background:rgba(18,27,45,.97);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+.input-grid{display:grid;grid-template-columns:minmax(420px,1.15fr) minmax(350px,.85fr);gap:18px}
+textarea{width:100%;min-height:500px;resize:vertical;background:#0b1424;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:14px;font-family:Consolas,monospace;font-size:13px;line-height:1.45;outline:none}
+textarea:focus,input:focus{border-color:var(--accent)}
+.controls{display:grid;grid-template-columns:repeat(2,minmax(130px,1fr));gap:10px}
+label{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:12px}
+input{width:100%;background:#0b1424;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px;outline:none}
+.buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+button{border:0;border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer;background:#24334c;color:var(--text)}
+button.primary{background:var(--accent)}button:hover{filter:brightness(1.08)}
+.cards{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:12px}
+.card{background:var(--panel2);border:1px solid var(--border);border-radius:14px;padding:14px}
+.card .label{font-size:12px;color:var(--muted)}.card .value{font-size:24px;font-weight:800;margin-top:5px}
+.section{margin-top:18px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.muted{color:var(--muted)}.small{font-size:12px}
+.scroll{overflow:auto;border:1px solid var(--border);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;font-size:13px}
+th{position:sticky;top:0;background:#182338;color:#cfe0f8;z-index:1}
+.badge{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
+.good{background:rgba(46,204,113,.16);color:#79e7a7}.warn{background:rgba(241,196,15,.16);color:#ffe27a}
+.bad{background:rgba(255,107,107,.16);color:#ff9f9f}.neutral{background:rgba(127,141,163,.16);color:#c8d0dc}
+.cancel{background:rgba(176,140,255,.16);color:#d4bdff}
+.notice{padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#0d1728;color:var(--muted)}
+.crew-list{display:grid;gap:12px}
+details{border:1px solid var(--border);border-radius:14px;background:#101a2b;overflow:hidden}
+summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-content:space-between;gap:12px}
+.timeline{padding:0 16px 16px}.job{display:grid;grid-template-columns:100px 1fr auto;gap:12px;padding:12px 0;border-top:1px solid var(--border)}
+.job.cancelled{opacity:.88}.job-time{color:#cfe0f8;font-weight:700}.job-title{font-weight:700}.job-meta{color:var(--muted);font-size:12px;margin-top:4px}
+.right{text-align:right}.hidden{display:none!important}
+@media(max-width:1000px){.input-grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.wrap{padding:12px}.cards{grid-template-columns:1fr 1fr}.controls{grid-template-columns:1fr}.job{grid-template-columns:1fr}.right{text-align:left}}
+@media print{
+  body{background:white;color:black}.wrap{max-width:none;padding:0}.input-grid,.buttons,.version{display:none!important}
+  .panel{box-shadow:none;border:0;background:white}.card,details{background:white;color:black;border-color:#ccc}
+  .muted,.job-meta{color:#555}th{background:#eee;color:black}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v2.3</span></h1>
+      <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
+    </div>
+    <div class="version">Version 2.3</div>
+  </div>
+
+  <div class="input-grid">
+    <section class="panel">
+      <h2>Paste report</h2>
+      <p class="muted small">Paste directly from Excel. Cancelled jobs are detected from the In column and excluded from efficiency.</p>
+      <textarea id="pasteBox" placeholder="Paste the full daily report here..."></textarea>
+      <div class="buttons">
+        <button class="primary" id="analyzeBtn">Analyze Report</button>
+        <button id="sampleBtn">Load Example</button>
+        <button id="clearBtn">Clear</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Report settings</h2>
+      <div class="controls" style="margin-top:14px">
+        <label>Same subdivision warning
+          <input id="sameGap" type="number" min="0" value="20">
+        </label>
+        <label>Different subdivision warning
+          <input id="diffGap" type="number" min="0" value="45">
+        </label>
+        <label>Strong efficiency at or above
+          <input id="goodEff" type="number" min="1" value="100">
+        </label>
+        <label>Major over-budget below
+          <input id="badEff" type="number" min="1" value="85">
+        </label>
+        <label>Arrival / parking buffer
+          <input id="travelBuffer" type="number" min="0" value="5">
+        </label>
+        <label>Late tolerance after expected travel
+          <input id="lateTolerance" type="number" min="0" value="10">
+        </label>
+      </div>
+      <div class="notice" style="margin-top:14px">
+        <strong>Efficiency formula:</strong> Budget ÷ Actual man-hours × 100.<br><br>
+        Travel delay uses only the time from the previous job’s clock-out to the next job’s clock-in. Expected time comes from the Subdivisions sheet plus the selected buffer and tolerance.
+      </div>
+      <div class="notice" style="margin-top:12px">
+        <strong>Subdivision locations:</strong>
+        <span id="subdivisionStatus">Loading saved locations…</span>
+        <div class="buttons" style="margin-top:10px">
+          <label style="display:inline-flex">
+            <input id="subdivisionFile" type="file" accept=".xlsx,.xls,.csv" style="display:none">
+            <span style="display:inline-block;background:#24334c;color:var(--text);border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer">Import Subdivisions Sheet</span>
+          </label>
+          <button id="resetSubdivisionsBtn">Restore Included Sheet</button>
+        </div>
+      </div>
+      <div class="buttons">
+        <button id="previewEmailBtn">Preview Outlook Email</button>
+        <button id="copyBtn">Copy Formatted Email</button>
+        <button id="downloadEmlBtn">Download Outlook Email (.eml)</button>
+        <button id="csvBtn">Export Efficiency CSV</button>
+      </div>
+      <div class="buttons" style="margin-top:10px">
+        <button id="previewMileageBtn">Preview Mileage Report</button>
+        <button id="downloadMileageEmlBtn">Download Mileage Outlook Email (.eml)</button>
+        <button id="downloadMileageCsvBtn">Export Mileage CSV</button>
+        <button id="printBtn">Print / Save PDF</button>
+      </div>
+      <div id="emailStatus" class="muted small" style="margin-top:8px"></div>
+    </section>
+  </div>
+
+  <div id="results" class="hidden">
+    <section class="panel section">
+      <div class="cards">
+        <div class="card"><div class="label">Completed Jobs</div><div class="value" id="totalJobs">0</div></div>
+        <div class="card"><div class="label">Cancelled Jobs</div><div class="value" id="cancelledJobs">0</div></div>
+        <div class="card"><div class="label">Actual Hours</div><div class="value" id="actualHours">0</div></div>
+        <div class="card"><div class="label">Budget Hours</div><div class="value" id="budgetHours">0</div></div>
+        <div class="card"><div class="label">Overall Efficiency</div><div class="value" id="overallEff">0%</div></div>
+      </div>
+    </section>
+
+    <section class="panel section">
+      <div class="section-head"><h2>Crew rankings</h2><span class="muted small">Cancelled jobs are shown but excluded from calculations.</span></div>
+      <div class="scroll"><table>
+        <thead><tr><th>Crew</th><th>Completed</th><th>Cancelled</th><th>Actual</th><th>Budget</th><th>Variance</th><th>Efficiency</th><th>Travel Delays</th></tr></thead>
+        <tbody id="crewTable"></tbody>
+      </table></div>
+    </section>
+
+    <section class="panel section">
+      <div class="section-head"><h2 id="travelHeading">Travel Delays — 0 delays</h2><span id="routeStatus" class="muted small"></span></div>
+      <div id="gapFindings" class="notice">No findings.</div>
+    </section>
+
+    <section class="panel section">
+      <div class="section-head"><h2>Cancelled jobs</h2><span id="cancelledCountLabel" class="muted small"></span></div>
+      <div class="scroll"><table>
+        <thead><tr><th>Crew</th><th>Subdivision</th><th>Builder</th><th>City</th><th>Lot / Job</th><th>Address</th></tr></thead>
+        <tbody id="cancelledTable"></tbody>
+      </table></div>
+    </section>
+
+    <section class="panel section">
+      <div class="section-head"><h2>Crew timelines</h2></div>
+      <div id="crewTimelines" class="crew-list"></div>
+    </section>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+let currentReport = null;
+let travelCalculationComplete = false;
+const DEFAULT_SUBDIVISIONS = [{"builder":"VIP","fullName":"Home Office","name":"Home Office","city":"","address":"1110 Claycraft Rd, Gahanna, OH 43230","lat":39.99286,"lon":-82.843525},{"builder":"Bob Webb","fullName":"Woodland Preserve *Bob Webb *New Albany","name":"Woodland Preserve","city":"New Albany","address":"1961 Reserve Way, New Albany, OH 43054","lat":40.048137,"lon":-82.810941},{"builder":"Pulte","fullName":"Abberley Park *Pulte *New Albany","name":"Abberley Park","city":"New Albany","address":"3384 Abberley Drive, New Albany, OH 43054","lat":40.052873,"lon":-82.816503},{"builder":"Bob Webb","fullName":"Woodhaven *Bob Webb *New Albany","name":"Woodhaven","city":"New Albany","address":"7515 Steeplechase Ln, New Albany, OH 43054","lat":40.108526,"lon":-82.793882},{"builder":"Epcon","fullName":"Haines Creek *Epcon *New Albany","name":"Haines Creek","city":"New Albany","address":"8306 Central College Rd, New Albany, OH 43054","lat":40.096351,"lon":-82.767662},{"builder":"Pulte","fullName":"Nottingham Trace *Pulte *New Albany","name":"Nottingham Trace","city":"New Albany","address":"7715 Nottingham Blvd, New Albany, OH 43054","lat":40.109604,"lon":-82.812551},{"builder":"Pulte","fullName":"Towns on the Greenway *Pulte *Westerville","name":"Towns on the Greenway","city":"Westerville","address":"337 Hockberry Ave, Westerville, OH 43081","lat":40.134287,"lon":-82.942262},{"builder":"Bob Webb","fullName":"Nook At Highland Lakes *Bob Webb *Westerville","name":"Nook At Highland Lakes","city":"Westerville","address":"6089 Victory Gate, Westerville, OH 43082","lat":40.181095,"lon":-82.928911},{"builder":"MI Homes","fullName":"Miller Farm *MI *Galena","name":"Miller Farm","city":"Galena","address":"2799 Sunbury Rd, Galena, OH 43021","lat":40.212932,"lon":-82.871836},{"builder":"Pulte","fullName":"Price Ponds *Pulte *Sunbury","name":"Price Ponds","city":"Sunbury","address":"1026 Ping Lane, Sunbury, OH 43074","lat":40.244527,"lon":-82.885731},{"builder":"Pulte","fullName":"Magnolia Park *Pulte *Sunbury","name":"Magnolia Park","city":"Sunbury","address":"582 Weatherby Drive Sunbury , OH 43074","lat":40.245373,"lon":-82.883716},{"builder":"DR Horton","fullName":"Kintner Crossing *DR *Sunbury","name":"Kintner Crossing","city":"Sunbury","address":"814 South Kintner Parkway","lat":40.253075,"lon":-82.878609},{"builder":"Del Webb","fullName":"Northstar *Del Webb *Sunbury","name":"Northstar","city":"Sunbury","address":"2492 Firethorn Drive Sunbury, Oh 43074","lat":40.281729,"lon":-82.896846},{"builder":"Pulte","fullName":"Honey Grove at Northstar *Pulte *Sunbury","name":"Honey Grove at Northstar","city":"Sunbury","address":"1652 Stella Place Sunbury, Oh 43074","lat":40.280618,"lon":-82.901596},{"builder":"3 Pillar","fullName":"Summerwood *3 Pillar *Galena","name":"Summerwood","city":"Galena","address":"2806 Summer Crest Drive Galena, OH 43021","lat":40.228167,"lon":-82.94685},{"builder":"Pulte","fullName":"Eagle *Pulte *Galena","name":"Eagle","city":"Galena","address":"7002 Crown Drive, Galena, OH 43021","lat":40.249897,"lon":-82.938333},{"builder":"MI Homes","fullName":"Berlin Farm *MI *Delaware","name":"Berlin Farm","city":"Delaware","address":"2651 Cleo St, Delaware, OH 43015","lat":40.240546,"lon":-83.004182},{"builder":"DR Horton","fullName":"Piatt Preserve *DR *Delaware","name":"Piatt Preserve","city":"Delaware","address":"2780 Aldengate Ln, Delaware, OH 43015","lat":40.245506,"lon":-83.00753},{"builder":"Pulte","fullName":"Berlin Bluffs *Pulte *Delaware","name":"Berlin Bluffs","city":"Delaware","address":"2651 Cleo St, Delaware, OH 43015","lat":40.24485,"lon":-82.997809},{"builder":"Pulte","fullName":"Arrowhead at Evans Farms *Pulte *Lewis Center","name":"Arrowhead at Evans Farms","city":"Lewis Center","address":"4613 Mcnamara Place Lewis Center, Oh 43035","lat":40.219469,"lon":-83.00693},{"builder":"Bob Webb","fullName":"Evans Farm *Bob Webb *Lewis Center","name":"Evans Farm","city":"Lewis Center","address":"5129 Maple Dr, Lewis Center, OH 43035","lat":40.206054,"lon":-83.003999},{"builder":"Epcon","fullName":"Evans Farm *Epcon *Lewis Center","name":"Evans Farm","city":"Lewis Center","address":"3110 Woodmere Cir, Lewis Center, OH 43035","lat":40.208498,"lon":-82.989714},{"builder":"MI Homes","fullName":"Winterbrooke Place *MI *Lewis Center","name":"Winterbrooke Place","city":"Lewis Center","address":"43 Sienna Glenn Dr, Lewis Center, OH 43035","lat":40.229418,"lon":-83.021288},{"builder":"Pulte","fullName":"Glenross *Pulte *Delaware","name":"Glenross","city":"Delaware","address":"106 E Wind Rd, Delaware, OH 43015","lat":40.236117,"lon":-83.020358},{"builder":"Ryan","fullName":"Glenross *Ryan *Delaware","name":"Glenross","city":"Delaware","address":"191 Sycamore Ln, Delaware, OH 43015","lat":40.248043,"lon":-83.033372},{"builder":"Ryan","fullName":"Terra Alta *Ryan *Delaware","name":"Terra Alta","city":"Delaware","address":"581 Pisa Lp, Delaware, OH 43015","lat":40.268005,"lon":-83.051701},{"builder":"MI Homes","fullName":"Northwood *MI *Delaware","name":"Northwood","city":"Delaware","address":"","lat":40.304717,"lon":-83.027602},{"builder":"DR Horton","fullName":"Park View *DR *Delaware","name":"Park View","city":"Delaware","address":"557 Park Vista Dr, Delaware, OH 43015","lat":40.317987,"lon":-83.09263},{"builder":"Ryan","fullName":"Addison Farms *Ryan *Delaware","name":"Addison Farms","city":"Delaware","address":"50 Allenhurst Way, Delaware, OH 43015","lat":40.322743,"lon":-83.085124},{"builder":"Ryan","fullName":"Rutherford *Ryan *Delaware","name":"Rutherford","city":"Delaware","address":"572 Rutherford Ave, Delaware, OH 43015","lat":40.320409,"lon":-83.088637},{"builder":"Pulte","fullName":"Limestone *Pulte *Delaware","name":"Limestone","city":"Delaware","address":"101 Franks Field Dr, Delaware, OH 43015","lat":40.302692,"lon":-83.122495},{"builder":"DR Horton","fullName":"Springer Woods *DR *Delaware","name":"Springer Woods","city":"Delaware","address":"693 Penwell Dr, Delaware, OH 43015","lat":40.310277,"lon":-83.120107},{"builder":"Pulte","fullName":"Slate *Pulte *Lewis Center","name":"Slate","city":"Lewis Center","address":"1258 Ashlar Lane Lewis Center , OH 43035","lat":40.19303,"lon":-83.013688},{"builder":"MI Homes","fullName":"Hyatts Meadows *MI *Delaware","name":"Hyatts Meadows","city":"Delaware","address":"521 Alicia Kelton Dr, Delaware, OH 43015","lat":40.216753,"lon":-83.044456},{"builder":"Bob Webb","fullName":"Liberty Trails *Bob Webb *Powell","name":"Liberty Trails","city":"Powell","address":"1963 Liberty trails Powell, OH 43065","lat":40.227948,"lon":-83.083279},{"builder":"Manor","fullName":"Liberty Trails *Manor *Powell","name":"Liberty Trails","city":"Powell","address":"2047 Liberty Trails, Powell, OH 43065","lat":40.228225,"lon":-83.081719},{"builder":"Pulte","fullName":"Nelson *Pulte *Delaware","name":"Nelson","city":"Delaware","address":"2538 Nelson Ln, Delaware, OH 43015","lat":40.20845,"lon":-83.084053},{"builder":"Bob Webb","fullName":"Liberty Bluff *Bob Webb *Delaware","name":"Liberty Bluff","city":"Delaware","address":"1608 Liberty Bluff Dr, Delaware, OH 43015","lat":40.209338,"lon":-83.064067},{"builder":"Epcon","fullName":"Courtyards on Hyatts *Epcon *Powell","name":"Courtyards on Hyatts","city":"Powell","address":"3200 Korg St, Powell, OH 43065","lat":40.217012,"lon":-83.099814},{"builder":"Epcon","fullName":"Hyatts Village *Epcon *Powell","name":"Hyatts Village","city":"Powell","address":"3372 Hyatts Rd, Powell, OH 43065","lat":40.217428,"lon":-83.100979},{"builder":"MI Homes","fullName":"Liberty Grand *MI *Powell","name":"Liberty Grand","city":"Powell","address":"3777 Shoal Way, Powell, OH 43065","lat":40.201641,"lon":-83.103957},{"builder":"MI Homes","fullName":"Clarkshaw Crossing *MI *Powell","name":"Clarkshaw Crossing","city":"Powell","address":"5429 Valleydale Rd, Powell, OH 43065","lat":40.226404,"lon":-83.092247},{"builder":"Pulte","fullName":"Clarkshaw *Pulte *Powell","name":"Clarkshaw","city":"Powell","address":"3411 Tender Avenue, Powell, OH 43065","lat":40.223191,"lon":-83.104699},{"builder":"MI Homes","fullName":"Woodcrest Crossing *MI *Powell","name":"Woodcrest Crossing","city":"Powell","address":"6443 Bluejay Rdg Dr, Powell, OH 43065","lat":40.222632,"lon":-83.114473},{"builder":"3 Pillar","fullName":"Scioto Bluffs *3Pillar *Powell","name":"Scioto Bluffs","city":"Powell","address":"6640 Scioto Bluff Court Concord Township, OH 43065","lat":40.214965,"lon":-83.136494},{"builder":"Rockford","fullName":"Jerome Aster *Rockford *Plain City","name":"Jerome Aster","city":"Plain City","address":"6981 Aster Wy, Plain City, OH 43064","lat":40.194037,"lon":-83.172143},{"builder":"Schottenstein","fullName":"Jerome Aster *Schott *Plain City","name":"Jerome Aster","city":"Plain City","address":"6971 Aster Way, Plain City, OH 43064","lat":40.194037,"lon":-83.172143},{"builder":"Rockford","fullName":"Jerome Village Meadowlark *Rockford *Plain City","name":"Jerome Village Meadowlark","city":"Plain City","address":"","lat":40.187765,"lon":-83.208492},{"builder":"Epcon","fullName":"Hyland Meadows *Epcon *Plain City","name":"Hyland Meadows","city":"Plain City","address":"8027 Grassland Dr, Plain City, OH 43064","lat":40.189891,"lon":-83.191183},{"builder":"MI Homes","fullName":"Jerome Village Applewood *MI *Plain City","name":"Jerome Village Applewood","city":"Plain City","address":"10715 Pearl Creek Dr, Plain City, OH 43064","lat":40.169613,"lon":-83.199764},{"builder":"3 Pillar","fullName":"Eversole Woods *3Pillar *Plain City","name":"Eversole Woods","city":"Plain City","address":"11451 Winterberry Drive, Plain City, OH 43064","lat":40.179464,"lon":-83.187045},{"builder":"Bob Webb","fullName":"Eversole Run *Bob Webb *Plain City","name":"Eversole Run","city":"Plain City","address":"11268 Sweetbay Dr, Plain City, OH 43064","lat":40.18068,"lon":-83.191297},{"builder":"3 Pillar","fullName":"Jerome Village *3Pillar *Plain City","name":"Jerome Village","city":"Plain City","address":"11451 Winterberry Dr, Plain City, OH 43064","lat":40.178976,"lon":-83.192238},{"builder":"Manor","fullName":"Jerome Village *Manor *Plain City","name":"Jerome Village","city":"Plain City","address":"7871 Sparrow Run, Plain City, OH 43064","lat":40.179033,"lon":-83.187736},{"builder":"Epcon","fullName":"Concord *Epcon *Dublin","name":"Concord","city":"Dublin","address":"10202 Concord Rd, Dublin, OH 43017","lat":40.156084,"lon":-83.157134},{"builder":"Schottenstein","fullName":"Cottages at Verbena *Schott *Plain City","name":"Cottages at Verbena","city":"Plain City","address":"11738 Verbena Place, Plain City, OH 43064","lat":40.184323,"lon":-83.200862},{"builder":"Epcon","fullName":"White Oaks *Epcon *Plain City","name":"White Oaks","city":"Plain City","address":"8400 Ryan Pkwy, Plain City, OH 43064","lat":40.166178,"lon":-83.192868},{"builder":"Pulte","fullName":"Scotts *Pulte *Plain City","name":"Scotts","city":"Plain City","address":"9556 Burghley Dr, Plain City, OH 43064","lat":40.154941,"lon":-83.214898},{"builder":"Rockford","fullName":"Mitchell Highlands *Rockford *Plain City","name":"Mitchell Highlands","city":"Plain City","address":"9511 Camberly Avenue Plain City, Ohio 43064","lat":40.148096,"lon":-83.22626},{"builder":"Pulte","fullName":"Pioneer *Pulte *Plain City","name":"Pioneer","city":"Plain City","address":"9569 Coach Line Ave, Plain City, OH 43064","lat":40.150438,"lon":-83.237856},{"builder":"MI Homes","fullName":"Hyland Glen *MI *Dublin","name":"Hyland Glen","city":"Dublin","address":"6986 Stillhouse Ln, Dublin, OH 43016","lat":40.114383,"lon":-83.175554},{"builder":"Schottenstein","fullName":"Reserve at New California *Schott *Plain City","name":"Reserve at New California","city":"Plain City","address":"10171 Jeffrey Pine Drive, Plain City, Ohio 43064","lat":40.159868,"lon":-83.243261},{"builder":"Bob Webb","fullName":"Indian Run *Bob Webb *Plain City","name":"Indian Run","city":"Plain City","address":"8974 Whitetail Wy, Plain City, OH 43064","lat":40.143754,"lon":-83.196779},{"builder":"Schottenstein","fullName":"Glacier Pointe *Schott *Plain City","name":"Glacier Pointe","city":"Plain City","address":"8798 Eliot Drive, Plain City, Ohio 43064","lat":40.147019,"lon":-83.20396},{"builder":"MI Homes","fullName":"Glacier Pointe *MI *Plain City","name":"Glacier Pointe","city":"Plain City","address":"8772 Glacier Pointe Dr, Plain City, OH 43064","lat":40.146403,"lon":-83.203878},{"builder":"Del Webb","fullName":"Maygrass *Del Webb *Plain City","name":"Maygrass","city":"Plain City","address":"8969 Bryce Road Plain City, Oh 43064","lat":40.140561,"lon":-83.228528},{"builder":"Rockford","fullName":"HofBauer *Rockford *Plain City","name":"HofBauer","city":"Plain City","address":"2223 Ashby Wy, Plain City, OH 43064","lat":40.11427,"lon":-83.269355},{"builder":"MI Homes","fullName":"Darby Station *MI *Plain City","name":"Darby Station","city":"Plain City","address":"537 Conductor Dr, Plain City, OH 43064","lat":40.107605,"lon":-83.250687},{"builder":"DR Horton","fullName":"Madison Meadows *DR *Plain City","name":"Madison Meadows","city":"Plain City","address":"403 Madison Wy, Plain City, OH 43064","lat":40.103927,"lon":-83.287352},{"builder":"Arbor Homes","fullName":"Maren Reserve *Arbor *Plain City","name":"Maren Reserve","city":"Plain City","address":"1409 Estate Rd, Plain City, OH 43064","lat":40.104058,"lon":-83.291513},{"builder":"Rockford","fullName":"Ayrshire Farms *Rockford *Dublin","name":"Ayrshire Farms","city":"Dublin","address":"6195 Lockroy Dr, Dublin, OH 43016","lat":40.092646,"lon":-83.185798},{"builder":"Rockford","fullName":"Tarlton Meadows *Rockford *Hillard","name":"Tarlton Meadows","city":"Hillard","address":"5292 Tarlton Boulevard Hilliard, Ohio 43026","lat":40.058805,"lon":-83.186599},{"builder":"Epcon","fullName":"Carr *Epcon *Hillard","name":"Carr","city":"Hillard","address":"5755 Arcadian Ave, Hilliard, OH 43026","lat":40.05138,"lon":-83.170284},{"builder":"MI Homes","fullName":"Hill Farm *MI *Hillard","name":"Hill Farm","city":"Hillard","address":"6960 Gelderland Dr, Hilliard, OH 43026","lat":40.037428,"lon":-83.203022},{"builder":"Drees","fullName":"Alton Place *Drees *Hillard","name":"Alton Place","city":"Hillard","address":"2504 Sycamore Trce, Hilliard, OH 43026","lat":40.001406,"lon":-83.190128},{"builder":"Pulte","fullName":"Sugar Farms *Pulte *Hillard","name":"Sugar Farms","city":"Hillard","address":"2040 Limone Drive, Hilliard, OH 43026","lat":39.992456,"lon":-83.174284},{"builder":"Schottenstein","fullName":"Renner Park *Schott *Hillard","name":"Renner Park","city":"Hillard","address":"6186 Renner Park Drive, Columbus, OH 43228","lat":39.982893,"lon":-83.173465},{"builder":"DR Horton","fullName":"Villas At Renner Park *DR *Hillard","name":"Villas At Renner Park","city":"Hillard","address":"1486 Cardinez Way, Columbus, OH 43228","lat":39.980788,"lon":-83.176207},{"builder":"Centex","fullName":"Clover *Centex *Galloway","name":"Clover","city":"Galloway","address":"40 Reneau Ave, Galloway, OH 43119","lat":39.949993,"lon":-83.161864},{"builder":"DR Horton","fullName":"Galloway East *DR *Galloway","name":"Galloway East","city":"Galloway","address":"6264 Farella Way Galloway Oh 43119","lat":39.919044,"lon":-83.163786},{"builder":"DR Horton","fullName":"Chase Landings *DR *Galloway","name":"Chase Landings","city":"Galloway","address":"6351 Ballast Rd, Galloway, OH 43119","lat":39.918362,"lon":-83.163537},{"builder":"DR Horton","fullName":"Villages at Galloway *DR *Galloway","name":"Villages at Galloway","city":"Galloway","address":"1705 Galloway Rd, Galloway, OH 43119","lat":39.918422,"lon":-83.163487},{"builder":"Fischer Homes","fullName":"Chase Landings *Fischer *Galloway","name":"Chase Landings","city":"Galloway","address":"6356 Ballast Rd, Galloway, OH 43119","lat":39.918956,"lon":-83.163964},{"builder":"Pulte","fullName":"Beulah Park *Pulte *Grove City","name":"Beulah Park","city":"Grove City","address":"3655 Glacial Ln, Grove City, OH 43123","lat":39.889952,"lon":-83.104556},{"builder":"3 Pillar","fullName":"Beulah *3Pillar *Grove City","name":"Beulah","city":"Grove City","address":"3708 Beulah Park Drive","lat":39.888989,"lon":-83.098775},{"builder":"Schottenstein","fullName":"Holton *Schott *Grove City","name":"Holton","city":"Grove City","address":"3600 Whirla Way, Grove City, OH","lat":39.8582,"lon":-83.0983},{"builder":"Schottenstein","fullName":"Hickory Creek *Schott *Grove City","name":"Hickory Creek","city":"Grove City","address":"5118 Haley Way, Grove City 43123","lat":39.860654,"lon":-83.101898},{"builder":"MI Homes","fullName":"Browns Farm *MI *Grove City","name":"Browns Farm","city":"Grove City","address":"3215 Farmhouse Ln, Grove City, OH 43123","lat":39.857121,"lon":-83.089867},{"builder":"MI Homes","fullName":"Pinnacle *MI *Grove City","name":"Pinnacle","city":"Grove City","address":"899 Heimat Haus Dr, Grove City, OH 43123","lat":39.866539,"lon":-83.028943},{"builder":"Epcon","fullName":"Mulberry *Epcon *Grove City","name":"Mulberry","city":"Grove City","address":"4416 Marilyn Ct, Grove City, OH 43123","lat":39.871459,"lon":-83.056351},{"builder":"Rockford","fullName":"Meadow Grove *Rockford *Grove City","name":"Meadow Grove","city":"Grove City","address":"1813 Silverlawn Dr, Grove City, OH 43123","lat":39.849346,"lon":-83.052656},{"builder":"Rockford","fullName":"Foxfire *Rockford *Commercial Point","name":"Foxfire","city":"Commercial Point","address":"440 Bethpage Blvd, Commercial Point, OH 43116","lat":39.777874,"lon":-83.029083},{"builder":"MI Homes","fullName":"Foxfire *MI *Commercial Point","name":"Foxfire","city":"Commercial Point","address":"444 Bethpage Blvd, Commercial Point, OH 43116","lat":39.777897,"lon":-83.028864},{"builder":"DR Horton","fullName":"Walnut Mill *DR *Ashville","name":"Walnut Mill","city":"Ashville","address":"5 Walnut Mill Way, Ashville, OH 43103","lat":39.734237,"lon":-82.95359},{"builder":"Centex","fullName":"Bloomfield Hills *Centex *South Bloomfield","name":"Bloomfield Hills","city":"South Bloomfield","address":"5002 Roese Ave, South Bloomfield, OH 43103","lat":39.708129,"lon":-82.988884},{"builder":"Pulte","fullName":"Buckstone Bend *Pulte *Lockbourne","name":"Buckstone Bend","city":"Lockbourne","address":"4918 Ranger Dr, Lockbourne, OH 43137","lat":39.856655,"lon":-82.967935},{"builder":"DR Horton","fullName":"Wagnalls *DR *Lithopolis","name":"Wagnalls","city":"Lithopolis","address":"1390 Hansberry Dr, Lithopolis, OH 43136","lat":39.811287,"lon":-82.813148},{"builder":"Arbor Homes","fullName":"Edgewood Farms *Arbor *Canal","name":"Edgewood Farms","city":"Canal","address":"5586 Washington St, Canal Winchester, OH 43110","lat":39.819593,"lon":-82.819663},{"builder":"DR Horton","fullName":"Orchard Lakes *DR *Canal","name":"Orchard Lakes","city":"Canal","address":"7055 Royalton Ridge Avenue, Canal Winchester, OH 43110","lat":39.866083,"lon":-82.809752},{"builder":"DR Horton","fullName":"Lansdowne *DR *Canal","name":"Lansdowne","city":"Canal","address":"4213 Sycamore Oak Avenue, Canal Winchester, OH 43110","lat":39.89249,"lon":-82.83537},{"builder":"Fischer Homes","fullName":"Glacier Pointe *Fischer *Canal","name":"Glacier Pointe","city":"Canal","address":"6261 Wright Rd, Canal Winchester, OH 43110","lat":39.887655,"lon":-82.820301},{"builder":"Fischer Homes","fullName":"Abbie Trails *Fischer *Canal","name":"Abbie Trails","city":"Canal","address":"3974 Winding Path Drive, Canal Winchester. OH","lat":39.90067,"lon":-82.806095},{"builder":"DR Horton","fullName":"Longview Highlands *DR *Pickerington","name":"Longview Highlands","city":"Pickerington","address":"102 Cedarhurst Ct, Pickerington, OH 43147","lat":39.89768,"lon":-82.789797},{"builder":"American Homes 4 Rent","fullName":"Eastwood *AMH *Reynoldsburg","name":"Eastwood","city":"Reynoldsburg","address":"9045 Lucy Drive, Reynoldsburg, OH","lat":39.961474,"lon":-82.758526},{"builder":"MI Homes","fullName":"Heron Crossing *MI *Pickerington","name":"Heron Crossing","city":"Pickerington","address":"12146 Prairie View Dr NW, Pickerington, OH 43147","lat":39.909728,"lon":-82.716874},{"builder":"Rockford","fullName":"Sycamore Grove *Rockford *Pickerington","name":"Sycamore Grove","city":"Pickerington","address":"12650 Toll Gate Rd, Pickerington, OH 43147","lat":39.91557,"lon":-82.707917},{"builder":"Rockford","fullName":"Hazelton *Rockford *Pataskala","name":"Hazelton","city":"Pataskala","address":"208 Scotsgrove Drive, Pataskala, OH 43062","lat":39.972371,"lon":-82.678359},{"builder":"MI Homes","fullName":"Forest Ridge *MI *Pataskala","name":"Forest Ridge","city":"Pataskala","address":"106 Ruby Rd SW, Pataskala, OH 43062","lat":40.015704,"lon":-82.668855},{"builder":"Rockford","fullName":"Willowbend *Rockford *Newark","name":"Willowbend","city":"Newark","address":"228 Willow Bnd Dr, Newark, OH 43055","lat":40.047837,"lon":-82.485522},{"builder":"DR Horton","fullName":"Overlook *DR *Newark","name":"Overlook","city":"Newark","address":"2100 Overlook Wy, Newark, OH 43055","lat":40.043237,"lon":-82.473669},{"builder":"MI Homes","fullName":"Hebron *MI *Hebron OH","name":"Hebron","city":"Hebron OH","address":"955 W. Main Street, Hebron, Ohio 43025","lat":39.959007,"lon":-82.506108},{"builder":"DR Horton","fullName":"Ludlow Ridge *DR *Bellefontaine","name":"Ludlow Ridge","city":"Bellefontaine","address":"819 Sherwood Loop, Bellefontaine, OH 43311","lat":40.339108,"lon":-83.745493},{"builder":"DR Horton","fullName":"Johnson's Creek *DR *London","name":"Johnson's Creek","city":"London","address":"1128 Stratford Way, London, OH 43140","lat":39.913494,"lon":-83.437509},{"builder":"Arbor Homes","fullName":"London Landing *Arbor *London","name":"London Landing","city":"London","address":"347 Jacob Ln, London, OH 43140","lat":39.900397,"lon":-83.458767},{"builder":"DR Horton","fullName":"Sugar Creek *DR *Jeffersonville","name":"Sugar Creek","city":"Jeffersonville","address":"27 Darbyshire Dr, Jeffersonville, OH 43128","lat":39.658749,"lon":-83.571496},{"builder":"DR Horton","fullName":"Bishop Estates *DR *Washington Courthouse","name":"Bishop Estates","city":"Washington Courthouse","address":"1105 Dayton Ave NW, Washington Court House, OH 43160","lat":39.537536,"lon":-83.455934},{"builder":"DR Horton","fullName":"River Ridge *DR *Circleville","name":"River Ridge","city":"Circleville","address":"1797 Jacko Lane, Circleville, OH 43113","lat":39.63585,"lon":-82.94865},{"builder":"DR Horton","fullName":"Leasure Farms *DR *Zanesville","name":"Leasure Farms","city":"Zanesville","address":"3870 Frazeysburg Rd, Zanesville, OH 43701","lat":39.99765,"lon":-82.035303},{"builder":"DR Horton","fullName":"Liberty Crossing *DR *Mt Vernon","name":"Liberty Crossing","city":"Mt Vernon","address":"8040 Newark Rd, Mt Vernon, OH 43050","lat":40.350467,"lon":-82.473826},{"builder":"Arbor Homes","fullName":"Maris *Arbor *Bellefontaine","name":"Maris","city":"Bellefontaine","address":"301 Kendall St, Bellefontaine, OH 43311","lat":40.354804,"lon":-83.727793},{"builder":"Arbor Homes","fullName":"Trotters Pointe *Arbor *Washington Courthouse","name":"Trotters Pointe","city":"Washington Courthouse","address":"1098 Andrick Dr, Washington Court House, OH 43160","lat":39.518923,"lon":-83.447057},{"builder":"Pulte","fullName":"Towns On The Parkway *Pulte *Dublin","name":"Towns On The Parkway","city":"Dublin","address":"4128 John Shields Pkwy, Dublin, OH 43017","lat":40.106649,"lon":-83.100162},{"builder":"Pulte","fullName":"Amrine *Pulte *Marysville","name":"Amrine","city":"Marysville","address":"334 Amrine Wy, Marysville, OH 43040","lat":40.270238,"lon":-83.371765},{"builder":"Bob Webb","fullName":"Harpers Pointe *Bob Webb *Powell","name":"Harpers Pointe","city":"Powell","address":"188 Chedworth Row, Powell, OH 43065","lat":40.160454,"lon":-83.071413},{"builder":"Ryan","fullName":"Hyatts *Ryan *Delaware","name":"Hyatts","city":"Delaware","address":"250 Alicia Kelton Dr, Delaware, OH 43015","lat":40.215079,"lon":-83.04102},{"builder":"Pulte","fullName":"Hyatts *Pulte *Delaware","name":"Hyatts","city":"Delaware","address":"6176 Bishop Blvd, Powell, OH 43065","lat":40.21481,"lon":-83.098683},{"builder":"Pulte","fullName":"Jefferson Manor *Pulte *Blacklick","name":"Jefferson Manor","city":"Blacklick","address":"8488 Ben Hale Ct, Blacklick, OH 43004","lat":40.036095,"lon":-82.787034},{"builder":"Tuckerman","fullName":"Hoxton *Tuckerman *Upper Arlington","name":"Hoxton","city":"Upper Arlington","address":"2300 Hoxton Ct, Upper Arlington, OH 43220","lat":40.0331,"lon":-83.078144},{"builder":"Tuckerman","fullName":"Eastcleft *Tuckerman *Columbus","name":"Eastcleft","city":"Columbus","address":"2520 Eastcleft, Columbus","lat":40.021396,"lon":-83.080911},{"builder":"Tuckerman","fullName":"Dorchester *Tuckerman *Columbus","name":"Dorchester","city":"Columbus","address":"3001 S Dorchester Rd Columbus, OH 43221","lat":40.018985,"lon":-83.081602},{"builder":"Tuckerman","fullName":"Derby *Tuckerman *Columbus","name":"Derby","city":"Columbus","address":"3051 Derby Rd, Columbus, OH 43221","lat":40.016958,"lon":-83.077961},{"builder":"Schottenstein","fullName":"Wellington Park *Schott *Pickerington","name":"Wellington Park","city":"Pickerington","address":"598 Courtright Dr, Pickerington, OH 43147","lat":39.895545,"lon":-82.751744},{"builder":"MI Homes","fullName":"Spring Hill Farm *MI *Reynoldsburg","name":"Spring Hill Farm","city":"Reynoldsburg","address":"7820 Oldham Dr., Reynoldsburg, OH 43068","lat":39.97291,"lon":-82.792604},{"builder":"DR Horton","fullName":"Monarch Greene *DR *Columbus","name":"Monarch Greene","city":"Columbus","address":"1414 Chrisman Drive, Columbus, OH 43223","lat":39.92751,"lon":-83.03278},{"builder":"DR Horton","fullName":"Maplewood *DR  *Reynoldsburg","name":"Maplewood","city":"Reynoldsburg","address":"1159 Mueller Dr, Reynoldsburg, OH 43068","lat":39.969688,"lon":-82.75482},{"builder":"Pulte","fullName":"Sunbury *Pulte *Sunbury","name":"Sunbury","city":"Sunbury","address":"608 Viola Dr, Sunbury, OH 43074","lat":40.233952,"lon":-82.871799},{"builder":"Tuckerman","fullName":"Jervis *Tuckerman *Columbus","name":"Jervis","city":"Columbus","address":"2165 Jervis Rd, Columbus OH","lat":40.0183829294128,"lon":-83.0705051392651},{"builder":"Compass","fullName":"Dominion Blvd *Compass *Columbus","name":"Dominion Blvd","city":"Columbus","address":"529 E Dominion Blvd, Columbus, OH 43214","lat":40.053238,"lon":-83.006055},{"builder":"Miller Homes","fullName":"Pleasant View Farm *Miller *Plain City","name":"Pleasant View Farm","city":"Plain City","address":"12260 Andrews dr 43064 plain city","lat":40.14511,"lon":-83.330556},{"builder":"Arbor Homes","fullName":"Trotter's Pointe *Arbor *Washington Courthouse","name":"Trotter's Pointe","city":"Washington Courthouse","address":"1098 Andrick Dr, Washington Court House, OH 43160","lat":39.518972,"lon":-83.447206},{"builder":"Arbor Homes","fullName":"Trailside Landing *Arbor *Jeffersonville","name":"Trailside Landing","city":"Jeffersonville","address":"1644 Railside Dr, Jeffersonville, IN 47130","lat":38.289165,"lon":-85.72189},{"builder":"Arbor Homes","fullName":"Old Heritage *Arbor *Shelbyville","name":"Old Heritage","city":"Shelbyville","address":"1005 Stratton Way, Shelbyville, KY 40065","lat":38.200559,"lon":-85.199076},{"builder":"Arbor Homes","fullName":"Day Farm *Arbor *South Bloomfield","name":"Day Farm","city":"South Bloomfield","address":"5026 Farmhouse Rd South Bloomfield, OH","lat":39.719082,"lon":-83.001929},{"builder":"Bob Webb","fullName":"Olive Court *Bob Webb *Sunbury","name":"Olive Court","city":"Sunbury","address":"332 Olive Ct, Sunbury, OH 43074","lat":40.208012,"lon":-82.774539},{"builder":"Monogram Homes","fullName":"Stonehill Drive East *Monogram *Carroll","name":"Stonehill Drive East","city":"Carroll","address":"4041 Stonehill Dr East/Carroll, Oh","lat":39.790146,"lon":-82.723961},{"builder":"Compass","fullName":"Enfield ct *Compass *Dublin","name":"Enfield ct","city":"Dublin","address":"6758 Enfield Ct, Dublin, OH 43017","lat":40.153201,"lon":-83.174983},{"builder":"Andrew Meyer","fullName":"Shanahan Rd *Lewis Center","name":"Shanahan Rd","city":"","address":"737 Shanahan Rd, Lewis Center, OH 43035","lat":40.21379,"lon":-83.02367},{"builder":"Heinlin","fullName":"Bordeaux Ct *Heinlin *Dublin","name":"Bordeaux Ct","city":"Dublin","address":"7040 Bordeaux Ct, Dublin, OH 43016","lat":40.14808,"lon":-83.177797},{"builder":"Sierra","fullName":"Starret Rd *Sierra *Columbus","name":"Starret Rd","city":"Columbus","address":"4586 Starret Rd, Columbus, OH 43214","lat":40.054634,"lon":-83.028545},{"builder":"Drees","fullName":"Millers Cove *Drees *Sunbury","name":"Millers Cove","city":"Sunbury","address":"396 Miller's Cv Ct, Sunbury, OH 43074","lat":40.249397,"lon":-82.865741},{"builder":"Ardent","fullName":"Velencia *Ardent *Dublin","name":"Velencia","city":"Dublin","address":"5814 Avery Crest Dr. W, Dublin, OH 43016","lat":40.071218,"lon":-83.157814},{"builder":"Ardent","fullName":"Gage Crossing *Ardent *Dublin","name":"Gage Crossing","city":"Dublin","address":"5927 Avery Woods Ave, Dublin, OH 43016","lat":40.073154,"lon":-83.156999},{"builder":"Fischer Homes","fullName":"Villages of Classicway *Fischer *Morrow","name":"Villages of Classicway","city":"Morrow","address":"5817 Montrose Ct, Morrow, OH 45152","lat":39.344112,"lon":-84.168007},{"builder":"Fischer Homes","fullName":"Trailhead *Fischer *Harrison","name":"Trailhead","city":"Harrison","address":"1322 Trailhead Pl, Harrison, OH 45030","lat":39.28602,"lon":-84.759843},{"builder":"Fischer Homes","fullName":"Salt Run Preserve *Fischer *Maineville","name":"Salt Run Preserve","city":"Maineville","address":"Mounts Rd, Maineville, OH 45039","lat":39.318058,"lon":-84.186225},{"builder":"WPLand","fullName":"Arabella *WPLand *Blue Ash","name":"Arabella","city":"Blue Ash","address":"4291 Parkview Dr, Blue Ash, OH 45242","lat":39.246249,"lon":-84.389358},{"builder":"Fischer Homes","fullName":"Ivy Rose *Fischer *Cincinnati","name":"Ivy Rose","city":"Cincinnati","address":"5236 Ivy Rose Ln, Cincinnati, OH 45247","lat":39.181193,"lon":-84.618055},{"builder":"Arbor Homes","fullName":"Old Haritage *Arbor *Shelbyville,Kentucky","name":"Old Haritage","city":"Shelbyville,Kentucky","address":"1005 Stratton Way, Shelbyville, KY 40065","lat":38.200643,"lon":-85.199476},{"builder":"Tuckerman","fullName":"Bedford *Tuckerman *Columbus","name":"Bedford","city":"Columbus","address":"1760 Bedford Columbus 43212","lat":39.992544,"lon":-83.057177},{"builder":"Brandon","fullName":"Penewit Dr *Brandon *Spring Valley","name":"Penewit Dr","city":"Spring Valley","address":"2950 Penewit Rd, Spring Valley, OH 45370","lat":39.604799,"lon":-84.053891},{"builder":"Ardent","fullName":"Cooks Pointe *Ardent *Marysville","name":"Cooks Pointe","city":"Marysville","address":"1805 Mill Pointe Rd, Marysville, OH 43040","lat":40.264009,"lon":-83.368504},{"builder":"Bob Webb","fullName":"Deep Run *Bob Webb *Powell","name":"Deep Run","city":"Powell","address":"8300 Deep Run, Powell, OH 43065","lat":40.172742,"lon":-83.036069},{"builder":"3 Pillar","fullName":"Smart Rd *3 Pillar *Ostrander","name":"Smart Rd","city":"Ostrander","address":"2784 Smart Road Ostrander, OH, 43061","lat":40.282287,"lon":-83.191767},{"builder":"3 Pillar","fullName":"Summer Crest Drive *3 Pillar *Galena","name":"Summer Crest Drive","city":"Galena","address":"2806 Summer Crest Drive Galena, OH 43021","lat":40.228274,"lon":-82.946842},{"builder":"Compass","fullName":"Chester Rd *Compass *Upper Arlington","name":"Chester Rd","city":"Upper Arlington","address":"2681 Chester Rd, Upper Arlington, OH 43221","lat":40.011928,"lon":-83.055803}];
+const STORAGE_KEYS = {
+  subdivisions: 'vipCrewReport.subdivisions.v1',
+  routeCache: 'vipCrewReport.routeCache.v1',
+  settings: 'vipCrewReport.settings.v1'
+};
+let subdivisionData = [];
+let routeCache = {};
+
+function normalizeName(value){
+  return String(value || '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\b(the|at|of)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+function saveSubdivisionData(data){
+  subdivisionData = data;
+  localStorage.setItem(STORAGE_KEYS.subdivisions, JSON.stringify(data));
+  updateSubdivisionStatus();
+}
+function loadLocalData(){
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.subdivisions) || 'null');
+    subdivisionData = Array.isArray(saved) && saved.length ? saved : DEFAULT_SUBDIVISIONS;
+    if(!saved) localStorage.setItem(STORAGE_KEYS.subdivisions, JSON.stringify(subdivisionData));
+  } catch(e) {
+    subdivisionData = DEFAULT_SUBDIVISIONS;
+  }
+  try { routeCache = JSON.parse(localStorage.getItem(STORAGE_KEYS.routeCache) || '{}') || {}; } catch(e) { routeCache = {}; }
+  try {
+    const settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || '{}');
+    ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id => {
+      if(settings[id] !== undefined && $('#'+id)) $('#'+id).value = settings[id];
+    });
+  } catch(e) {}
+  updateSubdivisionStatus();
+}
+function saveSettings(){
+  const settings = {};
+  ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id => settings[id] = $('#'+id).value);
+  localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings));
+}
+function updateSubdivisionStatus(){
+  if($('#subdivisionStatus')) $('#subdivisionStatus').textContent = `${subdivisionData.length} locations saved in this browser`;
+}
+function findSubdivision(name, builder, city){
+  const target = normalizeName(name);
+  const builderKey = normalizeName(builder);
+  const cityKey = normalizeName(city);
+  const candidates = subdivisionData.filter(s => normalizeName(s.name) === target || normalizeName(s.fullName) === target);
+  if(!candidates.length) {
+    const fuzzy = subdivisionData.filter(s => normalizeName(s.name).includes(target) || target.includes(normalizeName(s.name)));
+    if(!fuzzy.length) return null;
+    candidates.push(...fuzzy);
+  }
+  return candidates.sort((a,b) => {
+    const aScore = (builderKey && normalizeName(a.builder).includes(builderKey) ? 2 : 0) + (cityKey && normalizeName(a.city).includes(cityKey) ? 1 : 0);
+    const bScore = (builderKey && normalizeName(b.builder).includes(builderKey) ? 2 : 0) + (cityKey && normalizeName(b.city).includes(cityKey) ? 1 : 0);
+    return bScore - aScore;
+  })[0] || null;
+}
+function haversineMiles(a,b){
+  const R=3958.8, toRad=x=>x*Math.PI/180;
+  const dLat=toRad(b.lat-a.lat), dLon=toRad(b.lon-a.lon);
+  const q=Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q));
+}
+function fallbackRoute(a,b){
+  const straight = haversineMiles(a,b);
+  const miles = straight * 1.22;
+  const minutes = Math.max(4, Math.round((miles / 32) * 60));
+  return {minutes,miles,source:'estimated'};
+}
+function routeKey(a,b){
+  return `${a.lat.toFixed(5)},${a.lon.toFixed(5)}>${b.lat.toFixed(5)},${b.lon.toFixed(5)}`;
+}
+async function getRoute(a,b){
+  const key=routeKey(a,b);
+  if(routeCache[key]) return routeCache[key];
+  const fallback=fallbackRoute(a,b);
+  try {
+    const url=`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false`;
+    const response=await fetch(url);
+    if(!response.ok) throw new Error('Route request failed');
+    const data=await response.json();
+    const route=data.routes && data.routes[0];
+    if(!route) throw new Error('No route');
+    const result={minutes:Math.max(1,Math.round(route.duration/60)),miles:+(route.distance/1609.344).toFixed(1),source:'road route'};
+    routeCache[key]=result;
+    localStorage.setItem(STORAGE_KEYS.routeCache,JSON.stringify(routeCache));
+    return result;
+  } catch(e) {
+    routeCache[key]=fallback;
+    localStorage.setItem(STORAGE_KEYS.routeCache,JSON.stringify(routeCache));
+    return fallback;
+  }
+}
+
+
+function n(v){ const x=parseFloat(String(v??'').replace(/,/g,'')); return Number.isFinite(x)?x:0; }
+function fmt(v){ return Number(v).toFixed(1).replace(/\.0$/,''); }
+function timeToMin(s){
+  if(!s || /cancel/i.test(s)) return null;
+  const m=String(s).trim().match(/^(\d{1,2}):(\d{2})\s*([AP]M)$/i);
+  if(!m) return null;
+  let h=+m[1], min=+m[2], ap=m[3].toUpperCase();
+  if(h===12) h=0; if(ap==='PM') h+=12;
+  return h*60+min;
+}
+function minsToText(m){ if(m==null) return ''; const h=Math.floor(m/60), mm=m%60; return `${h}h ${mm}m`; }
+function effClass(e){ const good=+$('#goodEff').value||100, bad=+$('#badEff').value||85; return e>=good?'good':e<bad?'bad':'warn'; }
+function classifyJob(text){
+  const t=text.toLowerCase();
+  if(t.includes('windows')) return 'Windows';
+  if(t.includes('dry clean')) return 'Dry Clean Original';
+  if(t.includes('original')) return 'Original';
+  if(t.includes('reclean')) return 'Reclean';
+  return 'Other';
+}
+function parseSubdivision(line){
+  const parts=line.split('*').map(x=>x.trim()).filter(Boolean);
+  return {subdivision:parts[0]||'',builder:parts[1]||'',city:parts[2]||''};
+}
+function parseJobText(raw){
+  let txt=raw.trim();
+  txt=txt.replace(/^(AM|PM)\s+/i,'');
+  const dash=txt.indexOf(' - ');
+  let left=dash>=0?txt.slice(0,dash).trim():txt;
+  let address=dash>=0?txt.slice(dash+3).trim():'';
+  const lot=(left.match(/^([^\s]+)/)||[])[1]||'';
+  return {lot,left,address,jobType:classifyJob(left)};
+}
+function parseReport(text){
+  const lines=text.replace(/\r/g,'').split('\n');
+  const crews=[]; let crew=null, loc={subdivision:'',builder:'',city:''}, weekday='';
+  for(const rawLine of lines){
+    if(!rawLine.trim()) continue;
+    const cols=rawLine.split('\t');
+    const first=(cols[0]||'').trim();
+    if(/^Totals$/i.test(first)) continue;
+    if(/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$/i.test(first) && cols.some(c=>/People/i.test(c))){
+      weekday=first; continue;
+    }
+    if(first.startsWith('*')){ loc=parseSubdivision(first); continue; }
+    const remainingBlank = cols.slice(1).every(c=>!String(c).trim());
+    const isCrewHeader = remainingBlank && !first.startsWith('*') &&
+      !/^(Totals|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$/i.test(first) &&
+      !/^\s*(AM\s+|PM\s+)?\d/.test(first);
+    if(isCrewHeader){
+      crew={name:first,weekday,jobs:[]};
+      crews.push(crew);
+      loc={subdivision:'',builder:'',city:''};
+      continue;
+    }
+
+    const looksLikeJob = crew && cols.length>=2 &&
+      /^\s*(AM\s+|PM\s+)?\d/.test(first) &&
+      !/People/i.test(cols.join(' '));
+    if(looksLikeJob){
+      const people=n(cols[1]);
+      const inVal=(cols[2]||'').trim();
+      const outVal=(cols[3]||'').trim();
+      const actual=n(cols[4]);
+      const budget=n(cols[5]);
+      const est=(cols[6]||'').trim();
+      const cancelled=/cancelled/i.test(inVal);
+      const info=parseJobText(first);
+      crew.jobs.push({
+        ...info, raw:first, people, in:inVal, out:outVal, actual, budget, est, cancelled,
+        subdivision:loc.subdivision,builder:loc.builder,city:loc.city
+      });
+      continue;
+    }
+  }
+  crews.forEach(c=>{
+    const completed=c.jobs.filter(j=>!j.cancelled && j.actual>0);
+    c.cancelled=c.jobs.filter(j=>j.cancelled).length;
+    c.completed=completed.length;
+    c.actual=completed.reduce((s,j)=>s+j.actual,0);
+    c.budget=completed.reduce((s,j)=>s+j.budget,0);
+    c.variance=c.actual-c.budget;
+    c.eff=c.actual?c.budget/c.actual*100:0;
+    c.gaps=[];
+    c.trips=[];
+    let previousTimedJob=null;
+    let cancelledSincePrevious=false;
+
+    for(const job of c.jobs){
+      if(job.cancelled){
+        cancelledSincePrevious=true;
+        continue;
+      }
+
+      const hasTimes=timeToMin(job.in)!=null && timeToMin(job.out)!=null;
+      if(!hasTimes) continue;
+
+      if(previousTimedJob && !cancelledSincePrevious){
+        const a=previousTimedJob, b=job;
+        const gap=timeToMin(b.in)-timeToMin(a.out);
+        const same=normalizeName(a.subdivision)===normalizeName(b.subdivision) && a.subdivision;
+        c.trips.push({
+          from:a,to:b,gap,same,route:null,expected:null,delay:null,
+          travelDelay:0,previousOverrun:0,scheduleDelay:false,late:false
+        });
+      }
+
+      previousTimedJob=job;
+      cancelledSincePrevious=false;
+    }
+  });
+  const all=crews.flatMap(c=>c.jobs);
+  const completed=all.filter(j=>!j.cancelled && j.actual>0);
+  return {
+    crews,
+    jobs:completed,
+    cancelled:all.filter(j=>j.cancelled),
+    actual:completed.reduce((s,j)=>s+j.actual,0),
+    budget:completed.reduce((s,j)=>s+j.budget,0)
+  };
+}
+function render(report){
+  currentReport=report; $('#results').classList.remove('hidden');
+  $('#totalJobs').textContent=report.jobs.length;
+  $('#cancelledJobs').textContent=report.cancelled.length;
+  $('#actualHours').textContent=fmt(report.actual);
+  $('#budgetHours').textContent=fmt(report.budget);
+  const overall=report.actual?report.budget/report.actual*100:0;
+  $('#overallEff').textContent=overall.toFixed(1)+'%';
+
+  const tbody=$('#crewTable'); tbody.innerHTML='';
+  [...report.crews].sort((a,b)=>b.eff-a.eff).forEach(c=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><strong>${esc(c.name)}</strong></td><td>${c.completed}</td><td>${c.cancelled}</td>
+      <td>${fmt(c.actual)}</td><td>${fmt(c.budget)}</td>
+      <td>${c.variance>0?'+':''}${fmt(c.variance)} ${c.variance>0?'over':'under'}</td>
+      <td><span class="badge ${c.actual?effClass(c.eff):'neutral'}">${c.actual?c.eff.toFixed(1)+'%':'N/A'}</span></td>
+      <td class="trip-count">${c.trips.filter(t=>t.late).length}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  $('#gapFindings').innerHTML='Calculating expected travel times…';
+  calculateTravel(report);
+
+  $('#cancelledCountLabel').textContent=`${report.cancelled.length} cancelled job${report.cancelled.length===1?'':'s'}`;
+  const cbody=$('#cancelledTable'); cbody.innerHTML='';
+  if(!report.cancelled.length){
+    cbody.innerHTML='<tr><td colspan="6" class="muted">No cancelled jobs found.</td></tr>';
+  }else{
+    report.crews.forEach(c=>c.jobs.filter(j=>j.cancelled).forEach(j=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td><strong>${esc(c.name)}</strong></td><td>${esc(j.subdivision)}</td><td>${esc(j.builder)}</td><td>${esc(j.city)}</td><td>${esc(j.left)}</td><td>${esc(j.address)}</td>`;
+      cbody.appendChild(tr);
+    }));
+  }
+
+  const holder=$('#crewTimelines'); holder.innerHTML='';
+  report.crews.forEach(c=>{
+    const d=document.createElement('details');
+    d.innerHTML=`<summary><span>${esc(c.name)}</span><span>${c.completed} completed · ${c.cancelled} cancelled · ${c.actual?c.eff.toFixed(1)+'%':'N/A'}</span></summary>`;
+    const wrap=document.createElement('div'); wrap.className='timeline';
+    c.jobs.forEach(j=>{
+      const item=document.createElement('div'); item.className='job'+(j.cancelled?' cancelled':'');
+      const status=j.cancelled?'<span class="badge cancel">Cancelled</span>':`<span class="badge ${effClass(j.actual?j.budget/j.actual*100:0)}">${j.actual?(j.budget/j.actual*100).toFixed(1)+'%':'Incomplete'}</span>`;
+      item.innerHTML=`<div class="job-time">${j.cancelled?'Cancelled':esc(j.in||'No in')}<br>${j.cancelled?'':esc(j.out||'No out')}</div>
+      <div><div class="job-title">${esc(j.subdivision)} — ${esc(j.left)}</div><div class="job-meta">${esc(j.builder)} · ${esc(j.city)} · ${esc(j.address)}</div></div>
+      <div class="right">${status}<div class="job-meta">${j.cancelled?'Excluded from totals':`Actual ${fmt(j.actual)} / Budget ${fmt(j.budget)}`}</div></div>`;
+      wrap.appendChild(item);
+    });
+    d.appendChild(wrap); holder.appendChild(d);
+  });
+}
+function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+
+function getReportDateLabel(){
+  const firstCrew=currentReport?.crews?.[0];
+  const weekday=firstCrew?.weekday || 'Daily';
+  const now=new Date();
+  const dateText=now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  return `${weekday}, ${dateText}`;
+}
+function varianceText(c){
+  const diff=c.actual-c.budget;
+  if(Math.abs(diff)<0.05) return 'On budget';
+  return `${fmt(Math.abs(diff))} ${diff>0?'over':'under'}`;
+}
+function topHighlights(r){
+  const active=r.crews.filter(c=>c.actual>0);
+  const best=[...active].sort((a,b)=>b.eff-a.eff)[0];
+  const worst=[...active].sort((a,b)=>(b.actual-b.budget)-(a.actual-a.budget))[0];
+  const mostCancelled=[...r.crews].sort((a,b)=>b.cancelled-a.cancelled)[0];
+  const lateTrips=r.crews.flatMap(c=>c.trips.filter(t=>t.late).map(t=>({crew:c.name,...t})));
+  const longest=[...lateTrips].sort((a,b)=>b.travelDelay-a.travelDelay)[0];
+  return {best,worst,mostCancelled,longest};
+}
+function outlookEmailHtml(){
+  if(!currentReport) return '';
+  const r=currentReport;
+  const efficiency=r.actual?r.budget/r.actual*100:0;
+  const highlights=topHighlights(r);
+  const efficiencyBg=efficiency>=100?'#d9ead3':efficiency>=85?'#fff2cc':'#f4cccc';
+  const efficiencyColor=efficiency>=100?'#274e13':efficiency>=85?'#7f6000':'#990000';
+  const crews=[...r.crews].sort((a,b)=>b.eff-a.eff);
+  const lateTrips=r.crews.flatMap(c=>c.trips.filter(t=>t.late).map(t=>({crew:c.name,...t})));
+  out+=`\n\nCANCELLED JOBS\n`;
+  if(!r.cancelled.length) out+='None\n';
+  else r.crews.forEach(c=>c.jobs.filter(j=>j.cancelled).forEach(j=>out+=`\n- ${c.name}: ${j.subdivision} — ${j.left} — ${j.address}`));
+  out+=`\n\nTRAVEL DELAYS — ${r.crews.reduce((sum,c)=>sum+c.trips.filter(t=>t.late).length,0)}\n`;
+  let count=0;
+  r.crews.forEach(c=>c.trips.filter(t=>t.late).forEach(t=>{
+    count++;
+    out+=`\n- ${c.name}: ${t.from.subdivision} to ${t.to.subdivision}; actual ${t.gap} min, expected ${t.expected} min, ${t.travelDelay} min travel delay`;
+  }));
+  if(!count) out+='No travel delays found.\n';
+  return out;
+}
+async function copyFormattedEmail(){
+  if(!currentReport){alert('Analyze a report first.');return;}
+  if(!travelCalculationComplete){
+    alert('Travel calculations are still running. Wait until the page says Email export is ready.');
+    return;
+  }
+  const rich=outlookEmailHtml();
+  const plain=emailText();
+  try{
+    if(window.ClipboardItem){
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html':new Blob(['\ufeff',rich],{type:'text/html;charset=utf-8'}),
+          'text/plain':new Blob([plain],{type:'text/plain'})
+        })
+      ]);
+    }else{
+      await navigator.clipboard.writeText(plain);
+    }
+    alert('Formatted Outlook email copied. Paste it directly into a new Outlook message.');
+  }catch(err){
+    const area=document.createElement('textarea');
+    area.value=plain;document.body.appendChild(area);area.select();document.execCommand('copy');area.remove();
+    alert('Plain-text fallback copied because formatted clipboard access was blocked.');
+  }
+}
+
+function utf8ToBase64(value){
+  const bytes=new TextEncoder().encode(value);
+  let binary='';
+  const chunkSize=0x8000;
+  for(let i=0;i<bytes.length;i+=chunkSize){
+    binary+=String.fromCharCode(...bytes.subarray(i,i+chunkSize));
+  }
+  return btoa(binary);
+}
+function wrapBase64(value){
+  return value.match(/.{1,76}/g)?.join('\r\n') || '';
+}
+function safeFileDate(){
+  const d=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function downloadOutlookEml(){
+  if(!currentReport){
+    alert('Analyze a report first.');
+    return;
+  }
+  if(!travelCalculationComplete){
+    alert('Travel calculations are still running. Wait until the page says Email export is ready.');
+    return;
+  }
+
+  const subject=`VIP Crew Efficiency Report - ${getReportDateLabel()}`;
+  const htmlBody=outlookEmailHtml();
+  const plainBody=emailText();
+  const boundary=`VIP_REPORT_${Date.now()}`;
+
+  const eml=[
+    `Date: ${new Date().toUTCString()}`,
+    `Subject: ${subject}`,
+    'MIME-Version: 1.0',
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    '',
+    `--${boundary}`,
+    'Content-Type: text/plain; charset="UTF-8"',
+    'Content-Transfer-Encoding: base64',
+    '',
+    wrapBase64(utf8ToBase64(plainBody)),
+    '',
+    `--${boundary}`,
+    'Content-Type: text/html; charset="UTF-8"',
+    'Content-Transfer-Encoding: base64',
+    '',
+    wrapBase64(utf8ToBase64(htmlBody)),
+    '',
+    `--${boundary}--`,
+    ''
+  ].join('\r\n');
+
+  const blob=new Blob([eml],{type:'message/rfc822;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url;
+  link.download=`VIP-Crew-Efficiency-${safeFileDate()}.eml`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+
+  $('#emailStatus').textContent='Outlook email downloaded. Open the .eml file in Outlook.';
+}
+
+function mileageReportHtml(){
+  if(!currentReport) return '';
+
+  const r=currentReport;
+  const stats=crewMileageStats(r)
+    .filter(s=>s.routed.length || s.missing.length)
+    .sort((a,b)=>b.miles-a.miles);
+
+  const totalMiles=stats.reduce((sum,s)=>sum+s.miles,0);
+  const totalTrips=stats.reduce((sum,s)=>sum+s.routed.length,0);
+  const missingRoutes=stats.reduce((sum,s)=>sum+s.missing.length,0);
+
+  const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
+  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#1f4e78;color:#ffffff;font-size:13px;text-align:left;font-weight:700;';
+
+  const crewRows=stats.length?stats.map(s=>`<tr>
+    <td style="${td}font-weight:600">${esc(s.crew.name)}</td>
+    <td style="${td}text-align:center">${s.routed.length}</td>
+    <td style="${td}text-align:right;font-weight:700">${fmt(s.miles)} mi</td>
+    <td style="${td}text-align:right">${s.routed.length?fmt(s.average)+' mi':'N/A'}</td>
+    <td style="${td}text-align:center">${s.missing.length}</td>
+  </tr>`).join(''):`<tr><td colspan="5" style="${td}color:#666666">No mileage routes available.</td></tr>`;
+
+  const routeRows=[];
+  r.crews.forEach(c=>c.trips.forEach(t=>{
+    if(t.route && Number.isFinite(Number(t.route.miles))){
+      routeRows.push(`<tr>
+        <td style="${td}font-weight:600">${esc(c.name)}</td>
+        <td style="${td}">${esc(t.from.subdivision)}</td>
+        <td style="${td}">${esc(t.to.subdivision)}</td>
+        <td style="${td}text-align:right">${fmt(Number(t.route.miles))} mi</td>
+        <td style="${td}text-align:center">${t.route.minutes} min</td>
+        <td style="${td}">${esc(t.route.source)}</td>
+      </tr>`);
+    }else{
+      routeRows.push(`<tr>
+        <td style="${td}font-weight:600">${esc(c.name)}</td>
+        <td style="${td}">${esc(t.from.subdivision)}</td>
+        <td style="${td}">${esc(t.to.subdivision)}</td>
+        <td style="${td}" colspan="3">Route unavailable</td>
+      </tr>`);
+    }
+  }));
+
+  return `<!doctype html><html><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
+  <body style="margin:0;padding:0;background:#ffffff">
+    <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:980px;margin:0 auto;padding:20px">
+      <div style="background:#1f4e78;color:#ffffff;padding:20px 24px;border-radius:4px">
+        <div style="font-size:25px;font-weight:700">VIP Estimated Mileage Report</div>
+        <div style="font-size:14px;margin-top:5px;color:#dbe8f4">${getReportDateLabel()}</div>
+      </div>
+
+      <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;margin-top:14px">
+        <tr>
+          <td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center">
+            <div style="font-size:11px;color:#666666;text-transform:uppercase">Estimated Road Miles</div>
+            <div style="font-size:24px;font-weight:700;margin-top:4px">${fmt(totalMiles)}</div>
+          </td>
+          <td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center">
+            <div style="font-size:11px;color:#666666;text-transform:uppercase">Trips Counted</div>
+            <div style="font-size:24px;font-weight:700;margin-top:4px">${totalTrips}</div>
+          </td>
+          <td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center">
+            <div style="font-size:11px;color:#666666;text-transform:uppercase">Routes Missing</div>
+            <div style="font-size:24px;font-weight:700;margin-top:4px">${missingRoutes}</div>
+          </td>
+        </tr>
+      </table>
+
+      <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Crew</h2>
+      <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+        <thead><tr>
+          <th style="${th}">Crew</th>
+          <th style="${th}">Trips Counted</th>
+          <th style="${th}">Estimated Road Miles</th>
+          <th style="${th}">Average per Trip</th>
+          <th style="${th}">Routes Missing</th>
+        </tr></thead>
+        <tbody>${crewRows}</tbody>
+      </table>
+
+      <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Route Breakdown</h2>
+      <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+        <thead><tr>
+          <th style="${th}">Crew</th>
+          <th style="${th}">From</th>
+          <th style="${th}">To</th>
+          <th style="${th}">Road Miles</th>
+          <th style="${th}">Drive Time</th>
+          <th style="${th}">Route Source</th>
+        </tr></thead>
+        <tbody>${routeRows.join('')||`<tr><td colspan="6" style="${td}color:#666666">No routes found.</td></tr>`}</tbody>
+      </table>
+
+      <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666666;font-size:11px;line-height:1.5">
+        Mileage is estimated using routed road distance between consecutive scheduled subdivisions.
+        Travel chains interrupted by a cancelled job are excluded.
+      </div>
+    </div>
+  </body></html>`;
+}
+function mileageReportText(){
+  if(!currentReport) return '';
+
+  const stats=crewMileageStats(currentReport)
+    .filter(s=>s.routed.length || s.missing.length)
+    .sort((a,b)=>b.miles-a.miles);
+
+  const totalMiles=stats.reduce((sum,s)=>sum+s.miles,0);
+  let out=`VIP Estimated Mileage Report\n${getReportDateLabel()}\n\nTotal Estimated Road Miles: ${fmt(totalMiles)}\n\nMILEAGE BY CREW\n`;
+
+  stats.forEach(s=>{
+    out+=`\n${s.crew.name}: ${fmt(s.miles)} miles across ${s.routed.length} trip${s.routed.length===1?'':'s'}`;
+    if(s.missing.length) out+=` — ${s.missing.length} missing route${s.missing.length===1?'':'s'}`;
+  });
+
+  out+='\n\nROUTE BREAKDOWN\n';
+  currentReport.crews.forEach(c=>c.trips.forEach(t=>{
+    if(t.route && Number.isFinite(Number(t.route.miles))){
+      out+=`\n${c.name}: ${t.from.subdivision} to ${t.to.subdivision} — ${fmt(Number(t.route.miles))} miles`;
+    }
+  }));
+
+  return out;
+}
+function previewMileageReport(){
+  if(!currentReport){alert('Analyze a report first.');return;}
+  if(!travelCalculationComplete){
+    alert('Travel calculations are still running. Wait until the page says Email export is ready.');
+    return;
+  }
+
+  const blob=new Blob(['\ufeff',mileageReportHtml()],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const w=window.open(url,'_blank');
+
+  if(!w){
+    URL.revokeObjectURL(url);
+    alert('Allow pop-ups to preview the mileage report.');
+    return;
+  }
+
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+function downloadMileageEml(){
+  if(!currentReport){alert('Analyze a report first.');return;}
+  if(!travelCalculationComplete){
+    alert('Travel calculations are still running. Wait until the page says Email export is ready.');
+    return;
+  }
+
+  const boundary=`VIP_MILEAGE_${Date.now()}`;
+  const subject=`VIP Estimated Mileage Report - ${getReportDateLabel()}`;
+  const eml=[
+    `Date: ${new Date().toUTCString()}`,
+    `Subject: ${subject}`,
+    'MIME-Version: 1.0',
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    '',
+    `--${boundary}`,
+    'Content-Type: text/plain; charset="UTF-8"',
+    'Content-Transfer-Encoding: base64',
+    '',
+    wrapBase64(utf8ToBase64(mileageReportText())),
+    '',
+    `--${boundary}`,
+    'Content-Type: text/html; charset="UTF-8"',
+    'Content-Transfer-Encoding: base64',
+    '',
+    wrapBase64(utf8ToBase64(mileageReportHtml())),
+    '',
+    `--${boundary}--`,
+    ''
+  ].join('\r\n');
+
+  const blob=new Blob([eml],{type:'message/rfc822;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url;
+  link.download=`VIP-Estimated-Mileage-${safeFileDate()}.eml`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function downloadMileageCsv(){
+  if(!currentReport){alert('Analyze a report first.');return;}
+  if(!travelCalculationComplete){
+    alert('Travel calculations are still running. Wait until the page says Email export is ready.');
+    return;
+  }
+
+  const rows=[['Crew','From Subdivision','To Subdivision','Estimated Road Miles','Estimated Drive Minutes','Route Source']];
+
+  currentReport.crews.forEach(c=>c.trips.forEach(t=>{
+    rows.push([
+      c.name,
+      t.from.subdivision,
+      t.to.subdivision,
+      t.route&&Number.isFinite(Number(t.route.miles))?Number(t.route.miles):'',
+      t.route?t.route.minutes:'',
+      t.route?t.route.source:'Route unavailable'
+    ]);
+  }));
+
+  const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url;
+  link.download=`VIP-Estimated-Mileage-${safeFileDate()}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function previewOutlookEmail(){
+  if(!currentReport){alert('Analyze a report first.');return;}
+  if(!travelCalculationComplete){
+    alert('Travel calculations are still running. Wait until the page says Email export is ready.');
+    return;
+  }
+  const previewHtml=outlookEmailHtml().replace('</body>',`
+    <div style="font-family:Segoe UI,Arial,sans-serif;max-width:980px;margin:0 auto 30px;padding:0 20px">
+      <button onclick="window.print()" style="background:#1f4e78;color:white;border:0;border-radius:4px;padding:10px 15px;font-weight:700;cursor:pointer">Print / Save PDF</button>
+    </div></body>`);
+  const blob=new Blob(['\ufeff',previewHtml],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const w=window.open(url,'_blank');
+  if(!w){
+    URL.revokeObjectURL(url);
+    alert('Allow pop-ups to preview the email.');
+    return;
+  }
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+
+async function calculateTravel(report){
+  travelCalculationComplete=false;
+  $('#emailStatus').textContent='Travel calculations are running. Email export will be ready when complete.';
+  $('#previewEmailBtn').disabled=true;
+  $('#copyBtn').disabled=true;
+  $('#downloadEmlBtn').disabled=true;
+  $('#previewMileageBtn').disabled=true;
+  $('#downloadMileageEmlBtn').disabled=true;
+  $('#downloadMileageCsvBtn').disabled=true;
+  const allTrips=report.crews.flatMap(c=>c.trips.map(t=>({crew:c,trip:t})));
+  if(!allTrips.length){
+    $('#gapFindings').textContent='No between-job trips were found.';
+    $('#routeStatus').textContent='';
+    if($('#travelHeading')) $('#travelHeading').textContent='Travel Delays — 0 delays';
+      travelCalculationComplete=true;
+    $('#previewEmailBtn').disabled=false;
+    $('#copyBtn').disabled=false;
+    $('#downloadEmlBtn').disabled=false;
+    $('#previewMileageBtn').disabled=false;
+    $('#downloadMileageEmlBtn').disabled=false;
+    $('#downloadMileageCsvBtn').disabled=false;
+    $('#emailStatus').textContent='Email exports are ready.';
+    return;
+  }
+  $('#routeStatus').textContent=`Calculating 0 of ${allTrips.length} trips…`;
+  let completed=0;
+  const buffer=+$('#travelBuffer').value||0;
+  const tolerance=+$('#lateTolerance').value||0;
+  for(const entry of allTrips){
+    const t=entry.trip;
+    const fromLoc=findSubdivision(t.from.subdivision,t.from.builder,t.from.city);
+    const toLoc=findSubdivision(t.to.subdivision,t.to.builder,t.to.city);
+    if(t.same){
+      t.route={minutes:0,miles:0,source:'same subdivision'};
+      t.expected=buffer;
+    }else if(fromLoc && toLoc){
+      t.route=await getRoute(fromLoc,toLoc);
+      t.expected=t.route.minutes+buffer;
+    }else{
+      t.route=null;
+      t.expected=null;
+      t.missing=[!fromLoc?t.from.subdivision:null,!toLoc?t.to.subdivision:null].filter(Boolean);
+    }
+    if(t.expected!=null){
+      t.delay=t.gap-t.expected;
+      t.travelDelay=Math.max(0,t.delay);
+      t.late=t.travelDelay>tolerance;
+
+      const previousOut=timeToMin(t.from.out);
+      const previousEstimate=timeToMin(t.from.est);
+      t.previousOverrun=(previousOut!=null && previousEstimate!=null)
+        ? Math.max(0,previousOut-previousEstimate)
+        : 0;
+      t.scheduleDelay=t.previousOverrun>tolerance;
+    }
+    completed++;
+    $('#routeStatus').textContent=`Calculating ${completed} of ${allTrips.length} trips…`;
+  }
+  $('#routeStatus').textContent=`${allTrips.length} trip${allTrips.length===1?'':'s'} checked`;
+  renderTravelFindings(report);
+  const delayCount=report.crews.reduce((sum,c)=>sum+c.trips.filter(t=>t.late).length,0);
+  if($('#travelHeading')) $('#travelHeading').textContent=`Travel Delays — ${delayCount} delay${delayCount===1?'':'s'}`;
+  travelCalculationComplete=true;
+  $('#previewEmailBtn').disabled=false;
+  $('#copyBtn').disabled=false;
+  $('#downloadEmlBtn').disabled=false;
+  $('#previewMileageBtn').disabled=false;
+  $('#downloadMileageEmlBtn').disabled=false;
+  $('#downloadMileageCsvBtn').disabled=false;
+  $('#emailStatus').textContent='Email exports are ready.';
+}
+
+function crewMileageStats(report){
+  return report.crews.map(c=>{
+    const routed=c.trips.filter(t=>t.route && Number.isFinite(Number(t.route.miles)));
+    const missing=c.trips.filter(t=>!t.route || !Number.isFinite(Number(t.route.miles)));
+    const miles=routed.reduce((sum,t)=>sum+Number(t.route.miles),0);
+    return {
+      crew:c,
+      routed,
+      missing,
+      miles,
+      average:routed.length?miles/routed.length:0
+    };
+  });
+}
+function renderTravelFindings(report){
+  const findings=[];
+
+  report.crews.forEach(c=>c.trips.forEach(t=>{
+    if(t.expected==null){
+      findings.push(
+        `<div style="margin:9px 0"><strong>${esc(c.name)}</strong>: ` +
+        `Could not calculate ${esc(t.from.subdivision)} to ${esc(t.to.subdivision)}. ` +
+        `Missing subdivision location: ${esc((t.missing||[]).join(', '))} ` +
+        `<span class="badge neutral">location missing</span></div>`
+      );
+      return;
+    }
+
+    if(t.late){
+      const routeLabel=t.same
+        ? 'same subdivision'
+        : `${t.route.minutes} min / ${fmt(t.route.miles)} mi ${t.route.source}`;
+
+      findings.push(
+        `<div style="margin:9px 0"><strong>${esc(c.name)}</strong>: ` +
+        `${esc(t.from.subdivision)} → ${esc(t.to.subdivision)} · ` +
+        `actual time after clock-out <strong>${t.gap} min</strong> · ` +
+        `expected <strong>${t.expected} min</strong> ` +
+        `(${routeLabel} + buffer) ` +
+        `<span class="badge bad">${t.travelDelay} min travel delay</span></div>`
+      );
+    }
+  }));
+
+  $('#gapFindings').innerHTML=findings.length
+    ? findings.join('')
+    : 'No travel delays were found. Normal trips are hidden.';
+
+  const rows=$('#crewTable').querySelectorAll('tr');
+  const sorted=[...report.crews].sort((a,b)=>b.eff-a.eff);
+  rows.forEach((row,i)=>{
+    const cell=row.querySelector('.trip-count');
+    if(cell && sorted[i]) cell.textContent=sorted[i].trips.filter(t=>t.late).length;
+  });
+}
+async function importSubdivisionWorkbook(file){
+  if(typeof XLSX==='undefined'){
+    alert('The spreadsheet reader could not load. Check the internet connection and reopen the page.');
+    return;
+  }
+  const buffer=await file.arrayBuffer();
+  const workbook=XLSX.read(buffer,{type:'array'});
+  const sheet=workbook.Sheets[workbook.SheetNames[0]];
+  const rows=XLSX.utils.sheet_to_json(sheet,{defval:''});
+  const parsed=rows.map(row=>{
+    const subdivision=row.Subdivision ?? row.subdivision ?? '';
+    const parts=String(subdivision).split('*').map(x=>x.trim());
+    return {
+      builder:String(row.Builder ?? row.builder ?? parts[1] ?? '').trim(),
+      fullName:String(subdivision).trim(),
+      name:String(parts[0] ?? subdivision).trim(),
+      city:String(parts[2] ?? row.City ?? row.city ?? '').trim(),
+      address:String(row.Address ?? row.address ?? '').trim(),
+      lat:Number(row.Lat ?? row.lat ?? row.Latitude ?? row.latitude),
+      lon:Number(row.Lon ?? row.lon ?? row.Longitude ?? row.longitude)
+    };
+  }).filter(x=>x.name && Number.isFinite(x.lat) && Number.isFinite(x.lon));
+  if(!parsed.length){
+    alert('No usable locations were found. The sheet needs Subdivision, Lat, and Lon columns.');
+    return;
+  }
+  saveSubdivisionData(parsed);
+  alert(`${parsed.length} subdivision locations were imported and saved in local storage.`);
+  if(currentReport) render(currentReport=parseReport($('#pasteBox').value));
+}
+
+
+$('#analyzeBtn').onclick=()=>{ travelCalculationComplete=false; $('#emailStatus').textContent='Analyzing report…'; saveSettings(); const text=$('#pasteBox').value.trim(); if(!text){alert('Paste a report first.');return;} render(parseReport(text)); };
+$('#clearBtn').onclick=()=>{ $('#pasteBox').value=''; $('#results').classList.add('hidden'); currentReport=null; };
+$('#previewEmailBtn').onclick=previewOutlookEmail;
+$('#previewMileageBtn').onclick=previewMileageReport;
+$('#downloadMileageEmlBtn').onclick=downloadMileageEml;
+$('#downloadMileageCsvBtn').onclick=downloadMileageCsv;
+$('#downloadEmlBtn').onclick=downloadOutlookEml;
+$('#copyBtn').onclick=copyFormattedEmail;
+$('#printBtn').onclick=()=>{ if(!currentReport){alert('Analyze a report first.');return;} window.print(); };
+$('#csvBtn').onclick=()=>{
+  if(!currentReport){alert('Analyze a report first.');return;}
+  const rows=[['Crew','Subdivision','Builder','City','Job','Address','People','In','Out','Actual','Budget','Status']];
+  currentReport.crews.forEach(c=>c.jobs.forEach(j=>{
+    const trip=c.trips.find(t=>t.from===j);
+    rows.push([
+      c.name,j.subdivision,j.builder,j.city,j.left,j.address,j.people,j.in,j.out,j.actual,j.budget,
+      j.cancelled?'Cancelled':'Completed',
+      trip?trip.to.subdivision:'',
+      trip&&trip.route&&Number.isFinite(Number(trip.route.miles))?Number(trip.route.miles):''
+    ]);
+  }));
+  const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'}), a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='vip-crew-efficiency-report.csv'; a.click(); URL.revokeObjectURL(a.href);
+};
+$('#subdivisionFile').onchange=async e=>{ const file=e.target.files[0]; if(file) await importSubdivisionWorkbook(file); e.target.value=''; };
+$('#resetSubdivisionsBtn').onclick=()=>{
+  if(confirm('Restore the subdivision locations included with this report?')){
+    saveSubdivisionData(DEFAULT_SUBDIVISIONS);
+    routeCache={};
+    localStorage.removeItem(STORAGE_KEYS.routeCache);
+    if(currentReport) render(currentReport=parseReport($('#pasteBox').value));
+  }
+};
+['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id=>{
+  $('#'+id).addEventListener('change',()=>{saveSettings(); if(currentReport) render(currentReport=parseReport($('#pasteBox').value));});
+});
+loadLocalData();
+
+$('#sampleBtn').onclick=()=>{ $('#pasteBox').value=`EVA/JOSE\t\t\t\t\t\t
+Monday\tPeople\tIn\tOut\tActual Man Hours\tBudget\tEst. Complete
+*Nottingham Trace *Pulte *New Albany\t\t\t\t\t\t
+208 Reclean - 7324 Upper Albany Drive\t2\t8:15 AM\t10:02 AM\t3.6\t3\t9:45 AM
+209 Reclean - 7318 Upper Albany Drive\t2\tcancelled\t\t\t\t
+*Haines Creek *Epcon *New Albany\t\t\t\t\t\t
+104 Original - 5547 Wooster Dr.\t2\t10:49 AM\t3:41 PM\t9.7\t7\t2:19 PM`; };
+</script>
+</body>
+</html>
