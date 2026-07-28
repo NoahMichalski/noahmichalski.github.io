@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v2.3</title>
+<title>VIP Crew Efficiency & Travel Report v2.4</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -59,10 +59,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v2.3</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v2.4</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 2.3</div>
+    <div class="version">Version 2.4</div>
   </div>
 
   <div class="input-grid">
@@ -480,6 +480,137 @@ function outlookEmailHtml(){
   const efficiencyColor=efficiency>=100?'#274e13':efficiency>=85?'#7f6000':'#990000';
   const crews=[...r.crews].sort((a,b)=>b.eff-a.eff);
   const lateTrips=r.crews.flatMap(c=>c.trips.filter(t=>t.late).map(t=>({crew:c.name,...t})));
+  const incomplete=r.crews.flatMap(c=>c.jobs.filter(j=>!j.cancelled && (!j.in || !j.out || !j.actual)).map(j=>({crew:c.name,...j})));
+  const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
+  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#1f4e78;font-size:13px;text-align:left;color:#ffffff;font-weight:700;';
+  const section='font-size:18px;color:#1f4e78;margin:24px 0 8px;font-family:Segoe UI,Arial,sans-serif;';
+  const card=(label,value,bg='#eef3f8',color='#1f1f1f')=>`
+    <td style="width:20%;padding:10px;border:1px solid #d9e2f3;background:${bg};text-align:center">
+      <div style="font-size:11px;color:#666666;text-transform:uppercase;letter-spacing:.4px">${label}</div>
+      <div style="font-size:22px;font-weight:700;color:${color};margin-top:4px">${value}</div>
+    </td>`;
+
+  const crewRows=crews.map(c=>{
+    const bg=c.eff>=100?'#e2f0d9':c.eff>=85?'#fff2cc':'#f4cccc';
+    const color=c.eff>=100?'#274e13':c.eff>=85?'#7f6000':'#990000';
+    return `<tr>
+      <td style="${td}font-weight:600">${esc(c.name)}</td>
+      <td style="${td}text-align:center">${c.completed}</td>
+      <td style="${td}text-align:center">${c.cancelled}</td>
+      <td style="${td}text-align:right">${fmt(c.actual)}</td>
+      <td style="${td}text-align:right">${fmt(c.budget)}</td>
+      <td style="${td}">${varianceText(c)}</td>
+      <td style="${td}background:${bg};color:${color};font-weight:700;text-align:center">${c.actual?c.eff.toFixed(1)+'%':'N/A'}</td>
+      <td style="${td}text-align:center">${c.trips.filter(t=>t.late).length}</td>
+    </tr>`;
+  }).join('');
+
+  const travelRows=lateTrips.length
+    ? lateTrips.map(t=>`<tr>
+      <td style="${td}font-weight:600">${esc(t.crew)}</td>
+      <td style="${td}">${esc(t.from.subdivision)}</td>
+      <td style="${td}">${esc(t.to.subdivision)}</td>
+      <td style="${td}text-align:center">${t.gap} min</td>
+      <td style="${td}text-align:center">${t.expected} min</td>
+      <td style="${td}background:#f4cccc;color:#990000;font-weight:700">${t.travelDelay} min travel delay</td>
+    </tr>`).join('')
+    : `<tr><td colspan="6" style="${td}color:#666666">No travel delays found.</td></tr>`;
+
+  const cancelRows=r.cancelled.length?r.crews.flatMap(c=>c.jobs.filter(j=>j.cancelled).map(j=>`<tr>
+    <td style="${td}font-weight:600">${esc(c.name)}</td>
+    <td style="${td}">${esc(j.subdivision)}</td>
+    <td style="${td}">${esc(j.lot)}</td>
+    <td style="${td}">${esc(j.jobType)}</td>
+    <td style="${td}">${esc(j.address)}</td>
+  </tr>`)).join(''):`<tr><td colspan="5" style="${td}color:#666666">No cancelled jobs.</td></tr>`;
+
+  const incompleteRows=incomplete.length?incomplete.map(j=>`<tr>
+    <td style="${td}font-weight:600">${esc(j.crew)}</td>
+    <td style="${td}">${esc(j.subdivision)}</td>
+    <td style="${td}">${esc(j.left)}</td>
+    <td style="${td}">${esc(j.in||'Missing')}</td>
+    <td style="${td}">${esc(j.out||'Missing')}</td>
+  </tr>`).join(''):`<tr><td colspan="5" style="${td}color:#666666">No incomplete jobs.</td></tr>`;
+
+  const highlightRows=[
+    highlights.best?`<tr><td style="${td}font-weight:600">Best efficiency</td><td style="${td}">${esc(highlights.best.name)} &ndash; ${highlights.best.eff.toFixed(1)}%</td></tr>`:'',
+    highlights.worst?`<tr><td style="${td}font-weight:600">Most over budget</td><td style="${td}">${esc(highlights.worst.name)} &ndash; ${varianceText(highlights.worst)}</td></tr>`:'',
+    highlights.mostCancelled&&highlights.mostCancelled.cancelled?`<tr><td style="${td}font-weight:600">Most cancelled jobs</td><td style="${td}">${esc(highlights.mostCancelled.name)} &ndash; ${highlights.mostCancelled.cancelled}</td></tr>`:'',
+    highlights.longest?`<tr><td style="${td}font-weight:600">Longest travel delay</td><td style="${td}">${esc(highlights.longest.crew)} &ndash; ${highlights.longest.travelDelay} minutes travel delay</td></tr>`:''
+  ].filter(Boolean).join('');
+
+  return `<!doctype html><html><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body style="margin:0;padding:0;background:#ffffff">
+  <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:980px;margin:0 auto;padding:20px">
+    <div style="background:#1f4e78;color:#ffffff;padding:20px 24px;border-radius:4px">
+      <div style="font-size:25px;font-weight:700">VIP Crew Efficiency Report</div>
+      <div style="font-size:14px;margin-top:5px;color:#dbe8f4">${getReportDateLabel()}</div>
+    </div>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;margin-top:14px">
+      <tr>
+        ${card('Completed',r.jobs.length)}
+        ${card('Cancelled',r.cancelled.length,'#eadcf8','#7030a0')}
+        ${card('Actual Hours',fmt(r.actual))}
+        ${card('Budget Hours',fmt(r.budget))}
+        ${card('Efficiency',efficiency.toFixed(1)+'%',efficiencyBg,efficiencyColor)}
+      </tr>
+    </table>
+
+    <h2 style="${section}">Daily highlights</h2>
+    <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+      ${highlightRows||`<tr><td style="${td}color:#666666">No highlights available.</td></tr>`}
+    </table>
+
+    <h2 style="${section}">Crew performance</h2>
+    <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="${th}">Crew</th><th style="${th}">Jobs</th><th style="${th}">Cancelled</th>
+        <th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th>
+        <th style="${th}">Efficiency</th><th style="${th}">Travel Delays</th>
+      </tr></thead>
+      <tbody>${crewRows}</tbody>
+    </table>
+
+    <h2 style="${section}">Travel Delays &ndash; ${lateTrips.length} delay${lateTrips.length===1?'':'s'}</h2>
+    <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="${th}">Crew</th><th style="${th}">From</th><th style="${th}">To</th>
+        <th style="${th}">Actual Gap</th><th style="${th}">Expected</th><th style="${th}">Finding</th>
+      </tr></thead>
+      <tbody>${travelRows}</tbody>
+    </table>
+
+    <h2 style="${section}">Cancelled jobs &ndash; ${r.cancelled.length}</h2>
+    <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="${th}">Crew</th><th style="${th}">Subdivision</th><th style="${th}">Lot</th>
+        <th style="${th}">Job Type</th><th style="${th}">Address</th>
+      </tr></thead>
+      <tbody>${cancelRows}</tbody>
+    </table>
+
+    <h2 style="${section}">Incomplete jobs</h2>
+    <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="${th}">Crew</th><th style="${th}">Subdivision</th><th style="${th}">Job</th>
+        <th style="${th}">In</th><th style="${th}">Out</th>
+      </tr></thead>
+      <tbody>${incompleteRows}</tbody>
+    </table>
+
+    <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666666;font-size:11px;line-height:1.5">
+      Efficiency equals budget hours divided by actual man-hours. Cancelled jobs are excluded from efficiency.
+      Expected travel includes mapped road time plus the selected arrival and parking buffer. Only the time from the previous clock-out to the next clock-in is evaluated.
+    </div>
+  </div></body></html>`;
+}
+function emailText(){
+  if(!currentReport) return '';
+  const r=currentReport, eff=r.actual?r.budget/r.actual*100:0;
+  let out=`VIP Crew Efficiency Report\n${getReportDateLabel()}\n\nCompleted Jobs: ${r.jobs.length}\nCancelled Jobs: ${r.cancelled.length}\nActual Hours: ${fmt(r.actual)}\nBudget Hours: ${fmt(r.budget)}\nOverall Efficiency: ${eff.toFixed(1)}%\n\nCREW RESULTS\n`;
+  [...r.crews].sort((a,b)=>b.eff-a.eff).forEach(c=>{
+    out+=`\n${c.name}: ${c.completed} completed, ${c.cancelled} cancelled, ${fmt(c.actual)} actual, ${fmt(c.budget)} budget, ${c.actual?c.eff.toFixed(1)+'%':'N/A'} efficiency`;
+  });
   out+=`\n\nCANCELLED JOBS\n`;
   if(!r.cancelled.length) out+='None\n';
   else r.crews.forEach(c=>c.jobs.filter(j=>j.cancelled).forEach(j=>out+=`\n- ${c.name}: ${j.subdivision} — ${j.left} — ${j.address}`));
