@@ -99,6 +99,12 @@ td[contenteditable="true"] { outline:none; }
 <h3>Add Person</h3>
 
 <input id="newName" placeholder="Last, First"><br>
+
+<select id="newWeek">
+<option value="0">Week 1</option>
+<option value="1">Week 2</option>
+</select><br>
+
 <input id="m" placeholder="Mon">
 <input id="t" placeholder="Tue">
 <input id="w" placeholder="Wed">
@@ -111,7 +117,8 @@ td[contenteditable="true"] { outline:none; }
 
 <script>
 
-let allData = [];
+let week1 = [];
+let week2 = [];
 let futureSelections = {};
 
 function clean(v){
@@ -130,10 +137,9 @@ function loadExcel(){
         let sheet = wb.Sheets[wb.SheetNames[0]];
         let rows = XLSX.utils.sheet_to_json(sheet,{header:1});
 
-        allData = [];
+        let all = [];
 
         rows.forEach(r=>{
-
             let name = r[1];
             if(typeof name !== "string" || !name.includes(",")) return;
 
@@ -145,8 +151,12 @@ function loadExcel(){
                 clean(r[11])
             ];
 
-            allData.push({ name, days });
+            all.push({ name, days });
         });
+
+        let midpoint = Math.floor(all.length / 2);
+        week1 = all.slice(0, midpoint);
+        week2 = all.slice(midpoint);
 
         render();
     };
@@ -154,21 +164,19 @@ function loadExcel(){
     reader.readAsBinaryString(file);
 }
 
+function getCurrentData(){
+    return weekSelect.value == "0" ? week1 : week2;
+}
+
 function render(){
 
-    let week = parseInt(weekSelect.value);
     let day = parseInt(daySelect.value);
-
-    let midpoint = Math.floor(allData.length / 2);
-
-    let currentData = week === 0
-        ? allData.slice(0, midpoint)
-        : allData.slice(midpoint);
+    let data = getCurrentData();
 
     let tbody = table.querySelector("tbody");
     tbody.innerHTML="";
 
-    let rows = currentData.map((r,index)=>{
+    let rows = data.map((r,index)=>{
 
         let projected=0,running=0,hit="-";
 
@@ -179,7 +187,7 @@ function render(){
             if(i <= day){
                 val = r.days[i];
             } else {
-                let key = `${index}-${i}`;
+                let key = `${weekSelect.value}-${index}-${i}`;
                 let selected = futureSelections[key];
 
                 if(selected === "OFF") val = 0;
@@ -222,12 +230,13 @@ function render(){
                     ${r.days[i]}
                 </td>`;
             } else {
-                let key = `${r.index}-${i}`;
+
+                let key = `${weekSelect.value}-${r.index}-${i}`;
                 let val = futureSelections[key] || "8";
 
                 cells += `
                 <td class="predicted">
-                    <select onchange="updateFuture(${r.index}, ${i}, this.value)">
+                    <select onchange="updateFuture('${key}', this.value)">
                         <option value="8" ${val=="8"?"selected":""}>8</option>
                         <option value="4" ${val=="4"?"selected":""}>4</option>
                         <option value="0" ${val=="0"?"selected":""}>0</option>
@@ -251,13 +260,12 @@ function render(){
     });
 }
 
-/* REMOVE */
 function removePerson(index){
-    allData.splice(index,1);
+    let data = getCurrentData();
+    data.splice(index,1);
     render();
 }
 
-/* ADD */
 function showAddPopup(){
     popup.style.display="block";
 }
@@ -269,6 +277,7 @@ function closePopup(){
 function addPerson(){
 
     let name = newName.value;
+    let week = newWeek.value;
 
     if(!name.includes(",")){
         alert("Use format: Last, First");
@@ -283,26 +292,29 @@ function addPerson(){
         clean(f.value)
     ];
 
-    allData.push({ name, days });
+    if(week == "0"){
+        week1.push({ name, days });
+    } else {
+        week2.push({ name, days });
+    }
 
     closePopup();
     render();
 }
 
-/* EDIT */
 function updateCell(rowIndex, dayIndex, value){
+    let data = getCurrentData();
     let num = parseFloat(value);
     if(isNaN(num)) num = 0;
-    allData[rowIndex].days[dayIndex] = num;
+    data[rowIndex].days[dayIndex] = num;
     render();
 }
 
-function updateFuture(rowIndex, dayIndex, value){
-    futureSelections[`${rowIndex}-${dayIndex}`] = value;
+function updateFuture(key, value){
+    futureSelections[key] = value;
     render();
 }
 
-/* EMAIL */
 function emailPreview(){
 
     let rows = document.querySelectorAll("#table tr");
