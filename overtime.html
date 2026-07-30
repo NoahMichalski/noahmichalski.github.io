@@ -34,9 +34,18 @@ th { background:#d9d9d9; color:#000; }
 .overtime { background:#ff1a1a; color:#fff; }
 .predicted { background:#ff4da6; }
 
-/* 🔥 removed blue outline */
-td[contenteditable="true"] {
-    outline:none;
+td[contenteditable="true"] { outline:none; }
+
+/* popup */
+.popup {
+    display:none;
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:#1a1d24;
+    padding:20px;
+    border:1px solid #444;
 }
 </style>
 </head>
@@ -62,6 +71,7 @@ td[contenteditable="true"] {
 </select>
 
 <button onclick="loadExcel()">Load Excel</button>
+<button onclick="showAddPopup()">Add Person</button>
 <button onclick="emailPreview()">Email Preview</button>
 </div>
 
@@ -78,16 +88,31 @@ td[contenteditable="true"] {
 <th>Projected</th>
 <th>OT</th>
 <th>Hit</th>
+<th>Remove</th>
 </tr>
 </thead>
 <tbody></tbody>
 </table>
 
+<!-- ADD PERSON POPUP -->
+<div class="popup" id="popup">
+<h3>Add Person</h3>
+
+<input id="newName" placeholder="Last, First"><br>
+<input id="m" placeholder="Mon">
+<input id="t" placeholder="Tue">
+<input id="w" placeholder="Wed">
+<input id="th" placeholder="Thu">
+<input id="f" placeholder="Fri"><br>
+
+<button onclick="addPerson()">Add</button>
+<button onclick="closePopup()">Cancel</button>
+</div>
+
 <script>
 
 let allData = [];
-let currentData = [];
-let futureSelections = {}; // 🔥 stores dropdown values
+let futureSelections = {};
 
 function clean(v){
     let n = parseFloat(v);
@@ -106,7 +131,6 @@ function loadExcel(){
         let rows = XLSX.utils.sheet_to_json(sheet,{header:1});
 
         allData = [];
-        futureSelections = {};
 
         rows.forEach(r=>{
 
@@ -137,7 +161,7 @@ function render(){
 
     let midpoint = Math.floor(allData.length / 2);
 
-    currentData = week === 0
+    let currentData = week === 0
         ? allData.slice(0, midpoint)
         : allData.slice(midpoint);
 
@@ -192,15 +216,12 @@ function render(){
         for(let i=0;i<5;i++){
 
             if(i <= day){
-
                 cells += `
                 <td contenteditable="true"
                     onblur="updateCell(${r.index}, ${i}, this.innerText)">
                     ${r.days[i]}
                 </td>`;
-
             } else {
-
                 let key = `${r.index}-${i}`;
                 let val = futureSelections[key] || "8";
 
@@ -223,13 +244,52 @@ function render(){
         <td>${r.projected.toFixed(1)}</td>
         <td>${r.ot.toFixed(1)}</td>
         <td>${r.hit}</td>
+        <td><button onclick="removePerson(${r.index})">X</button></td>
         `;
 
         tbody.appendChild(tr);
     });
 }
 
-/* edit past days */
+/* REMOVE */
+function removePerson(index){
+    allData.splice(index,1);
+    render();
+}
+
+/* ADD */
+function showAddPopup(){
+    popup.style.display="block";
+}
+
+function closePopup(){
+    popup.style.display="none";
+}
+
+function addPerson(){
+
+    let name = newName.value;
+
+    if(!name.includes(",")){
+        alert("Use format: Last, First");
+        return;
+    }
+
+    let days = [
+        clean(m.value),
+        clean(t.value),
+        clean(w.value),
+        clean(th.value),
+        clean(f.value)
+    ];
+
+    allData.push({ name, days });
+
+    closePopup();
+    render();
+}
+
+/* EDIT */
 function updateCell(rowIndex, dayIndex, value){
     let num = parseFloat(value);
     if(isNaN(num)) num = 0;
@@ -237,13 +297,12 @@ function updateCell(rowIndex, dayIndex, value){
     render();
 }
 
-/* dropdown future */
 function updateFuture(rowIndex, dayIndex, value){
     futureSelections[`${rowIndex}-${dayIndex}`] = value;
     render();
 }
 
-/* email */
+/* EMAIL */
 function emailPreview(){
 
     let rows = document.querySelectorAll("#table tr");
