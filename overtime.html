@@ -8,7 +8,6 @@
 <style>
 body { background:#111; color:#eee; font-family:Arial; margin:0; }
 .header { background:#1a1d24; padding:10px; }
-
 .controls { text-align:center; padding:10px; }
 
 button, select, input {
@@ -36,7 +35,6 @@ th { background:#d9d9d9; color:#000; }
 
 td[contenteditable="true"] { outline:none; }
 
-/* popup */
 .popup {
     display:none;
     position:fixed;
@@ -55,7 +53,7 @@ td[contenteditable="true"] { outline:none; }
 <div class="header">Overtime Dashboard</div>
 
 <div class="controls">
-<input type="file" id="fileInput">
+<input type="file" id="fileInput" multiple>
 
 <select id="weekSelect" onchange="render()">
 <option value="0">Week 1</option>
@@ -94,7 +92,6 @@ td[contenteditable="true"] { outline:none; }
 <tbody></tbody>
 </table>
 
-<!-- ADD PERSON POPUP -->
 <div class="popup" id="popup">
 <h3>Add Person</h3>
 
@@ -126,22 +123,25 @@ function clean(v){
     return isNaN(n) ? 0 : n;
 }
 
-function loadExcel(){
+/* 🔥 MULTI IMPORT + IGNORE DUPES */
+async function loadExcel(){
 
-    let file = fileInput.files[0];
-    let reader = new FileReader();
+    let files = fileInput.files;
 
-    reader.onload = e=>{
+    for(let f = 0; f < files.length; f++){
 
-        let wb = XLSX.read(e.target.result,{type:'binary'});
+        let data = await files[f].arrayBuffer();
+        let wb = XLSX.read(data);
         let sheet = wb.Sheets[wb.SheetNames[0]];
         let rows = XLSX.utils.sheet_to_json(sheet,{header:1});
 
-        let all = [];
-
         rows.forEach(r=>{
+
             let name = r[1];
             if(typeof name !== "string" || !name.includes(",")) return;
+
+            // normalize name (prevents hidden dupes)
+            name = name.trim().toLowerCase();
 
             let days = [
                 clean(r[4]),
@@ -151,27 +151,33 @@ function loadExcel(){
                 clean(r[11])
             ];
 
-            all.push({ name, days });
+            let exists =
+                week1.some(p => p.name === name) ||
+                week2.some(p => p.name === name);
+
+            if(exists) return;
+
+            // default insert to selected week
+            if(weekSelect.value == "0"){
+                week1.push({ name, days });
+            } else {
+                week2.push({ name, days });
+            }
+
         });
+    }
 
-        let midpoint = Math.floor(all.length / 2);
-        week1 = all.slice(0, midpoint);
-        week2 = all.slice(midpoint);
-
-        render();
-    };
-
-    reader.readAsBinaryString(file);
+    render();
 }
 
-function getCurrentData(){
+function getData(){
     return weekSelect.value == "0" ? week1 : week2;
 }
 
 function render(){
 
     let day = parseInt(daySelect.value);
-    let data = getCurrentData();
+    let data = getData();
 
     let tbody = table.querySelector("tbody");
     tbody.innerHTML="";
@@ -188,10 +194,10 @@ function render(){
                 val = r.days[i];
             } else {
                 let key = `${weekSelect.value}-${index}-${i}`;
-                let selected = futureSelections[key];
+                let sel = futureSelections[key];
 
-                if(selected === "OFF") val = 0;
-                else if(selected) val = parseFloat(selected);
+                if(sel === "OFF") val = 0;
+                else if(sel) val = parseFloat(sel);
                 else val = 8;
             }
 
@@ -224,11 +230,9 @@ function render(){
         for(let i=0;i<5;i++){
 
             if(i <= day){
-                cells += `
-                <td contenteditable="true"
-                    onblur="updateCell(${r.index}, ${i}, this.innerText)">
-                    ${r.days[i]}
-                </td>`;
+                cells += `<td contenteditable="true"
+                onblur="updateCell(${r.index}, ${i}, this.innerText)">
+                ${r.days[i]}</td>`;
             } else {
 
                 let key = `${weekSelect.value}-${r.index}-${i}`;
@@ -236,12 +240,12 @@ function render(){
 
                 cells += `
                 <td class="predicted">
-                    <select onchange="updateFuture('${key}', this.value)">
-                        <option value="8" ${val=="8"?"selected":""}>8</option>
-                        <option value="4" ${val=="4"?"selected":""}>4</option>
-                        <option value="0" ${val=="0"?"selected":""}>0</option>
-                        <option value="OFF" ${val=="OFF"?"selected":""}>OFF</option>
-                    </select>
+                <select onchange="updateFuture('${key}', this.value)">
+                <option value="8" ${val=="8"?"selected":""}>8</option>
+                <option value="4" ${val=="4"?"selected":""}>4</option>
+                <option value="0" ${val=="0"?"selected":""}>0</option>
+                <option value="OFF" ${val=="OFF"?"selected":""}>OFF</option>
+                </select>
                 </td>`;
             }
         }
@@ -261,26 +265,19 @@ function render(){
 }
 
 function removePerson(index){
-    let data = getCurrentData();
-    data.splice(index,1);
+    getData().splice(index,1);
     render();
 }
 
-function showAddPopup(){
-    popup.style.display="block";
-}
-
-function closePopup(){
-    popup.style.display="none";
-}
+function showAddPopup(){ popup.style.display="block"; }
+function closePopup(){ popup.style.display="none"; }
 
 function addPerson(){
 
-    let name = newName.value;
-    let week = newWeek.value;
+    let name = newName.value.trim().toLowerCase();
 
     if(!name.includes(",")){
-        alert("Use format: Last, First");
+        alert("Use Last, First");
         return;
     }
 
@@ -292,7 +289,7 @@ function addPerson(){
         clean(f.value)
     ];
 
-    if(week == "0"){
+    if(newWeek.value == "0"){
         week1.push({ name, days });
     } else {
         week2.push({ name, days });
@@ -302,16 +299,15 @@ function addPerson(){
     render();
 }
 
-function updateCell(rowIndex, dayIndex, value){
-    let data = getCurrentData();
-    let num = parseFloat(value);
+function updateCell(i,d,v){
+    let num = parseFloat(v);
     if(isNaN(num)) num = 0;
-    data[rowIndex].days[dayIndex] = num;
+    getData()[i].days[d] = num;
     render();
 }
 
-function updateFuture(key, value){
-    futureSelections[key] = value;
+function updateFuture(k,v){
+    futureSelections[k] = v;
     render();
 }
 
