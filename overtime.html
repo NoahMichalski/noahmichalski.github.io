@@ -15,10 +15,7 @@ button, select, input {
     margin:5px;
 }
 
-table {
-    width:100%;
-    border-collapse:collapse;
-}
+table { width:100%; border-collapse:collapse; }
 
 th, td {
     border:1px solid #333;
@@ -123,7 +120,6 @@ function clean(v){
     return isNaN(n) ? 0 : n;
 }
 
-/* 🔥 MULTI IMPORT + IGNORE DUPES */
 async function loadExcel(){
 
     let files = fileInput.files;
@@ -140,7 +136,6 @@ async function loadExcel(){
             let name = r[1];
             if(typeof name !== "string" || !name.includes(",")) return;
 
-            // normalize name (prevents hidden dupes)
             name = name.trim().toLowerCase();
 
             let days = [
@@ -157,7 +152,6 @@ async function loadExcel(){
 
             if(exists) return;
 
-            // default insert to selected week
             if(weekSelect.value == "0"){
                 week1.push({ name, days });
             } else {
@@ -311,18 +305,50 @@ function updateFuture(k,v){
     render();
 }
 
+/* 🔥 FINAL EXPORT */
 function emailPreview(){
 
     let rows = document.querySelectorAll("#table tr");
 
-    let html = `<html><body><table style="border-collapse:collapse;">`;
+    let totalOT = 0;
+    let totalHours = 0;
+
+    document.querySelectorAll("#table tbody tr").forEach(tr=>{
+        let tds = tr.querySelectorAll("td");
+
+        let actual = parseFloat(tds[6]?.innerText);
+        let ot = parseFloat(tds[8]?.innerText);
+
+        if(!isNaN(actual)) totalHours += actual;
+        if(!isNaN(ot)) totalOT += ot;
+    });
+
+    let html = `
+    <html><body style="font-family:Arial;">
+    <h3>Overtime Report</h3>
+
+    <div style="margin-bottom:10px;font-weight:bold;">
+        Total Hours: ${totalHours.toFixed(1)}<br>
+        Expected OT: ${totalOT.toFixed(1)}
+    </div>
+
+    <table style="border-collapse:collapse;">
+    `;
 
     rows.forEach((tr,i)=>{
-        html+="<tr>";
 
-        tr.querySelectorAll("th,td").forEach(td=>{
+        html += "<tr>";
 
-            let text = td.querySelector("select") ? td.querySelector("select").value : td.innerText;
+        let cells = tr.querySelectorAll("th,td");
+
+        cells.forEach((td,idx)=>{
+
+            // 🔥 skip remove column
+            if(idx === cells.length - 1) return;
+
+            let text = td.querySelector("select")
+                ? td.querySelector("select").value
+                : td.innerText;
 
             let style="border:1px solid #000;padding:6px;text-align:center;";
 
