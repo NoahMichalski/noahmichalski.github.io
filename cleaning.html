@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v2.5</title>
+<title>VIP Crew Efficiency & Travel Report v2.7</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -59,10 +59,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v2.5</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v2.7</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 2.5</div>
+    <div class="version">Version 2.7</div>
   </div>
 
   <div class="input-grid">
@@ -128,9 +128,9 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
       </div>
       <div id="emailStatus" class="muted small" style="margin-top:8px"></div>
 
-      <details id="weeklyMileagePanel" style="margin-top:16px">
+      <details id="weeklyReportsPanel" style="margin-top:16px" open>
         <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
-          Weekly Mileage History
+          Saved Daily Reports
         </summary>
         <div style="padding-top:14px">
           <div class="controls">
@@ -141,21 +141,21 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
               <input id="mileageWeekStart" type="date">
             </label>
           </div>
+
           <div class="buttons">
             <button id="saveMileageDayBtn">Save Current Day</button>
             <label style="display:inline-flex">
               <input id="multiDayMileageFiles" type="file" accept=".txt,.csv" multiple style="display:none">
               <span style="display:inline-block;background:#24334c;color:var(--text);border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer">Import Up to 5 Daily Reports</span>
             </label>
-            <button id="previewWeeklyMileageBtn">Preview Weekly Mileage</button>
-            <button id="downloadWeeklyMileageEmlBtn">Download Weekly Mileage Email (.eml)</button>
-            <button id="downloadWeeklyMileageCsvBtn">Export Weekly Mileage CSV</button>
           </div>
+
           <div class="notice" style="margin-top:12px">
-            Daily mileage is saved in this browser by operation date. Cancelled jobs remain in the mileage route because the crew may still have driven there. Mileage uses routed driving distance only; unavailable road routes are shown as missing and are not replaced with straight-line mileage.
+            Saved daily reports are used for both the weekly operations report and weekly mileage report. Everything is stored in this browser.
           </div>
+
           <div class="section-head" style="margin-top:14px">
-            <h3>Saved Mileage Days</h3>
+            <h3>Saved Days</h3>
             <span id="savedMileageStatus" class="muted small"></span>
           </div>
           <div class="scroll">
@@ -163,6 +163,60 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
               <thead><tr><th>Date</th><th>Day</th><th>Crews</th><th>Road Miles</th><th>Missing Routes</th><th>Action</th></tr></thead>
               <tbody id="savedMileageDaysTable"></tbody>
             </table>
+          </div>
+        </div>
+      </details>
+
+      <details id="weeklyOperationsPanel" style="margin-top:14px" open>
+        <summary style="padding:12px 14px;background:#1f4e78;border:1px solid #315f89;border-radius:12px;cursor:pointer;font-weight:800;color:#ffffff">
+          Weekly Operations Reports
+        </summary>
+        <div style="padding-top:14px">
+          <div class="notice">
+            Full Monday–Friday reporting for completed jobs, cancellations, actual and budget hours, efficiency, travel delays, crew performance, and job types.
+          </div>
+          <div class="buttons">
+            <button id="previewWeeklyOperationsBtn" class="primary">Preview Weekly Operations</button>
+            <button id="downloadWeeklyOperationsEmlBtn">Download Weekly Operations Email (.eml)</button>
+            <button id="downloadWeeklyOperationsCsvBtn">Export Weekly Operations CSV</button>
+          </div>
+        </div>
+      </details>
+
+      <details id="weeklyMileagePanel" style="margin-top:14px">
+        <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
+          Weekly Mileage Reports
+        </summary>
+        <div style="padding-top:14px">
+          <div class="buttons">
+            <button id="previewWeeklyMileageBtn">Preview Weekly Mileage</button>
+            <button id="downloadWeeklyMileageEmlBtn">Download Weekly Mileage Email (.eml)</button>
+            <button id="downloadWeeklyMileageCsvBtn">Export Weekly Mileage CSV</button>
+          </div>
+
+          <div class="notice" style="margin-top:12px">
+            Cancelled jobs remain in the mileage route because the crew may still have driven there. Mileage uses routed driving distance only; unavailable routes are marked missing rather than replaced with straight-line mileage.
+          </div>
+
+          <div class="notice" style="margin-top:12px">
+            <strong>Mileage exclusions</strong>
+            <div class="controls" style="margin-top:10px">
+              <label>Person or crew to exclude from mileage
+                <input id="mileageExcludeInput" type="text" placeholder="Example: Dennis">
+              </label>
+              <label>&nbsp;
+                <button id="addMileageExcludeBtn" type="button">Add Mileage Exclusion</button>
+              </label>
+            </div>
+            <div id="mileageExcludeChips" class="buttons" style="margin-top:10px"></div>
+            <div class="muted small" style="margin-top:8px">
+              An excluded person or crew is omitted only from mileage reports. They remain in efficiency and weekly operations reports.
+            </div>
+            <div class="section-head" style="margin-top:12px">
+              <h3>Current Crew Mileage Buttons</h3>
+              <span class="muted small">Click to include or exclude</span>
+            </div>
+            <div id="currentCrewMileageButtons" class="buttons"></div>
           </div>
         </div>
       </details>
@@ -219,12 +273,14 @@ const STORAGE_KEYS = {
   routeCache: 'vipCrewReport.routeCache.v1',
   settings: 'vipCrewReport.settings.v1',
   drivingRouteCache: 'vipCrewReport.drivingRouteCache.v1',
-  mileageHistory: 'vipCrewReport.mileageHistory.v1'
+  mileageHistory: 'vipCrewReport.mileageHistory.v1',
+  mileageExclusions: 'vipCrewReport.mileageExclusions.v1'
 };
 let subdivisionData = [];
 let routeCache = {};
 let drivingRouteCache = {};
 let mileageHistory = {};
+let mileageExclusions = [];
 
 function normalizeName(value){
   return String(value || '')
@@ -251,6 +307,7 @@ function loadLocalData(){
   try { routeCache = JSON.parse(localStorage.getItem(STORAGE_KEYS.routeCache) || '{}') || {}; } catch(e) { routeCache = {}; }
   try { drivingRouteCache = JSON.parse(localStorage.getItem(STORAGE_KEYS.drivingRouteCache) || '{}') || {}; } catch(e) { drivingRouteCache = {}; }
   try { mileageHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.mileageHistory) || '{}') || {}; } catch(e) { mileageHistory = {}; }
+  try { mileageExclusions = JSON.parse(localStorage.getItem(STORAGE_KEYS.mileageExclusions) || '[]') || []; } catch(e) { mileageExclusions = []; }
   try {
     const settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || '{}');
     ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id => {
@@ -260,6 +317,8 @@ function loadLocalData(){
   updateSubdivisionStatus();
   initializeMileageDates();
   renderSavedMileageDays();
+  renderMileageExclusions();
+  renderCurrentCrewMileageButtons();
 }
 function saveSettings(){
   const settings = {};
@@ -344,6 +403,142 @@ function classifyJob(text){
   return 'Other';
 }
 
+
+function normalizePersonName(value){
+  return String(value||'')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function crewNameParts(name){
+  const raw=String(name||'');
+  const parts=raw.split('/').map(normalizePersonName).filter(Boolean);
+  parts.push(normalizePersonName(raw));
+  return [...new Set(parts)];
+}
+function isMileageCrewExcluded(name){
+  const parts=crewNameParts(name);
+  return mileageExclusions.some(item=>{
+    const key=normalizePersonName(item);
+    return key && parts.some(part=>part===key || part.includes(key) || key.includes(part));
+  });
+}
+function saveMileageExclusions(){
+  mileageExclusions=[...new Set(mileageExclusions.map(x=>String(x).trim()).filter(Boolean))];
+  localStorage.setItem(STORAGE_KEYS.mileageExclusions,JSON.stringify(mileageExclusions));
+  renderMileageExclusions();
+  renderCurrentCrewMileageButtons();
+  renderSavedMileageDays();
+}
+function addMileageExclusion(value){
+  const clean=String(value||'').trim();
+  if(!clean) return;
+  if(!mileageExclusions.some(x=>normalizePersonName(x)===normalizePersonName(clean))){
+    mileageExclusions.push(clean);
+    saveMileageExclusions();
+  }
+}
+function removeMileageExclusion(value){
+  const key=normalizePersonName(value);
+  mileageExclusions=mileageExclusions.filter(x=>normalizePersonName(x)!==key);
+  saveMileageExclusions();
+}
+function renderMileageExclusions(){
+  const holder=$('#mileageExcludeChips');
+  if(!holder) return;
+  holder.innerHTML='';
+  if(!mileageExclusions.length){
+    holder.innerHTML='<span class="muted small">No mileage exclusions saved.</span>';
+    return;
+  }
+  [...mileageExclusions].sort((a,b)=>a.localeCompare(b)).forEach(name=>{
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.innerHTML=`${esc(name)} ×`;
+    btn.title='Remove mileage exclusion';
+    btn.addEventListener('click',()=>removeMileageExclusion(name));
+    holder.appendChild(btn);
+  });
+}
+function renderCurrentCrewMileageButtons(){
+  const holder=$('#currentCrewMileageButtons');
+  if(!holder) return;
+  holder.innerHTML='';
+  if(!currentReport || !currentReport.crews?.length){
+    holder.innerHTML='<span class="muted small">Analyze a report to show crew buttons.</span>';
+    return;
+  }
+  currentReport.crews.forEach(c=>{
+    const excluded=isMileageCrewExcluded(c.name);
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.textContent=`${excluded?'Excluded':'Included'}: ${c.name}`;
+    btn.className=excluded?'':'primary';
+    btn.addEventListener('click',()=>{
+      if(excluded){
+        const matching=mileageExclusions.filter(x=>isMileageNameMatch(c.name,x));
+        matching.forEach(removeMileageExclusion);
+      }else{
+        addMileageExclusion(c.name);
+      }
+      if(currentReport?.mileageCalculationComplete) $('#emailStatus').textContent='Mileage exclusions updated. Mileage reports now use the saved exclusions.';
+    });
+    holder.appendChild(btn);
+  });
+}
+function isMileageNameMatch(crewName,excludedName){
+  const key=normalizePersonName(excludedName);
+  return crewNameParts(crewName).some(part=>part===key || part.includes(key) || key.includes(part));
+}
+function operationSnapshot(report){
+  const crews=report.crews.map(c=>({
+    name:c.name,
+    completed:c.completed,
+    cancelled:c.cancelled,
+    actual:+c.actual.toFixed(1),
+    budget:+c.budget.toFixed(1),
+    variance:+c.variance.toFixed(1),
+    efficiency:c.actual?+(c.eff.toFixed(1)):0,
+    travelDelays:c.trips.filter(t=>t.late).length,
+    travelDelayMinutes:c.trips.filter(t=>t.late).reduce((s,t)=>s+(Number(t.travelDelay)||0),0),
+    jobs:c.jobs.map(j=>({
+      subdivision:j.subdivision,
+      builder:j.builder,
+      city:j.city,
+      lot:j.lot,
+      jobType:j.jobType,
+      cancelled:!!j.cancelled,
+      actual:Number(j.actual)||0,
+      budget:Number(j.budget)||0,
+      in:j.in||'',
+      out:j.out||'',
+      address:j.address||''
+    }))
+  }));
+  return {
+    completed:report.jobs.length,
+    cancelled:report.cancelled.length,
+    actual:+report.actual.toFixed(1),
+    budget:+report.budget.toFixed(1),
+    efficiency:report.actual?+((report.budget/report.actual*100).toFixed(1)):0,
+    travelDelays:crews.reduce((s,c)=>s+c.travelDelays,0),
+    travelDelayMinutes:crews.reduce((s,c)=>s+c.travelDelayMinutes,0),
+    crews
+  };
+}
+function ensureDayOperations(day){
+  if(day.operations) return day.operations;
+  if(day.rawText){
+    try{
+      const parsed=parseReport(day.rawText);
+      day.operations=operationSnapshot(parsed);
+      localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
+      return day.operations;
+    }catch(e){}
+  }
+  return {completed:0,cancelled:0,actual:0,budget:0,efficiency:0,travelDelays:0,travelDelayMinutes:0,crews:[]};
+}
 function localIsoDate(date=new Date()){
   const d=new Date(date), pad=n=>String(n).padStart(2,'0');
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -425,23 +620,26 @@ async function calculateMileageRoutes(report,onProgress){
   return report;
 }
 function mileageTripsForCrew(c){ return Array.isArray(c.mileageTrips)?c.mileageTrips:[]; }
-function crewMileageStats(report){
-  return report.crews.map(c=>{
-    const trips=mileageTripsForCrew(c);
-    const routed=trips.filter(t=>t.route&&Number.isFinite(Number(t.route.miles)));
-    const missing=trips.filter(t=>!t.route||!Number.isFinite(Number(t.route.miles)));
-    const miles=routed.reduce((s,t)=>s+Number(t.route.miles),0);
-    return {crew:c,routed,missing,miles,average:routed.length?miles/routed.length:0};
-  });
+function crewMileageStats(report,includeExcluded=false){
+  return report.crews
+    .filter(c=>includeExcluded || !isMileageCrewExcluded(c.name))
+    .map(c=>{
+      const trips=mileageTripsForCrew(c);
+      const routed=trips.filter(t=>t.route&&Number.isFinite(Number(t.route.miles)));
+      const missing=trips.filter(t=>!t.route||!Number.isFinite(Number(t.route.miles)));
+      const miles=routed.reduce((s,t)=>s+Number(t.route.miles),0);
+      return {crew:c,routed,missing,miles,average:routed.length?miles/routed.length:0,excluded:isMileageCrewExcluded(c.name)};
+    });
 }
 function mileageSnapshot(report,date,rawText=''){
-  const stats=crewMileageStats(report);
+  const stats=crewMileageStats(report,true);
   return {
     date,weekday:dayLabel(date),savedAt:new Date().toISOString(),rawText,
-    totalMiles:stats.reduce((s,x)=>s+x.miles,0),
-    missingRoutes:stats.reduce((s,x)=>s+x.missing.length,0),
+    operations:operationSnapshot(report),
+    totalMiles:stats.filter(x=>!isMileageCrewExcluded(x.crew.name)).reduce((s,x)=>s+x.miles,0),
+    missingRoutes:stats.filter(x=>!isMileageCrewExcluded(x.crew.name)).reduce((s,x)=>s+x.missing.length,0),
     crews:stats.map(x=>({
-      name:x.crew.name,miles:+x.miles.toFixed(1),trips:x.routed.length,missingRoutes:x.missing.length,
+      name:x.crew.name,excluded:isMileageCrewExcluded(x.crew.name),miles:+x.miles.toFixed(1),trips:x.routed.length,missingRoutes:x.missing.length,
       routes:mileageTripsForCrew(x.crew).map(t=>({
         from:t.from.subdivision,to:t.to.subdivision,
         fromCancelled:!!t.from.cancelled,toCancelled:!!t.to.cancelled,
@@ -466,7 +664,10 @@ function renderSavedMileageDays(){
   }
   entries.forEach(day=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td><strong>${esc(shortDateLabel(day.date))}</strong></td><td>${esc(day.weekday||dayLabel(day.date))}</td><td>${day.crews?.length||0}</td><td><strong>${fmt(day.totalMiles||0)} mi</strong></td><td>${day.missingRoutes||0}</td><td><button class="delete-mileage-day" data-date="${esc(day.date)}">Remove</button></td>`;
+    const included=(day.crews||[]).filter(c=>!isMileageCrewExcluded(c.name));
+    const miles=included.reduce((s,c)=>s+(Number(c.miles)||0),0);
+    const missing=included.reduce((s,c)=>s+(Number(c.missingRoutes)||0),0);
+    tr.innerHTML=`<td><strong>${esc(shortDateLabel(day.date))}</strong></td><td>${esc(day.weekday||dayLabel(day.date))}</td><td>${included.length}</td><td><strong>${fmt(miles)} mi</strong></td><td>${missing}</td><td><button class="delete-mileage-day" data-date="${esc(day.date)}">Remove</button></td>`;
     body.appendChild(tr);
   });
   body.querySelectorAll('.delete-mileage-day').forEach(btn=>btn.addEventListener('click',()=>{
@@ -482,7 +683,18 @@ function selectedWeekDays(){
 }
 function weeklyMileageData(){
   const dates=selectedWeekDays();
-  const days=dates.map(date=>mileageHistory[date]||{date,weekday:dayLabel(date),totalMiles:0,missingRoutes:0,crews:[]});
+  const days=dates.map(date=>{
+    const stored=mileageHistory[date]||{date,weekday:dayLabel(date),crews:[]};
+    const included=(stored.crews||[]).filter(c=>!isMileageCrewExcluded(c.name));
+    return {
+      ...stored,
+      date,
+      weekday:stored.weekday||dayLabel(date),
+      crews:included,
+      totalMiles:included.reduce((s,c)=>s+(Number(c.miles)||0),0),
+      missingRoutes:included.reduce((s,c)=>s+(Number(c.missingRoutes)||0),0)
+    };
+  });
   const map=new Map();
   days.forEach(day=>(day.crews||[]).forEach(c=>{
     if(!map.has(c.name)) map.set(c.name,{name:c.name,byDate:{},totalMiles:0,totalTrips:0,missingRoutes:0});
@@ -492,7 +704,13 @@ function weeklyMileageData(){
     row.totalTrips+=Number(c.trips)||0;
     row.missingRoutes+=Number(c.missingRoutes)||0;
   }));
-  return {dates,days,crews:[...map.values()].sort((a,b)=>b.totalMiles-a.totalMiles),totalMiles:days.reduce((s,d)=>s+(Number(d.totalMiles)||0),0),missingRoutes:days.reduce((s,d)=>s+(Number(d.missingRoutes)||0),0)};
+  return {
+    dates,days,
+    crews:[...map.values()].sort((a,b)=>b.totalMiles-a.totalMiles),
+    totalMiles:days.reduce((s,d)=>s+(Number(d.totalMiles)||0),0),
+    missingRoutes:days.reduce((s,d)=>s+(Number(d.missingRoutes)||0),0),
+    exclusions:[...mileageExclusions]
+  };
 }
 function parseSubdivision(line){
   const parts=line.split('*').map(x=>x.trim()).filter(Boolean);
@@ -596,7 +814,7 @@ function parseReport(text){
   };
 }
 function render(report){
-  currentReport=report; $('#results').classList.remove('hidden');
+  currentReport=report; $('#results').classList.remove('hidden'); renderCurrentCrewMileageButtons();
   $('#totalJobs').textContent=report.jobs.length;
   $('#cancelledJobs').textContent=report.cancelled.length;
   $('#actualHours').textContent=fmt(report.actual);
@@ -966,6 +1184,7 @@ function mileageReportHtml(){
         <div style="font-size:25px;font-weight:700">VIP Estimated Mileage Report</div>
         <div style="font-size:14px;margin-top:5px;color:#dbe8f4">${getReportDateLabel()}</div>
       </div>
+      ${mileageExclusions.length?`<div style="margin-top:10px;padding:8px 10px;background:#fff2cc;border:1px solid #e6d58c;font-size:12px"><strong>Excluded from mileage:</strong> ${esc(mileageExclusions.join(', '))}</div>`:''}
 
       <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;margin-top:14px">
         <tr>
@@ -1132,6 +1351,132 @@ function downloadMileageCsv(){
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
+
+function weeklyOperationsData(){
+  const dates=selectedWeekDays();
+  const days=dates.map(date=>{
+    const stored=mileageHistory[date]||{date,weekday:dayLabel(date),rawText:'',crews:[]};
+    return {...stored,date,weekday:stored.weekday||dayLabel(date),operations:ensureDayOperations(stored)};
+  });
+  const crewMap=new Map();
+  days.forEach(day=>(day.operations.crews||[]).forEach(c=>{
+    if(!crewMap.has(c.name)){
+      crewMap.set(c.name,{name:c.name,byDate:{},completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0});
+    }
+    const row=crewMap.get(c.name);
+    row.byDate[day.date]=c;
+    row.completed+=Number(c.completed)||0;
+    row.cancelled+=Number(c.cancelled)||0;
+    row.actual+=Number(c.actual)||0;
+    row.budget+=Number(c.budget)||0;
+    row.travelDelays+=Number(c.travelDelays)||0;
+    row.travelDelayMinutes+=Number(c.travelDelayMinutes)||0;
+  }));
+  const crews=[...crewMap.values()].map(c=>({
+    ...c,
+    efficiency:c.actual?c.budget/c.actual*100:0,
+    variance:c.actual-c.budget
+  })).sort((a,b)=>b.efficiency-a.efficiency);
+  const totals={
+    completed:days.reduce((s,d)=>s+(Number(d.operations.completed)||0),0),
+    cancelled:days.reduce((s,d)=>s+(Number(d.operations.cancelled)||0),0),
+    actual:days.reduce((s,d)=>s+(Number(d.operations.actual)||0),0),
+    budget:days.reduce((s,d)=>s+(Number(d.operations.budget)||0),0),
+    travelDelays:days.reduce((s,d)=>s+(Number(d.operations.travelDelays)||0),0),
+    travelDelayMinutes:days.reduce((s,d)=>s+(Number(d.operations.travelDelayMinutes)||0),0)
+  };
+  totals.efficiency=totals.actual?totals.budget/totals.actual*100:0;
+  totals.variance=totals.actual-totals.budget;
+  return {dates,days,crews,totals};
+}
+function weeklyOperationsReportHtml(){
+  const w=weeklyOperationsData();
+  const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
+  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#1f4e78;color:#ffffff;font-size:13px;text-align:left;font-weight:700;';
+  const effBg=v=>v>=100?'#e2f0d9':v>=85?'#fff2cc':'#f4cccc';
+  const effColor=v=>v>=100?'#274e13':v>=85?'#7f6000':'#990000';
+  const dailyRows=w.days.map(d=>`<tr>
+    <td style="${td}font-weight:600">${esc(d.weekday)}</td>
+    <td style="${td}">${esc(shortDateLabel(d.date))}</td>
+    <td style="${td}text-align:center">${d.operations.completed}</td>
+    <td style="${td}text-align:center">${d.operations.cancelled}</td>
+    <td style="${td}text-align:right">${fmt(d.operations.actual)}</td>
+    <td style="${td}text-align:right">${fmt(d.operations.budget)}</td>
+    <td style="${td}background:${effBg(d.operations.efficiency)};color:${effColor(d.operations.efficiency)};font-weight:700;text-align:center">${fmt(d.operations.efficiency)}%</td>
+    <td style="${td}text-align:center">${d.operations.travelDelays}</td>
+  </tr>`).join('');
+  const crewRows=w.crews.length?w.crews.map(c=>`<tr>
+    <td style="${td}font-weight:600">${esc(c.name)}</td>
+    <td style="${td}text-align:center">${c.completed}</td>
+    <td style="${td}text-align:center">${c.cancelled}</td>
+    <td style="${td}text-align:right">${fmt(c.actual)}</td>
+    <td style="${td}text-align:right">${fmt(c.budget)}</td>
+    <td style="${td}">${fmt(Math.abs(c.variance))} ${c.variance>0?'over':'under'}</td>
+    <td style="${td}background:${effBg(c.efficiency)};color:${effColor(c.efficiency)};font-weight:700;text-align:center">${fmt(c.efficiency)}%</td>
+    <td style="${td}text-align:center">${c.travelDelays}</td>
+  </tr>`).join(''):`<tr><td colspan="8" style="${td}color:#666666">No saved operations were found for this week.</td></tr>`;
+  const jobTypeMap=new Map();
+  w.days.forEach(day=>(day.operations.crews||[]).forEach(c=>(c.jobs||[]).forEach(j=>{
+    const key=j.jobType||'Other';
+    if(!jobTypeMap.has(key)) jobTypeMap.set(key,{type:key,completed:0,cancelled:0,actual:0,budget:0});
+    const x=jobTypeMap.get(key);
+    if(j.cancelled)x.cancelled++;else x.completed++;
+    x.actual+=Number(j.actual)||0;x.budget+=Number(j.budget)||0;
+  })));
+  const jobRows=[...jobTypeMap.values()].map(x=>`<tr><td style="${td}font-weight:600">${esc(x.type)}</td><td style="${td}text-align:center">${x.completed}</td><td style="${td}text-align:center">${x.cancelled}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:right">${fmt(x.budget)}</td><td style="${td}text-align:center">${x.actual?fmt(x.budget/x.actual*100)+'%':'N/A'}</td></tr>`).join('');
+
+  return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff">
+  <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1100px;margin:0 auto;padding:20px">
+    <div style="background:#1f4e78;color:#ffffff;padding:20px 24px">
+      <div style="font-size:25px;font-weight:700">VIP Weekly Operations Report</div>
+      <div style="font-size:14px;margin-top:5px;color:#dbe8f4">Week of ${shortDateLabel(w.dates[0])}</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>
+      <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">COMPLETED</div><div style="font-size:24px;font-weight:700">${w.totals.completed}</div></td>
+      <td style="padding:12px;border:1px solid #d9e2f3;background:#eadcf8;text-align:center"><div style="font-size:11px;color:#666">CANCELLED</div><div style="font-size:24px;font-weight:700">${w.totals.cancelled}</div></td>
+      <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">ACTUAL HOURS</div><div style="font-size:24px;font-weight:700">${fmt(w.totals.actual)}</div></td>
+      <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">BUDGET HOURS</div><div style="font-size:24px;font-weight:700">${fmt(w.totals.budget)}</div></td>
+      <td style="padding:12px;border:1px solid #d9e2f3;background:${effBg(w.totals.efficiency)};text-align:center"><div style="font-size:11px;color:#666">EFFICIENCY</div><div style="font-size:24px;font-weight:700;color:${effColor(w.totals.efficiency)}">${fmt(w.totals.efficiency)}%</div></td>
+    </tr></table>
+    <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Breakdown</h2>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Efficiency</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${dailyRows}</tbody></table>
+    <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Weekly Crew Breakdown</h2>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th><th style="${th}">Efficiency</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${crewRows}</tbody></table>
+    <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Job Type Breakdown</h2>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Job Type</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Efficiency</th></tr></thead><tbody>${jobRows||`<tr><td colspan="6" style="${td}color:#666666">No job data available.</td></tr>`}</tbody></table>
+    <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Weekly operations are built from the daily reports saved in local storage. Mileage exclusions do not remove anyone from this operations report.</div>
+  </div></body></html>`;
+}
+function weeklyOperationsReportText(){
+  const w=weeklyOperationsData();
+  let out=`VIP Weekly Operations Report\nWeek of ${shortDateLabel(w.dates[0])}\n\nCompleted: ${w.totals.completed}\nCancelled: ${w.totals.cancelled}\nActual Hours: ${fmt(w.totals.actual)}\nBudget Hours: ${fmt(w.totals.budget)}\nEfficiency: ${fmt(w.totals.efficiency)}%\nTravel Delays: ${w.totals.travelDelays}\n\nDAILY BREAKDOWN\n`;
+  w.days.forEach(d=>out+=`\n${d.weekday}: ${d.operations.completed} completed, ${d.operations.cancelled} cancelled, ${fmt(d.operations.actual)} actual, ${fmt(d.operations.budget)} budget, ${fmt(d.operations.efficiency)}% efficiency`);
+  out+='\n\nCREW BREAKDOWN\n';
+  w.crews.forEach(c=>out+=`\n${c.name}: ${c.completed} completed, ${c.cancelled} cancelled, ${fmt(c.actual)} actual, ${fmt(c.budget)} budget, ${fmt(c.efficiency)}% efficiency, ${c.travelDelays} travel delays`);
+  return out;
+}
+function previewWeeklyOperations(){
+  const blob=new Blob(['\ufeff',weeklyOperationsReportHtml()],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob),w=window.open(url,'_blank');
+  if(!w){URL.revokeObjectURL(url);alert('Allow pop-ups to preview the weekly operations report.');return;}
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+function downloadWeeklyOperationsEml(){
+  const w=weeklyOperationsData(),boundary=`VIP_WEEKLY_OPERATIONS_${Date.now()}`;
+  const eml=[`Date: ${new Date().toUTCString()}`,`Subject: VIP Weekly Operations Report - Week of ${shortDateLabel(w.dates[0])}`,'MIME-Version: 1.0',`Content-Type: multipart/alternative; boundary="${boundary}"`,'',`--${boundary}`,'Content-Type: text/plain; charset="UTF-8"','Content-Transfer-Encoding: base64','',wrapBase64(utf8ToBase64(weeklyOperationsReportText())),'',`--${boundary}`,'Content-Type: text/html; charset="UTF-8"','Content-Transfer-Encoding: base64','',wrapBase64(utf8ToBase64(weeklyOperationsReportHtml())),'',`--${boundary}--`,''].join('\r\n');
+  const blob=new Blob([eml],{type:'message/rfc822;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=`VIP-Weekly-Operations-${w.dates[0]}.eml`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function downloadWeeklyOperationsCsv(){
+  const w=weeklyOperationsData();
+  const rows=[['Crew','Completed','Cancelled','Actual Hours','Budget Hours','Variance','Efficiency %','Travel Delays','Travel Delay Minutes']];
+  w.crews.forEach(c=>rows.push([c.name,c.completed,c.cancelled,+c.actual.toFixed(1),+c.budget.toFixed(1),+c.variance.toFixed(1),+c.efficiency.toFixed(1),c.travelDelays,c.travelDelayMinutes]));
+  rows.push([]);
+  rows.push(['Weekly Total',w.totals.completed,w.totals.cancelled,+w.totals.actual.toFixed(1),+w.totals.budget.toFixed(1),+w.totals.variance.toFixed(1),+w.totals.efficiency.toFixed(1),w.totals.travelDelays,w.totals.travelDelayMinutes]);
+  const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=`VIP-Weekly-Operations-${w.dates[0]}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
 function weeklyMileageReportHtml(){
   const w=weeklyMileageData();
   const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
@@ -1147,7 +1492,7 @@ function weeklyMileageReportHtml(){
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Crew and Day</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th>${headers}<th style="${th}">Weekly Total</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Totals</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Road Miles</th><th style="${th}">Missing Routes</th></tr></thead><tbody>${dailyRows}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Route Detail</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Crew</th><th style="${th}">From</th><th style="${th}">To</th><th style="${th}">Road Miles</th><th style="${th}">Note</th></tr></thead><tbody>${detail.join('')||`<tr><td colspan="6" style="${td}color:#666">No route detail available.</td></tr>`}</tbody></table>
-  <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Mileage uses routed driving distance only. Cancelled jobs remain in the route sequence. Missing road routes are not replaced with straight-line distance.</div>
+  <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Mileage uses routed driving distance only. Cancelled jobs remain in the route sequence. Missing road routes are not replaced with straight-line distance. Mileage exclusions are applied from the saved local browser settings.</div>
   </div></body></html>`;
 }
 function weeklyMileageReportText(){
@@ -1401,6 +1746,20 @@ $('#resetSubdivisionsBtn').onclick=()=>{
 ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id=>{
   $('#'+id).addEventListener('change',()=>{saveSettings(); if(currentReport) render(currentReport=parseReport($('#pasteBox').value));});
 });
+$('#addMileageExcludeBtn').onclick=()=>{
+  addMileageExclusion($('#mileageExcludeInput').value);
+  $('#mileageExcludeInput').value='';
+};
+$('#mileageExcludeInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    addMileageExclusion($('#mileageExcludeInput').value);
+    $('#mileageExcludeInput').value='';
+  }
+});
+$('#previewWeeklyOperationsBtn').onclick=previewWeeklyOperations;
+$('#downloadWeeklyOperationsEmlBtn').onclick=downloadWeeklyOperationsEml;
+$('#downloadWeeklyOperationsCsvBtn').onclick=downloadWeeklyOperationsCsv;
 $('#saveMileageDayBtn').onclick=saveCurrentMileageDay;
 $('#previewWeeklyMileageBtn').onclick=previewWeeklyMileage;
 $('#downloadWeeklyMileageEmlBtn').onclick=downloadWeeklyMileageEml;
