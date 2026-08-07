@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.2</title>
+<title>VIP Crew Efficiency & Travel Report v3.3</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -122,16 +122,82 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
       table-layout: auto;
     }
   }
+
+  /* v3.3: reporting workspace is its own full-width section */
+  .report-workspace {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+  }
+
+  .report-workspace details {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+  }
+
+  .report-workspace .scroll {
+    width: 100%;
+    overflow-x: visible;
+  }
+
+  .report-workspace table {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+  }
+
+  .report-workspace th,
+  .report-workspace td {
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
+  .report-workspace .controls {
+    width: 100%;
+  }
+
+  .report-workspace .buttons {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  #weeklyReportsPanel th:nth-child(1),
+  #weeklyReportsPanel td:nth-child(1) { width: 17%; }
+
+  #weeklyReportsPanel th:nth-child(2),
+  #weeklyReportsPanel td:nth-child(2) { width: 14%; }
+
+  #weeklyReportsPanel th:nth-child(3),
+  #weeklyReportsPanel td:nth-child(3) { width: 12%; }
+
+  #weeklyReportsPanel th:nth-child(4),
+  #weeklyReportsPanel td:nth-child(4) { width: 18%; }
+
+  #weeklyReportsPanel th:nth-child(5),
+  #weeklyReportsPanel td:nth-child(5) { width: 18%; }
+
+  #weeklyReportsPanel th:nth-child(6),
+  #weeklyReportsPanel td:nth-child(6) { width: 21%; }
+
+  @media (max-width: 900px) {
+    .report-workspace .scroll {
+      overflow-x: auto;
+    }
+    .report-workspace table {
+      table-layout: auto;
+    }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.2</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.3</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.2</div>
+    <div class="version">Version 3.3</div>
   </div>
 
   <div class="input-grid">
@@ -215,6 +281,13 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
       </div>
       <div id="emailStatus" class="muted small" style="margin-top:8px"></div>
 
+    </section>
+  </div>
+
+  <section class="panel report-workspace" style="margin-top:18px">
+    <div class="section-head" style="margin-bottom:10px">
+      <h2>Saved Reports & Reporting</h2>
+    </div>
       <details id="weeklyReportsPanel" style="margin-top:16px" open>
         <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
           Saved Daily Reports
@@ -323,9 +396,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
             <div id="currentCrewMileageButtons" class="buttons"></div>
           </div>
         </div>
-      </details>
-    </section>
-  </div>
+  </section>
 
   <div id="results" class="hidden">
     <section class="panel section">
