@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v2.7</title>
+<title>VIP Crew Efficiency & Travel Report v2.8</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -59,10 +59,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v2.7</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v2.8</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 2.7</div>
+    <div class="version">Version 2.8</div>
   </div>
 
   <div class="input-grid">
@@ -104,14 +104,32 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
         Travel delay uses only the time from the previous job’s clock-out to the next job’s clock-in. Expected time comes from the Subdivisions sheet plus the selected buffer and tolerance.
       </div>
       <div class="notice" style="margin-top:12px">
-        <strong>Subdivision locations:</strong>
-        <span id="subdivisionStatus">Loading saved locations…</span>
+        <strong>Reference sheets:</strong>
+        <div style="margin-top:8px">
+          <strong>Subdivision locations:</strong>
+          <span id="subdivisionStatus">Loading saved locations…</span>
+        </div>
         <div class="buttons" style="margin-top:10px">
           <label style="display:inline-flex">
             <input id="subdivisionFile" type="file" accept=".xlsx,.xls,.csv" style="display:none">
             <span style="display:inline-block;background:#24334c;color:var(--text);border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer">Import Subdivisions Sheet</span>
           </label>
-          <button id="resetSubdivisionsBtn">Restore Included Sheet</button>
+          <button id="resetSubdivisionsBtn">Clear Saved Subdivisions</button>
+        </div>
+
+        <div style="margin-top:14px">
+          <strong>Floor plans:</strong>
+          <span id="floorplanStatus">No floor-plan sheet saved yet</span>
+        </div>
+        <div class="buttons" style="margin-top:10px">
+          <label style="display:inline-flex">
+            <input id="floorplanFile" type="file" accept=".xlsx,.xls,.csv" style="display:none">
+            <span style="display:inline-block;background:#24334c;color:var(--text);border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer">Import Floor Plans Sheet</span>
+          </label>
+          <button id="clearFloorplansBtn">Clear Saved Floor Plans</button>
+        </div>
+        <div class="muted small" style="margin-top:8px">
+          Both sheets are saved in this browser. The floor-plan sheet is used only to identify the floor plan; pasted Actual and Budget values are never replaced.
         </div>
       </div>
       <div class="buttons">
@@ -267,20 +285,22 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 const $ = s => document.querySelector(s);
 let currentReport = null;
 let travelCalculationComplete = false;
-const DEFAULT_SUBDIVISIONS = [{"builder":"VIP","fullName":"Home Office","name":"Home Office","city":"","address":"1110 Claycraft Rd, Gahanna, OH 43230","lat":39.99286,"lon":-82.843525},{"builder":"Bob Webb","fullName":"Woodland Preserve *Bob Webb *New Albany","name":"Woodland Preserve","city":"New Albany","address":"1961 Reserve Way, New Albany, OH 43054","lat":40.048137,"lon":-82.810941},{"builder":"Pulte","fullName":"Abberley Park *Pulte *New Albany","name":"Abberley Park","city":"New Albany","address":"3384 Abberley Drive, New Albany, OH 43054","lat":40.052873,"lon":-82.816503},{"builder":"Bob Webb","fullName":"Woodhaven *Bob Webb *New Albany","name":"Woodhaven","city":"New Albany","address":"7515 Steeplechase Ln, New Albany, OH 43054","lat":40.108526,"lon":-82.793882},{"builder":"Epcon","fullName":"Haines Creek *Epcon *New Albany","name":"Haines Creek","city":"New Albany","address":"8306 Central College Rd, New Albany, OH 43054","lat":40.096351,"lon":-82.767662},{"builder":"Pulte","fullName":"Nottingham Trace *Pulte *New Albany","name":"Nottingham Trace","city":"New Albany","address":"7715 Nottingham Blvd, New Albany, OH 43054","lat":40.109604,"lon":-82.812551},{"builder":"Pulte","fullName":"Towns on the Greenway *Pulte *Westerville","name":"Towns on the Greenway","city":"Westerville","address":"337 Hockberry Ave, Westerville, OH 43081","lat":40.134287,"lon":-82.942262},{"builder":"Bob Webb","fullName":"Nook At Highland Lakes *Bob Webb *Westerville","name":"Nook At Highland Lakes","city":"Westerville","address":"6089 Victory Gate, Westerville, OH 43082","lat":40.181095,"lon":-82.928911},{"builder":"MI Homes","fullName":"Miller Farm *MI *Galena","name":"Miller Farm","city":"Galena","address":"2799 Sunbury Rd, Galena, OH 43021","lat":40.212932,"lon":-82.871836},{"builder":"Pulte","fullName":"Price Ponds *Pulte *Sunbury","name":"Price Ponds","city":"Sunbury","address":"1026 Ping Lane, Sunbury, OH 43074","lat":40.244527,"lon":-82.885731},{"builder":"Pulte","fullName":"Magnolia Park *Pulte *Sunbury","name":"Magnolia Park","city":"Sunbury","address":"582 Weatherby Drive Sunbury , OH 43074","lat":40.245373,"lon":-82.883716},{"builder":"DR Horton","fullName":"Kintner Crossing *DR *Sunbury","name":"Kintner Crossing","city":"Sunbury","address":"814 South Kintner Parkway","lat":40.253075,"lon":-82.878609},{"builder":"Del Webb","fullName":"Northstar *Del Webb *Sunbury","name":"Northstar","city":"Sunbury","address":"2492 Firethorn Drive Sunbury, Oh 43074","lat":40.281729,"lon":-82.896846},{"builder":"Pulte","fullName":"Honey Grove at Northstar *Pulte *Sunbury","name":"Honey Grove at Northstar","city":"Sunbury","address":"1652 Stella Place Sunbury, Oh 43074","lat":40.280618,"lon":-82.901596},{"builder":"3 Pillar","fullName":"Summerwood *3 Pillar *Galena","name":"Summerwood","city":"Galena","address":"2806 Summer Crest Drive Galena, OH 43021","lat":40.228167,"lon":-82.94685},{"builder":"Pulte","fullName":"Eagle *Pulte *Galena","name":"Eagle","city":"Galena","address":"7002 Crown Drive, Galena, OH 43021","lat":40.249897,"lon":-82.938333},{"builder":"MI Homes","fullName":"Berlin Farm *MI *Delaware","name":"Berlin Farm","city":"Delaware","address":"2651 Cleo St, Delaware, OH 43015","lat":40.240546,"lon":-83.004182},{"builder":"DR Horton","fullName":"Piatt Preserve *DR *Delaware","name":"Piatt Preserve","city":"Delaware","address":"2780 Aldengate Ln, Delaware, OH 43015","lat":40.245506,"lon":-83.00753},{"builder":"Pulte","fullName":"Berlin Bluffs *Pulte *Delaware","name":"Berlin Bluffs","city":"Delaware","address":"2651 Cleo St, Delaware, OH 43015","lat":40.24485,"lon":-82.997809},{"builder":"Pulte","fullName":"Arrowhead at Evans Farms *Pulte *Lewis Center","name":"Arrowhead at Evans Farms","city":"Lewis Center","address":"4613 Mcnamara Place Lewis Center, Oh 43035","lat":40.219469,"lon":-83.00693},{"builder":"Bob Webb","fullName":"Evans Farm *Bob Webb *Lewis Center","name":"Evans Farm","city":"Lewis Center","address":"5129 Maple Dr, Lewis Center, OH 43035","lat":40.206054,"lon":-83.003999},{"builder":"Epcon","fullName":"Evans Farm *Epcon *Lewis Center","name":"Evans Farm","city":"Lewis Center","address":"3110 Woodmere Cir, Lewis Center, OH 43035","lat":40.208498,"lon":-82.989714},{"builder":"MI Homes","fullName":"Winterbrooke Place *MI *Lewis Center","name":"Winterbrooke Place","city":"Lewis Center","address":"43 Sienna Glenn Dr, Lewis Center, OH 43035","lat":40.229418,"lon":-83.021288},{"builder":"Pulte","fullName":"Glenross *Pulte *Delaware","name":"Glenross","city":"Delaware","address":"106 E Wind Rd, Delaware, OH 43015","lat":40.236117,"lon":-83.020358},{"builder":"Ryan","fullName":"Glenross *Ryan *Delaware","name":"Glenross","city":"Delaware","address":"191 Sycamore Ln, Delaware, OH 43015","lat":40.248043,"lon":-83.033372},{"builder":"Ryan","fullName":"Terra Alta *Ryan *Delaware","name":"Terra Alta","city":"Delaware","address":"581 Pisa Lp, Delaware, OH 43015","lat":40.268005,"lon":-83.051701},{"builder":"MI Homes","fullName":"Northwood *MI *Delaware","name":"Northwood","city":"Delaware","address":"","lat":40.304717,"lon":-83.027602},{"builder":"DR Horton","fullName":"Park View *DR *Delaware","name":"Park View","city":"Delaware","address":"557 Park Vista Dr, Delaware, OH 43015","lat":40.317987,"lon":-83.09263},{"builder":"Ryan","fullName":"Addison Farms *Ryan *Delaware","name":"Addison Farms","city":"Delaware","address":"50 Allenhurst Way, Delaware, OH 43015","lat":40.322743,"lon":-83.085124},{"builder":"Ryan","fullName":"Rutherford *Ryan *Delaware","name":"Rutherford","city":"Delaware","address":"572 Rutherford Ave, Delaware, OH 43015","lat":40.320409,"lon":-83.088637},{"builder":"Pulte","fullName":"Limestone *Pulte *Delaware","name":"Limestone","city":"Delaware","address":"101 Franks Field Dr, Delaware, OH 43015","lat":40.302692,"lon":-83.122495},{"builder":"DR Horton","fullName":"Springer Woods *DR *Delaware","name":"Springer Woods","city":"Delaware","address":"693 Penwell Dr, Delaware, OH 43015","lat":40.310277,"lon":-83.120107},{"builder":"Pulte","fullName":"Slate *Pulte *Lewis Center","name":"Slate","city":"Lewis Center","address":"1258 Ashlar Lane Lewis Center , OH 43035","lat":40.19303,"lon":-83.013688},{"builder":"MI Homes","fullName":"Hyatts Meadows *MI *Delaware","name":"Hyatts Meadows","city":"Delaware","address":"521 Alicia Kelton Dr, Delaware, OH 43015","lat":40.216753,"lon":-83.044456},{"builder":"Bob Webb","fullName":"Liberty Trails *Bob Webb *Powell","name":"Liberty Trails","city":"Powell","address":"1963 Liberty trails Powell, OH 43065","lat":40.227948,"lon":-83.083279},{"builder":"Manor","fullName":"Liberty Trails *Manor *Powell","name":"Liberty Trails","city":"Powell","address":"2047 Liberty Trails, Powell, OH 43065","lat":40.228225,"lon":-83.081719},{"builder":"Pulte","fullName":"Nelson *Pulte *Delaware","name":"Nelson","city":"Delaware","address":"2538 Nelson Ln, Delaware, OH 43015","lat":40.20845,"lon":-83.084053},{"builder":"Bob Webb","fullName":"Liberty Bluff *Bob Webb *Delaware","name":"Liberty Bluff","city":"Delaware","address":"1608 Liberty Bluff Dr, Delaware, OH 43015","lat":40.209338,"lon":-83.064067},{"builder":"Epcon","fullName":"Courtyards on Hyatts *Epcon *Powell","name":"Courtyards on Hyatts","city":"Powell","address":"3200 Korg St, Powell, OH 43065","lat":40.217012,"lon":-83.099814},{"builder":"Epcon","fullName":"Hyatts Village *Epcon *Powell","name":"Hyatts Village","city":"Powell","address":"3372 Hyatts Rd, Powell, OH 43065","lat":40.217428,"lon":-83.100979},{"builder":"MI Homes","fullName":"Liberty Grand *MI *Powell","name":"Liberty Grand","city":"Powell","address":"3777 Shoal Way, Powell, OH 43065","lat":40.201641,"lon":-83.103957},{"builder":"MI Homes","fullName":"Clarkshaw Crossing *MI *Powell","name":"Clarkshaw Crossing","city":"Powell","address":"5429 Valleydale Rd, Powell, OH 43065","lat":40.226404,"lon":-83.092247},{"builder":"Pulte","fullName":"Clarkshaw *Pulte *Powell","name":"Clarkshaw","city":"Powell","address":"3411 Tender Avenue, Powell, OH 43065","lat":40.223191,"lon":-83.104699},{"builder":"MI Homes","fullName":"Woodcrest Crossing *MI *Powell","name":"Woodcrest Crossing","city":"Powell","address":"6443 Bluejay Rdg Dr, Powell, OH 43065","lat":40.222632,"lon":-83.114473},{"builder":"3 Pillar","fullName":"Scioto Bluffs *3Pillar *Powell","name":"Scioto Bluffs","city":"Powell","address":"6640 Scioto Bluff Court Concord Township, OH 43065","lat":40.214965,"lon":-83.136494},{"builder":"Rockford","fullName":"Jerome Aster *Rockford *Plain City","name":"Jerome Aster","city":"Plain City","address":"6981 Aster Wy, Plain City, OH 43064","lat":40.194037,"lon":-83.172143},{"builder":"Schottenstein","fullName":"Jerome Aster *Schott *Plain City","name":"Jerome Aster","city":"Plain City","address":"6971 Aster Way, Plain City, OH 43064","lat":40.194037,"lon":-83.172143},{"builder":"Rockford","fullName":"Jerome Village Meadowlark *Rockford *Plain City","name":"Jerome Village Meadowlark","city":"Plain City","address":"","lat":40.187765,"lon":-83.208492},{"builder":"Epcon","fullName":"Hyland Meadows *Epcon *Plain City","name":"Hyland Meadows","city":"Plain City","address":"8027 Grassland Dr, Plain City, OH 43064","lat":40.189891,"lon":-83.191183},{"builder":"MI Homes","fullName":"Jerome Village Applewood *MI *Plain City","name":"Jerome Village Applewood","city":"Plain City","address":"10715 Pearl Creek Dr, Plain City, OH 43064","lat":40.169613,"lon":-83.199764},{"builder":"3 Pillar","fullName":"Eversole Woods *3Pillar *Plain City","name":"Eversole Woods","city":"Plain City","address":"11451 Winterberry Drive, Plain City, OH 43064","lat":40.179464,"lon":-83.187045},{"builder":"Bob Webb","fullName":"Eversole Run *Bob Webb *Plain City","name":"Eversole Run","city":"Plain City","address":"11268 Sweetbay Dr, Plain City, OH 43064","lat":40.18068,"lon":-83.191297},{"builder":"3 Pillar","fullName":"Jerome Village *3Pillar *Plain City","name":"Jerome Village","city":"Plain City","address":"11451 Winterberry Dr, Plain City, OH 43064","lat":40.178976,"lon":-83.192238},{"builder":"Manor","fullName":"Jerome Village *Manor *Plain City","name":"Jerome Village","city":"Plain City","address":"7871 Sparrow Run, Plain City, OH 43064","lat":40.179033,"lon":-83.187736},{"builder":"Epcon","fullName":"Concord *Epcon *Dublin","name":"Concord","city":"Dublin","address":"10202 Concord Rd, Dublin, OH 43017","lat":40.156084,"lon":-83.157134},{"builder":"Schottenstein","fullName":"Cottages at Verbena *Schott *Plain City","name":"Cottages at Verbena","city":"Plain City","address":"11738 Verbena Place, Plain City, OH 43064","lat":40.184323,"lon":-83.200862},{"builder":"Epcon","fullName":"White Oaks *Epcon *Plain City","name":"White Oaks","city":"Plain City","address":"8400 Ryan Pkwy, Plain City, OH 43064","lat":40.166178,"lon":-83.192868},{"builder":"Pulte","fullName":"Scotts *Pulte *Plain City","name":"Scotts","city":"Plain City","address":"9556 Burghley Dr, Plain City, OH 43064","lat":40.154941,"lon":-83.214898},{"builder":"Rockford","fullName":"Mitchell Highlands *Rockford *Plain City","name":"Mitchell Highlands","city":"Plain City","address":"9511 Camberly Avenue Plain City, Ohio 43064","lat":40.148096,"lon":-83.22626},{"builder":"Pulte","fullName":"Pioneer *Pulte *Plain City","name":"Pioneer","city":"Plain City","address":"9569 Coach Line Ave, Plain City, OH 43064","lat":40.150438,"lon":-83.237856},{"builder":"MI Homes","fullName":"Hyland Glen *MI *Dublin","name":"Hyland Glen","city":"Dublin","address":"6986 Stillhouse Ln, Dublin, OH 43016","lat":40.114383,"lon":-83.175554},{"builder":"Schottenstein","fullName":"Reserve at New California *Schott *Plain City","name":"Reserve at New California","city":"Plain City","address":"10171 Jeffrey Pine Drive, Plain City, Ohio 43064","lat":40.159868,"lon":-83.243261},{"builder":"Bob Webb","fullName":"Indian Run *Bob Webb *Plain City","name":"Indian Run","city":"Plain City","address":"8974 Whitetail Wy, Plain City, OH 43064","lat":40.143754,"lon":-83.196779},{"builder":"Schottenstein","fullName":"Glacier Pointe *Schott *Plain City","name":"Glacier Pointe","city":"Plain City","address":"8798 Eliot Drive, Plain City, Ohio 43064","lat":40.147019,"lon":-83.20396},{"builder":"MI Homes","fullName":"Glacier Pointe *MI *Plain City","name":"Glacier Pointe","city":"Plain City","address":"8772 Glacier Pointe Dr, Plain City, OH 43064","lat":40.146403,"lon":-83.203878},{"builder":"Del Webb","fullName":"Maygrass *Del Webb *Plain City","name":"Maygrass","city":"Plain City","address":"8969 Bryce Road Plain City, Oh 43064","lat":40.140561,"lon":-83.228528},{"builder":"Rockford","fullName":"HofBauer *Rockford *Plain City","name":"HofBauer","city":"Plain City","address":"2223 Ashby Wy, Plain City, OH 43064","lat":40.11427,"lon":-83.269355},{"builder":"MI Homes","fullName":"Darby Station *MI *Plain City","name":"Darby Station","city":"Plain City","address":"537 Conductor Dr, Plain City, OH 43064","lat":40.107605,"lon":-83.250687},{"builder":"DR Horton","fullName":"Madison Meadows *DR *Plain City","name":"Madison Meadows","city":"Plain City","address":"403 Madison Wy, Plain City, OH 43064","lat":40.103927,"lon":-83.287352},{"builder":"Arbor Homes","fullName":"Maren Reserve *Arbor *Plain City","name":"Maren Reserve","city":"Plain City","address":"1409 Estate Rd, Plain City, OH 43064","lat":40.104058,"lon":-83.291513},{"builder":"Rockford","fullName":"Ayrshire Farms *Rockford *Dublin","name":"Ayrshire Farms","city":"Dublin","address":"6195 Lockroy Dr, Dublin, OH 43016","lat":40.092646,"lon":-83.185798},{"builder":"Rockford","fullName":"Tarlton Meadows *Rockford *Hillard","name":"Tarlton Meadows","city":"Hillard","address":"5292 Tarlton Boulevard Hilliard, Ohio 43026","lat":40.058805,"lon":-83.186599},{"builder":"Epcon","fullName":"Carr *Epcon *Hillard","name":"Carr","city":"Hillard","address":"5755 Arcadian Ave, Hilliard, OH 43026","lat":40.05138,"lon":-83.170284},{"builder":"MI Homes","fullName":"Hill Farm *MI *Hillard","name":"Hill Farm","city":"Hillard","address":"6960 Gelderland Dr, Hilliard, OH 43026","lat":40.037428,"lon":-83.203022},{"builder":"Drees","fullName":"Alton Place *Drees *Hillard","name":"Alton Place","city":"Hillard","address":"2504 Sycamore Trce, Hilliard, OH 43026","lat":40.001406,"lon":-83.190128},{"builder":"Pulte","fullName":"Sugar Farms *Pulte *Hillard","name":"Sugar Farms","city":"Hillard","address":"2040 Limone Drive, Hilliard, OH 43026","lat":39.992456,"lon":-83.174284},{"builder":"Schottenstein","fullName":"Renner Park *Schott *Hillard","name":"Renner Park","city":"Hillard","address":"6186 Renner Park Drive, Columbus, OH 43228","lat":39.982893,"lon":-83.173465},{"builder":"DR Horton","fullName":"Villas At Renner Park *DR *Hillard","name":"Villas At Renner Park","city":"Hillard","address":"1486 Cardinez Way, Columbus, OH 43228","lat":39.980788,"lon":-83.176207},{"builder":"Centex","fullName":"Clover *Centex *Galloway","name":"Clover","city":"Galloway","address":"40 Reneau Ave, Galloway, OH 43119","lat":39.949993,"lon":-83.161864},{"builder":"DR Horton","fullName":"Galloway East *DR *Galloway","name":"Galloway East","city":"Galloway","address":"6264 Farella Way Galloway Oh 43119","lat":39.919044,"lon":-83.163786},{"builder":"DR Horton","fullName":"Chase Landings *DR *Galloway","name":"Chase Landings","city":"Galloway","address":"6351 Ballast Rd, Galloway, OH 43119","lat":39.918362,"lon":-83.163537},{"builder":"DR Horton","fullName":"Villages at Galloway *DR *Galloway","name":"Villages at Galloway","city":"Galloway","address":"1705 Galloway Rd, Galloway, OH 43119","lat":39.918422,"lon":-83.163487},{"builder":"Fischer Homes","fullName":"Chase Landings *Fischer *Galloway","name":"Chase Landings","city":"Galloway","address":"6356 Ballast Rd, Galloway, OH 43119","lat":39.918956,"lon":-83.163964},{"builder":"Pulte","fullName":"Beulah Park *Pulte *Grove City","name":"Beulah Park","city":"Grove City","address":"3655 Glacial Ln, Grove City, OH 43123","lat":39.889952,"lon":-83.104556},{"builder":"3 Pillar","fullName":"Beulah *3Pillar *Grove City","name":"Beulah","city":"Grove City","address":"3708 Beulah Park Drive","lat":39.888989,"lon":-83.098775},{"builder":"Schottenstein","fullName":"Holton *Schott *Grove City","name":"Holton","city":"Grove City","address":"3600 Whirla Way, Grove City, OH","lat":39.8582,"lon":-83.0983},{"builder":"Schottenstein","fullName":"Hickory Creek *Schott *Grove City","name":"Hickory Creek","city":"Grove City","address":"5118 Haley Way, Grove City 43123","lat":39.860654,"lon":-83.101898},{"builder":"MI Homes","fullName":"Browns Farm *MI *Grove City","name":"Browns Farm","city":"Grove City","address":"3215 Farmhouse Ln, Grove City, OH 43123","lat":39.857121,"lon":-83.089867},{"builder":"MI Homes","fullName":"Pinnacle *MI *Grove City","name":"Pinnacle","city":"Grove City","address":"899 Heimat Haus Dr, Grove City, OH 43123","lat":39.866539,"lon":-83.028943},{"builder":"Epcon","fullName":"Mulberry *Epcon *Grove City","name":"Mulberry","city":"Grove City","address":"4416 Marilyn Ct, Grove City, OH 43123","lat":39.871459,"lon":-83.056351},{"builder":"Rockford","fullName":"Meadow Grove *Rockford *Grove City","name":"Meadow Grove","city":"Grove City","address":"1813 Silverlawn Dr, Grove City, OH 43123","lat":39.849346,"lon":-83.052656},{"builder":"Rockford","fullName":"Foxfire *Rockford *Commercial Point","name":"Foxfire","city":"Commercial Point","address":"440 Bethpage Blvd, Commercial Point, OH 43116","lat":39.777874,"lon":-83.029083},{"builder":"MI Homes","fullName":"Foxfire *MI *Commercial Point","name":"Foxfire","city":"Commercial Point","address":"444 Bethpage Blvd, Commercial Point, OH 43116","lat":39.777897,"lon":-83.028864},{"builder":"DR Horton","fullName":"Walnut Mill *DR *Ashville","name":"Walnut Mill","city":"Ashville","address":"5 Walnut Mill Way, Ashville, OH 43103","lat":39.734237,"lon":-82.95359},{"builder":"Centex","fullName":"Bloomfield Hills *Centex *South Bloomfield","name":"Bloomfield Hills","city":"South Bloomfield","address":"5002 Roese Ave, South Bloomfield, OH 43103","lat":39.708129,"lon":-82.988884},{"builder":"Pulte","fullName":"Buckstone Bend *Pulte *Lockbourne","name":"Buckstone Bend","city":"Lockbourne","address":"4918 Ranger Dr, Lockbourne, OH 43137","lat":39.856655,"lon":-82.967935},{"builder":"DR Horton","fullName":"Wagnalls *DR *Lithopolis","name":"Wagnalls","city":"Lithopolis","address":"1390 Hansberry Dr, Lithopolis, OH 43136","lat":39.811287,"lon":-82.813148},{"builder":"Arbor Homes","fullName":"Edgewood Farms *Arbor *Canal","name":"Edgewood Farms","city":"Canal","address":"5586 Washington St, Canal Winchester, OH 43110","lat":39.819593,"lon":-82.819663},{"builder":"DR Horton","fullName":"Orchard Lakes *DR *Canal","name":"Orchard Lakes","city":"Canal","address":"7055 Royalton Ridge Avenue, Canal Winchester, OH 43110","lat":39.866083,"lon":-82.809752},{"builder":"DR Horton","fullName":"Lansdowne *DR *Canal","name":"Lansdowne","city":"Canal","address":"4213 Sycamore Oak Avenue, Canal Winchester, OH 43110","lat":39.89249,"lon":-82.83537},{"builder":"Fischer Homes","fullName":"Glacier Pointe *Fischer *Canal","name":"Glacier Pointe","city":"Canal","address":"6261 Wright Rd, Canal Winchester, OH 43110","lat":39.887655,"lon":-82.820301},{"builder":"Fischer Homes","fullName":"Abbie Trails *Fischer *Canal","name":"Abbie Trails","city":"Canal","address":"3974 Winding Path Drive, Canal Winchester. OH","lat":39.90067,"lon":-82.806095},{"builder":"DR Horton","fullName":"Longview Highlands *DR *Pickerington","name":"Longview Highlands","city":"Pickerington","address":"102 Cedarhurst Ct, Pickerington, OH 43147","lat":39.89768,"lon":-82.789797},{"builder":"American Homes 4 Rent","fullName":"Eastwood *AMH *Reynoldsburg","name":"Eastwood","city":"Reynoldsburg","address":"9045 Lucy Drive, Reynoldsburg, OH","lat":39.961474,"lon":-82.758526},{"builder":"MI Homes","fullName":"Heron Crossing *MI *Pickerington","name":"Heron Crossing","city":"Pickerington","address":"12146 Prairie View Dr NW, Pickerington, OH 43147","lat":39.909728,"lon":-82.716874},{"builder":"Rockford","fullName":"Sycamore Grove *Rockford *Pickerington","name":"Sycamore Grove","city":"Pickerington","address":"12650 Toll Gate Rd, Pickerington, OH 43147","lat":39.91557,"lon":-82.707917},{"builder":"Rockford","fullName":"Hazelton *Rockford *Pataskala","name":"Hazelton","city":"Pataskala","address":"208 Scotsgrove Drive, Pataskala, OH 43062","lat":39.972371,"lon":-82.678359},{"builder":"MI Homes","fullName":"Forest Ridge *MI *Pataskala","name":"Forest Ridge","city":"Pataskala","address":"106 Ruby Rd SW, Pataskala, OH 43062","lat":40.015704,"lon":-82.668855},{"builder":"Rockford","fullName":"Willowbend *Rockford *Newark","name":"Willowbend","city":"Newark","address":"228 Willow Bnd Dr, Newark, OH 43055","lat":40.047837,"lon":-82.485522},{"builder":"DR Horton","fullName":"Overlook *DR *Newark","name":"Overlook","city":"Newark","address":"2100 Overlook Wy, Newark, OH 43055","lat":40.043237,"lon":-82.473669},{"builder":"MI Homes","fullName":"Hebron *MI *Hebron OH","name":"Hebron","city":"Hebron OH","address":"955 W. Main Street, Hebron, Ohio 43025","lat":39.959007,"lon":-82.506108},{"builder":"DR Horton","fullName":"Ludlow Ridge *DR *Bellefontaine","name":"Ludlow Ridge","city":"Bellefontaine","address":"819 Sherwood Loop, Bellefontaine, OH 43311","lat":40.339108,"lon":-83.745493},{"builder":"DR Horton","fullName":"Johnson's Creek *DR *London","name":"Johnson's Creek","city":"London","address":"1128 Stratford Way, London, OH 43140","lat":39.913494,"lon":-83.437509},{"builder":"Arbor Homes","fullName":"London Landing *Arbor *London","name":"London Landing","city":"London","address":"347 Jacob Ln, London, OH 43140","lat":39.900397,"lon":-83.458767},{"builder":"DR Horton","fullName":"Sugar Creek *DR *Jeffersonville","name":"Sugar Creek","city":"Jeffersonville","address":"27 Darbyshire Dr, Jeffersonville, OH 43128","lat":39.658749,"lon":-83.571496},{"builder":"DR Horton","fullName":"Bishop Estates *DR *Washington Courthouse","name":"Bishop Estates","city":"Washington Courthouse","address":"1105 Dayton Ave NW, Washington Court House, OH 43160","lat":39.537536,"lon":-83.455934},{"builder":"DR Horton","fullName":"River Ridge *DR *Circleville","name":"River Ridge","city":"Circleville","address":"1797 Jacko Lane, Circleville, OH 43113","lat":39.63585,"lon":-82.94865},{"builder":"DR Horton","fullName":"Leasure Farms *DR *Zanesville","name":"Leasure Farms","city":"Zanesville","address":"3870 Frazeysburg Rd, Zanesville, OH 43701","lat":39.99765,"lon":-82.035303},{"builder":"DR Horton","fullName":"Liberty Crossing *DR *Mt Vernon","name":"Liberty Crossing","city":"Mt Vernon","address":"8040 Newark Rd, Mt Vernon, OH 43050","lat":40.350467,"lon":-82.473826},{"builder":"Arbor Homes","fullName":"Maris *Arbor *Bellefontaine","name":"Maris","city":"Bellefontaine","address":"301 Kendall St, Bellefontaine, OH 43311","lat":40.354804,"lon":-83.727793},{"builder":"Arbor Homes","fullName":"Trotters Pointe *Arbor *Washington Courthouse","name":"Trotters Pointe","city":"Washington Courthouse","address":"1098 Andrick Dr, Washington Court House, OH 43160","lat":39.518923,"lon":-83.447057},{"builder":"Pulte","fullName":"Towns On The Parkway *Pulte *Dublin","name":"Towns On The Parkway","city":"Dublin","address":"4128 John Shields Pkwy, Dublin, OH 43017","lat":40.106649,"lon":-83.100162},{"builder":"Pulte","fullName":"Amrine *Pulte *Marysville","name":"Amrine","city":"Marysville","address":"334 Amrine Wy, Marysville, OH 43040","lat":40.270238,"lon":-83.371765},{"builder":"Bob Webb","fullName":"Harpers Pointe *Bob Webb *Powell","name":"Harpers Pointe","city":"Powell","address":"188 Chedworth Row, Powell, OH 43065","lat":40.160454,"lon":-83.071413},{"builder":"Ryan","fullName":"Hyatts *Ryan *Delaware","name":"Hyatts","city":"Delaware","address":"250 Alicia Kelton Dr, Delaware, OH 43015","lat":40.215079,"lon":-83.04102},{"builder":"Pulte","fullName":"Hyatts *Pulte *Delaware","name":"Hyatts","city":"Delaware","address":"6176 Bishop Blvd, Powell, OH 43065","lat":40.21481,"lon":-83.098683},{"builder":"Pulte","fullName":"Jefferson Manor *Pulte *Blacklick","name":"Jefferson Manor","city":"Blacklick","address":"8488 Ben Hale Ct, Blacklick, OH 43004","lat":40.036095,"lon":-82.787034},{"builder":"Tuckerman","fullName":"Hoxton *Tuckerman *Upper Arlington","name":"Hoxton","city":"Upper Arlington","address":"2300 Hoxton Ct, Upper Arlington, OH 43220","lat":40.0331,"lon":-83.078144},{"builder":"Tuckerman","fullName":"Eastcleft *Tuckerman *Columbus","name":"Eastcleft","city":"Columbus","address":"2520 Eastcleft, Columbus","lat":40.021396,"lon":-83.080911},{"builder":"Tuckerman","fullName":"Dorchester *Tuckerman *Columbus","name":"Dorchester","city":"Columbus","address":"3001 S Dorchester Rd Columbus, OH 43221","lat":40.018985,"lon":-83.081602},{"builder":"Tuckerman","fullName":"Derby *Tuckerman *Columbus","name":"Derby","city":"Columbus","address":"3051 Derby Rd, Columbus, OH 43221","lat":40.016958,"lon":-83.077961},{"builder":"Schottenstein","fullName":"Wellington Park *Schott *Pickerington","name":"Wellington Park","city":"Pickerington","address":"598 Courtright Dr, Pickerington, OH 43147","lat":39.895545,"lon":-82.751744},{"builder":"MI Homes","fullName":"Spring Hill Farm *MI *Reynoldsburg","name":"Spring Hill Farm","city":"Reynoldsburg","address":"7820 Oldham Dr., Reynoldsburg, OH 43068","lat":39.97291,"lon":-82.792604},{"builder":"DR Horton","fullName":"Monarch Greene *DR *Columbus","name":"Monarch Greene","city":"Columbus","address":"1414 Chrisman Drive, Columbus, OH 43223","lat":39.92751,"lon":-83.03278},{"builder":"DR Horton","fullName":"Maplewood *DR  *Reynoldsburg","name":"Maplewood","city":"Reynoldsburg","address":"1159 Mueller Dr, Reynoldsburg, OH 43068","lat":39.969688,"lon":-82.75482},{"builder":"Pulte","fullName":"Sunbury *Pulte *Sunbury","name":"Sunbury","city":"Sunbury","address":"608 Viola Dr, Sunbury, OH 43074","lat":40.233952,"lon":-82.871799},{"builder":"Tuckerman","fullName":"Jervis *Tuckerman *Columbus","name":"Jervis","city":"Columbus","address":"2165 Jervis Rd, Columbus OH","lat":40.0183829294128,"lon":-83.0705051392651},{"builder":"Compass","fullName":"Dominion Blvd *Compass *Columbus","name":"Dominion Blvd","city":"Columbus","address":"529 E Dominion Blvd, Columbus, OH 43214","lat":40.053238,"lon":-83.006055},{"builder":"Miller Homes","fullName":"Pleasant View Farm *Miller *Plain City","name":"Pleasant View Farm","city":"Plain City","address":"12260 Andrews dr 43064 plain city","lat":40.14511,"lon":-83.330556},{"builder":"Arbor Homes","fullName":"Trotter's Pointe *Arbor *Washington Courthouse","name":"Trotter's Pointe","city":"Washington Courthouse","address":"1098 Andrick Dr, Washington Court House, OH 43160","lat":39.518972,"lon":-83.447206},{"builder":"Arbor Homes","fullName":"Trailside Landing *Arbor *Jeffersonville","name":"Trailside Landing","city":"Jeffersonville","address":"1644 Railside Dr, Jeffersonville, IN 47130","lat":38.289165,"lon":-85.72189},{"builder":"Arbor Homes","fullName":"Old Heritage *Arbor *Shelbyville","name":"Old Heritage","city":"Shelbyville","address":"1005 Stratton Way, Shelbyville, KY 40065","lat":38.200559,"lon":-85.199076},{"builder":"Arbor Homes","fullName":"Day Farm *Arbor *South Bloomfield","name":"Day Farm","city":"South Bloomfield","address":"5026 Farmhouse Rd South Bloomfield, OH","lat":39.719082,"lon":-83.001929},{"builder":"Bob Webb","fullName":"Olive Court *Bob Webb *Sunbury","name":"Olive Court","city":"Sunbury","address":"332 Olive Ct, Sunbury, OH 43074","lat":40.208012,"lon":-82.774539},{"builder":"Monogram Homes","fullName":"Stonehill Drive East *Monogram *Carroll","name":"Stonehill Drive East","city":"Carroll","address":"4041 Stonehill Dr East/Carroll, Oh","lat":39.790146,"lon":-82.723961},{"builder":"Compass","fullName":"Enfield ct *Compass *Dublin","name":"Enfield ct","city":"Dublin","address":"6758 Enfield Ct, Dublin, OH 43017","lat":40.153201,"lon":-83.174983},{"builder":"Andrew Meyer","fullName":"Shanahan Rd *Lewis Center","name":"Shanahan Rd","city":"","address":"737 Shanahan Rd, Lewis Center, OH 43035","lat":40.21379,"lon":-83.02367},{"builder":"Heinlin","fullName":"Bordeaux Ct *Heinlin *Dublin","name":"Bordeaux Ct","city":"Dublin","address":"7040 Bordeaux Ct, Dublin, OH 43016","lat":40.14808,"lon":-83.177797},{"builder":"Sierra","fullName":"Starret Rd *Sierra *Columbus","name":"Starret Rd","city":"Columbus","address":"4586 Starret Rd, Columbus, OH 43214","lat":40.054634,"lon":-83.028545},{"builder":"Drees","fullName":"Millers Cove *Drees *Sunbury","name":"Millers Cove","city":"Sunbury","address":"396 Miller's Cv Ct, Sunbury, OH 43074","lat":40.249397,"lon":-82.865741},{"builder":"Ardent","fullName":"Velencia *Ardent *Dublin","name":"Velencia","city":"Dublin","address":"5814 Avery Crest Dr. W, Dublin, OH 43016","lat":40.071218,"lon":-83.157814},{"builder":"Ardent","fullName":"Gage Crossing *Ardent *Dublin","name":"Gage Crossing","city":"Dublin","address":"5927 Avery Woods Ave, Dublin, OH 43016","lat":40.073154,"lon":-83.156999},{"builder":"Fischer Homes","fullName":"Villages of Classicway *Fischer *Morrow","name":"Villages of Classicway","city":"Morrow","address":"5817 Montrose Ct, Morrow, OH 45152","lat":39.344112,"lon":-84.168007},{"builder":"Fischer Homes","fullName":"Trailhead *Fischer *Harrison","name":"Trailhead","city":"Harrison","address":"1322 Trailhead Pl, Harrison, OH 45030","lat":39.28602,"lon":-84.759843},{"builder":"Fischer Homes","fullName":"Salt Run Preserve *Fischer *Maineville","name":"Salt Run Preserve","city":"Maineville","address":"Mounts Rd, Maineville, OH 45039","lat":39.318058,"lon":-84.186225},{"builder":"WPLand","fullName":"Arabella *WPLand *Blue Ash","name":"Arabella","city":"Blue Ash","address":"4291 Parkview Dr, Blue Ash, OH 45242","lat":39.246249,"lon":-84.389358},{"builder":"Fischer Homes","fullName":"Ivy Rose *Fischer *Cincinnati","name":"Ivy Rose","city":"Cincinnati","address":"5236 Ivy Rose Ln, Cincinnati, OH 45247","lat":39.181193,"lon":-84.618055},{"builder":"Arbor Homes","fullName":"Old Haritage *Arbor *Shelbyville,Kentucky","name":"Old Haritage","city":"Shelbyville,Kentucky","address":"1005 Stratton Way, Shelbyville, KY 40065","lat":38.200643,"lon":-85.199476},{"builder":"Tuckerman","fullName":"Bedford *Tuckerman *Columbus","name":"Bedford","city":"Columbus","address":"1760 Bedford Columbus 43212","lat":39.992544,"lon":-83.057177},{"builder":"Brandon","fullName":"Penewit Dr *Brandon *Spring Valley","name":"Penewit Dr","city":"Spring Valley","address":"2950 Penewit Rd, Spring Valley, OH 45370","lat":39.604799,"lon":-84.053891},{"builder":"Ardent","fullName":"Cooks Pointe *Ardent *Marysville","name":"Cooks Pointe","city":"Marysville","address":"1805 Mill Pointe Rd, Marysville, OH 43040","lat":40.264009,"lon":-83.368504},{"builder":"Bob Webb","fullName":"Deep Run *Bob Webb *Powell","name":"Deep Run","city":"Powell","address":"8300 Deep Run, Powell, OH 43065","lat":40.172742,"lon":-83.036069},{"builder":"3 Pillar","fullName":"Smart Rd *3 Pillar *Ostrander","name":"Smart Rd","city":"Ostrander","address":"2784 Smart Road Ostrander, OH, 43061","lat":40.282287,"lon":-83.191767},{"builder":"3 Pillar","fullName":"Summer Crest Drive *3 Pillar *Galena","name":"Summer Crest Drive","city":"Galena","address":"2806 Summer Crest Drive Galena, OH 43021","lat":40.228274,"lon":-82.946842},{"builder":"Compass","fullName":"Chester Rd *Compass *Upper Arlington","name":"Chester Rd","city":"Upper Arlington","address":"2681 Chester Rd, Upper Arlington, OH 43221","lat":40.011928,"lon":-83.055803}];
+const DEFAULT_SUBDIVISIONS = [];
 const STORAGE_KEYS = {
   subdivisions: 'vipCrewReport.subdivisions.v1',
   routeCache: 'vipCrewReport.routeCache.v1',
   settings: 'vipCrewReport.settings.v1',
   drivingRouteCache: 'vipCrewReport.drivingRouteCache.v1',
   mileageHistory: 'vipCrewReport.mileageHistory.v1',
-  mileageExclusions: 'vipCrewReport.mileageExclusions.v1'
+  mileageExclusions: 'vipCrewReport.mileageExclusions.v1',
+  floorplans: 'vipCrewReport.floorplans.v1'
 };
 let subdivisionData = [];
 let routeCache = {};
 let drivingRouteCache = {};
 let mileageHistory = {};
 let mileageExclusions = [];
+let floorplanData = [];
 
 function normalizeName(value){
   return String(value || '')
@@ -298,16 +318,16 @@ function saveSubdivisionData(data){
 }
 function loadLocalData(){
   try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.subdivisions) || 'null');
-    subdivisionData = Array.isArray(saved) && saved.length ? saved : DEFAULT_SUBDIVISIONS;
-    if(!saved) localStorage.setItem(STORAGE_KEYS.subdivisions, JSON.stringify(subdivisionData));
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.subdivisions) || '[]');
+    subdivisionData = Array.isArray(saved) ? saved : [];
   } catch(e) {
-    subdivisionData = DEFAULT_SUBDIVISIONS;
+    subdivisionData = [];
   }
   try { routeCache = JSON.parse(localStorage.getItem(STORAGE_KEYS.routeCache) || '{}') || {}; } catch(e) { routeCache = {}; }
   try { drivingRouteCache = JSON.parse(localStorage.getItem(STORAGE_KEYS.drivingRouteCache) || '{}') || {}; } catch(e) { drivingRouteCache = {}; }
   try { mileageHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.mileageHistory) || '{}') || {}; } catch(e) { mileageHistory = {}; }
   try { mileageExclusions = JSON.parse(localStorage.getItem(STORAGE_KEYS.mileageExclusions) || '[]') || []; } catch(e) { mileageExclusions = []; }
+  try { floorplanData = JSON.parse(localStorage.getItem(STORAGE_KEYS.floorplans) || '[]') || []; } catch(e) { floorplanData = []; }
   try {
     const settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || '{}');
     ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id => {
@@ -315,10 +335,97 @@ function loadLocalData(){
     });
   } catch(e) {}
   updateSubdivisionStatus();
+  updateFloorplanStatus();
   initializeMileageDates();
   renderSavedMileageDays();
   renderMileageExclusions();
   renderCurrentCrewMileageButtons();
+}
+
+function saveFloorplanData(data){
+  floorplanData = Array.isArray(data) ? data : [];
+  localStorage.setItem(STORAGE_KEYS.floorplans, JSON.stringify(floorplanData));
+  updateFloorplanStatus();
+}
+function updateFloorplanStatus(){
+  if($('#floorplanStatus')){
+    $('#floorplanStatus').textContent = floorplanData.length
+      ? `${floorplanData.length} floor-plan rows saved in this browser`
+      : 'No floor-plan sheet saved yet';
+  }
+}
+function normalizeFloorplanLot(value){
+  return String(value??'')
+    .trim()
+    .replace(/\.0$/,'')
+    .replace(/^0+(?=\d)/,'')
+    .toLowerCase();
+}
+function floorplanSubdivisionName(value){
+  return String(value||'').split('*')[0].trim();
+}
+function normalizeBuilderForFloorplan(value){
+  return normalizeName(value)
+    .replace(/\bdr horton\b/g,'dr')
+    .replace(/\bhorton\b/g,'dr')
+    .replace(/\bfischer homes\b/g,'fischer')
+    .replace(/\barbor homes\b/g,'arbor')
+    .replace(/\bschottenstein\b/g,'schott')
+    .replace(/\bmi homes\b/g,'mi')
+    .trim();
+}
+function lookupFloorplan(job){
+  if(!floorplanData.length) return '';
+  const sub = normalizeName(job.subdivision);
+  const lot = normalizeFloorplanLot(job.lot);
+  const builder = normalizeBuilderForFloorplan(job.builder);
+  if(!sub || !lot) return '';
+
+  const matches = floorplanData.filter(row =>
+    normalizeName(floorplanSubdivisionName(row.subdivision)) === sub &&
+    normalizeFloorplanLot(row.lot) === lot
+  );
+  if(!matches.length) return '';
+  if(matches.length===1) return matches[0].floorplan || '';
+
+  const exactBuilder = matches.find(row =>
+    normalizeBuilderForFloorplan(row.builder) === builder
+  );
+  if(exactBuilder) return exactBuilder.floorplan || '';
+
+  const unique = [...new Set(matches.map(row=>row.floorplan).filter(Boolean))];
+  return unique.length===1 ? unique[0] : (matches[0].floorplan || '');
+}
+function jobIsLateAgainstBudget(job){
+  if(job.cancelled) return false;
+  const actual = Number(job.actual)||0;
+  const budget = Number(job.budget)||0;
+  return actual > 0 && (actual - budget) >= 0.75 - 1e-9;
+}
+async function importFloorplanWorkbook(file){
+  if(typeof XLSX==='undefined'){
+    alert('The spreadsheet reader could not load. Check the internet connection and reopen the page.');
+    return;
+  }
+  const buffer = await file.arrayBuffer();
+  const workbook = XLSX.read(buffer,{type:'array'});
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet,{defval:''});
+
+  const parsed = rows.map(row=>({
+    builder:String(row.Builder ?? row.builder ?? '').trim(),
+    subdivision:String(row.Subdivision ?? row.subdivision ?? '').trim(),
+    lot:String(row.Lot ?? row.lot ?? row['LOT #/Address'] ?? '').trim(),
+    floorplan:String(row.Floorplan ?? row.floorplan ?? row['Floor Plan'] ?? row['Floor plan'] ?? '').trim()
+  })).filter(row=>row.subdivision && row.lot && row.floorplan);
+
+  if(!parsed.length){
+    alert('No usable floor plans were found. The sheet needs Subdivision, Lot, and Floorplan columns.');
+    return;
+  }
+
+  saveFloorplanData(parsed);
+  alert(`${parsed.length} floor-plan rows were imported and saved in local storage.`);
 }
 function saveSettings(){
   const settings = {};
@@ -1018,6 +1125,35 @@ function outlookEmailHtml(){
       Efficiency equals budget hours divided by actual man-hours. Cancelled jobs are excluded from efficiency.
       Expected travel includes mapped road time plus the selected arrival and parking buffer. Only the time from the previous clock-out to the next clock-in is evaluated.
     </div>
+
+    <h2 style="${section}">Job Budget Breakdown</h2>
+    ${r.crews.map(c=>{
+      const jobs=c.jobs.filter(j=>!j.cancelled && j.actual>0);
+      if(!jobs.length) return '';
+      const jobRows=jobs.map(j=>{
+        const floorplan=lookupFloorplan(j);
+        const late=jobIsLateAgainstBudget(j);
+        return `<tr>
+          <td style="${td}">${esc(j.left)}</td>
+          <td style="${td}">${esc(floorplan || 'Not found')}</td>
+          <td style="${td}text-align:right">${fmt(j.actual)}</td>
+          <td style="${td}text-align:right">${fmt(j.budget)}</td>
+          <td style="${td}${late?'background:#f4cccc;color:#990000;font-weight:700;':''}">${late?'Late':''}</td>
+        </tr>`;
+      }).join('');
+      return `
+        <div style="font-size:15px;font-weight:700;color:#1f4e78;margin:18px 0 6px">${esc(c.name)}</div>
+        <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+          <thead><tr>
+            <th style="${th}">Job</th>
+            <th style="${th}">Floor Plan</th>
+            <th style="${th}">Actual Man Hours</th>
+            <th style="${th}">Budget</th>
+            <th style="${th}">Status</th>
+          </tr></thead>
+          <tbody>${jobRows}</tbody>
+        </table>`;
+    }).join('')}
   </div></body></html>`;
 }
 function emailText(){
@@ -1037,6 +1173,18 @@ function emailText(){
     out+=`\n- ${c.name}: ${t.from.subdivision} to ${t.to.subdivision}; actual ${t.gap} min, expected ${t.expected} min, ${t.travelDelay} min travel delay`;
   }));
   if(!count) out+='No travel delays found.\n';
+
+  out+='\n\nJOB BUDGET BREAKDOWN\n';
+  r.crews.forEach(c=>{
+    const jobs=c.jobs.filter(j=>!j.cancelled && j.actual>0);
+    if(!jobs.length) return;
+    out+=`\n\n${c.name}`;
+    jobs.forEach(j=>{
+      const floorplan=lookupFloorplan(j) || 'Not found';
+      out+=`\n- ${j.left} | ${floorplan} | Actual ${fmt(j.actual)} | Budget ${fmt(j.budget)}${jobIsLateAgainstBudget(j)?' | LATE':''}`;
+    });
+  });
+
   return out;
 }
 async function copyFormattedEmail(){
@@ -1736,11 +1884,18 @@ $('#csvBtn').onclick=()=>{
 };
 $('#subdivisionFile').onchange=async e=>{ const file=e.target.files[0]; if(file) await importSubdivisionWorkbook(file); e.target.value=''; };
 $('#resetSubdivisionsBtn').onclick=()=>{
-  if(confirm('Restore the subdivision locations included with this report?')){
-    saveSubdivisionData(DEFAULT_SUBDIVISIONS);
+  if(confirm('Clear the subdivision locations saved in this browser?')){
+    saveSubdivisionData([]);
     routeCache={};
+    drivingRouteCache={};
     localStorage.removeItem(STORAGE_KEYS.routeCache);
-    if(currentReport) render(currentReport=parseReport($('#pasteBox').value));
+    localStorage.removeItem(STORAGE_KEYS.drivingRouteCache);
+  }
+};
+$('#floorplanFile').onchange=async e=>{ const file=e.target.files[0]; if(file) await importFloorplanWorkbook(file); e.target.value=''; };
+$('#clearFloorplansBtn').onclick=()=>{
+  if(confirm('Clear the floor-plan sheet saved in this browser?')){
+    saveFloorplanData([]);
   }
 };
 ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id=>{
