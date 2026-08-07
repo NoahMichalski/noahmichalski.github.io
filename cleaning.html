@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.0</title>
+<title>VIP Crew Efficiency & Travel Report v3.1</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -59,10 +59,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.0</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.1</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.0</div>
+    <div class="version">Version 3.1</div>
   </div>
 
   <div class="input-grid">
@@ -182,34 +182,51 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
               <tbody id="savedMileageDaysTable"></tbody>
             </table>
           </div>
+
+          <div class="section-head" style="margin-top:18px">
+            <h3>Report Days</h3>
+            <span id="reportDayStatus" class="muted small"></span>
+          </div>
+          <div class="notice">
+            Select any saved dates below. Both Operations and Mileage reports will use exactly these dates.
+          </div>
+          <div class="buttons" style="margin-top:10px">
+            <button id="selectCurrentWeekBtn" type="button">Current M–F</button>
+            <button id="selectLast2WeeksBtn" type="button">Last 2 Weeks</button>
+            <button id="selectLast3WeeksBtn" type="button">Last 3 Weeks</button>
+            <button id="selectCurrentMonthBtn" type="button">Current Month</button>
+            <button id="selectAllReportDaysBtn" type="button">Select All Saved</button>
+            <button id="clearReportDaysBtn" type="button">Clear Selection</button>
+          </div>
+          <div id="reportDayChoices" class="buttons" style="margin-top:12px;align-items:flex-start;flex-wrap:wrap"></div>
         </div>
       </details>
 
       <details id="weeklyOperationsPanel" style="margin-top:14px" open>
         <summary style="padding:12px 14px;background:#1f4e78;border:1px solid #315f89;border-radius:12px;cursor:pointer;font-weight:800;color:#ffffff">
-          Weekly Operations Reports
+          Operations Reports
         </summary>
         <div style="padding-top:14px">
           <div class="notice">
             Full Monday–Friday reporting for completed jobs, cancellations, actual and budget hours, efficiency, travel delays, crew performance, and job types.
           </div>
           <div class="buttons">
-            <button id="previewWeeklyOperationsBtn" class="primary">Preview Weekly Operations</button>
-            <button id="downloadWeeklyOperationsEmlBtn">Download Weekly Operations Email (.eml)</button>
-            <button id="downloadWeeklyOperationsCsvBtn">Export Weekly Operations CSV</button>
+            <button id="previewWeeklyOperationsBtn" class="primary">Preview Operations Report</button>
+            <button id="downloadWeeklyOperationsEmlBtn">Download Operations Email (.eml)</button>
+            <button id="downloadWeeklyOperationsCsvBtn">Export Operations CSV</button>
           </div>
         </div>
       </details>
 
       <details id="weeklyMileagePanel" style="margin-top:14px">
         <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
-          Weekly Mileage Reports
+          Mileage Reports
         </summary>
         <div style="padding-top:14px">
           <div class="buttons">
-            <button id="previewWeeklyMileageBtn">Preview Weekly Mileage</button>
-            <button id="downloadWeeklyMileageEmlBtn">Download Weekly Mileage Email (.eml)</button>
-            <button id="downloadWeeklyMileageCsvBtn">Export Weekly Mileage CSV</button>
+            <button id="previewWeeklyMileageBtn">Preview Mileage Report</button>
+            <button id="downloadWeeklyMileageEmlBtn">Download Mileage Email (.eml)</button>
+            <button id="downloadWeeklyMileageCsvBtn">Export Mileage CSV</button>
           </div>
 
           <div class="notice" style="margin-top:12px">
@@ -293,7 +310,8 @@ const STORAGE_KEYS = {
   drivingRouteCache: 'vipCrewReport.drivingRouteCache.v1',
   mileageHistory: 'vipCrewReport.mileageHistory.v1',
   mileageExclusions: 'vipCrewReport.mileageExclusions.v1',
-  floorplans: 'vipCrewReport.floorplans.v1'
+  floorplans: 'vipCrewReport.floorplans.v1',
+  reportSelectedDates: 'vipCrewReport.reportSelectedDates.v1'
 };
 let subdivisionData = [];
 let routeCache = {};
@@ -301,6 +319,7 @@ let drivingRouteCache = {};
 let mileageHistory = {};
 let mileageExclusions = [];
 let floorplanData = [];
+let reportSelectedDates = [];
 
 function normalizeName(value){
   return String(value || '')
@@ -328,6 +347,7 @@ function loadLocalData(){
   try { mileageHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.mileageHistory) || '{}') || {}; } catch(e) { mileageHistory = {}; }
   try { mileageExclusions = JSON.parse(localStorage.getItem(STORAGE_KEYS.mileageExclusions) || '[]') || []; } catch(e) { mileageExclusions = []; }
   try { floorplanData = JSON.parse(localStorage.getItem(STORAGE_KEYS.floorplans) || '[]') || []; } catch(e) { floorplanData = []; }
+  try { reportSelectedDates = JSON.parse(localStorage.getItem(STORAGE_KEYS.reportSelectedDates) || '[]') || []; } catch(e) { reportSelectedDates = []; }
   try {
     const settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || '{}');
     ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id => {
@@ -340,6 +360,7 @@ function loadLocalData(){
   renderSavedMileageDays();
   renderMileageExclusions();
   renderCurrentCrewMileageButtons();
+  renderReportDayChoices();
 }
 
 function saveFloorplanData(data){
@@ -401,6 +422,99 @@ function jobIsLateAgainstBudget(job){
   const actual = Number(job.actual)||0;
   const budget = Number(job.budget)||0;
   return actual > 0 && (actual - budget) >= 0.75 - 1e-9;
+}
+
+
+function crewTotalDriveMinutes(crew){
+  const trips = Array.isArray(crew.mileageTrips) && crew.mileageTrips.length
+    ? crew.mileageTrips
+    : (crew.trips || []);
+  return trips.reduce((sum,t)=>{
+    if(t.route && Number.isFinite(Number(t.route.minutes))){
+      return sum + Number(t.route.minutes);
+    }
+    return sum;
+  },0);
+}
+function formatDriveMinutes(minutes){
+  const total=Math.round(Number(minutes)||0);
+  if(total<60) return `${total} min`;
+  const h=Math.floor(total/60);
+  const m=total%60;
+  return m ? `${h} hr ${m} min` : `${h} hr`;
+}
+function saveReportSelectedDates(){
+  reportSelectedDates=[...new Set(reportSelectedDates)].filter(d=>mileageHistory[d]).sort();
+  localStorage.setItem(STORAGE_KEYS.reportSelectedDates,JSON.stringify(reportSelectedDates));
+  renderReportDayChoices();
+}
+function reportDates(){
+  const selected=reportSelectedDates.filter(d=>mileageHistory[d]).sort();
+  if(selected.length) return selected;
+  return selectedWeekDays().filter(d=>mileageHistory[d]);
+}
+function reportRangeLabel(dates){
+  if(!dates.length) return 'No dates selected';
+  if(dates.length===1) return shortDateLabel(dates[0]);
+  const sorted=[...dates].sort();
+  return `${shortDateLabel(sorted[0])} – ${shortDateLabel(sorted[sorted.length-1])} (${dates.length} days)`;
+}
+function renderReportDayChoices(){
+  const holder=$('#reportDayChoices');
+  if(!holder) return;
+  reportSelectedDates=reportSelectedDates.filter(d=>mileageHistory[d]).sort();
+  const dates=Object.keys(mileageHistory).sort().reverse();
+
+  $('#reportDayStatus').textContent=reportSelectedDates.length
+    ? `${reportSelectedDates.length} selected · ${reportRangeLabel(reportSelectedDates)}`
+    : 'No custom selection — reports use the selected Monday–Friday week';
+
+  holder.innerHTML='';
+  if(!dates.length){
+    holder.innerHTML='<span class="muted small">Save daily reports first.</span>';
+    return;
+  }
+
+  dates.forEach(date=>{
+    const checked=reportSelectedDates.includes(date);
+    const label=document.createElement('label');
+    label.style.cssText='display:inline-flex;gap:7px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:10px;cursor:pointer;background:#182338';
+    label.innerHTML=`<input type="checkbox" class="report-day-check" data-date="${esc(date)}" ${checked?'checked':''}> <span>${esc(dayLabel(date).slice(0,3))} ${esc(shortDateLabel(date))}</span>`;
+    holder.appendChild(label);
+  });
+
+  holder.querySelectorAll('.report-day-check').forEach(input=>{
+    input.addEventListener('change',()=>{
+      const date=input.dataset.date;
+      if(input.checked){
+        if(!reportSelectedDates.includes(date)) reportSelectedDates.push(date);
+      }else{
+        reportSelectedDates=reportSelectedDates.filter(d=>d!==date);
+      }
+      saveReportSelectedDates();
+    });
+  });
+}
+function selectReportDates(dates){
+  reportSelectedDates=[...new Set(dates.filter(d=>mileageHistory[d]))].sort();
+  saveReportSelectedDates();
+}
+function selectRecentSavedDays(daysBack){
+  const saved=Object.keys(mileageHistory).sort();
+  if(!saved.length){selectReportDates([]);return;}
+  const latest=new Date(`${saved[saved.length-1]}T12:00:00`);
+  const start=new Date(latest);
+  start.setDate(start.getDate()-(daysBack-1));
+  selectReportDates(saved.filter(d=>{
+    const x=new Date(`${d}T12:00:00`);
+    return x>=start && x<=latest;
+  }));
+}
+function selectMonthOfLatestSaved(){
+  const saved=Object.keys(mileageHistory).sort();
+  if(!saved.length){selectReportDates([]);return;}
+  const ym=saved[saved.length-1].slice(0,7);
+  selectReportDates(saved.filter(d=>d.startsWith(ym)));
 }
 
 function budgetTaskLabel(job){
@@ -694,6 +808,7 @@ function initializeMileageDates(){
 function saveMileageHistory(){
   localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
   renderSavedMileageDays();
+  renderReportDayChoices();
 }
 function drivingRouteKey(a,b){
   return `${a.lat.toFixed(5)},${a.lon.toFixed(5)}>${b.lat.toFixed(5)},${b.lon.toFixed(5)}`;
@@ -809,7 +924,7 @@ function selectedWeekDays(){
   return Array.from({length:5},(_,i)=>addDaysIso(monday,i));
 }
 function weeklyMileageData(){
-  const dates=selectedWeekDays();
+  const dates=reportDates();
   const days=dates.map(date=>{
     const stored=mileageHistory[date]||{date,weekday:dayLabel(date),crews:[]};
     const included=(stored.crews||[]).filter(c=>!isMileageCrewExcluded(c.name));
@@ -1045,6 +1160,7 @@ function outlookEmailHtml(){
       <td style="${td}">${varianceText(c)}</td>
       <td style="${td}background:${bg};color:${color};font-weight:700;text-align:center">${c.actual?c.eff.toFixed(1)+'%':'N/A'}</td>
       <td style="${td}text-align:center">${c.trips.filter(t=>t.late).length}</td>
+      <td style="${td}text-align:center">${formatDriveMinutes(crewTotalDriveMinutes(c))}</td>
     </tr>`;
   }).join('');
 
@@ -1109,7 +1225,7 @@ function outlookEmailHtml(){
       <thead><tr>
         <th style="${th}">Crew</th><th style="${th}">Jobs</th><th style="${th}">Cancelled</th>
         <th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th>
-        <th style="${th}">Efficiency</th><th style="${th}">Travel Delays</th>
+        <th style="${th}">Efficiency</th><th style="${th}">Travel Delays</th><th style="${th}">Total Drive Time</th>
       </tr></thead>
       <tbody>${crewRows}</tbody>
     </table>
@@ -1167,12 +1283,12 @@ function outlookEmailHtml(){
           const floorplan=lookupFloorplan(j);
           const late=jobIsLateAgainstBudget(j);
           return `<tr>
-            <td style="${td}">${esc(j.lot || '')}</td>
-            <td style="${td}">${esc(budgetTaskLabel(j))}</td>
-            <td style="${td}">${esc(floorplan || 'Not found')}</td>
-            <td style="${td}text-align:right">${fmt(j.actual)}</td>
-            <td style="${td}text-align:right">${fmt(j.budget)}</td>
-            <td style="${td}${late?'background:#f4cccc;color:#990000;font-weight:700;':''}">${late?'Late':''}</td>
+            <td style="${td}text-align:center">${esc(j.lot || '')}</td>
+            <td style="${td}text-align:center">${esc(budgetTaskLabel(j))}</td>
+            <td style="${td}text-align:center">${esc(floorplan || 'Not found')}</td>
+            <td style="${td}text-align:center">${fmt(j.actual)}</td>
+            <td style="${td}text-align:center">${fmt(j.budget)}</td>
+            <td style="${td}text-align:center;${late?'background:#f4cccc;color:#990000;font-weight:700;':''}">${late?'Late':''}</td>
           </tr>`;
         }).join('');
 
@@ -1180,12 +1296,12 @@ function outlookEmailHtml(){
           <div style="font-size:14px;font-weight:700;color:#333333;margin:12px 0 5px">${esc(group.name)}</div>
           <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
             <thead><tr>
-              <th style="${th}">Lot</th>
-              <th style="${th}">Task</th>
-              <th style="${th}">Floor Plan</th>
-              <th style="${th}">Actual Man Hours</th>
-              <th style="${th}">Budget</th>
-              <th style="${th}">Status</th>
+              <th style="${th}text-align:center">Lot</th>
+              <th style="${th}text-align:center">Task</th>
+              <th style="${th}text-align:center">Floor Plan</th>
+              <th style="${th}text-align:center">Actual Man Hours</th>
+              <th style="${th}text-align:center">Budget</th>
+              <th style="${th}text-align:center">Status</th>
             </tr></thead>
             <tbody>${jobRows}</tbody>
           </table>`;
@@ -1558,7 +1674,7 @@ function downloadMileageCsv(){
 
 
 function weeklyOperationsData(){
-  const dates=selectedWeekDays();
+  const dates=reportDates();
   const days=dates.map(date=>{
     const stored=mileageHistory[date]||{date,weekday:dayLabel(date),rawText:'',crews:[]};
     return {...stored,date,weekday:stored.weekday||dayLabel(date),operations:ensureDayOperations(stored)};
@@ -1633,8 +1749,8 @@ function weeklyOperationsReportHtml(){
   return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff">
   <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1100px;margin:0 auto;padding:20px">
     <div style="background:#1f4e78;color:#ffffff;padding:20px 24px">
-      <div style="font-size:25px;font-weight:700">VIP Weekly Operations Report</div>
-      <div style="font-size:14px;margin-top:5px;color:#dbe8f4">Week of ${shortDateLabel(w.dates[0])}</div>
+      <div style="font-size:25px;font-weight:700">VIP Operations Report</div>
+      <div style="font-size:14px;margin-top:5px;color:#dbe8f4">${reportRangeLabel(w.dates)}</div>
     </div>
     <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">COMPLETED</div><div style="font-size:24px;font-weight:700">${w.totals.completed}</div></td>
@@ -1645,7 +1761,7 @@ function weeklyOperationsReportHtml(){
     </tr></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Breakdown</h2>
     <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Efficiency</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${dailyRows}</tbody></table>
-    <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Weekly Crew Breakdown</h2>
+    <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Crew Breakdown</h2>
     <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th><th style="${th}">Efficiency</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${crewRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Job Type Breakdown</h2>
     <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Job Type</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Efficiency</th></tr></thead><tbody>${jobRows||`<tr><td colspan="6" style="${td}color:#666666">No job data available.</td></tr>`}</tbody></table>
@@ -1654,30 +1770,33 @@ function weeklyOperationsReportHtml(){
 }
 function weeklyOperationsReportText(){
   const w=weeklyOperationsData();
-  let out=`VIP Weekly Operations Report\nWeek of ${shortDateLabel(w.dates[0])}\n\nCompleted: ${w.totals.completed}\nCancelled: ${w.totals.cancelled}\nActual Hours: ${fmt(w.totals.actual)}\nBudget Hours: ${fmt(w.totals.budget)}\nEfficiency: ${fmt(w.totals.efficiency)}%\nTravel Delays: ${w.totals.travelDelays}\n\nDAILY BREAKDOWN\n`;
+  let out=`VIP Operations Report\n${reportRangeLabel(w.dates)}\n\nCompleted: ${w.totals.completed}\nCancelled: ${w.totals.cancelled}\nActual Hours: ${fmt(w.totals.actual)}\nBudget Hours: ${fmt(w.totals.budget)}\nEfficiency: ${fmt(w.totals.efficiency)}%\nTravel Delays: ${w.totals.travelDelays}\n\nDAILY BREAKDOWN\n`;
   w.days.forEach(d=>out+=`\n${d.weekday}: ${d.operations.completed} completed, ${d.operations.cancelled} cancelled, ${fmt(d.operations.actual)} actual, ${fmt(d.operations.budget)} budget, ${fmt(d.operations.efficiency)}% efficiency`);
   out+='\n\nCREW BREAKDOWN\n';
   w.crews.forEach(c=>out+=`\n${c.name}: ${c.completed} completed, ${c.cancelled} cancelled, ${fmt(c.actual)} actual, ${fmt(c.budget)} budget, ${fmt(c.efficiency)}% efficiency, ${c.travelDelays} travel delays`);
   return out;
 }
 function previewWeeklyOperations(){
+  if(!reportDates().length){alert('Select at least one saved report day first.');return;}
   const blob=new Blob(['\ufeff',weeklyOperationsReportHtml()],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob),w=window.open(url,'_blank');
   if(!w){URL.revokeObjectURL(url);alert('Allow pop-ups to preview the weekly operations report.');return;}
   setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
 function downloadWeeklyOperationsEml(){
+  if(!reportDates().length){alert('Select at least one saved report day first.');return;}
   const w=weeklyOperationsData(),boundary=`VIP_WEEKLY_OPERATIONS_${Date.now()}`;
-  const eml=[`Date: ${new Date().toUTCString()}`,`Subject: VIP Weekly Operations Report - Week of ${shortDateLabel(w.dates[0])}`,'MIME-Version: 1.0',`Content-Type: multipart/alternative; boundary="${boundary}"`,'',`--${boundary}`,'Content-Type: text/plain; charset="UTF-8"','Content-Transfer-Encoding: base64','',wrapBase64(utf8ToBase64(weeklyOperationsReportText())),'',`--${boundary}`,'Content-Type: text/html; charset="UTF-8"','Content-Transfer-Encoding: base64','',wrapBase64(utf8ToBase64(weeklyOperationsReportHtml())),'',`--${boundary}--`,''].join('\r\n');
+  const eml=[`Date: ${new Date().toUTCString()}`,`Subject: VIP Operations Report - ${reportRangeLabel(w.dates)}`,'MIME-Version: 1.0',`Content-Type: multipart/alternative; boundary="${boundary}"`,'',`--${boundary}`,'Content-Type: text/plain; charset="UTF-8"','Content-Transfer-Encoding: base64','',wrapBase64(utf8ToBase64(weeklyOperationsReportText())),'',`--${boundary}`,'Content-Type: text/html; charset="UTF-8"','Content-Transfer-Encoding: base64','',wrapBase64(utf8ToBase64(weeklyOperationsReportHtml())),'',`--${boundary}--`,''].join('\r\n');
   const blob=new Blob([eml],{type:'message/rfc822;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download=`VIP-Weekly-Operations-${w.dates[0]}.eml`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 function downloadWeeklyOperationsCsv(){
+  if(!reportDates().length){alert('Select at least one saved report day first.');return;}
   const w=weeklyOperationsData();
   const rows=[['Crew','Completed','Cancelled','Actual Hours','Budget Hours','Variance','Efficiency %','Travel Delays','Travel Delay Minutes']];
   w.crews.forEach(c=>rows.push([c.name,c.completed,c.cancelled,+c.actual.toFixed(1),+c.budget.toFixed(1),+c.variance.toFixed(1),+c.efficiency.toFixed(1),c.travelDelays,c.travelDelayMinutes]));
   rows.push([]);
-  rows.push(['Weekly Total',w.totals.completed,w.totals.cancelled,+w.totals.actual.toFixed(1),+w.totals.budget.toFixed(1),+w.totals.variance.toFixed(1),+w.totals.efficiency.toFixed(1),w.totals.travelDelays,w.totals.travelDelayMinutes]);
+  rows.push(['Report Total',w.totals.completed,w.totals.cancelled,+w.totals.actual.toFixed(1),+w.totals.budget.toFixed(1),+w.totals.variance.toFixed(1),+w.totals.efficiency.toFixed(1),w.totals.travelDelays,w.totals.travelDelayMinutes]);
   const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download=`VIP-Weekly-Operations-${w.dates[0]}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -1692,9 +1811,9 @@ function weeklyMileageReportHtml(){
   const detail=[];
   w.days.forEach(day=>(day.crews||[]).forEach(c=>(c.routes||[]).forEach(r=>detail.push(`<tr><td style="${td}">${esc(day.weekday)}</td><td style="${td}font-weight:600">${esc(c.name)}</td><td style="${td}">${esc(r.from)}</td><td style="${td}">${esc(r.to)}</td><td style="${td}text-align:right">${r.miles==null?'Missing':fmt(r.miles)+' mi'}</td><td style="${td}">${r.includesCancellation?'Includes cancelled stop':''}</td></tr>`))));
   return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff"><div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1100px;margin:0 auto;padding:20px">
-  <div style="background:#1f4e78;color:#ffffff;padding:20px 24px"><div style="font-size:25px;font-weight:700">VIP Weekly Mileage Report</div><div style="font-size:14px;margin-top:5px;color:#dbe8f4">Week of ${shortDateLabel(w.dates[0])}</div></div>
-  <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Weekly Road Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.totalMiles)}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Crews</div><div style="font-size:24px;font-weight:700">${w.crews.length}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Routes Missing</div><div style="font-size:24px;font-weight:700">${w.missingRoutes}</div></td></tr></table>
-  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Crew and Day</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th>${headers}<th style="${th}">Weekly Total</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
+  <div style="background:#1f4e78;color:#ffffff;padding:20px 24px"><div style="font-size:25px;font-weight:700">VIP Mileage Report</div><div style="font-size:14px;margin-top:5px;color:#dbe8f4">${reportRangeLabel(w.dates)}</div></div>
+  <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Report Road Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.totalMiles)}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Crews</div><div style="font-size:24px;font-weight:700">${w.crews.length}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Routes Missing</div><div style="font-size:24px;font-weight:700">${w.missingRoutes}</div></td></tr></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Crew and Day</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th>${headers}<th style="${th}">Report Total</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Totals</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Road Miles</th><th style="${th}">Missing Routes</th></tr></thead><tbody>${dailyRows}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Route Detail</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Crew</th><th style="${th}">From</th><th style="${th}">To</th><th style="${th}">Road Miles</th><th style="${th}">Note</th></tr></thead><tbody>${detail.join('')||`<tr><td colspan="6" style="${td}color:#666">No route detail available.</td></tr>`}</tbody></table>
   <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Mileage uses routed driving distance only. Cancelled jobs remain in the route sequence. Missing road routes are not replaced with straight-line distance. Mileage exclusions are applied from the saved local browser settings.</div>
@@ -1702,23 +1821,26 @@ function weeklyMileageReportHtml(){
 }
 function weeklyMileageReportText(){
   const w=weeklyMileageData();
-  let out=`VIP Weekly Mileage Report\nWeek of ${shortDateLabel(w.dates[0])}\n\nWeekly Road Miles: ${fmt(w.totalMiles)}\nRoutes Missing: ${w.missingRoutes}\n\nMILEAGE BY CREW AND DAY\n`;
+  let out=`VIP Mileage Report\n${reportRangeLabel(w.dates)}\n\nReport Road Miles: ${fmt(w.totalMiles)}\nRoutes Missing: ${w.missingRoutes}\n\nMILEAGE BY CREW AND DAY\n`;
   w.crews.forEach(c=>{out+=`\n${c.name}`;w.dates.forEach(d=>out+=` | ${dayLabel(d).slice(0,3)}: ${fmt(c.byDate[d]||0)} mi`);out+=` | Total: ${fmt(c.totalMiles)} mi`;});
   out+='\n\nDAILY TOTALS\n';w.days.forEach(d=>out+=`\n${d.weekday} ${shortDateLabel(d.date)}: ${fmt(d.totalMiles||0)} mi`);
   return out;
 }
 function previewWeeklyMileage(){
+  if(!reportDates().length){alert('Select at least one saved report day first.');return;}
   const blob=new Blob(['\ufeff',weeklyMileageReportHtml()],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),w=window.open(url,'_blank');
   if(!w){URL.revokeObjectURL(url);alert('Allow pop-ups to preview the weekly mileage report.');return;}
   setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
 function downloadWeeklyMileageEml(){
+  if(!reportDates().length){alert('Select at least one saved report day first.');return;}
   const w=weeklyMileageData(),boundary=`VIP_WEEKLY_MILEAGE_${Date.now()}`;
-  const eml=[`Date: ${new Date().toUTCString()}`,`Subject: VIP Weekly Mileage Report - Week of ${shortDateLabel(w.dates[0])}`,'MIME-Version: 1.0',`Content-Type: multipart/alternative; boundary="${boundary}"`,'',`--${boundary}`,'Content-Type: text/plain; charset="UTF-8"','Content-Transfer-Encoding: base64','',wrapBase64(utf8ToBase64(weeklyMileageReportText())),'',`--${boundary}`,'Content-Type: text/html; charset="UTF-8"','Content-Transfer-Encoding: base64','',wrapBase64(utf8ToBase64(weeklyMileageReportHtml())),'',`--${boundary}--`,''].join('\r\n');
+  const eml=[`Date: ${new Date().toUTCString()}`,`Subject: VIP Mileage Report - ${reportRangeLabel(w.dates)}`,'MIME-Version: 1.0',`Content-Type: multipart/alternative; boundary="${boundary}"`,'',`--${boundary}`,'Content-Type: text/plain; charset="UTF-8"','Content-Transfer-Encoding: base64','',wrapBase64(utf8ToBase64(weeklyMileageReportText())),'',`--${boundary}`,'Content-Type: text/html; charset="UTF-8"','Content-Transfer-Encoding: base64','',wrapBase64(utf8ToBase64(weeklyMileageReportHtml())),'',`--${boundary}--`,''].join('\r\n');
   const blob=new Blob([eml],{type:'message/rfc822;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`VIP-Weekly-Mileage-${w.dates[0]}.eml`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 function downloadWeeklyMileageCsv(){
-  const w=weeklyMileageData(),rows=[['Crew',...w.dates.map(d=>`${dayLabel(d)} ${d}`),'Weekly Total Miles','Missing Routes']];
+  if(!reportDates().length){alert('Select at least one saved report day first.');return;}
+  const w=weeklyMileageData(),rows=[['Crew',...w.dates.map(d=>`${dayLabel(d)} ${d}`),'Report Total Miles','Missing Routes']];
   w.crews.forEach(c=>rows.push([c.name,...w.dates.map(d=>Number(c.byDate[d]||0)),+c.totalMiles.toFixed(1),c.missingRoutes]));
   rows.push([]);rows.push(['Daily Total',...w.days.map(d=>Number(d.totalMiles||0)),+w.totalMiles.toFixed(1),w.missingRoutes]);
   const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n'),blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`VIP-Weekly-Mileage-${w.dates[0]}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -1972,13 +2094,22 @@ $('#mileageExcludeInput').addEventListener('keydown',e=>{
 $('#previewWeeklyOperationsBtn').onclick=previewWeeklyOperations;
 $('#downloadWeeklyOperationsEmlBtn').onclick=downloadWeeklyOperationsEml;
 $('#downloadWeeklyOperationsCsvBtn').onclick=downloadWeeklyOperationsCsv;
+$('#selectCurrentWeekBtn').onclick=()=>selectReportDates(selectedWeekDays());
+$('#selectLast2WeeksBtn').onclick=()=>selectRecentSavedDays(14);
+$('#selectLast3WeeksBtn').onclick=()=>selectRecentSavedDays(21);
+$('#selectCurrentMonthBtn').onclick=selectMonthOfLatestSaved;
+$('#selectAllReportDaysBtn').onclick=()=>selectReportDates(Object.keys(mileageHistory));
+$('#clearReportDaysBtn').onclick=()=>selectReportDates([]);
 $('#saveMileageDayBtn').onclick=saveCurrentMileageDay;
 $('#previewWeeklyMileageBtn').onclick=previewWeeklyMileage;
 $('#downloadWeeklyMileageEmlBtn').onclick=downloadWeeklyMileageEml;
 $('#downloadWeeklyMileageCsvBtn').onclick=downloadWeeklyMileageCsv;
 $('#multiDayMileageFiles').onchange=async e=>{await importMileageFiles(e.target.files);e.target.value='';};
 $('#operationDate').addEventListener('change',()=>{if($('#operationDate').value)$('#mileageWeekStart').value=mondayOf($('#operationDate').value);});
-$('#mileageWeekStart').addEventListener('change',renderSavedMileageDays);
+$('#mileageWeekStart').addEventListener('change',()=>{
+  renderSavedMileageDays();
+  if(!reportSelectedDates.length) renderReportDayChoices();
+});
 loadLocalData();
 
 $('#sampleBtn').onclick=()=>{ $('#pasteBox').value=`EVA/JOSE\t\t\t\t\t\t
