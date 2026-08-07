@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.1</title>
+<title>VIP Crew Efficiency & Travel Report v3.2</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -12,7 +12,7 @@
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(180deg,#09101d,#0d1626 40%,#0b1220);color:var(--text)}
-.wrap{max-width:1500px;margin:0 auto;padding:24px}
+.wrap{max-width:1600px;margin:0 auto;padding:24px}
 .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:18px}
 h1,h2,h3{margin:0}.brand p{margin:6px 0 0;color:var(--muted)}
 .version{color:var(--muted);font-size:13px}
@@ -53,16 +53,85 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
   .panel{box-shadow:none;border:0;background:white}.card,details{background:white;color:black;border-color:#ccc}
   .muted,.job-meta{color:#555}th{background:#eee;color:black}
 }
+
+  /* v3.2: wider saved-report workspace */
+  #weeklyReportsPanel,
+  #weeklyOperationsPanel,
+  #weeklyMileagePanel {
+    width: 100%;
+    max-width: none;
+  }
+
+  #weeklyReportsPanel > div,
+  #weeklyOperationsPanel > div,
+  #weeklyMileagePanel > div {
+    width: 100%;
+  }
+
+  #weeklyReportsPanel .scroll {
+    overflow-x: visible;
+    width: 100%;
+  }
+
+  #weeklyReportsPanel table {
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  #weeklyReportsPanel th,
+  #weeklyReportsPanel td {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  #weeklyReportsPanel th:nth-child(1),
+  #weeklyReportsPanel td:nth-child(1) { width: 18%; }
+
+  #weeklyReportsPanel th:nth-child(2),
+  #weeklyReportsPanel td:nth-child(2) { width: 14%; }
+
+  #weeklyReportsPanel th:nth-child(3),
+  #weeklyReportsPanel td:nth-child(3) { width: 12%; }
+
+  #weeklyReportsPanel th:nth-child(4),
+  #weeklyReportsPanel td:nth-child(4) { width: 18%; }
+
+  #weeklyReportsPanel th:nth-child(5),
+  #weeklyReportsPanel td:nth-child(5) { width: 18%; }
+
+  #weeklyReportsPanel th:nth-child(6),
+  #weeklyReportsPanel td:nth-child(6) { width: 20%; }
+
+  #weeklyReportsPanel .controls {
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
+    width: 100%;
+  }
+
+  #weeklyReportsPanel .buttons,
+  #weeklyOperationsPanel .buttons,
+  #weeklyMileagePanel .buttons {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 800px) {
+    #weeklyReportsPanel .controls {
+      grid-template-columns: 1fr;
+    }
+    #weeklyReportsPanel table {
+      table-layout: auto;
+    }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.1</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.2</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.1</div>
+    <div class="version">Version 3.2</div>
   </div>
 
   <div class="input-grid">
@@ -1199,7 +1268,7 @@ function outlookEmailHtml(){
   ].filter(Boolean).join('');
 
   return `<!doctype html><html><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body style="margin:0;padding:0;background:#ffffff">
-  <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:980px;margin:0 auto;padding:20px">
+  <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
     <div style="background:#1f4e78;color:#ffffff;padding:20px 24px;border-radius:4px">
       <div style="font-size:25px;font-weight:700">VIP Crew Efficiency Report</div>
       <div style="font-size:14px;margin-top:5px;color:#dbe8f4">${getReportDateLabel()}</div>
@@ -1500,7 +1569,7 @@ function mileageReportHtml(){
 
   return `<!doctype html><html><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
   <body style="margin:0;padding:0;background:#ffffff">
-    <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:980px;margin:0 auto;padding:20px">
+    <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
       <div style="background:#1f4e78;color:#ffffff;padding:20px 24px;border-radius:4px">
         <div style="font-size:25px;font-weight:700">VIP Estimated Mileage Report</div>
         <div style="font-size:14px;margin-top:5px;color:#dbe8f4">${getReportDateLabel()}</div>
@@ -1747,7 +1816,7 @@ function weeklyOperationsReportHtml(){
   const jobRows=[...jobTypeMap.values()].map(x=>`<tr><td style="${td}font-weight:600">${esc(x.type)}</td><td style="${td}text-align:center">${x.completed}</td><td style="${td}text-align:center">${x.cancelled}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:right">${fmt(x.budget)}</td><td style="${td}text-align:center">${x.actual?fmt(x.budget/x.actual*100)+'%':'N/A'}</td></tr>`).join('');
 
   return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff">
-  <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1100px;margin:0 auto;padding:20px">
+  <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
     <div style="background:#1f4e78;color:#ffffff;padding:20px 24px">
       <div style="font-size:25px;font-weight:700">VIP Operations Report</div>
       <div style="font-size:14px;margin-top:5px;color:#dbe8f4">${reportRangeLabel(w.dates)}</div>
@@ -1810,7 +1879,7 @@ function weeklyMileageReportHtml(){
   const dailyRows=w.days.map(d=>`<tr><td style="${td}font-weight:600">${esc(d.weekday)}</td><td style="${td}">${esc(shortDateLabel(d.date))}</td><td style="${td}text-align:right">${fmt(d.totalMiles||0)} mi</td><td style="${td}text-align:center">${d.missingRoutes||0}</td></tr>`).join('');
   const detail=[];
   w.days.forEach(day=>(day.crews||[]).forEach(c=>(c.routes||[]).forEach(r=>detail.push(`<tr><td style="${td}">${esc(day.weekday)}</td><td style="${td}font-weight:600">${esc(c.name)}</td><td style="${td}">${esc(r.from)}</td><td style="${td}">${esc(r.to)}</td><td style="${td}text-align:right">${r.miles==null?'Missing':fmt(r.miles)+' mi'}</td><td style="${td}">${r.includesCancellation?'Includes cancelled stop':''}</td></tr>`))));
-  return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff"><div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1100px;margin:0 auto;padding:20px">
+  return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff"><div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
   <div style="background:#1f4e78;color:#ffffff;padding:20px 24px"><div style="font-size:25px;font-weight:700">VIP Mileage Report</div><div style="font-size:14px;margin-top:5px;color:#dbe8f4">${reportRangeLabel(w.dates)}</div></div>
   <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Report Road Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.totalMiles)}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Crews</div><div style="font-size:24px;font-weight:700">${w.crews.length}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Routes Missing</div><div style="font-size:24px;font-weight:700">${w.missingRoutes}</div></td></tr></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Crew and Day</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th>${headers}<th style="${th}">Report Total</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
@@ -1865,7 +1934,7 @@ function previewOutlookEmail(){
     return;
   }
   const previewHtml=outlookEmailHtml().replace('</body>',`
-    <div style="font-family:Segoe UI,Arial,sans-serif;max-width:980px;margin:0 auto 30px;padding:0 20px">
+    <div style="font-family:Segoe UI,Arial,sans-serif;max-width:1600px;margin:0 auto 30px;padding:0 20px">
       <button onclick="window.print()" style="background:#1f4e78;color:white;border:0;border-radius:4px;padding:10px 15px;font-weight:700;cursor:pointer">Print / Save PDF</button>
     </div></body>`);
   const blob=new Blob(['\ufeff',previewHtml],{type:'text/html;charset=utf-8'});
