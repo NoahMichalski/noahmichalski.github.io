@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v2.9</title>
+<title>VIP Crew Efficiency & Travel Report v3.0</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -59,10 +59,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v2.9</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.0</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 2.9</div>
+    <div class="version">Version 3.0</div>
   </div>
 
   <div class="input-grid">
@@ -401,6 +401,26 @@ function jobIsLateAgainstBudget(job){
   const actual = Number(job.actual)||0;
   const budget = Number(job.budget)||0;
   return actual > 0 && (actual - budget) >= 0.75 - 1e-9;
+}
+
+function budgetTaskLabel(job){
+  const t=String(job.left||'').toLowerCase();
+
+  if(t.includes('rewash') && t.includes('window')) return 'Rewash Windows';
+  if(t.includes('1st w/water') || t.includes('1st with water')) return '1st w/water Reclean';
+  if(t.includes('dry clean')) return 'Dry Clean Original';
+
+  const hasOriginal=t.includes('original');
+  const hasReclean=t.includes('reclean');
+  const hasWindows=t.includes('window');
+
+  if(hasOriginal && hasWindows) return 'Original & Windows';
+  if(hasReclean && hasWindows) return 'Reclean & Windows';
+  if(hasOriginal) return 'Original';
+  if(hasReclean) return 'Reclean';
+  if(hasWindows) return 'Windows';
+
+  return job.jobType && job.jobType!=='Other' ? job.jobType : 'Other';
 }
 async function importFloorplanWorkbook(file){
   if(typeof XLSX==='undefined'){
@@ -1130,31 +1150,50 @@ function outlookEmailHtml(){
     ${r.crews.map(c=>{
       const jobs=c.jobs.filter(j=>!j.cancelled && j.actual>0);
       if(!jobs.length) return '';
-      const jobRows=jobs.map(j=>{
-        const floorplan=lookupFloorplan(j);
-        const late=jobIsLateAgainstBudget(j);
-        return `<tr>
-          <td style="${td}">${esc(j.left)}</td>
-          <td style="${td}">${esc(j.subdivision || '')}</td>
-          <td style="${td}">${esc(floorplan || 'Not found')}</td>
-          <td style="${td}text-align:right">${fmt(j.actual)}</td>
-          <td style="${td}text-align:right">${fmt(j.budget)}</td>
-          <td style="${td}${late?'background:#f4cccc;color:#990000;font-weight:700;':''}">${late?'Late':''}</td>
-        </tr>`;
+
+      const groups=[];
+      jobs.forEach(j=>{
+        const name=j.subdivision || 'Subdivision not found';
+        let group=groups.find(g=>g.name===name);
+        if(!group){
+          group={name,jobs:[]};
+          groups.push(group);
+        }
+        group.jobs.push(j);
+      });
+
+      const subdivisionSections=groups.map(group=>{
+        const jobRows=group.jobs.map(j=>{
+          const floorplan=lookupFloorplan(j);
+          const late=jobIsLateAgainstBudget(j);
+          return `<tr>
+            <td style="${td}">${esc(j.lot || '')}</td>
+            <td style="${td}">${esc(budgetTaskLabel(j))}</td>
+            <td style="${td}">${esc(floorplan || 'Not found')}</td>
+            <td style="${td}text-align:right">${fmt(j.actual)}</td>
+            <td style="${td}text-align:right">${fmt(j.budget)}</td>
+            <td style="${td}${late?'background:#f4cccc;color:#990000;font-weight:700;':''}">${late?'Late':''}</td>
+          </tr>`;
+        }).join('');
+
+        return `
+          <div style="font-size:14px;font-weight:700;color:#333333;margin:12px 0 5px">${esc(group.name)}</div>
+          <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+            <thead><tr>
+              <th style="${th}">Lot</th>
+              <th style="${th}">Task</th>
+              <th style="${th}">Floor Plan</th>
+              <th style="${th}">Actual Man Hours</th>
+              <th style="${th}">Budget</th>
+              <th style="${th}">Status</th>
+            </tr></thead>
+            <tbody>${jobRows}</tbody>
+          </table>`;
       }).join('');
+
       return `
-        <div style="font-size:15px;font-weight:700;color:#1f4e78;margin:18px 0 6px">${esc(c.name)}</div>
-        <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
-          <thead><tr>
-            <th style="${th}">Job</th>
-            <th style="${th}">Subdivision</th>
-            <th style="${th}">Floor Plan</th>
-            <th style="${th}">Actual Man Hours</th>
-            <th style="${th}">Budget</th>
-            <th style="${th}">Status</th>
-          </tr></thead>
-          <tbody>${jobRows}</tbody>
-        </table>`;
+        <div style="font-size:16px;font-weight:700;color:#1f4e78;margin:20px 0 6px">${esc(c.name)}</div>
+        ${subdivisionSections}`;
     }).join('')}
   </div></body></html>`;
 }
@@ -1180,10 +1219,26 @@ function emailText(){
   r.crews.forEach(c=>{
     const jobs=c.jobs.filter(j=>!j.cancelled && j.actual>0);
     if(!jobs.length) return;
+
     out+=`\n\n${c.name}`;
+
+    const groups=[];
     jobs.forEach(j=>{
-      const floorplan=lookupFloorplan(j) || 'Not found';
-      out+=`\n- ${j.left} | ${j.subdivision || ''} | ${floorplan} | Actual ${fmt(j.actual)} | Budget ${fmt(j.budget)}${jobIsLateAgainstBudget(j)?' | LATE':''}`;
+      const name=j.subdivision || 'Subdivision not found';
+      let group=groups.find(g=>g.name===name);
+      if(!group){
+        group={name,jobs:[]};
+        groups.push(group);
+      }
+      group.jobs.push(j);
+    });
+
+    groups.forEach(group=>{
+      out+=`\n  ${group.name}`;
+      group.jobs.forEach(j=>{
+        const floorplan=lookupFloorplan(j) || 'Not found';
+        out+=`\n  - Lot ${j.lot || ''} | ${budgetTaskLabel(j)} | ${floorplan} | Actual ${fmt(j.actual)} | Budget ${fmt(j.budget)}${jobIsLateAgainstBudget(j)?' | LATE':''}`;
+      });
     });
   });
 
