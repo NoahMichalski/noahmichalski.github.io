@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.3</title>
+<title>VIP Crew Efficiency & Travel Report v3.4</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.3</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.4</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.3</div>
+    <div class="version">Version 3.4</div>
   </div>
 
   <div class="input-grid">
@@ -557,11 +557,69 @@ function lookupFloorplan(job){
   const unique = [...new Set(matches.map(row=>row.floorplan).filter(Boolean))];
   return unique.length===1 ? unique[0] : (matches[0].floorplan || '');
 }
+function jobBudgetStatus(job){
+  const actual=Number(job.actual)||0;
+  const budget=Number(job.budget)||0;
+  const delta=actual-budget;
+
+  if(delta < -1e-9){
+    return {label:'Under',bg:'#e2f0d9',color:'#274e13'};
+  }
+  if(delta < 0.75 - 1e-9){
+    return {label:'On Time',bg:'#fff2cc',color:'#7f6000'};
+  }
+  return {label:'Late',bg:'#f4cccc',color:'#990000'};
+}
 function jobIsLateAgainstBudget(job){
-  if(job.cancelled) return false;
-  const actual = Number(job.actual)||0;
-  const budget = Number(job.budget)||0;
-  return actual > 0 && (actual - budget) >= 0.75 - 1e-9;
+  return !job.cancelled && jobBudgetStatus(job).label==='Late';
+}
+function ensureMissingFloorplansForReport(report){
+  if(!report) return;
+  const seen=new Set();
+  let added=0;
+
+  report.crews.forEach(c=>{
+    c.jobs
+      .filter(j=>!j.cancelled && Number(j.actual)>0)
+      .forEach(j=>{
+        if(lookupFloorplan(j)) return;
+
+        const key=[
+          normalizeBuilderForFloorplan(j.builder),
+          normalizeName(j.subdivision),
+          normalizeFloorplanLot(j.lot)
+        ].join('|');
+
+        if(seen.has(key)) return;
+        seen.add(key);
+
+        const entered=window.prompt(
+          `Floor plan not found.\n\n` +
+          `Crew: ${c.name}\n` +
+          `Subdivision: ${j.subdivision || 'Unknown'}\n` +
+          `Lot: ${j.lot || 'Unknown'}\n` +
+          `Task: ${budgetTaskLabel(j)}\n\n` +
+          `Enter the floor plan. Leave blank or press Cancel to keep "Not found".`,
+          ''
+        );
+
+        const value=String(entered??'').trim();
+        if(!value) return;
+
+        floorplanData.push({
+          builder:String(j.builder||'').trim(),
+          subdivision:String(j.subdivision||'').trim(),
+          lot:String(j.lot||'').trim(),
+          floorplan:value,
+          manual:true
+        });
+        added++;
+      });
+  });
+
+  if(added){
+    saveFloorplanData(floorplanData);
+  }
 }
 
 
@@ -1421,14 +1479,14 @@ function outlookEmailHtml(){
       const subdivisionSections=groups.map(group=>{
         const jobRows=group.jobs.map(j=>{
           const floorplan=lookupFloorplan(j);
-          const late=jobIsLateAgainstBudget(j);
+          const status=jobBudgetStatus(j);
           return `<tr>
             <td style="${td}text-align:center">${esc(j.lot || '')}</td>
             <td style="${td}text-align:center">${esc(budgetTaskLabel(j))}</td>
             <td style="${td}text-align:center">${esc(floorplan || 'Not found')}</td>
             <td style="${td}text-align:center">${fmt(j.actual)}</td>
             <td style="${td}text-align:center">${fmt(j.budget)}</td>
-            <td style="${td}text-align:center;${late?'background:#f4cccc;color:#990000;font-weight:700;':''}">${late?'Late':''}</td>
+            <td style="${td}text-align:center;background:${status.bg};color:${status.color};font-weight:700">${status.label}</td>
           </tr>`;
         }).join('');
 
@@ -1493,7 +1551,7 @@ function emailText(){
       out+=`\n  ${group.name}`;
       group.jobs.forEach(j=>{
         const floorplan=lookupFloorplan(j) || 'Not found';
-        out+=`\n  - Lot ${j.lot || ''} | ${budgetTaskLabel(j)} | ${floorplan} | Actual ${fmt(j.actual)} | Budget ${fmt(j.budget)}${jobIsLateAgainstBudget(j)?' | LATE':''}`;
+        out+=`\n  - Lot ${j.lot || ''} | ${budgetTaskLabel(j)} | ${floorplan} | Actual ${fmt(j.actual)} | Budget ${fmt(j.budget)} | ${jobBudgetStatus(j).label.toUpperCase()}`;
       });
     });
   });
@@ -1506,6 +1564,7 @@ async function copyFormattedEmail(){
     alert('Travel calculations are still running. Wait until the page says Email export is ready.');
     return;
   }
+  ensureMissingFloorplansForReport(currentReport);
   const rich=outlookEmailHtml();
   const plain=emailText();
   try{
@@ -1554,6 +1613,7 @@ function downloadOutlookEml(){
     return;
   }
 
+  ensureMissingFloorplansForReport(currentReport);
   const subject=`VIP Crew Efficiency Report - ${getReportDateLabel()}`;
   const htmlBody=outlookEmailHtml();
   const plainBody=emailText();
@@ -2004,6 +2064,7 @@ function previewOutlookEmail(){
     alert('Travel calculations are still running. Wait until the page says Email export is ready.');
     return;
   }
+  ensureMissingFloorplansForReport(currentReport);
   const previewHtml=outlookEmailHtml().replace('</body>',`
     <div style="font-family:Segoe UI,Arial,sans-serif;max-width:1600px;margin:0 auto 30px;padding:0 20px">
       <button onclick="window.print()" style="background:#1f4e78;color:white;border:0;border-radius:4px;padding:10px 15px;font-weight:700;cursor:pointer">Print / Save PDF</button>
