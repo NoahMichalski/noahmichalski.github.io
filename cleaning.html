@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.15</title>
+<title>VIP Crew Efficiency & Travel Report v3.16</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.15</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.16</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.15</div>
+    <div class="version">Version 3.16</div>
   </div>
 
   <div class="input-grid">
@@ -383,7 +383,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
           <div class="notice" style="margin-top:12px">
             <strong>Employee Driver List</strong>
             <div class="muted small" style="margin-top:6px">
-              Every unique employee found in your saved days and analyzed schedules appears here. Fix any misspelled name in Correct Name, choose the normal mileage status, then save. The typo will map to that employee from then on.
+              Every unique employee found in your saved days and analyzed schedules appears here. Fix misspelled names, choose the normal mileage status, and optionally set the date that driver status began. Leave the date blank if it applies to all saved history.
             </div>
             <div class="buttons" style="margin-top:10px">
               <button id="refreshEmployeeDriverListBtn" type="button">Refresh From Saved Days</button>
@@ -1055,6 +1055,7 @@ function renderEmployeeDriverList(){
         <th>Employee Found</th>
         <th>Correct Name</th>
         <th>Normal Mileage Status</th>
+        <th>Effective Driver Date</th>
       </tr>
     </thead>
     <tbody></tbody>`;
@@ -1064,6 +1065,7 @@ function renderEmployeeDriverList(){
     const key=driverKey(name);
     const profile=driverProfiles[key];
     const current=profile?.type || 'nondriver';
+    const currentEffectiveDate=profile?.effectiveDate || '';
 
     const tr=document.createElement('tr');
     const nameTd=document.createElement('td');
@@ -1096,6 +1098,15 @@ function renderEmployeeDriverList(){
     });
     statusTd.appendChild(select);
 
+    const dateTd=document.createElement('td');
+    const effectiveDateInput=document.createElement('input');
+    effectiveDateInput.type='date';
+    effectiveDateInput.className='employee-driver-effective-date';
+    effectiveDateInput.dataset.name=name;
+    effectiveDateInput.value=currentEffectiveDate;
+    effectiveDateInput.title='Leave blank if this status applies to all saved dates.';
+    dateTd.appendChild(effectiveDateInput);
+
     const autosave=()=>{
       const original=cleanCrewToken(name);
       const corrected=cleanCrewToken(correctInput.value)||original;
@@ -1110,11 +1121,20 @@ function renderEmployeeDriverList(){
 
       const key=normalizePersonName(corrected);
       if(key){
-        driverProfiles[key]={name:corrected,type:select.value};
+        driverProfiles[key]={
+          name:corrected,
+          type:select.value,
+          effectiveDate:effectiveDateInput.value || ''
+        };
         localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
       }
     };
     select.addEventListener('change',()=>{
+      autosave();
+      renderSavedMileageDays();
+      renderDailyDriverOverrides();
+    });
+    effectiveDateInput.addEventListener('change',()=>{
       autosave();
       renderSavedMileageDays();
       renderDailyDriverOverrides();
@@ -1128,7 +1148,7 @@ function renderEmployeeDriverList(){
       renderDailyDriverOverrides();
     });
 
-    tr.append(nameTd,correctTd,statusTd);
+    tr.append(nameTd,correctTd,statusTd,dateTd);
     tbody.appendChild(tr);
   });
 
@@ -1155,7 +1175,13 @@ function saveEmployeeDriverListFromUi(){
     const name=canonicalEmployeeName(original);
     const key=driverKey(name);
     if(!key) return;
-    driverProfiles[key]={name,type:sel.value};
+    const dateInput=[...document.querySelectorAll('.employee-driver-effective-date')]
+      .find(input=>input.dataset.name===sel.dataset.name);
+    driverProfiles[key]={
+      name,
+      type:sel.value,
+      effectiveDate:dateInput?.value || ''
+    };
   });
 
   knownEmployees=knownEmployees.map(canonicalEmployeeName);
@@ -1260,12 +1286,18 @@ function findDriverProfileForName(name){
   });
   return best;
 }
-function defaultMileageDriversForCrew(crewName){
+function driverProfileActiveOnDate(profile,date){
+  if(!profile) return false;
+  if(profile.type!=='driver' && profile.type!=='trainee') return false;
+  if(!profile.effectiveDate || !date) return true;
+  return date >= profile.effectiveDate;
+}
+function defaultMileageDriversForCrew(crewName,date=''){
   const members=parseCrewMembers(crewName);
   const found=[];
   members.forEach(name=>{
     const profile=findDriverProfileForName(name);
-    if(profile && (profile.type==='driver' || profile.type==='trainee')){
+    if(driverProfileActiveOnDate(profile,date)){
       found.push(profile.name || canonicalEmployeeName(name));
     }
   });
@@ -1277,7 +1309,7 @@ function overrideKey(date,crewName){
 function mileageDriversForCrew(date,crewName){
   const key=overrideKey(date,crewName);
   if(Array.isArray(driverOverrides[key])) return [...driverOverrides[key]];
-  return defaultMileageDriversForCrew(crewName);
+  return defaultMileageDriversForCrew(crewName,date);
 }
 function renderDailyDriverOverrides(){
   const area=$('#dailyDriverOverrideArea');
@@ -1319,7 +1351,9 @@ function renderDailyDriverOverrides(){
       const text=document.createElement('span');
       const profile=driverProfiles[driverKey(name)];
       const canonical=canonicalEmployeeName(name);
-      text.textContent=profile ? `${canonical} (${driverTypeLabel(profile.type)})` : `${canonical} (not set)`;
+      text.textContent=profile
+        ? `${canonical} (${driverTypeLabel(profile.type)}${profile.effectiveDate?`, from ${shortDateLabel(profile.effectiveDate)}`:''})`
+        : `${canonical} (not set)`;
       label.append(cb,text);
       row.appendChild(label);
     });
@@ -2826,25 +2860,46 @@ function weeklyMileageReportHtml(){
   <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Report Road Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.totalMiles)}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Drivers</div><div style="font-size:24px;font-weight:700">${w.crews.length}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Routes Missing</div><div style="font-size:24px;font-weight:700">${w.missingRoutes}</div></td></tr></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Driver and Day</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Driver</th>${headers}<th style="${th}">Report Total</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Totals</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Road Miles</th><th style="${th}">Missing Routes</th></tr></thead><tbody>${dailyRows}</tbody></table>
-  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Driver Breakdown</h2>
-  ${w.days.map(day=>{
-    const driverBlocks=(day.driverMileage||[]).map(d=>{
-      const routes=(d.routes||[]).map(r=>`<tr>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Driver / Crew Detail</h2>
+  ${w.crews.map(summary=>{
+    const driverName=summary.name;
+    const dated=w.days.map(day=>{
+      const d=(day.driverMileage||[]).find(x=>driverKey(x.name)===driverKey(driverName));
+      if(!d) return '';
+
+      const routeRows=(d.routes||[]).map(r=>`<tr>
+        <td style="${td}">${esc(r.crew||'')}</td>
         <td style="${td}">${esc(r.from)}</td>
         <td style="${td}">${esc(r.to)}</td>
         <td style="${td}text-align:right">${r.miles==null?'Missing':fmt(r.miles)+' mi'}</td>
         <td style="${td}text-align:center">${r.minutes==null?'—':r.minutes+' min'}</td>
-        <td style="${td}">${r.includesCancellation?'Cancelled stop':''}${r.crew?` ${r.includesCancellation?'· ':''}Crew ${esc(r.crew)}`:''}</td>
+        <td style="${td}">${r.includesCancellation?'Cancelled stop':''}</td>
       </tr>`).join('');
-      return `<div style="font-size:14px;font-weight:700;color:#1f4e78;margin:12px 0 5px">${esc(d.name)} — ${fmt(d.miles||0)} mi</div>
+
+      return `
+        <div style="margin:12px 0 5px;font-size:14px;font-weight:700;color:#333333">
+          ${esc(new Date(`${day.date}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'}))}
+          — ${fmt(d.miles||0)} mi
+        </div>
         <table style="width:100%;border-collapse:collapse">
-          <thead><tr><th style="${th}">From</th><th style="${th}">To</th><th style="${th}">Road Miles</th><th style="${th}">Drive Time</th><th style="${th}">Note</th></tr></thead>
-          <tbody>${routes||`<tr><td colspan="5" style="${td}color:#666">No routes.</td></tr>`}</tbody>
+          <thead><tr>
+            <th style="${th}">Crew</th>
+            <th style="${th}">From</th>
+            <th style="${th}">To</th>
+            <th style="${th}">Distance</th>
+            <th style="${th}">Drive Time</th>
+            <th style="${th}">Note</th>
+          </tr></thead>
+          <tbody>${routeRows||`<tr><td colspan="6" style="${td}color:#666">No route legs.</td></tr>`}</tbody>
         </table>`;
     }).join('');
-    return `<div style="font-size:16px;font-weight:700;color:#333;margin:18px 0 6px">${esc(day.weekday)} — ${esc(shortDateLabel(day.date))}</div>${driverBlocks||'<div style="color:#666">No mileage drivers for this day.</div>'}`;
+
+    return `
+      <div style="font-size:17px;font-weight:700;color:#1f4e78;margin:22px 0 6px">
+        ${esc(driverName)} — ${fmt(summary.totalMiles||0)} mi report total
+      </div>
+      ${dated}`;
   }).join('')}
-  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Route Detail</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Driver</th><th style="${th}">From</th><th style="${th}">To</th><th style="${th}">Road Miles</th><th style="${th}">Note</th></tr></thead><tbody>${detail.join('')||`<tr><td colspan="6" style="${td}color:#666">No route detail available.</td></tr>`}</tbody></table>
   <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Mileage uses routed driving distance only. Cancelled jobs remain in the route sequence. Missing road routes are not replaced with straight-line distance. Mileage exclusions are applied from the saved local browser settings.</div>
   </div></body></html>`;
 }
@@ -2853,6 +2908,18 @@ function weeklyMileageReportText(){
   let out=`VIP Mileage Report\n${reportRangeLabel(w.dates)}\n\nReport Road Miles: ${fmt(w.totalMiles)}\nRoutes Missing: ${w.missingRoutes}\n\nMILEAGE BY DRIVER AND DAY\n`;
   w.crews.forEach(c=>{out+=`\n${c.name}`;w.dates.forEach(d=>out+=` | ${dayLabel(d).slice(0,3)}: ${fmt(c.byDate[d]||0)} mi`);out+=` | Total: ${fmt(c.totalMiles)} mi`;});
   out+='\n\nDAILY TOTALS\n';w.days.forEach(d=>out+=`\n${d.weekday} ${shortDateLabel(d.date)}: ${fmt(d.totalMiles||0)} mi`);
+  out+='\n\nDRIVER / CREW DETAIL\n';
+  w.crews.forEach(summary=>{
+    out+=`\n\n${summary.name} — ${fmt(summary.totalMiles||0)} mi report total`;
+    w.days.forEach(day=>{
+      const d=(day.driverMileage||[]).find(x=>driverKey(x.name)===driverKey(summary.name));
+      if(!d) return;
+      out+=`\n  ${new Date(`${day.date}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'})} — ${fmt(d.miles||0)} mi`;
+      (d.routes||[]).forEach(r=>{
+        out+=`\n    ${r.crew||''}: ${r.from} -> ${r.to} | ${r.miles==null?'Missing':fmt(r.miles)+' mi'}${r.minutes==null?'':' | '+r.minutes+' min'}${r.includesCancellation?' | Cancelled stop':''}`;
+      });
+    });
+  });
   return out;
 }
 async function previewWeeklyMileage(){
