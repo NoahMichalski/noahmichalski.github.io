@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.14</title>
+<title>VIP Crew Efficiency & Travel Report v3.15</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.14</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.15</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.14</div>
+    <div class="version">Version 3.15</div>
   </div>
 
   <div class="input-grid">
@@ -1096,6 +1096,38 @@ function renderEmployeeDriverList(){
     });
     statusTd.appendChild(select);
 
+    const autosave=()=>{
+      const original=cleanCrewToken(name);
+      const corrected=cleanCrewToken(correctInput.value)||original;
+      const originalKey=normalizePersonName(original);
+
+      if(normalizePersonName(corrected)!==originalKey){
+        employeeAliases[originalKey]=corrected;
+      }else{
+        delete employeeAliases[originalKey];
+      }
+      localStorage.setItem(STORAGE_KEYS.employeeAliases,JSON.stringify(employeeAliases));
+
+      const key=normalizePersonName(corrected);
+      if(key){
+        driverProfiles[key]={name:corrected,type:select.value};
+        localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
+      }
+    };
+    select.addEventListener('change',()=>{
+      autosave();
+      renderSavedMileageDays();
+      renderDailyDriverOverrides();
+    });
+    correctInput.addEventListener('change',()=>{
+      autosave();
+      knownEmployees=knownEmployees.map(n=>normalizePersonName(n)===normalizePersonName(original)?corrected:n);
+      saveKnownEmployees();
+      renderEmployeeDriverList();
+      renderSavedMileageDays();
+      renderDailyDriverOverrides();
+    });
+
     tr.append(nameTd,correctTd,statusTd);
     tbody.appendChild(tr);
   });
@@ -1183,13 +1215,58 @@ async function importDriverList(file){
   alert('Driver list loaded.');
 }
 
+function editDistance(a,b){
+  a=normalizePersonName(a);
+  b=normalizePersonName(b);
+  const m=a.length,n=b.length;
+  if(!m) return n;
+  if(!n) return m;
+  const prev=Array.from({length:n+1},(_,i)=>i);
+  for(let i=1;i<=m;i++){
+    let left=i;
+    let diag=i-1;
+    for(let j=1;j<=n;j++){
+      const up=prev[j];
+      const cost=a[i-1]===b[j-1]?0:1;
+      const cur=Math.min(up+1,left+1,diag+cost);
+      prev[j-1]=left;
+      left=cur;
+      diag=up;
+    }
+    prev[n]=left;
+  }
+  return prev[n];
+}
+function findDriverProfileForName(name){
+  const exact=driverProfiles[driverKey(name)];
+  if(exact) return exact;
+
+  const target=normalizePersonName(cleanCrewToken(name));
+  if(!target) return null;
+
+  let best=null;
+  let bestDistance=Infinity;
+  Object.values(driverProfiles).forEach(profile=>{
+    const candidate=normalizePersonName(profile?.name);
+    if(!candidate) return;
+
+    // Only use fuzzy matching for plausible small typos.
+    const distance=editDistance(target,candidate);
+    const allowed=Math.max(1,Math.min(2,Math.floor(Math.max(target.length,candidate.length)/5)));
+    if(distance<=allowed && distance<bestDistance){
+      best=profile;
+      bestDistance=distance;
+    }
+  });
+  return best;
+}
 function defaultMileageDriversForCrew(crewName){
   const members=parseCrewMembers(crewName);
   const found=[];
   members.forEach(name=>{
-    const profile=driverProfiles[driverKey(name)];
+    const profile=findDriverProfileForName(name);
     if(profile && (profile.type==='driver' || profile.type==='trainee')){
-      found.push(profile.name || name);
+      found.push(profile.name || canonicalEmployeeName(name));
     }
   });
   return [...new Set(found)];
@@ -1755,7 +1832,8 @@ function selectedWeekDays(){
 function rebuildDriverMileageFromSavedDay(date,stored){
   const drivers=[];
 
-  (stored?.crews||[]).forEach(c=>{
+  const crews=Array.isArray(stored?.crews)?stored.crews:[];
+  crews.forEach(c=>{
     const names=mileageDriversForCrew(date,c.name);
     names.forEach(driver=>{
       const key=driverKey(driver);
@@ -1776,9 +1854,76 @@ function rebuildDriverMileageFromSavedDay(date,stored){
   });
 
   drivers.forEach(d=>d.miles=+d.miles.toFixed(1));
+
+  // Transitional fallback: if an older saved day has a driver snapshot
+  // but no usable crew route payload, don't throw that mileage away.
+  if(!drivers.length && !savedDayHasUsableCrewMileage(stored) && Array.isArray(stored?.driverMileage)){
+    return stored.driverMileage
+      .filter(d=>{
+        const profile=findDriverProfileForName(d.name);
+        return !(profile && (profile.type==='mileiq' || profile.type==='nondriver'));
+      })
+      .map(d=>({...d,name:canonicalEmployeeName(d.name)}));
+  }
+
   return drivers;
 }
 
+
+function savedDayHasUsableCrewMileage(day){
+  if(!day || !Array.isArray(day.crews) || !day.crews.length) return false;
+  return day.crews.some(c=>
+    Number(c.miles)>0 ||
+    Number(c.missingRoutes)>0 ||
+    (Array.isArray(c.routes) && c.routes.length>0)
+  );
+}
+async function repairSavedMileageDayIfNeeded(date){
+  const stored=mileageHistory[date];
+  if(!stored) return false;
+  if(savedDayHasUsableCrewMileage(stored)) return false;
+  if(!stored.rawText || !String(stored.rawText).trim()) return false;
+
+  let report;
+  try{
+    report=parseReport(stored.rawText);
+  }catch(e){
+    return false;
+  }
+  if(!report || !report.crews || !report.crews.length) return false;
+
+  await calculateMileageRoutes(report);
+  const repaired=mileageSnapshot(report,date,stored.rawText);
+
+  // Preserve any older operations snapshot if it was richer.
+  if(stored.operations) repaired.operations=stored.operations;
+  mileageHistory[date]=repaired;
+  localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
+  return true;
+}
+async function repairSelectedMileageDays(){
+  const dates=reportDates();
+  let repaired=0;
+
+  for(let i=0;i<dates.length;i++){
+    const date=dates[i];
+    const stored=mileageHistory[date];
+    if(!stored) continue;
+
+    // Repair missing legacy route data.
+    const didRepair=await repairSavedMileageDayIfNeeded(date);
+    if(didRepair) repaired++;
+
+    // If route data exists but driver matching currently returns none,
+    // keep the route data intact; current driver profiles are applied
+    // dynamically by rebuildDriverMileageFromSavedDay().
+  }
+
+  if(repaired){
+    renderSavedMileageDays();
+  }
+  return repaired;
+}
 function weeklyMileageData(){
   const dates=reportDates();
   const days=dates.map(date=>{
@@ -2678,7 +2823,7 @@ function weeklyMileageReportHtml(){
   w.days.forEach(day=>(day.driverMileage||[]).forEach(d=>(d.routes||[]).forEach(r=>detail.push(`<tr><td style="${td}">${esc(day.weekday)}</td><td style="${td}font-weight:600">${esc(d.name)}</td><td style="${td}">${esc(r.from)}</td><td style="${td}">${esc(r.to)}</td><td style="${td}text-align:right">${r.miles==null?'Missing':fmt(r.miles)+' mi'}</td><td style="${td}">${r.includesCancellation?'Includes cancelled stop':''}${r.crew?` · Crew ${esc(r.crew)}`:''}</td></tr>`))));
   return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff"><div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
   <div style="background:#1f4e78;color:#ffffff;padding:20px 24px"><div style="font-size:25px;font-weight:700">VIP Mileage Report</div><div style="font-size:14px;margin-top:5px;color:#dbe8f4">${reportRangeLabel(w.dates)}</div></div>
-  <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Report Road Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.totalMiles)}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Crews</div><div style="font-size:24px;font-weight:700">${w.crews.length}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Routes Missing</div><div style="font-size:24px;font-weight:700">${w.missingRoutes}</div></td></tr></table>
+  <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Report Road Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.totalMiles)}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Drivers</div><div style="font-size:24px;font-weight:700">${w.crews.length}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Routes Missing</div><div style="font-size:24px;font-weight:700">${w.missingRoutes}</div></td></tr></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Driver and Day</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Driver</th>${headers}<th style="${th}">Report Total</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Totals</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Road Miles</th><th style="${th}">Missing Routes</th></tr></thead><tbody>${dailyRows}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Driver Breakdown</h2>
@@ -2710,21 +2855,30 @@ function weeklyMileageReportText(){
   out+='\n\nDAILY TOTALS\n';w.days.forEach(d=>out+=`\n${d.weekday} ${shortDateLabel(d.date)}: ${fmt(d.totalMiles||0)} mi`);
   return out;
 }
-function previewWeeklyMileage(){
+async function previewWeeklyMileage(){
   if(!reportDates().length){alert('Select at least one saved report day first.');return;}
+  $('#savedMileageStatus').textContent='Checking selected saved days and repairing older mileage data if needed…';
+  await repairSelectedMileageDays();
+  renderSavedMileageDays();
   const blob=new Blob(['\ufeff',weeklyMileageReportHtml()],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),w=window.open(url,'_blank');
-  if(!w){URL.revokeObjectURL(url);alert('Allow pop-ups to preview the weekly mileage report.');return;}
+  if(!w){URL.revokeObjectURL(url);alert('Allow pop-ups to preview the mileage report.');return;}
   setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
-function downloadWeeklyMileageEml(){
+async function downloadWeeklyMileageEml(){
   if(!reportDates().length){alert('Select at least one saved report day first.');return;}
+  $('#savedMileageStatus').textContent='Checking selected saved days and repairing older mileage data if needed…';
+  await repairSelectedMileageDays();
+  renderSavedMileageDays();
   const w=weeklyMileageData(),boundary=`VIP_WEEKLY_MILEAGE_${Date.now()}`;
   const eml=[`Date: ${new Date().toUTCString()}`,`Subject: VIP Mileage Report - ${reportRangeLabel(w.dates)}`,'MIME-Version: 1.0',`Content-Type: multipart/alternative; boundary="${boundary}"`,'',`--${boundary}`,'Content-Type: text/plain; charset="UTF-8"','Content-Transfer-Encoding: base64','',wrapBase64(utf8ToBase64(weeklyMileageReportText())),'',`--${boundary}`,'Content-Type: text/html; charset="UTF-8"','Content-Transfer-Encoding: base64','',wrapBase64(utf8ToBase64(weeklyMileageReportHtml())),'',`--${boundary}--`,''].join('\r\n');
   const blob=new Blob([eml],{type:'message/rfc822;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`VIP-Weekly-Mileage-${w.dates[0]}.eml`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function downloadWeeklyMileageCsv(){
+async function downloadWeeklyMileageCsv(){
   if(!reportDates().length){alert('Select at least one saved report day first.');return;}
-  const w=weeklyMileageData(),rows=[['Crew',...w.dates.map(d=>`${dayLabel(d)} ${d}`),'Report Total Miles','Missing Routes']];
+  $('#savedMileageStatus').textContent='Checking selected saved days and repairing older mileage data if needed…';
+  await repairSelectedMileageDays();
+  renderSavedMileageDays();
+  const w=weeklyMileageData(),rows=[['Driver',...w.dates.map(d=>`${dayLabel(d)} ${d}`),'Report Total Miles','Missing Routes']];
   w.crews.forEach(c=>rows.push([c.name,...w.dates.map(d=>Number(c.byDate[d]||0)),+c.totalMiles.toFixed(1),c.missingRoutes]));
   rows.push([]);rows.push(['Daily Total',...w.days.map(d=>Number(d.totalMiles||0)),+w.totalMiles.toFixed(1),w.missingRoutes]);
   const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n'),blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`VIP-Weekly-Mileage-${w.dates[0]}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
