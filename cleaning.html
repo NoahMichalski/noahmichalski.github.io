@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.17</title>
+<title>VIP Crew Efficiency & Travel Report v3.18</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.17</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.18</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.17</div>
+    <div class="version">Version 3.18</div>
   </div>
 
   <div class="input-grid">
@@ -1601,6 +1601,13 @@ function backupSettingsPayload(){
   try{settings=JSON.parse(localStorage.getItem(STORAGE_KEYS.settings)||'{}')||{};}catch(e){}
   return {
     settings,
+    driverConfig:{
+      profiles:driverProfiles,
+      overrides:driverOverrides,
+      knownEmployees,
+      aliases:employeeAliases,
+      exclusions:mileageExclusions
+    },
     driverProfiles,
     driverOverrides,
     knownEmployees,
@@ -1622,6 +1629,24 @@ async function exportSavedDataBackup(){
 
   const zip=new JSZipLib();
   zip.file('manifest.json',JSON.stringify(backupManifest(),null,2));
+  zip.file('README.txt',
+`VIP Crew Efficiency & Travel Report Backup
+
+This backup includes:
+- Saved daily reports
+- Driver list
+- Driver statuses
+- Effective Driver Dates
+- Daily driver overrides
+- Employee name aliases/corrections
+- Mileage exclusions
+- Selected report dates
+- Floor plans
+- Subdivisions
+- Report settings
+
+Generated: ${new Date().toLocaleString()}
+`);
 
   const daysFolder=zip.folder('days');
   Object.keys(mileageHistory||{}).sort().forEach(date=>{
@@ -1630,6 +1655,7 @@ async function exportSavedDataBackup(){
 
   const config=backupSettingsPayload();
   zip.file('settings/report-settings.json',JSON.stringify(config.settings,null,2));
+  zip.file('settings/driver-config.json',JSON.stringify(config.driverConfig,null,2));
   zip.file('settings/driver-profiles.json',JSON.stringify(config.driverProfiles,null,2));
   zip.file('settings/driver-overrides.json',JSON.stringify(config.driverOverrides,null,2));
   zip.file('settings/known-employees.json',JSON.stringify(config.knownEmployees,null,2));
@@ -1699,11 +1725,18 @@ async function importSavedDataBackup(file){
   await Promise.all(dayTasks);
 
   const importedSettings=await readZipJson(zip,'settings/report-settings.json',{});
-  const importedDriverProfiles=await readZipJson(zip,'settings/driver-profiles.json',{});
-  const importedDriverOverrides=await readZipJson(zip,'settings/driver-overrides.json',{});
-  const importedKnownEmployees=await readZipJson(zip,'settings/known-employees.json',[]);
-  const importedEmployeeAliases=await readZipJson(zip,'settings/employee-aliases.json',{});
-  const importedMileageExclusions=await readZipJson(zip,'settings/mileage-exclusions.json',[]);
+  const importedDriverConfig=await readZipJson(zip,'settings/driver-config.json',null);
+
+  const importedDriverProfiles=importedDriverConfig?.profiles
+    ?? await readZipJson(zip,'settings/driver-profiles.json',{});
+  const importedDriverOverrides=importedDriverConfig?.overrides
+    ?? await readZipJson(zip,'settings/driver-overrides.json',{});
+  const importedKnownEmployees=importedDriverConfig?.knownEmployees
+    ?? await readZipJson(zip,'settings/known-employees.json',[]);
+  const importedEmployeeAliases=importedDriverConfig?.aliases
+    ?? await readZipJson(zip,'settings/employee-aliases.json',{});
+  const importedMileageExclusions=importedDriverConfig?.exclusions
+    ?? await readZipJson(zip,'settings/mileage-exclusions.json',[]);
   const importedReportDates=await readZipJson(zip,'settings/report-selected-dates.json',[]);
   const importedFloorplans=await readZipJson(zip,'reference/floorplans.json',[]);
   const importedSubdivisions=await readZipJson(zip,'reference/subdivisions.json',[]);
@@ -1715,7 +1748,18 @@ async function importSavedDataBackup(file){
   );
 
   mileageHistory=replace ? foundDays : {...(mileageHistory||{}),...foundDays};
-  driverProfiles=importedDriverProfiles||{};
+  driverProfiles={};
+  if(importedDriverProfiles && typeof importedDriverProfiles==='object'){
+    Object.entries(importedDriverProfiles).forEach(([key,p])=>{
+      if(!p || typeof p!=='object') return;
+      driverProfiles[key]={
+        ...p,
+        name:String(p.name||'').trim(),
+        type:p.type||'nondriver',
+        effectiveDate:String(p.effectiveDate||'').trim()
+      };
+    });
+  }
   driverOverrides=importedDriverOverrides||{};
   knownEmployees=Array.isArray(importedKnownEmployees)?importedKnownEmployees:[];
   employeeAliases=(importedEmployeeAliases && typeof importedEmployeeAliases==='object')?importedEmployeeAliases:{};
