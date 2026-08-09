@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.21</title>
+<title>VIP Crew Efficiency & Travel Report v3.22</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.21</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.22</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.21</div>
+    <div class="version">Version 3.22</div>
   </div>
 
   <div class="input-grid">
@@ -1677,7 +1677,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.21',
+    appVersion:'3.22',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -2405,7 +2405,7 @@ function outlookEmailHtml(){
   const lateTrips=r.crews.flatMap(c=>c.trips.filter(t=>t.late).map(t=>({crew:c.name,...t})));
   const incomplete=r.crews.flatMap(c=>c.jobs.filter(j=>!j.cancelled && (!j.in || !j.out || !j.actual)).map(j=>({crew:c.name,...j})));
   const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
-  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#1f4e78;font-size:13px;text-align:left;color:#ffffff;font-weight:700;';
+  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;color:#000000;font-size:13px;text-align:left;font-weight:700;';
   const section='font-size:18px;color:#1f4e78;margin:24px 0 8px;font-family:Segoe UI,Arial,sans-serif;';
   const card=(label,value,bg='#eef3f8',color='#1f1f1f')=>`
     <td style="width:20%;padding:10px;border:1px solid #d9e2f3;background:${bg};text-align:center">
@@ -2734,7 +2734,7 @@ function mileageReportHtml(){
   const missingRoutes=stats.reduce((sum,s)=>sum+s.missing.length,0);
 
   const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
-  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#1f4e78;color:#ffffff;font-size:13px;text-align:left;font-weight:700;';
+  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;color:#000000;font-size:13px;text-align:left;font-weight:700;';
 
   const crewRows=stats.length?stats.map(s=>`<tr>
     <td style="${td}font-weight:600">${esc(s.crew.name)}</td>
@@ -3011,7 +3011,7 @@ function previewCopyToolbarHtml(){
 function weeklyOperationsReportHtml(){
   const w=weeklyOperationsData();
   const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
-  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#1f4e78;color:#ffffff;font-size:13px;text-align:left;font-weight:700;';
+  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;color:#000000;font-size:13px;text-align:left;font-weight:700;';
   const effBg=v=>v>=100?'#e2f0d9':v>=85?'#fff2cc':'#f4cccc';
   const effColor=v=>v>=100?'#274e13':v>=85?'#7f6000':'#990000';
   const dailyRows=w.days.map(d=>`<tr>
@@ -3104,7 +3104,7 @@ function downloadWeeklyOperationsCsv(){
 function weeklyMileageReportHtml(){
   const w=weeklyMileageData();
   const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
-  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#1f4e78;color:#ffffff;font-size:13px;text-align:left;font-weight:700;';
+  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;color:#000000;font-size:13px;text-align:left;font-weight:700;';
   const headers=w.dates.map(d=>`<th style="${th}">${dayLabel(d).slice(0,3)}<br><span style="font-weight:400">${new Date(`${d}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'})}</span></th>`).join('');
   const crewRows=w.crews.length?w.crews.map(c=>`<tr><td style="${td}font-weight:600">${esc(c.name)}</td>${w.dates.map(d=>`<td style="${td}text-align:right">${fmt(c.byDate[d]||0)} mi</td>`).join('')}<td style="${td}text-align:right;font-weight:700">${fmt(c.totalMiles)} mi</td><td style="${td}text-align:center">${c.missingRoutes}</td></tr>`).join(''):`<tr><td colspan="8" style="${td}color:#666666">No saved mileage was found for this week.</td></tr>`;
   const dailyRows=w.days.map(d=>`<tr><td style="${td}font-weight:600">${esc(d.weekday)}</td><td style="${td}">${esc(shortDateLabel(d.date))}</td><td style="${td}text-align:right">${fmt(d.totalMiles||0)} mi</td><td style="${td}text-align:center">${d.missingRoutes||0}</td></tr>`).join('');
