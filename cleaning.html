@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.12</title>
+<title>VIP Crew Efficiency & Travel Report v3.13</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.12</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.13</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.12</div>
+    <div class="version">Version 3.13</div>
   </div>
 
   <div class="input-grid">
@@ -383,10 +383,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
           <div class="notice" style="margin-top:12px">
             <strong>Employee Driver List</strong>
             <div class="muted small" style="margin-top:6px">
-              Every unique employee found in analyzed schedules appears here. Choose each person's normal mileage status, then save it in this browser.
+              Every unique employee found in your saved days and analyzed schedules appears here. Choose each person's normal mileage status, then save it in this browser.
             </div>
             <div class="buttons" style="margin-top:10px">
-              <button id="refreshEmployeeDriverListBtn" type="button">Refresh Employee List</button>
+              <button id="refreshEmployeeDriverListBtn" type="button">Refresh From Saved Days</button>
               <button id="saveEmployeeDriverListBtn" type="button">Save Driver List</button>
               <button id="exportDriverListBtn" type="button">Export Driver List</button>
               <label style="display:inline-flex">
@@ -556,6 +556,7 @@ function loadLocalData(){
   renderMileageExclusions();
   renderCurrentCrewMileageButtons();
   renderReportDayChoices();
+  collectEmployeesFromSavedDays();
   renderEmployeeDriverList();
   renderDailyDriverOverrides();
 }
@@ -984,6 +985,36 @@ function saveKnownEmployees(){
     .sort((a,b)=>a.localeCompare(b));
   localStorage.setItem(STORAGE_KEYS.knownEmployees,JSON.stringify(knownEmployees));
 }
+function collectEmployeesFromSavedDays(){
+  const found=[];
+
+  Object.values(mileageHistory||{}).forEach(day=>{
+    // Best source: saved raw schedule text, parsed with the normal parser.
+    if(day && day.rawText){
+      try{
+        const parsed=parseReport(day.rawText);
+        parsed.crews.forEach(c=>parseCrewMembers(c.name).forEach(n=>found.push(n)));
+      }catch(e){}
+    }
+
+    // Fallback for older saved records that may not have rawText.
+    (day?.crews||[]).forEach(c=>{
+      if(c && c.name) parseCrewMembers(c.name).forEach(n=>found.push(n));
+    });
+
+    // Driver snapshots may contain names not present in the old crew snapshot.
+    (day?.driverMileage||[]).forEach(d=>{
+      if(d && d.name) found.push(cleanCrewToken(d.name));
+    });
+  });
+
+  knownEmployees=[...new Set([
+    ...knownEmployees,
+    ...found
+  ].map(cleanCrewToken).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+
+  saveKnownEmployees();
+}
 function collectEmployeesFromReport(report){
   if(!report) return;
   const found=[];
@@ -1067,6 +1098,7 @@ function saveEmployeeDriverListFromUi(){
   alert('Driver list saved in this browser.');
 }
 function refreshEmployeeDriverList(){
+  collectEmployeesFromSavedDays();
   collectEmployeesFromReport(currentReport);
   renderEmployeeDriverList();
 }
