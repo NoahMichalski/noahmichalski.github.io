@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.18</title>
+<title>VIP Crew Efficiency & Travel Report v3.19</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.18</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.19</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.18</div>
+    <div class="version">Version 3.19</div>
   </div>
 
   <div class="input-grid">
@@ -243,6 +243,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
         <div style="margin-top:8px">
           <strong>Subdivision locations:</strong>
           <span id="subdivisionStatus">Loading saved locations…</span>
+          <div id="subdivisionUploadedAt" class="muted small" style="margin-top:4px"></div>
         </div>
         <div class="buttons" style="margin-top:10px">
           <label style="display:inline-flex">
@@ -255,6 +256,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
         <div style="margin-top:14px">
           <strong>Floor plans:</strong>
           <span id="floorplanStatus">No floor-plan sheet saved yet</span>
+          <div id="floorplanUploadedAt" class="muted small" style="margin-top:4px"></div>
         </div>
         <div class="buttons" style="margin-top:10px">
           <label style="display:inline-flex">
@@ -365,7 +367,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
         </div>
       </details>
 
-      <details id="weeklyMileagePanel" style="margin-top:14px">
+      <details id="weeklyMileagePanel" style="margin-top:14px" open>
         <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
           Mileage Reports
         </summary>
@@ -379,6 +381,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
           <div class="notice" style="margin-top:12px">
             Cancelled jobs remain in the mileage route because the crew may still have driven there. Mileage uses routed driving distance only; unavailable routes are marked missing rather than replaced with straight-line mileage.
           </div>
+          <div id="mileageExclusionSummary" class="muted small" style="margin-top:8px;font-weight:700"></div>
 
           <div class="notice" style="margin-top:12px">
             <strong>Employee Driver List</strong>
@@ -501,7 +504,8 @@ const STORAGE_KEYS = {
   driverProfiles: 'vipCrewReport.driverProfiles.v1',
   driverOverrides: 'vipCrewReport.driverOverrides.v1',
   knownEmployees: 'vipCrewReport.knownEmployees.v1',
-  employeeAliases: 'vipCrewReport.employeeAliases.v1'
+  employeeAliases: 'vipCrewReport.employeeAliases.v1',
+  referenceUploads: 'vipCrewReport.referenceUploads.v1'
 };
 let subdivisionData = [];
 let routeCache = {};
@@ -514,6 +518,7 @@ let driverProfiles = {};
 let driverOverrides = {};
 let knownEmployees = [];
 let employeeAliases = {};
+let referenceUploads = {subdivisions:'',floorplans:''};
 
 function normalizeName(value){
   return String(value || '')
@@ -546,6 +551,8 @@ function loadLocalData(){
   try { driverOverrides = JSON.parse(localStorage.getItem(STORAGE_KEYS.driverOverrides) || '{}') || {}; } catch(e) { driverOverrides = {}; }
   try { knownEmployees = JSON.parse(localStorage.getItem(STORAGE_KEYS.knownEmployees) || '[]') || []; } catch(e) { knownEmployees = []; }
   try { employeeAliases = JSON.parse(localStorage.getItem(STORAGE_KEYS.employeeAliases) || '{}') || {}; } catch(e) { employeeAliases = {}; }
+  try { referenceUploads = JSON.parse(localStorage.getItem(STORAGE_KEYS.referenceUploads) || '{}') || {}; } catch(e) { referenceUploads = {}; }
+  referenceUploads={subdivisions:String(referenceUploads.subdivisions||''),floorplans:String(referenceUploads.floorplans||'')};
   try {
     const settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || '{}');
     ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id => {
@@ -575,6 +582,7 @@ function updateFloorplanStatus(){
       ? `${floorplanData.length} floor-plan rows saved in this browser`
       : 'No floor-plan sheet saved yet';
   }
+  if($('#floorplanUploadedAt')) $('#floorplanUploadedAt').textContent=formatReferenceUploadTime(referenceUploads.floorplans);
 }
 function normalizeFloorplanLot(value){
   return String(value??'')
@@ -820,6 +828,8 @@ async function importFloorplanWorkbook(file){
     return;
   }
 
+  referenceUploads.floorplans=new Date().toISOString();
+  saveReferenceUploads();
   saveFloorplanData(parsed);
   alert(`${parsed.length} floor-plan rows were imported and saved in local storage.`);
 }
@@ -828,8 +838,20 @@ function saveSettings(){
   ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id => settings[id] = $('#'+id).value);
   localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings));
 }
+function formatReferenceUploadTime(value){
+  if(!value) return 'Last uploaded: Not recorded';
+  const d=new Date(value);
+  if(Number.isNaN(d.getTime())) return 'Last uploaded: Not recorded';
+  return `Last uploaded: ${d.toLocaleString('en-US',{month:'numeric',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}`;
+}
+function saveReferenceUploads(){
+  localStorage.setItem(STORAGE_KEYS.referenceUploads,JSON.stringify(referenceUploads));
+}
 function updateSubdivisionStatus(){
-  if($('#subdivisionStatus')) $('#subdivisionStatus').textContent = `${subdivisionData.length} locations saved in this browser`;
+  if($('#subdivisionStatus')) $('#subdivisionStatus').textContent = subdivisionData.length
+    ? `${subdivisionData.length} locations saved in this browser`
+    : 'No subdivision sheet saved yet';
+  if($('#subdivisionUploadedAt')) $('#subdivisionUploadedAt').textContent=formatReferenceUploadTime(referenceUploads.subdivisions);
 }
 function findSubdivision(name, builder, city){
   const target = normalizeName(name);
@@ -926,6 +948,15 @@ function parseCrewMembers(name){
     .map(x=>x.trim())
     .filter(Boolean)
     .map(canonicalEmployeeName);
+}
+function canonicalCrewName(name){
+  const parts=String(name||'')
+    .split('/')
+    .map(cleanCrewToken)
+    .map(x=>x.trim())
+    .filter(Boolean)
+    .map(canonicalEmployeeName);
+  return parts.join('/');
 }
 function driverKey(name){
   return normalizePersonName(canonicalEmployeeName(name));
@@ -1477,6 +1508,11 @@ function removeMileageExclusion(value){
 }
 function renderMileageExclusions(){
   const holder=$('#mileageExcludeChips');
+  const summary=$('#mileageExclusionSummary');
+  if(summary){
+    const names=[...new Set(mileageExclusions.map(canonicalEmployeeName).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+    summary.textContent=names.length?`Excluding — ${names.join(', ')}`:'Excluding — None';
+  }
   if(!holder) return;
   holder.innerHTML='';
   if(!mileageExclusions.length){
@@ -1592,7 +1628,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.7',
+    appVersion:'3.19',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -1615,7 +1651,8 @@ function backupSettingsPayload(){
     mileageExclusions,
     reportSelectedDates,
     floorplanData,
-    subdivisionData
+    subdivisionData,
+    referenceUploads
   };
 }
 async function exportSavedDataBackup(){
@@ -1638,11 +1675,12 @@ This backup includes:
 - Driver statuses
 - Effective Driver Dates
 - Daily driver overrides
-- Employee name aliases/corrections
+- Employee Correct Name aliases/corrections (used by Mileage and Operations)
 - Mileage exclusions
 - Selected report dates
 - Floor plans
 - Subdivisions
+- Reference sheet Last Uploaded timestamps
 - Report settings
 
 Generated: ${new Date().toLocaleString()}
@@ -1664,6 +1702,7 @@ Generated: ${new Date().toLocaleString()}
   zip.file('settings/report-selected-dates.json',JSON.stringify(config.reportSelectedDates,null,2));
   zip.file('reference/floorplans.json',JSON.stringify(config.floorplanData,null,2));
   zip.file('reference/subdivisions.json',JSON.stringify(config.subdivisionData,null,2));
+  zip.file('reference/upload-times.json',JSON.stringify(config.referenceUploads,null,2));
 
   const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
   const url=URL.createObjectURL(blob);
@@ -1740,6 +1779,7 @@ async function importSavedDataBackup(file){
   const importedReportDates=await readZipJson(zip,'settings/report-selected-dates.json',[]);
   const importedFloorplans=await readZipJson(zip,'reference/floorplans.json',[]);
   const importedSubdivisions=await readZipJson(zip,'reference/subdivisions.json',[]);
+  const importedReferenceUploads=await readZipJson(zip,'reference/upload-times.json',{});
 
   const replace=confirm(
     `Backup contains ${Object.keys(foundDays).length} saved day(s).\n\n`+
@@ -1748,25 +1788,37 @@ async function importSavedDataBackup(file){
   );
 
   mileageHistory=replace ? foundDays : {...(mileageHistory||{}),...foundDays};
+
+  // Restore Correct Name aliases first so every other employee setting uses the same canonical identity.
+  employeeAliases=(importedEmployeeAliases && typeof importedEmployeeAliases==='object')?importedEmployeeAliases:{};
+  knownEmployees=Array.isArray(importedKnownEmployees)?importedKnownEmployees.map(canonicalEmployeeName):[];
+
+  // Re-key imported driver profiles from their canonical corrected names. This preserves status + Effective Driver Date on a clean browser.
   driverProfiles={};
   if(importedDriverProfiles && typeof importedDriverProfiles==='object'){
-    Object.entries(importedDriverProfiles).forEach(([key,p])=>{
+    Object.entries(importedDriverProfiles).forEach(([oldKey,p])=>{
       if(!p || typeof p!=='object') return;
+      const rawName=String(p.name||oldKey||'').trim();
+      const name=canonicalEmployeeName(rawName);
+      const key=normalizePersonName(name);
+      if(!key) return;
       driverProfiles[key]={
         ...p,
-        name:String(p.name||'').trim(),
+        name,
         type:p.type||'nondriver',
         effectiveDate:String(p.effectiveDate||'').trim()
       };
     });
   }
-  driverOverrides=importedDriverOverrides||{};
-  knownEmployees=Array.isArray(importedKnownEmployees)?importedKnownEmployees:[];
-  employeeAliases=(importedEmployeeAliases && typeof importedEmployeeAliases==='object')?importedEmployeeAliases:{};
-  mileageExclusions=Array.isArray(importedMileageExclusions)?importedMileageExclusions:[];
+  driverOverrides=(importedDriverOverrides && typeof importedDriverOverrides==='object')?importedDriverOverrides:{};
+  mileageExclusions=Array.isArray(importedMileageExclusions)?importedMileageExclusions.map(canonicalEmployeeName):[];
   reportSelectedDates=Array.isArray(importedReportDates)?importedReportDates:[];
   floorplanData=Array.isArray(importedFloorplans)?importedFloorplans:[];
   subdivisionData=Array.isArray(importedSubdivisions)?importedSubdivisions:[];
+  referenceUploads={
+    subdivisions:String(importedReferenceUploads?.subdivisions||''),
+    floorplans:String(importedReferenceUploads?.floorplans||'')
+  };
 
   localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
   localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
@@ -1777,13 +1829,15 @@ async function importSavedDataBackup(file){
   localStorage.setItem(STORAGE_KEYS.reportSelectedDates,JSON.stringify(reportSelectedDates));
   localStorage.setItem(STORAGE_KEYS.floorplans,JSON.stringify(floorplanData));
   localStorage.setItem(STORAGE_KEYS.subdivisions,JSON.stringify(subdivisionData));
+  localStorage.setItem(STORAGE_KEYS.referenceUploads,JSON.stringify(referenceUploads));
   localStorage.setItem(STORAGE_KEYS.settings,JSON.stringify(importedSettings||{}));
 
   updateSubdivisionStatus();
   updateFloorplanStatus();
   renderSavedMileageDays();
   renderReportDayChoices();
-  renderDriverProfiles();
+  collectEmployeesFromSavedDays();
+  renderEmployeeDriverList();
   renderDailyDriverOverrides();
   renderMileageExclusions();
   renderCurrentCrewMileageButtons();
@@ -2802,11 +2856,22 @@ function weeklyOperationsData(){
   });
   const crewMap=new Map();
   days.forEach(day=>(day.operations.crews||[]).forEach(c=>{
-    if(!crewMap.has(c.name)){
-      crewMap.set(c.name,{name:c.name,byDate:{},completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0});
+    const crewName=canonicalCrewName(c.name) || c.name;
+    if(!crewMap.has(crewName)){
+      crewMap.set(crewName,{name:crewName,byDate:{},completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0});
     }
-    const row=crewMap.get(c.name);
-    row.byDate[day.date]=c;
+    const row=crewMap.get(crewName);
+    const existing=row.byDate[day.date]||{completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0};
+    row.byDate[day.date]={
+      ...existing,
+      name:crewName,
+      completed:(Number(existing.completed)||0)+(Number(c.completed)||0),
+      cancelled:(Number(existing.cancelled)||0)+(Number(c.cancelled)||0),
+      actual:(Number(existing.actual)||0)+(Number(c.actual)||0),
+      budget:(Number(existing.budget)||0)+(Number(c.budget)||0),
+      travelDelays:(Number(existing.travelDelays)||0)+(Number(c.travelDelays)||0),
+      travelDelayMinutes:(Number(existing.travelDelayMinutes)||0)+(Number(c.travelDelayMinutes)||0)
+    };
     row.completed+=Number(c.completed)||0;
     row.cancelled+=Number(c.cancelled)||0;
     row.actual+=Number(c.actual)||0;
@@ -2830,6 +2895,26 @@ function weeklyOperationsData(){
   totals.efficiency=totals.actual?totals.budget/totals.actual*100:0;
   totals.variance=totals.actual-totals.budget;
   return {dates,days,crews,totals};
+}
+function previewCopyToolbarHtml(){
+  return `<div style="font-family:Segoe UI,Arial,sans-serif;max-width:1600px;margin:12px auto 0;padding:0 20px">
+    <button type="button" onclick="copyReportForOutlook()" style="background:#1f4e78;color:#fff;border:0;border-radius:5px;padding:10px 16px;font-weight:700;cursor:pointer">Copy for Outlook</button>
+  </div>
+  <script>
+  function copyReportForOutlook(){
+    var node=document.getElementById('reportContent');
+    if(!node){alert('Report content was not found.');return;}
+    var range=document.createRange();
+    range.selectNodeContents(node);
+    var sel=window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    var ok=false;
+    try{ok=document.execCommand('copy');}catch(e){}
+    sel.removeAllRanges();
+    alert(ok?'Formatted report copied. Paste it into Outlook.':'Copy was blocked by the browser. Select the report and copy it manually.');
+  }
+  <\/script>`;
 }
 function weeklyOperationsReportHtml(){
   const w=weeklyOperationsData();
@@ -2868,7 +2953,8 @@ function weeklyOperationsReportHtml(){
   const jobRows=[...jobTypeMap.values()].map(x=>`<tr><td style="${td}font-weight:600">${esc(x.type)}</td><td style="${td}text-align:center">${x.completed}</td><td style="${td}text-align:center">${x.cancelled}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:right">${fmt(x.budget)}</td><td style="${td}text-align:center">${x.actual?fmt(x.budget/x.actual*100)+'%':'N/A'}</td></tr>`).join('');
 
   return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff">
-  <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
+  ${previewCopyToolbarHtml()}
+  <div id="reportContent" style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
     <div style="background:#1f4e78;color:#ffffff;padding:20px 24px">
       <div style="font-size:25px;font-weight:700">VIP Operations Report</div>
       <div style="font-size:14px;margin-top:5px;color:#dbe8f4">${reportRangeLabel(w.dates)}</div>
@@ -2931,8 +3017,8 @@ function weeklyMileageReportHtml(){
   const dailyRows=w.days.map(d=>`<tr><td style="${td}font-weight:600">${esc(d.weekday)}</td><td style="${td}">${esc(shortDateLabel(d.date))}</td><td style="${td}text-align:right">${fmt(d.totalMiles||0)} mi</td><td style="${td}text-align:center">${d.missingRoutes||0}</td></tr>`).join('');
   const detail=[];
   w.days.forEach(day=>(day.driverMileage||[]).forEach(d=>(d.routes||[]).forEach(r=>detail.push(`<tr><td style="${td}">${esc(day.weekday)}</td><td style="${td}font-weight:600">${esc(d.name)}</td><td style="${td}">${esc(r.from)}</td><td style="${td}">${esc(r.to)}</td><td style="${td}text-align:right">${r.miles==null?'Missing':fmt(r.miles)+' mi'}</td><td style="${td}">${r.includesCancellation?'Includes cancelled stop':''}${r.crew?` · Crew ${esc(r.crew)}`:''}</td></tr>`))));
-  return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff"><div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
-  <div style="background:#1f4e78;color:#ffffff;padding:20px 24px"><div style="font-size:25px;font-weight:700">VIP Mileage Report</div><div style="font-size:14px;margin-top:5px;color:#dbe8f4">${reportRangeLabel(w.dates)}</div></div>
+  return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff">${previewCopyToolbarHtml()}<div id="reportContent" style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
+  <div style="background:#1f4e78;color:#ffffff;padding:20px 24px"><div style="font-size:25px;font-weight:700">VIP Mileage Report</div><div style="font-size:14px;margin-top:5px;color:#dbe8f4">${reportRangeLabel(w.dates)}</div>${w.exclusions.length?`<div style="font-size:13px;margin-top:7px;color:#ffffff"><strong>Excluding —</strong> ${esc([...new Set(w.exclusions.map(canonicalEmployeeName))].join(', '))}</div>`:''}</div>
   <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Report Road Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.totalMiles)}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Drivers</div><div style="font-size:24px;font-weight:700">${w.crews.length}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Routes Missing</div><div style="font-size:24px;font-weight:700">${w.missingRoutes}</div></td></tr></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Driver and Day</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Driver</th>${headers}<th style="${th}">Report Total</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Totals</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Road Miles</th><th style="${th}">Missing Routes</th></tr></thead><tbody>${dailyRows}</tbody></table>
@@ -2981,7 +3067,7 @@ function weeklyMileageReportHtml(){
 }
 function weeklyMileageReportText(){
   const w=weeklyMileageData();
-  let out=`VIP Mileage Report\n${reportRangeLabel(w.dates)}\n\nReport Road Miles: ${fmt(w.totalMiles)}\nRoutes Missing: ${w.missingRoutes}\n\nMILEAGE BY DRIVER AND DAY\n`;
+  let out=`VIP Mileage Report\n${reportRangeLabel(w.dates)}${w.exclusions.length?`\nExcluding — ${[...new Set(w.exclusions.map(canonicalEmployeeName))].join(', ')}`:''}\n\nReport Road Miles: ${fmt(w.totalMiles)}\nRoutes Missing: ${w.missingRoutes}\n\nMILEAGE BY DRIVER AND DAY\n`;
   w.crews.forEach(c=>{out+=`\n${c.name}`;w.dates.forEach(d=>out+=` | ${dayLabel(d).slice(0,3)}: ${fmt(c.byDate[d]||0)} mi`);out+=` | Total: ${fmt(c.totalMiles)} mi`;});
   out+='\n\nDAILY TOTALS\n';w.days.forEach(d=>out+=`\n${d.weekday} ${shortDateLabel(d.date)}: ${fmt(d.totalMiles||0)} mi`);
   out+='\n\nDRIVER / CREW DETAIL\n';
@@ -3215,6 +3301,8 @@ async function importSubdivisionWorkbook(file){
     alert('No usable locations were found. The sheet needs Subdivision, Lat, and Lon columns.');
     return;
   }
+  referenceUploads.subdivisions=new Date().toISOString();
+  saveReferenceUploads();
   saveSubdivisionData(parsed);
   alert(`${parsed.length} subdivision locations were imported and saved in local storage.`);
   if(currentReport) render(currentReport=parseReport($('#pasteBox').value));
@@ -3249,6 +3337,8 @@ $('#csvBtn').onclick=()=>{
 $('#subdivisionFile').onchange=async e=>{ const file=e.target.files[0]; if(file) await importSubdivisionWorkbook(file); e.target.value=''; };
 $('#resetSubdivisionsBtn').onclick=()=>{
   if(confirm('Clear the subdivision locations saved in this browser?')){
+    referenceUploads.subdivisions='';
+    saveReferenceUploads();
     saveSubdivisionData([]);
     routeCache={};
     drivingRouteCache={};
@@ -3259,6 +3349,8 @@ $('#resetSubdivisionsBtn').onclick=()=>{
 $('#floorplanFile').onchange=async e=>{ const file=e.target.files[0]; if(file) await importFloorplanWorkbook(file); e.target.value=''; };
 $('#clearFloorplansBtn').onclick=()=>{
   if(confirm('Clear the floor-plan sheet saved in this browser?')){
+    referenceUploads.floorplans='';
+    saveReferenceUploads();
     saveFloorplanData([]);
   }
 };
