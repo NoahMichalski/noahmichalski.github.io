@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.13</title>
+<title>VIP Crew Efficiency & Travel Report v3.14</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.13</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.14</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.13</div>
+    <div class="version">Version 3.14</div>
   </div>
 
   <div class="input-grid">
@@ -383,7 +383,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
           <div class="notice" style="margin-top:12px">
             <strong>Employee Driver List</strong>
             <div class="muted small" style="margin-top:6px">
-              Every unique employee found in your saved days and analyzed schedules appears here. Choose each person's normal mileage status, then save it in this browser.
+              Every unique employee found in your saved days and analyzed schedules appears here. Fix any misspelled name in Correct Name, choose the normal mileage status, then save. The typo will map to that employee from then on.
             </div>
             <div class="buttons" style="margin-top:10px">
               <button id="refreshEmployeeDriverListBtn" type="button">Refresh From Saved Days</button>
@@ -500,7 +500,8 @@ const STORAGE_KEYS = {
   reportSelectedDates: 'vipCrewReport.reportSelectedDates.v1',
   driverProfiles: 'vipCrewReport.driverProfiles.v1',
   driverOverrides: 'vipCrewReport.driverOverrides.v1',
-  knownEmployees: 'vipCrewReport.knownEmployees.v1'
+  knownEmployees: 'vipCrewReport.knownEmployees.v1',
+  employeeAliases: 'vipCrewReport.employeeAliases.v1'
 };
 let subdivisionData = [];
 let routeCache = {};
@@ -512,6 +513,7 @@ let reportSelectedDates = [];
 let driverProfiles = {};
 let driverOverrides = {};
 let knownEmployees = [];
+let employeeAliases = {};
 
 function normalizeName(value){
   return String(value || '')
@@ -543,6 +545,7 @@ function loadLocalData(){
   try { driverProfiles = JSON.parse(localStorage.getItem(STORAGE_KEYS.driverProfiles) || '{}') || {}; } catch(e) { driverProfiles = {}; }
   try { driverOverrides = JSON.parse(localStorage.getItem(STORAGE_KEYS.driverOverrides) || '{}') || {}; } catch(e) { driverOverrides = {}; }
   try { knownEmployees = JSON.parse(localStorage.getItem(STORAGE_KEYS.knownEmployees) || '[]') || []; } catch(e) { knownEmployees = []; }
+  try { employeeAliases = JSON.parse(localStorage.getItem(STORAGE_KEYS.employeeAliases) || '{}') || {}; } catch(e) { employeeAliases = {}; }
   try {
     const settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || '{}');
     ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id => {
@@ -911,15 +914,21 @@ function cleanCrewToken(value){
     .replace(/\s+/g,' ')
     .trim();
 }
+function canonicalEmployeeName(name){
+  const clean=cleanCrewToken(name);
+  const key=normalizePersonName(clean);
+  return employeeAliases[key] || clean;
+}
 function parseCrewMembers(name){
   return String(name||'')
     .split('/')
     .map(cleanCrewToken)
     .map(x=>x.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .map(canonicalEmployeeName);
 }
 function driverKey(name){
-  return normalizePersonName(cleanCrewToken(name));
+  return normalizePersonName(canonicalEmployeeName(name));
 }
 function saveDriverProfiles(){
   localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
@@ -981,7 +990,7 @@ function renderDriverProfiles(){
 }
 
 function saveKnownEmployees(){
-  knownEmployees=[...new Set(knownEmployees.map(cleanCrewToken).filter(Boolean))]
+  knownEmployees=[...new Set(knownEmployees.map(canonicalEmployeeName).filter(Boolean))]
     .sort((a,b)=>a.localeCompare(b));
   localStorage.setItem(STORAGE_KEYS.knownEmployees,JSON.stringify(knownEmployees));
 }
@@ -1043,7 +1052,8 @@ function renderEmployeeDriverList(){
   table.innerHTML=`
     <thead>
       <tr>
-        <th>Employee</th>
+        <th>Employee Found</th>
+        <th>Correct Name</th>
         <th>Normal Mileage Status</th>
       </tr>
     </thead>
@@ -1058,6 +1068,15 @@ function renderEmployeeDriverList(){
     const tr=document.createElement('tr');
     const nameTd=document.createElement('td');
     nameTd.textContent=name;
+
+    const correctTd=document.createElement('td');
+    const correctInput=document.createElement('input');
+    correctInput.type='text';
+    correctInput.className='employee-correct-name';
+    correctInput.dataset.original=name;
+    correctInput.value=canonicalEmployeeName(name);
+    correctInput.placeholder='Correct employee name';
+    correctTd.appendChild(correctInput);
 
     const statusTd=document.createElement('td');
     const select=document.createElement('select');
@@ -1077,25 +1096,43 @@ function renderEmployeeDriverList(){
     });
     statusTd.appendChild(select);
 
-    tr.append(nameTd,statusTd);
+    tr.append(nameTd,correctTd,statusTd);
     tbody.appendChild(tr);
   });
 
   holder.appendChild(table);
 }
 function saveEmployeeDriverListFromUi(){
+  const corrections=[...document.querySelectorAll('.employee-correct-name')];
+  corrections.forEach(input=>{
+    const original=cleanCrewToken(input.dataset.original);
+    const corrected=cleanCrewToken(input.value);
+    if(!original || !corrected) return;
+    const originalKey=normalizePersonName(original);
+    if(normalizePersonName(corrected)!==originalKey){
+      employeeAliases[originalKey]=corrected;
+    }else{
+      delete employeeAliases[originalKey];
+    }
+  });
+  localStorage.setItem(STORAGE_KEYS.employeeAliases,JSON.stringify(employeeAliases));
+
   const selects=[...document.querySelectorAll('.employee-driver-status')];
   selects.forEach(sel=>{
-    const name=cleanCrewToken(sel.dataset.name);
+    const original=cleanCrewToken(sel.dataset.name);
+    const name=canonicalEmployeeName(original);
     const key=driverKey(name);
     if(!key) return;
     driverProfiles[key]={name,type:sel.value};
   });
+
+  knownEmployees=knownEmployees.map(canonicalEmployeeName);
   saveKnownEmployees();
   localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
   renderEmployeeDriverList();
   renderDailyDriverOverrides();
-  alert('Driver list saved in this browser.');
+  renderSavedMileageDays();
+  alert('Driver list and employee name corrections saved.');
 }
 function refreshEmployeeDriverList(){
   collectEmployeesFromSavedDays();
@@ -1108,7 +1145,8 @@ function exportDriverList(){
     version:1,
     exportedAt:new Date().toISOString(),
     employees:knownEmployees,
-    driverProfiles
+    driverProfiles,
+    employeeAliases
   };
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
   const url=URL.createObjectURL(blob);
@@ -1135,7 +1173,9 @@ async function importDriverList(file){
 
   knownEmployees=Array.isArray(data.employees)?data.employees:[];
   driverProfiles=(data.driverProfiles && typeof data.driverProfiles==='object')?data.driverProfiles:{};
+  employeeAliases=(data.employeeAliases && typeof data.employeeAliases==='object')?data.employeeAliases:{};
 
+  localStorage.setItem(STORAGE_KEYS.employeeAliases,JSON.stringify(employeeAliases));
   saveKnownEmployees();
   localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
   renderEmployeeDriverList();
@@ -1201,7 +1241,8 @@ function renderDailyDriverOverrides(){
       });
       const text=document.createElement('span');
       const profile=driverProfiles[driverKey(name)];
-      text.textContent=profile ? `${name} (${driverTypeLabel(profile.type)})` : `${name} (not set)`;
+      const canonical=canonicalEmployeeName(name);
+      text.textContent=profile ? `${canonical} (${driverTypeLabel(profile.type)})` : `${canonical} (not set)`;
       label.append(cb,text);
       row.appendChild(label);
     });
@@ -1423,6 +1464,7 @@ function backupSettingsPayload(){
     driverProfiles,
     driverOverrides,
     knownEmployees,
+    employeeAliases,
     mileageExclusions,
     reportSelectedDates,
     floorplanData,
@@ -1451,6 +1493,7 @@ async function exportSavedDataBackup(){
   zip.file('settings/driver-profiles.json',JSON.stringify(config.driverProfiles,null,2));
   zip.file('settings/driver-overrides.json',JSON.stringify(config.driverOverrides,null,2));
   zip.file('settings/known-employees.json',JSON.stringify(config.knownEmployees,null,2));
+  zip.file('settings/employee-aliases.json',JSON.stringify(config.employeeAliases,null,2));
   zip.file('settings/mileage-exclusions.json',JSON.stringify(config.mileageExclusions,null,2));
   zip.file('settings/report-selected-dates.json',JSON.stringify(config.reportSelectedDates,null,2));
   zip.file('reference/floorplans.json',JSON.stringify(config.floorplanData,null,2));
@@ -1519,6 +1562,7 @@ async function importSavedDataBackup(file){
   const importedDriverProfiles=await readZipJson(zip,'settings/driver-profiles.json',{});
   const importedDriverOverrides=await readZipJson(zip,'settings/driver-overrides.json',{});
   const importedKnownEmployees=await readZipJson(zip,'settings/known-employees.json',[]);
+  const importedEmployeeAliases=await readZipJson(zip,'settings/employee-aliases.json',{});
   const importedMileageExclusions=await readZipJson(zip,'settings/mileage-exclusions.json',[]);
   const importedReportDates=await readZipJson(zip,'settings/report-selected-dates.json',[]);
   const importedFloorplans=await readZipJson(zip,'reference/floorplans.json',[]);
@@ -1534,6 +1578,7 @@ async function importSavedDataBackup(file){
   driverProfiles=importedDriverProfiles||{};
   driverOverrides=importedDriverOverrides||{};
   knownEmployees=Array.isArray(importedKnownEmployees)?importedKnownEmployees:[];
+  employeeAliases=(importedEmployeeAliases && typeof importedEmployeeAliases==='object')?importedEmployeeAliases:{};
   mileageExclusions=Array.isArray(importedMileageExclusions)?importedMileageExclusions:[];
   reportSelectedDates=Array.isArray(importedReportDates)?importedReportDates:[];
   floorplanData=Array.isArray(importedFloorplans)?importedFloorplans:[];
@@ -1543,6 +1588,7 @@ async function importSavedDataBackup(file){
   localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
   localStorage.setItem(STORAGE_KEYS.driverOverrides,JSON.stringify(driverOverrides));
   localStorage.setItem(STORAGE_KEYS.knownEmployees,JSON.stringify(knownEmployees));
+  localStorage.setItem(STORAGE_KEYS.employeeAliases,JSON.stringify(employeeAliases));
   localStorage.setItem(STORAGE_KEYS.mileageExclusions,JSON.stringify(mileageExclusions));
   localStorage.setItem(STORAGE_KEYS.reportSelectedDates,JSON.stringify(reportSelectedDates));
   localStorage.setItem(STORAGE_KEYS.floorplans,JSON.stringify(floorplanData));
@@ -1689,7 +1735,7 @@ function renderSavedMileageDays(){
   }
   entries.forEach(day=>{
     const tr=document.createElement('tr');
-    const drivers=Array.isArray(day.driverMileage)?day.driverMileage:[];
+    const drivers=rebuildDriverMileageFromSavedDay(day.date,day);
     const miles=drivers.reduce((s,d)=>s+(Number(d.miles)||0),0);
     const missing=drivers.reduce((s,d)=>s+(Number(d.missingRoutes)||0),0);
     tr.innerHTML=`<td><strong>${esc(shortDateLabel(day.date))}</strong></td><td>${esc(day.weekday||dayLabel(day.date))}</td><td>${drivers.length}</td><td><strong>${fmt(miles)} mi</strong></td><td>${missing}</td><td><button class="delete-mileage-day" data-date="${esc(day.date)}">Remove</button></td>`;
@@ -1706,35 +1752,38 @@ function selectedWeekDays(){
   const monday=$('#mileageWeekStart').value||mondayOf();
   return Array.from({length:5},(_,i)=>addDaysIso(monday,i));
 }
+function rebuildDriverMileageFromSavedDay(date,stored){
+  const drivers=[];
+
+  (stored?.crews||[]).forEach(c=>{
+    const names=mileageDriversForCrew(date,c.name);
+    names.forEach(driver=>{
+      const key=driverKey(driver);
+      const profile=driverProfiles[key];
+      if(profile && (profile.type==='mileiq' || profile.type==='nondriver')) return;
+
+      let row=drivers.find(x=>driverKey(x.name)===key);
+      if(!row){
+        row={name:canonicalEmployeeName(driver),miles:0,trips:0,missingRoutes:0,routes:[]};
+        drivers.push(row);
+      }
+
+      row.miles+=Number(c.miles)||0;
+      row.trips+=Number(c.trips)||0;
+      row.missingRoutes+=Number(c.missingRoutes)||0;
+      (c.routes||[]).forEach(r=>row.routes.push({...r,crew:c.name}));
+    });
+  });
+
+  drivers.forEach(d=>d.miles=+d.miles.toFixed(1));
+  return drivers;
+}
+
 function weeklyMileageData(){
   const dates=reportDates();
   const days=dates.map(date=>{
-    const stored=mileageHistory[date]||{date,weekday:dayLabel(date),driverMileage:[]};
-    let drivers=Array.isArray(stored.driverMileage)?stored.driverMileage:null;
-
-    if(!drivers){
-      drivers=[];
-      (stored.crews||[]).forEach(c=>{
-        const names=mileageDriversForCrew(date,c.name);
-        names.forEach(driver=>{
-          const key=driverKey(driver);
-          let row=drivers.find(x=>driverKey(x.name)===key);
-          if(!row){
-            row={name:driver,miles:0,trips:0,missingRoutes:0,routes:[]};
-            drivers.push(row);
-          }
-          row.miles+=Number(c.miles)||0;
-          row.trips+=Number(c.trips)||0;
-          row.missingRoutes+=Number(c.missingRoutes)||0;
-          (c.routes||[]).forEach(r=>row.routes.push({...r,crew:c.name}));
-        });
-      });
-    }
-
-    drivers=drivers.filter(d=>{
-      const p=driverProfiles[driverKey(d.name)];
-      return !(p && (p.type==='mileiq' || p.type==='nondriver'));
-    });
+    const stored=mileageHistory[date]||{date,weekday:dayLabel(date),crews:[]};
+    const drivers=rebuildDriverMileageFromSavedDay(date,stored);
 
     return {
       ...stored,
