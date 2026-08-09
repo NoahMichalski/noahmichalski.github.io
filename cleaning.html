@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.7</title>
+<title>VIP Crew Efficiency & Travel Report v3.11</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.7</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.11</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.7</div>
+    <div class="version">Version 3.11</div>
   </div>
 
   <div class="input-grid">
@@ -474,9 +474,25 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 const $ = s => document.querySelector(s);
+
+let xlsxLibraryPromise=null;
+function ensureXlsxLibrary(){
+  if(window.XLSX) return Promise.resolve(window.XLSX);
+  if(xlsxLibraryPromise) return xlsxLibraryPromise;
+
+  xlsxLibraryPromise=new Promise((resolve,reject)=>{
+    const script=document.createElement('script');
+    script.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    script.async=true;
+    script.onload=()=>window.XLSX ? resolve(window.XLSX) : reject(new Error('XLSX library did not initialize'));
+    script.onerror=()=>reject(new Error('XLSX library could not load'));
+    document.head.appendChild(script);
+  });
+
+  return xlsxLibraryPromise;
+}
 let currentReport = null;
 let travelCalculationComplete = false;
 const DEFAULT_SUBDIVISIONS = [];
@@ -780,14 +796,17 @@ function budgetTaskLabel(job){
   return job.jobType && job.jobType!=='Other' ? job.jobType : 'Other';
 }
 async function importFloorplanWorkbook(file){
-  if(typeof XLSX==='undefined'){
-    alert('The spreadsheet reader could not load. Check the internet connection and reopen the page.');
+  let XLSXLib;
+  try{
+    XLSXLib=await ensureXlsxLibrary();
+  }catch(e){
+    alert('The Excel reader could not load. Check the internet connection and try the floor-plan upload again. Analyze and the rest of the page will continue to work.');
     return;
   }
   const buffer = await file.arrayBuffer();
-  const workbook = XLSX.read(buffer,{type:'array'});
+  const workbook = XLSXLib.read(buffer,{type:'array'});
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json(sheet,{defval:''});
+  const rows = XLSXLib.utils.sheet_to_json(sheet,{defval:''});
 
   const parsed = rows.map(row=>({
     builder:String(row.Builder ?? row.builder ?? '').trim(),
@@ -1584,6 +1603,727 @@ function weeklyMileageData(){
   };
 }
 
+function parseSubdivision(line){
+  const parts=line.split('*').map(x=>x.trim()).filter(Boolean);
+  return {subdivision:parts[0]||'',builder:parts[1]||'',city:parts[2]||''};
+}
+function parseJobText(raw){
+  let txt=raw.trim();
+  txt=txt.replace(/^(AM|PM)\s+/i,'');
+  const dash=txt.indexOf(' - ');
+  let left=dash>=0?txt.slice(0,dash).trim():txt;
+  let address=dash>=0?txt.slice(dash+3).trim():'';
+  const lot=(left.match(/^([^\s]+)/)||[])[1]||'';
+  return {lot,left,address,jobType:classifyJob(left)};
+}
+function parseReport(text){
+  const lines=text.replace(/\r/g,'').split('\n');
+  const crews=[]; let crew=null, loc={subdivision:'',builder:'',city:''}, weekday='';
+  for(const rawLine of lines){
+    if(!rawLine.trim()) continue;
+    const cols=rawLine.split('\t');
+    const first=(cols[0]||'').trim();
+    if(/^Totals$/i.test(first)) continue;
+    if(/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$/i.test(first) && cols.some(c=>/People/i.test(c))){
+      weekday=first; continue;
+    }
+    if(first.startsWith('*')){ loc=parseSubdivision(first); continue; }
+    const remainingBlank = cols.slice(1).every(c=>!String(c).trim());
+    const isCrewHeader = remainingBlank && !first.startsWith('*') &&
+      !/^(Totals|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$/i.test(first) &&
+      !/^\s*(AM\s+|PM\s+)?\d/.test(first);
+    if(isCrewHeader){
+      crew={name:first,weekday,jobs:[]};
+      crews.push(crew);
+      loc={subdivision:'',builder:'',city:''};
+      continue;
+    }
+
+    const looksLikeJob = crew && cols.length>=2 &&
+      /^\s*(AM\s+|PM\s+)?\d/.test(first) &&
+      !/People/i.test(cols.join(' '));
+    if(looksLikeJob){
+      const people=n(cols[1]);
+      const inVal=(cols[2]||'').trim();
+      const outVal=(cols[3]||'').trim();
+      const actual=n(cols[4]);
+      const budget=n(cols[5]);
+      const est=(cols[6]||'').trim();
+      const cancelled=/cancelled/i.test(inVal);
+      const info=parseJobText(first);
+      crew.jobs.push({
+        ...info, raw:first, people, in:inVal, out:outVal, actual, budget, est, cancelled,
+        subdivision:loc.subdivision,builder:loc.builder,city:loc.city
+      });
+      continue;
+    }
+  }
+  crews.forEach(c=>{
+    const completed=c.jobs.filter(j=>!j.cancelled && j.actual>0);
+    c.cancelled=c.jobs.filter(j=>j.cancelled).length;
+    c.completed=completed.length;
+    c.actual=completed.reduce((s,j)=>s+j.actual,0);
+    c.budget=completed.reduce((s,j)=>s+j.budget,0);
+    c.variance=c.actual-c.budget;
+    c.eff=c.actual?c.budget/c.actual*100:0;
+    c.gaps=[];
+    c.trips=[];
+    let previousTimedJob=null;
+    let cancelledSincePrevious=false;
+
+    for(const job of c.jobs){
+      if(job.cancelled){
+        cancelledSincePrevious=true;
+        continue;
+      }
+
+      const hasTimes=timeToMin(job.in)!=null && timeToMin(job.out)!=null;
+      if(!hasTimes) continue;
+
+      if(previousTimedJob && !cancelledSincePrevious){
+        const a=previousTimedJob, b=job;
+        const gap=timeToMin(b.in)-timeToMin(a.out);
+        const same=normalizeName(a.subdivision)===normalizeName(b.subdivision) && a.subdivision;
+        c.trips.push({
+          from:a,to:b,gap,same,route:null,expected:null,delay:null,
+          travelDelay:0,previousOverrun:0,scheduleDelay:false,late:false
+        });
+      }
+
+      previousTimedJob=job;
+      cancelledSincePrevious=false;
+    }
+  });
+  const all=crews.flatMap(c=>c.jobs);
+  const completed=all.filter(j=>!j.cancelled && j.actual>0);
+  return {
+    crews,
+    jobs:completed,
+    cancelled:all.filter(j=>j.cancelled),
+    actual:completed.reduce((s,j)=>s+j.actual,0),
+    budget:completed.reduce((s,j)=>s+j.budget,0)
+  };
+}
+function render(report){
+  currentReport=report; $('#results').classList.remove('hidden'); renderCurrentCrewMileageButtons();
+  $('#totalJobs').textContent=report.jobs.length;
+  $('#cancelledJobs').textContent=report.cancelled.length;
+  $('#actualHours').textContent=fmt(report.actual);
+  $('#budgetHours').textContent=fmt(report.budget);
+  const overall=report.actual?report.budget/report.actual*100:0;
+  $('#overallEff').textContent=overall.toFixed(1)+'%';
+
+  const tbody=$('#crewTable'); tbody.innerHTML='';
+  [...report.crews].sort((a,b)=>b.eff-a.eff).forEach(c=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><strong>${esc(c.name)}</strong></td><td>${c.completed}</td><td>${c.cancelled}</td>
+      <td>${fmt(c.actual)}</td><td>${fmt(c.budget)}</td>
+      <td>${c.variance>0?'+':''}${fmt(c.variance)} ${c.variance>0?'over':'under'}</td>
+      <td><span class="badge ${c.actual?effClass(c.eff):'neutral'}">${c.actual?c.eff.toFixed(1)+'%':'N/A'}</span></td>
+      <td class="trip-count">${c.trips.filter(t=>t.late).length}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  $('#gapFindings').innerHTML='Calculating expected travel times…';
+  calculateTravel(report);
+
+  $('#cancelledCountLabel').textContent=`${report.cancelled.length} cancelled job${report.cancelled.length===1?'':'s'}`;
+  const cbody=$('#cancelledTable'); cbody.innerHTML='';
+  if(!report.cancelled.length){
+    cbody.innerHTML='<tr><td colspan="6" class="muted">No cancelled jobs found.</td></tr>';
+  }else{
+    report.crews.forEach(c=>c.jobs.filter(j=>j.cancelled).forEach(j=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td><strong>${esc(c.name)}</strong></td><td>${esc(j.subdivision)}</td><td>${esc(j.builder)}</td><td>${esc(j.city)}</td><td>${esc(j.left)}</td><td>${esc(j.address)}</td>`;
+      cbody.appendChild(tr);
+    }));
+  }
+
+  const holder=$('#crewTimelines'); holder.innerHTML='';
+  report.crews.forEach(c=>{
+    const d=document.createElement('details');
+    d.innerHTML=`<summary><span>${esc(c.name)}</span><span>${c.completed} completed · ${c.cancelled} cancelled · ${c.actual?c.eff.toFixed(1)+'%':'N/A'}</span></summary>`;
+    const wrap=document.createElement('div'); wrap.className='timeline';
+    c.jobs.forEach(j=>{
+      const item=document.createElement('div'); item.className='job'+(j.cancelled?' cancelled':'');
+      const status=j.cancelled?'<span class="badge cancel">Cancelled</span>':`<span class="badge ${effClass(j.actual?j.budget/j.actual*100:0)}">${j.actual?(j.budget/j.actual*100).toFixed(1)+'%':'Incomplete'}</span>`;
+      item.innerHTML=`<div class="job-time">${j.cancelled?'Cancelled':esc(j.in||'No in')}<br>${j.cancelled?'':esc(j.out||'No out')}</div>
+      <div><div class="job-title">${esc(j.subdivision)} — ${esc(j.left)}</div><div class="job-meta">${esc(j.builder)} · ${esc(j.city)} · ${esc(j.address)}</div></div>
+      <div class="right">${status}<div class="job-meta">${j.cancelled?'Excluded from totals':`Actual ${fmt(j.actual)} / Budget ${fmt(j.budget)}`}</div></div>`;
+      wrap.appendChild(item);
+    });
+    d.appendChild(wrap); holder.appendChild(d);
+  });
+}
+function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+
+function getReportDateLabel(){
+  const firstCrew=currentReport?.crews?.[0];
+  const weekday=firstCrew?.weekday || 'Daily';
+  const now=new Date();
+  const dateText=now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  return `${weekday}, ${dateText}`;
+}
+function varianceText(c){
+  const diff=c.actual-c.budget;
+  if(Math.abs(diff)<0.05) return 'On budget';
+  return `${fmt(Math.abs(diff))} ${diff>0?'over':'under'}`;
+}
+function topHighlights(r){
+  const active=r.crews.filter(c=>c.actual>0);
+  const best=[...active].sort((a,b)=>b.eff-a.eff)[0];
+  const worst=[...active].sort((a,b)=>(b.actual-b.budget)-(a.actual-a.budget))[0];
+  const mostCancelled=[...r.crews].sort((a,b)=>b.cancelled-a.cancelled)[0];
+  const lateTrips=r.crews.flatMap(c=>c.trips.filter(t=>t.late).map(t=>({crew:c.name,...t})));
+  const longest=[...lateTrips].sort((a,b)=>b.travelDelay-a.travelDelay)[0];
+  return {best,worst,mostCancelled,longest};
+}
+function outlookEmailHtml(){
+  if(!currentReport) return '';
+  const r=currentReport;
+  const efficiency=r.actual?r.budget/r.actual*100:0;
+  const highlights=topHighlights(r);
+  const efficiencyBg=efficiency>=100?'#d9ead3':efficiency>=85?'#fff2cc':'#f4cccc';
+  const efficiencyColor=efficiency>=100?'#274e13':efficiency>=85?'#7f6000':'#990000';
+  const crews=[...r.crews].sort((a,b)=>b.eff-a.eff);
+  const lateTrips=r.crews.flatMap(c=>c.trips.filter(t=>t.late).map(t=>({crew:c.name,...t})));
+  const incomplete=r.crews.flatMap(c=>c.jobs.filter(j=>!j.cancelled && (!j.in || !j.out || !j.actual)).map(j=>({crew:c.name,...j})));
+  const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
+  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#1f4e78;font-size:13px;text-align:left;color:#ffffff;font-weight:700;';
+  const section='font-size:18px;color:#1f4e78;margin:24px 0 8px;font-family:Segoe UI,Arial,sans-serif;';
+  const card=(label,value,bg='#eef3f8',color='#1f1f1f')=>`
+    <td style="width:20%;padding:10px;border:1px solid #d9e2f3;background:${bg};text-align:center">
+      <div style="font-size:11px;color:#666666;text-transform:uppercase;letter-spacing:.4px">${label}</div>
+      <div style="font-size:22px;font-weight:700;color:${color};margin-top:4px">${value}</div>
+    </td>`;
+
+  const crewRows=crews.map(c=>{
+    const bg=c.eff>=100?'#e2f0d9':c.eff>=85?'#fff2cc':'#f4cccc';
+    const color=c.eff>=100?'#274e13':c.eff>=85?'#7f6000':'#990000';
+    return `<tr>
+      <td style="${td}font-weight:600">${esc(c.name)}</td>
+      <td style="${td}text-align:center">${c.completed}</td>
+      <td style="${td}text-align:center">${c.cancelled}</td>
+      <td style="${td}text-align:right">${fmt(c.actual)}</td>
+      <td style="${td}text-align:right">${fmt(c.budget)}</td>
+      <td style="${td}">${varianceText(c)}</td>
+      <td style="${td}background:${bg};color:${color};font-weight:700;text-align:center">${c.actual?c.eff.toFixed(1)+'%':'N/A'}</td>
+      <td style="${td}text-align:center">${c.trips.filter(t=>t.late).length}</td>
+      <td style="${td}text-align:center">${formatDriveMinutes(crewTotalDriveMinutes(c))}</td>
+    </tr>`;
+  }).join('');
+
+  const travelRows=lateTrips.length
+    ? lateTrips.map(t=>`<tr>
+      <td style="${td}font-weight:600">${esc(t.crew)}</td>
+      <td style="${td}">${esc(t.from.subdivision)}</td>
+      <td style="${td}">${esc(t.to.subdivision)}</td>
+      <td style="${td}text-align:center">${t.gap} min</td>
+      <td style="${td}text-align:center">${t.expected} min</td>
+      <td style="${td}background:#f4cccc;color:#990000;font-weight:700">${t.travelDelay} min travel delay</td>
+    </tr>`).join('')
+    : `<tr><td colspan="6" style="${td}color:#666666">No travel delays found.</td></tr>`;
+
+  const cancelRows=r.cancelled.length?r.crews.flatMap(c=>c.jobs.filter(j=>j.cancelled).map(j=>`<tr>
+    <td style="${td}font-weight:600">${esc(c.name)}</td>
+    <td style="${td}">${esc(j.subdivision)}</td>
+    <td style="${td}">${esc(j.lot)}</td>
+    <td style="${td}">${esc(j.jobType)}</td>
+    <td style="${td}">${esc(j.address)}</td>
+  </tr>`)).join(''):`<tr><td colspan="5" style="${td}color:#666666">No cancelled jobs.</td></tr>`;
+
+  const incompleteRows=incomplete.length?incomplete.map(j=>`<tr>
+    <td style="${td}font-weight:600">${esc(j.crew)}</td>
+    <td style="${td}">${esc(j.subdivision)}</td>
+    <td style="${td}">${esc(j.left)}</td>
+    <td style="${td}">${esc(j.in||'Missing')}</td>
+    <td style="${td}">${esc(j.out||'Missing')}</td>
+  </tr>`).join(''):`<tr><td colspan="5" style="${td}color:#666666">No incomplete jobs.</td></tr>`;
+
+  const highlightRows=[
+    highlights.best?`<tr><td style="${td}font-weight:600">Best efficiency</td><td style="${td}">${esc(highlights.best.name)} &ndash; ${highlights.best.eff.toFixed(1)}%</td></tr>`:'',
+    highlights.worst?`<tr><td style="${td}font-weight:600">Most over budget</td><td style="${td}">${esc(highlights.worst.name)} &ndash; ${varianceText(highlights.worst)}</td></tr>`:'',
+    highlights.mostCancelled&&highlights.mostCancelled.cancelled?`<tr><td style="${td}font-weight:600">Most cancelled jobs</td><td style="${td}">${esc(highlights.mostCancelled.name)} &ndash; ${highlights.mostCancelled.cancelled}</td></tr>`:'',
+    highlights.longest?`<tr><td style="${td}font-weight:600">Longest travel delay</td><td style="${td}">${esc(highlights.longest.crew)} &ndash; ${highlights.longest.travelDelay} minutes travel delay</td></tr>`:''
+  ].filter(Boolean).join('');
+
+  return `<!doctype html><html><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body style="margin:0;padding:0;background:#ffffff">
+  <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
+    <div style="background:#1f4e78;color:#ffffff;padding:20px 24px;border-radius:4px">
+      <div style="font-size:25px;font-weight:700">VIP Crew Efficiency Report</div>
+      <div style="font-size:14px;margin-top:5px;color:#dbe8f4">${getReportDateLabel()}</div>
+    </div>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;margin-top:14px">
+      <tr>
+        ${card('Completed',r.jobs.length)}
+        ${card('Cancelled',r.cancelled.length,'#eadcf8','#7030a0')}
+        ${card('Actual Hours',fmt(r.actual))}
+        ${card('Budget Hours',fmt(r.budget))}
+        ${card('Efficiency',efficiency.toFixed(1)+'%',efficiencyBg,efficiencyColor)}
+      </tr>
+    </table>
+
+    <h2 style="${section}">Daily highlights</h2>
+    <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+      ${highlightRows||`<tr><td style="${td}color:#666666">No highlights available.</td></tr>`}
+    </table>
+
+    <h2 style="${section}">Crew performance</h2>
+    <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="${th}">Crew</th><th style="${th}">Jobs</th><th style="${th}">Cancelled</th>
+        <th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th>
+        <th style="${th}">Efficiency</th><th style="${th}">Travel Delays</th><th style="${th}">Total Drive Time</th>
+      </tr></thead>
+      <tbody>${crewRows}</tbody>
+    </table>
+
+    <h2 style="${section}">Travel Delays &ndash; ${lateTrips.length} delay${lateTrips.length===1?'':'s'}</h2>
+    <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="${th}">Crew</th><th style="${th}">From</th><th style="${th}">To</th>
+        <th style="${th}">Actual Gap</th><th style="${th}">Expected</th><th style="${th}">Finding</th>
+      </tr></thead>
+      <tbody>${travelRows}</tbody>
+    </table>
+
+    <h2 style="${section}">Cancelled jobs &ndash; ${r.cancelled.length}</h2>
+    <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="${th}">Crew</th><th style="${th}">Subdivision</th><th style="${th}">Lot</th>
+        <th style="${th}">Job Type</th><th style="${th}">Address</th>
+      </tr></thead>
+      <tbody>${cancelRows}</tbody>
+    </table>
+
+    <h2 style="${section}">Incomplete jobs</h2>
+    <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="${th}">Crew</th><th style="${th}">Subdivision</th><th style="${th}">Job</th>
+        <th style="${th}">In</th><th style="${th}">Out</th>
+      </tr></thead>
+      <tbody>${incompleteRows}</tbody>
+    </table>
+
+    <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666666;font-size:11px;line-height:1.5">
+      Efficiency equals budget hours divided by actual man-hours. Cancelled jobs are excluded from efficiency.
+      Expected travel includes mapped road time plus the selected arrival and parking buffer. Only the time from the previous clock-out to the next clock-in is evaluated.
+    </div>
+
+    <h2 style="${section}">Job Budget Breakdown</h2>
+    ${r.crews.map(c=>{
+      const jobs=c.jobs.filter(j=>!j.cancelled && j.actual>0);
+      if(!jobs.length) return '';
+
+      const groups=[];
+      jobs.forEach(j=>{
+        const name=j.subdivision || 'Subdivision not found';
+        let group=groups.find(g=>g.name===name);
+        if(!group){
+          group={name,jobs:[]};
+          groups.push(group);
+        }
+        group.jobs.push(j);
+      });
+
+      const subdivisionSections=groups.map(group=>{
+        const jobRows=group.jobs.map(j=>{
+          const floorplan=lookupFloorplan(j);
+          const status=jobBudgetStatus(j);
+          return `<tr>
+            <td style="${td}text-align:center">${esc(j.lot || '')}</td>
+            <td style="${td}text-align:center">${esc(budgetTaskLabel(j))}</td>
+            <td style="${td}text-align:center">${esc(floorplan || 'Not found')}</td>
+            <td style="${td}text-align:center">${fmt(j.actual)}</td>
+            <td style="${td}text-align:center">${fmt(j.budget)}</td>
+            <td style="${td}text-align:center;background:${status.bg};color:${status.color};font-weight:700">${status.label}</td>
+          </tr>`;
+        }).join('');
+
+        return `
+          <div style="font-size:14px;font-weight:700;color:#333333;margin:12px 0 5px">${esc(group.name)}</div>
+          <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+            <thead><tr>
+              <th style="${th}text-align:center">Lot</th>
+              <th style="${th}text-align:center">Task</th>
+              <th style="${th}text-align:center">Floor Plan</th>
+              <th style="${th}text-align:center">Actual Man Hours</th>
+              <th style="${th}text-align:center">Budget</th>
+              <th style="${th}text-align:center">Status</th>
+            </tr></thead>
+            <tbody>${jobRows}</tbody>
+          </table>`;
+      }).join('');
+
+      return `
+        <div style="font-size:16px;font-weight:700;color:#1f4e78;margin:20px 0 6px">${esc(c.name)}</div>
+        ${subdivisionSections}`;
+    }).join('')}
+  </div></body></html>`;
+}
+function emailText(){
+  if(!currentReport) return '';
+  const r=currentReport, eff=r.actual?r.budget/r.actual*100:0;
+  let out=`VIP Crew Efficiency Report\n${getReportDateLabel()}\n\nCompleted Jobs: ${r.jobs.length}\nCancelled Jobs: ${r.cancelled.length}\nActual Hours: ${fmt(r.actual)}\nBudget Hours: ${fmt(r.budget)}\nOverall Efficiency: ${eff.toFixed(1)}%\n\nCREW RESULTS\n`;
+  [...r.crews].sort((a,b)=>b.eff-a.eff).forEach(c=>{
+    out+=`\n${c.name}: ${c.completed} completed, ${c.cancelled} cancelled, ${fmt(c.actual)} actual, ${fmt(c.budget)} budget, ${c.actual?c.eff.toFixed(1)+'%':'N/A'} efficiency`;
+  });
+  out+=`\n\nCANCELLED JOBS\n`;
+  if(!r.cancelled.length) out+='None\n';
+  else r.crews.forEach(c=>c.jobs.filter(j=>j.cancelled).forEach(j=>out+=`\n- ${c.name}: ${j.subdivision} — ${j.left} — ${j.address}`));
+  out+=`\n\nTRAVEL DELAYS — ${r.crews.reduce((sum,c)=>sum+c.trips.filter(t=>t.late).length,0)}\n`;
+  let count=0;
+  r.crews.forEach(c=>c.trips.filter(t=>t.late).forEach(t=>{
+    count++;
+    out+=`\n- ${c.name}: ${t.from.subdivision} to ${t.to.subdivision}; actual ${t.gap} min, expected ${t.expected} min, ${t.travelDelay} min travel delay`;
+  }));
+  if(!count) out+='No travel delays found.\n';
+
+  out+='\n\nJOB BUDGET BREAKDOWN\n';
+  r.crews.forEach(c=>{
+    const jobs=c.jobs.filter(j=>!j.cancelled && j.actual>0);
+    if(!jobs.length) return;
+
+    out+=`\n\n${c.name}`;
+
+    const groups=[];
+    jobs.forEach(j=>{
+      const name=j.subdivision || 'Subdivision not found';
+      let group=groups.find(g=>g.name===name);
+      if(!group){
+        group={name,jobs:[]};
+        groups.push(group);
+      }
+      group.jobs.push(j);
+    });
+
+    groups.forEach(group=>{
+      out+=`\n  ${group.name}`;
+      group.jobs.forEach(j=>{
+        const floorplan=lookupFloorplan(j) || 'Not found';
+        out+=`\n  - Lot ${j.lot || ''} | ${budgetTaskLabel(j)} | ${floorplan} | Actual ${fmt(j.actual)} | Budget ${fmt(j.budget)} | ${jobBudgetStatus(j).label.toUpperCase()}`;
+      });
+    });
+  });
+
+  return out;
+}
+async function copyFormattedEmail(){
+  if(!currentReport){alert('Analyze a report first.');return;}
+  if(!travelCalculationComplete){
+    alert('Travel calculations are still running. Wait until the page says Email export is ready.');
+    return;
+  }
+  ensureMissingFloorplansForReport(currentReport);
+  const rich=outlookEmailHtml();
+  const plain=emailText();
+  try{
+    if(window.ClipboardItem){
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html':new Blob(['\ufeff',rich],{type:'text/html;charset=utf-8'}),
+          'text/plain':new Blob([plain],{type:'text/plain'})
+        })
+      ]);
+    }else{
+      await navigator.clipboard.writeText(plain);
+    }
+    alert('Formatted Outlook email copied. Paste it directly into a new Outlook message.');
+  }catch(err){
+    const area=document.createElement('textarea');
+    area.value=plain;document.body.appendChild(area);area.select();document.execCommand('copy');area.remove();
+    alert('Plain-text fallback copied because formatted clipboard access was blocked.');
+  }
+}
+
+function utf8ToBase64(value){
+  const bytes=new TextEncoder().encode(value);
+  let binary='';
+  const chunkSize=0x8000;
+  for(let i=0;i<bytes.length;i+=chunkSize){
+    binary+=String.fromCharCode(...bytes.subarray(i,i+chunkSize));
+  }
+  return btoa(binary);
+}
+function wrapBase64(value){
+  return value.match(/.{1,76}/g)?.join('\r\n') || '';
+}
+function safeFileDate(){
+  const d=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function downloadOutlookEml(){
+  if(!currentReport){
+    alert('Analyze a report first.');
+    return;
+  }
+  if(!travelCalculationComplete){
+    alert('Travel calculations are still running. Wait until the page says Email export is ready.');
+    return;
+  }
+
+  ensureMissingFloorplansForReport(currentReport);
+  const subject=`VIP Crew Efficiency Report - ${getReportDateLabel()}`;
+  const htmlBody=outlookEmailHtml();
+  const plainBody=emailText();
+  const boundary=`VIP_REPORT_${Date.now()}`;
+
+  const eml=[
+    `Date: ${new Date().toUTCString()}`,
+    `Subject: ${subject}`,
+    'MIME-Version: 1.0',
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    '',
+    `--${boundary}`,
+    'Content-Type: text/plain; charset="UTF-8"',
+    'Content-Transfer-Encoding: base64',
+    '',
+    wrapBase64(utf8ToBase64(plainBody)),
+    '',
+    `--${boundary}`,
+    'Content-Type: text/html; charset="UTF-8"',
+    'Content-Transfer-Encoding: base64',
+    '',
+    wrapBase64(utf8ToBase64(htmlBody)),
+    '',
+    `--${boundary}--`,
+    ''
+  ].join('\r\n');
+
+  const blob=new Blob([eml],{type:'message/rfc822;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url;
+  link.download=`VIP-Crew-Efficiency-${safeFileDate()}.eml`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+
+  $('#emailStatus').textContent='Outlook email downloaded. Open the .eml file in Outlook.';
+}
+
+function mileageReportHtml(){
+  if(!currentReport) return '';
+
+  const r=currentReport;
+  const stats=crewMileageStats(r)
+    .filter(s=>s.routed.length || s.missing.length)
+    .sort((a,b)=>b.miles-a.miles);
+
+  const totalMiles=stats.reduce((sum,s)=>sum+s.miles,0);
+  const totalTrips=stats.reduce((sum,s)=>sum+s.routed.length,0);
+  const missingRoutes=stats.reduce((sum,s)=>sum+s.missing.length,0);
+
+  const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
+  const th='padding:8px 10px;border:1px solid #b4c7e7;background:#1f4e78;color:#ffffff;font-size:13px;text-align:left;font-weight:700;';
+
+  const crewRows=stats.length?stats.map(s=>`<tr>
+    <td style="${td}font-weight:600">${esc(s.crew.name)}</td>
+    <td style="${td}text-align:center">${s.routed.length}</td>
+    <td style="${td}text-align:right;font-weight:700">${fmt(s.miles)} mi</td>
+    <td style="${td}text-align:right">${s.routed.length?fmt(s.average)+' mi':'N/A'}</td>
+    <td style="${td}text-align:center">${s.missing.length}</td>
+  </tr>`).join(''):`<tr><td colspan="5" style="${td}color:#666666">No mileage routes available.</td></tr>`;
+
+  const routeRows=[];
+  r.crews.forEach(c=>mileageTripsForCrew(c).forEach(t=>{
+    if(t.route && Number.isFinite(Number(t.route.miles))){
+      routeRows.push(`<tr>
+        <td style="${td}font-weight:600">${esc(c.name)}</td>
+        <td style="${td}">${esc(t.from.subdivision)}</td>
+        <td style="${td}">${esc(t.to.subdivision)}</td>
+        <td style="${td}text-align:right">${fmt(Number(t.route.miles))} mi</td>
+        <td style="${td}text-align:center">${t.route.minutes} min</td>
+        <td style="${td}">${esc(t.route.source)}${t.includesCancellation?' · cancelled stop':''}</td>
+      </tr>`);
+    }else{
+      routeRows.push(`<tr>
+        <td style="${td}font-weight:600">${esc(c.name)}</td>
+        <td style="${td}">${esc(t.from.subdivision)}</td>
+        <td style="${td}">${esc(t.to.subdivision)}</td>
+        <td style="${td}" colspan="3">Route unavailable</td>
+      </tr>`);
+    }
+  }));
+
+  return `<!doctype html><html><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
+  <body style="margin:0;padding:0;background:#ffffff">
+    <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
+      <div style="background:#1f4e78;color:#ffffff;padding:20px 24px;border-radius:4px">
+        <div style="font-size:25px;font-weight:700">VIP Estimated Mileage Report</div>
+        <div style="font-size:14px;margin-top:5px;color:#dbe8f4">${getReportDateLabel()}</div>
+      </div>
+      ${mileageExclusions.length?`<div style="margin-top:10px;padding:8px 10px;background:#fff2cc;border:1px solid #e6d58c;font-size:12px"><strong>Excluded from mileage:</strong> ${esc(mileageExclusions.join(', '))}</div>`:''}
+
+      <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;margin-top:14px">
+        <tr>
+          <td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center">
+            <div style="font-size:11px;color:#666666;text-transform:uppercase">Estimated Road Miles</div>
+            <div style="font-size:24px;font-weight:700;margin-top:4px">${fmt(totalMiles)}</div>
+          </td>
+          <td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center">
+            <div style="font-size:11px;color:#666666;text-transform:uppercase">Trips Counted</div>
+            <div style="font-size:24px;font-weight:700;margin-top:4px">${totalTrips}</div>
+          </td>
+          <td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center">
+            <div style="font-size:11px;color:#666666;text-transform:uppercase">Routes Missing</div>
+            <div style="font-size:24px;font-weight:700;margin-top:4px">${missingRoutes}</div>
+          </td>
+        </tr>
+      </table>
+
+      <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Crew</h2>
+      <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+        <thead><tr>
+          <th style="${th}">Crew</th>
+          <th style="${th}">Trips Counted</th>
+          <th style="${th}">Estimated Road Miles</th>
+          <th style="${th}">Average per Trip</th>
+          <th style="${th}">Routes Missing</th>
+        </tr></thead>
+        <tbody>${crewRows}</tbody>
+      </table>
+
+      <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Route Breakdown</h2>
+      <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
+        <thead><tr>
+          <th style="${th}">Crew</th>
+          <th style="${th}">From</th>
+          <th style="${th}">To</th>
+          <th style="${th}">Road Miles</th>
+          <th style="${th}">Drive Time</th>
+          <th style="${th}">Route Source</th>
+        </tr></thead>
+        <tbody>${routeRows.join('')||`<tr><td colspan="6" style="${td}color:#666666">No routes found.</td></tr>`}</tbody>
+      </table>
+
+      <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666666;font-size:11px;line-height:1.5">
+        Mileage is estimated using routed road distance between consecutive scheduled subdivisions.
+        Travel chains interrupted by a cancelled job are excluded.
+      </div>
+    </div>
+  </body></html>`;
+}
+function mileageReportText(){
+  if(!currentReport) return '';
+
+  const stats=crewMileageStats(currentReport)
+    .filter(s=>s.routed.length || s.missing.length)
+    .sort((a,b)=>b.miles-a.miles);
+
+  const totalMiles=stats.reduce((sum,s)=>sum+s.miles,0);
+  let out=`VIP Estimated Mileage Report\n${getReportDateLabel()}\n\nTotal Estimated Road Miles: ${fmt(totalMiles)}\n\nMILEAGE BY CREW\n`;
+
+  stats.forEach(s=>{
+    out+=`\n${s.crew.name}: ${fmt(s.miles)} miles across ${s.routed.length} trip${s.routed.length===1?'':'s'}`;
+    if(s.missing.length) out+=` — ${s.missing.length} missing route${s.missing.length===1?'':'s'}`;
+  });
+
+  out+='\n\nROUTE BREAKDOWN\n';
+  currentReport.crews.forEach(c=>mileageTripsForCrew(c).forEach(t=>{
+    if(t.route && Number.isFinite(Number(t.route.miles))){
+      out+=`\n${c.name}: ${t.from.subdivision} to ${t.to.subdivision} — ${fmt(Number(t.route.miles))} miles${t.includesCancellation?' — includes cancelled stop':''}`;
+    }
+  }));
+
+  return out;
+}
+function previewMileageReport(){
+  if(!currentReport){alert('Analyze a report first.');return;}
+  if(!travelCalculationComplete){
+    alert('Travel calculations are still running. Wait until the page says Email export is ready.');
+    return;
+  }
+
+  const blob=new Blob(['\ufeff',mileageReportHtml()],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const w=window.open(url,'_blank');
+
+  if(!w){
+    URL.revokeObjectURL(url);
+    alert('Allow pop-ups to preview the mileage report.');
+    return;
+  }
+
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+function downloadMileageEml(){
+  if(!currentReport){alert('Analyze a report first.');return;}
+  if(!travelCalculationComplete){
+    alert('Travel calculations are still running. Wait until the page says Email export is ready.');
+    return;
+  }
+
+  const boundary=`VIP_MILEAGE_${Date.now()}`;
+  const subject=`VIP Estimated Mileage Report - ${getReportDateLabel()}`;
+  const eml=[
+    `Date: ${new Date().toUTCString()}`,
+    `Subject: ${subject}`,
+    'MIME-Version: 1.0',
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    '',
+    `--${boundary}`,
+    'Content-Type: text/plain; charset="UTF-8"',
+    'Content-Transfer-Encoding: base64',
+    '',
+    wrapBase64(utf8ToBase64(mileageReportText())),
+    '',
+    `--${boundary}`,
+    'Content-Type: text/html; charset="UTF-8"',
+    'Content-Transfer-Encoding: base64',
+    '',
+    wrapBase64(utf8ToBase64(mileageReportHtml())),
+    '',
+    `--${boundary}--`,
+    ''
+  ].join('\r\n');
+
+  const blob=new Blob([eml],{type:'message/rfc822;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url;
+  link.download=`VIP-Estimated-Mileage-${safeFileDate()}.eml`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function downloadMileageCsv(){
+  if(!currentReport){alert('Analyze a report first.');return;}
+  if(!travelCalculationComplete){
+    alert('Travel calculations are still running. Wait until the page says Email export is ready.');
+    return;
+  }
+
+  const rows=[['Crew','From Subdivision','To Subdivision','Estimated Road Miles','Estimated Drive Minutes','Route Source']];
+
+  currentReport.crews.forEach(c=>mileageTripsForCrew(c).forEach(t=>{
+    rows.push([
+      c.name,
+      t.from.subdivision,
+      t.to.subdivision,
+      t.route&&Number.isFinite(Number(t.route.miles))?Number(t.route.miles):'',
+      t.route?t.route.minutes:'',
+      t.route?t.route.source:'Route unavailable'
+    ]);
+  }));
+
+  const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url;
+  link.download=`VIP-Estimated-Mileage-${safeFileDate()}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+
 function weeklyOperationsData(){
   const dates=reportDates();
   const days=dates.map(date=>{
@@ -1935,14 +2675,17 @@ function renderTravelFindings(report){
   });
 }
 async function importSubdivisionWorkbook(file){
-  if(typeof XLSX==='undefined'){
-    alert('The spreadsheet reader could not load. Check the internet connection and reopen the page.');
+  let XLSXLib;
+  try{
+    XLSXLib=await ensureXlsxLibrary();
+  }catch(e){
+    alert('The Excel reader could not load. Check the internet connection and try the subdivision upload again. Analyze and the rest of the page will continue to work.');
     return;
   }
   const buffer=await file.arrayBuffer();
-  const workbook=XLSX.read(buffer,{type:'array'});
+  const workbook=XLSXLib.read(buffer,{type:'array'});
   const sheet=workbook.Sheets[workbook.SheetNames[0]];
-  const rows=XLSX.utils.sheet_to_json(sheet,{defval:''});
+  const rows=XLSXLib.utils.sheet_to_json(sheet,{defval:''});
   const parsed=rows.map(row=>{
     const subdivision=row.Subdivision ?? row.subdivision ?? '';
     const parts=String(subdivision).split('*').map(x=>x.trim());
