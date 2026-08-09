@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.6</title>
+<title>VIP Crew Efficiency & Travel Report v3.7</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.6</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.7</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.6</div>
+    <div class="version">Version 3.7</div>
   </div>
 
   <div class="input-grid">
@@ -316,7 +316,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
           </div>
 
           <div class="notice" style="margin-top:12px">
-            Saved daily reports are used for both operations and mileage reporting. Everything is stored in this browser. Use the backup ZIP to move the saved history and settings to another PC.
+            Saved daily reports are used for both the weekly operations report and weekly mileage report. Everything is stored in this browser.
           </div>
 
           <div class="section-head" style="margin-top:14px">
@@ -475,7 +475,6 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 let currentReport = null;
@@ -1211,18 +1210,34 @@ function ensureDayOperations(day){
   return {completed:0,cancelled:0,actual:0,budget:0,efficiency:0,travelDelays:0,travelDelayMinutes:0,crews:[]};
 }
 
+let zipLibraryPromise=null;
+function ensureZipLibrary(){
+  if(window.JSZip) return Promise.resolve(window.JSZip);
+  if(zipLibraryPromise) return zipLibraryPromise;
+
+  zipLibraryPromise=new Promise((resolve,reject)=>{
+    const script=document.createElement('script');
+    script.src='https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+    script.async=true;
+    script.onload=()=>window.JSZip ? resolve(window.JSZip) : reject(new Error('ZIP library did not initialize'));
+    script.onerror=()=>reject(new Error('ZIP library could not load'));
+    document.head.appendChild(script);
+  });
+
+  return zipLibraryPromise;
+}
 function backupManifest(){
   return {
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.6',
+    appVersion:'3.7',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
 function backupSettingsPayload(){
   let settings={};
-  try{ settings=JSON.parse(localStorage.getItem(STORAGE_KEYS.settings)||'{}')||{}; }catch(e){}
+  try{settings=JSON.parse(localStorage.getItem(STORAGE_KEYS.settings)||'{}')||{};}catch(e){}
   return {
     settings,
     driverProfiles,
@@ -1234,12 +1249,15 @@ function backupSettingsPayload(){
   };
 }
 async function exportSavedDataBackup(){
-  if(typeof JSZip==='undefined'){
-    alert('The ZIP library could not load. Check the internet connection and reopen the page.');
+  let JSZipLib;
+  try{
+    JSZipLib=await ensureZipLibrary();
+  }catch(e){
+    alert('The ZIP library could not load. Your reports and uploads are unaffected; check the internet connection and try the backup again.');
     return;
   }
 
-  const zip=new JSZip();
+  const zip=new JSZipLib();
   zip.file('manifest.json',JSON.stringify(backupManifest(),null,2));
 
   const daysFolder=zip.folder('days');
@@ -1270,21 +1288,23 @@ async function readZipJson(zip,path,fallback){
   const file=zip.file(path);
   if(!file) return fallback;
   try{
-    const text=await file.async('string');
-    return JSON.parse(text);
+    return JSON.parse(await file.async('string'));
   }catch(e){
     return fallback;
   }
 }
 async function importSavedDataBackup(file){
-  if(typeof JSZip==='undefined'){
-    alert('The ZIP library could not load. Check the internet connection and reopen the page.');
+  let JSZipLib;
+  try{
+    JSZipLib=await ensureZipLibrary();
+  }catch(e){
+    alert('The ZIP library could not load. Your reports and uploads are unaffected; check the internet connection and try the backup again.');
     return;
   }
 
   let zip;
   try{
-    zip=await JSZip.loadAsync(file);
+    zip=await JSZipLib.loadAsync(file);
   }catch(e){
     alert('That file could not be opened as a ZIP backup.');
     return;
@@ -1297,21 +1317,23 @@ async function importSavedDataBackup(file){
   }
 
   const foundDays={};
-  const dayPromises=[];
-  zip.folder('days')?.forEach((relativePath,entry)=>{
-    if(entry.dir || !relativePath.toLowerCase().endsWith('.json')) return;
-    dayPromises.push((async()=>{
-      try{
-        const text=await entry.async('string');
-        const day=JSON.parse(text);
-        const date=(day && day.date) || relativePath.replace(/\.json$/i,'');
-        if(date) foundDays[date]=day;
-      }catch(e){}
-    })());
-  });
-  await Promise.all(dayPromises);
+  const dayTasks=[];
+  const folder=zip.folder('days');
+  if(folder){
+    folder.forEach((relativePath,entry)=>{
+      if(entry.dir || !relativePath.toLowerCase().endsWith('.json')) return;
+      dayTasks.push((async()=>{
+        try{
+          const day=JSON.parse(await entry.async('string'));
+          const date=(day&&day.date)||relativePath.replace(/\.json$/i,'');
+          if(date) foundDays[date]=day;
+        }catch(e){}
+      })());
+    });
+  }
+  await Promise.all(dayTasks);
 
-  const settings=await readZipJson(zip,'settings/report-settings.json',{});
+  const importedSettings=await readZipJson(zip,'settings/report-settings.json',{});
   const importedDriverProfiles=await readZipJson(zip,'settings/driver-profiles.json',{});
   const importedDriverOverrides=await readZipJson(zip,'settings/driver-overrides.json',{});
   const importedMileageExclusions=await readZipJson(zip,'settings/mileage-exclusions.json',[]);
@@ -1319,19 +1341,13 @@ async function importSavedDataBackup(file){
   const importedFloorplans=await readZipJson(zip,'reference/floorplans.json',[]);
   const importedSubdivisions=await readZipJson(zip,'reference/subdivisions.json',[]);
 
-  const dayCount=Object.keys(foundDays).length;
   const replace=confirm(
-    `Backup contains ${dayCount} saved day${dayCount===1?'':'s'}.\n\n` +
-    `OK = Replace this browser's saved report data with the backup.\n` +
-    `Cancel = Merge the backup days into the existing saved days.`
+    `Backup contains ${Object.keys(foundDays).length} saved day(s).\n\n`+
+    `OK = Replace this browser's saved report data.\n`+
+    `Cancel = Merge backup days into the existing saved days.`
   );
 
-  if(replace){
-    mileageHistory=foundDays;
-  }else{
-    mileageHistory={...(mileageHistory||{}),...foundDays};
-  }
-
+  mileageHistory=replace ? foundDays : {...(mileageHistory||{}),...foundDays};
   driverProfiles=importedDriverProfiles||{};
   driverOverrides=importedDriverOverrides||{};
   mileageExclusions=Array.isArray(importedMileageExclusions)?importedMileageExclusions:[];
@@ -1346,7 +1362,7 @@ async function importSavedDataBackup(file){
   localStorage.setItem(STORAGE_KEYS.reportSelectedDates,JSON.stringify(reportSelectedDates));
   localStorage.setItem(STORAGE_KEYS.floorplans,JSON.stringify(floorplanData));
   localStorage.setItem(STORAGE_KEYS.subdivisions,JSON.stringify(subdivisionData));
-  localStorage.setItem(STORAGE_KEYS.settings,JSON.stringify(settings||{}));
+  localStorage.setItem(STORAGE_KEYS.settings,JSON.stringify(importedSettings||{}));
 
   updateSubdivisionStatus();
   updateFloorplanStatus();
@@ -1357,8 +1373,9 @@ async function importSavedDataBackup(file){
   renderMileageExclusions();
   renderCurrentCrewMileageButtons();
 
-  alert(`Backup imported. ${Object.keys(mileageHistory).length} saved day${Object.keys(mileageHistory).length===1?' is':'s are'} now available in this browser.`);
+  alert(`Backup imported successfully. ${Object.keys(mileageHistory).length} saved day(s) are now available.`);
 }
+
 function localIsoDate(date=new Date()){
   const d=new Date(date), pad=n=>String(n).padStart(2,'0');
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
