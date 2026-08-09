@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.16</title>
+<title>VIP Crew Efficiency & Travel Report v3.17</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.16</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.17</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.16</div>
+    <div class="version">Version 3.17</div>
   </div>
 
   <div class="input-grid">
@@ -1298,7 +1298,10 @@ function defaultMileageDriversForCrew(crewName,date=''){
   members.forEach(name=>{
     const profile=findDriverProfileForName(name);
     if(driverProfileActiveOnDate(profile,date)){
-      found.push(profile.name || canonicalEmployeeName(name));
+      const driverName=profile.name || canonicalEmployeeName(name);
+      if(!isMileageDriverExcluded(driverName)){
+        found.push(driverName);
+      }
     }
   });
   return [...new Set(found)];
@@ -1308,7 +1311,9 @@ function overrideKey(date,crewName){
 }
 function mileageDriversForCrew(date,crewName){
   const key=overrideKey(date,crewName);
-  if(Array.isArray(driverOverrides[key])) return [...driverOverrides[key]];
+  if(Array.isArray(driverOverrides[key])){
+    return [...driverOverrides[key]].filter(name=>!isMileageDriverExcluded(name));
+  }
   return defaultMileageDriversForCrew(crewName,date);
 }
 function renderDailyDriverOverrides(){
@@ -1379,6 +1384,7 @@ function driverMileageSnapshotForDay(report,date){
 
     const trips=mileageTripsForCrew(c);
     drivers.forEach(driver=>{
+      if(isMileageDriverExcluded(driver)) return;
       const key=driverKey(driver);
       if(!byDriver.has(key)){
         byDriver.set(key,{name:driver,miles:0,trips:0,missingRoutes:0,routes:[]});
@@ -1419,6 +1425,29 @@ function crewNameParts(name){
   parts.push(normalizePersonName(raw));
   return [...new Set(parts)];
 }
+function isMileageDriverExcluded(name){
+  const target=normalizePersonName(canonicalEmployeeName(name));
+  if(!target) return false;
+
+  return mileageExclusions.some(ex=>{
+    const exNorm=normalizePersonName(canonicalEmployeeName(ex));
+    if(!exNorm) return false;
+
+    // Exact saved-person exclusion.
+    if(exNorm===target) return true;
+
+    // Also allow an exclusion entry that contains slash-separated names.
+    const parts=String(ex||'')
+      .split('/')
+      .map(cleanCrewToken)
+      .map(canonicalEmployeeName)
+      .map(normalizePersonName)
+      .filter(Boolean);
+
+    return parts.includes(target);
+  });
+}
+
 function isMileageCrewExcluded(name){
   const parts=crewNameParts(name);
   return mileageExclusions.some(item=>{
@@ -1873,6 +1902,7 @@ function rebuildDriverMileageFromSavedDay(date,stored){
       const key=driverKey(driver);
       const profile=driverProfiles[key];
       if(profile && (profile.type==='mileiq' || profile.type==='nondriver')) return;
+      if(isMileageDriverExcluded(driver)) return;
 
       let row=drivers.find(x=>driverKey(x.name)===key);
       if(!row){
@@ -1895,7 +1925,8 @@ function rebuildDriverMileageFromSavedDay(date,stored){
     return stored.driverMileage
       .filter(d=>{
         const profile=findDriverProfileForName(d.name);
-        return !(profile && (profile.type==='mileiq' || profile.type==='nondriver'));
+        if(profile && (profile.type==='mileiq' || profile.type==='nondriver')) return false;
+        return !isMileageDriverExcluded(d.name);
       })
       .map(d=>({...d,name:canonicalEmployeeName(d.name)}));
   }
@@ -1976,6 +2007,7 @@ function weeklyMileageData(){
 
   const map=new Map();
   days.forEach(day=>(day.driverMileage||[]).forEach(d=>{
+    if(isMileageDriverExcluded(d.name)) return;
     const key=driverKey(d.name);
     if(!map.has(key)){
       map.set(key,{name:d.name,byDate:{},totalMiles:0,totalTrips:0,missingRoutes:0});
