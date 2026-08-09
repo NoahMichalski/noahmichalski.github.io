@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.11</title>
+<title>VIP Crew Efficiency & Travel Report v3.12</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.11</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.12</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.11</div>
+    <div class="version">Version 3.12</div>
   </div>
 
   <div class="input-grid">
@@ -381,27 +381,20 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
           </div>
 
           <div class="notice" style="margin-top:12px">
-            <strong>Driver Manager</strong>
-            <div class="controls" style="margin-top:10px">
-              <label>Person
-                <input id="driverProfileName" type="text" placeholder="Example: Catalina">
+            <strong>Employee Driver List</strong>
+            <div class="muted small" style="margin-top:6px">
+              Every unique employee found in analyzed schedules appears here. Choose each person's normal mileage status, then save it in this browser.
+            </div>
+            <div class="buttons" style="margin-top:10px">
+              <button id="refreshEmployeeDriverListBtn" type="button">Refresh Employee List</button>
+              <button id="saveEmployeeDriverListBtn" type="button">Save Driver List</button>
+              <button id="exportDriverListBtn" type="button">Export Driver List</button>
+              <label style="display:inline-flex">
+                <input id="importDriverListFile" type="file" accept=".json" style="display:none">
+                <span style="display:inline-block;background:#24334c;color:var(--text);border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer">Load Driver List</span>
               </label>
-              <label>Default mileage status
-                <select id="driverProfileType">
-                  <option value="driver">Regular Driver</option>
-                  <option value="trainee">Trainee / Separate Vehicle</option>
-                  <option value="mileiq">MileIQ / Excluded</option>
-                  <option value="nondriver">Not a Driver</option>
-                </select>
-              </label>
             </div>
-            <div class="buttons">
-              <button id="saveDriverProfileBtn" type="button">Save Driver Profile</button>
-            </div>
-            <div id="driverProfileList" class="buttons" style="margin-top:10px"></div>
-            <div class="muted small" style="margin-top:8px">
-              Regular Drivers and Trainee / Separate Vehicle profiles receive calculated route mileage when they appear in a crew. MileIQ and Not a Driver profiles do not. You can override the detected drivers for any saved day.
-            </div>
+            <div id="employeeDriverList" style="margin-top:12px"></div>
           </div>
 
           <div class="notice" style="margin-top:12px">
@@ -506,7 +499,8 @@ const STORAGE_KEYS = {
   floorplans: 'vipCrewReport.floorplans.v1',
   reportSelectedDates: 'vipCrewReport.reportSelectedDates.v1',
   driverProfiles: 'vipCrewReport.driverProfiles.v1',
-  driverOverrides: 'vipCrewReport.driverOverrides.v1'
+  driverOverrides: 'vipCrewReport.driverOverrides.v1',
+  knownEmployees: 'vipCrewReport.knownEmployees.v1'
 };
 let subdivisionData = [];
 let routeCache = {};
@@ -517,6 +511,7 @@ let floorplanData = [];
 let reportSelectedDates = [];
 let driverProfiles = {};
 let driverOverrides = {};
+let knownEmployees = [];
 
 function normalizeName(value){
   return String(value || '')
@@ -547,6 +542,7 @@ function loadLocalData(){
   try { reportSelectedDates = JSON.parse(localStorage.getItem(STORAGE_KEYS.reportSelectedDates) || '[]') || []; } catch(e) { reportSelectedDates = []; }
   try { driverProfiles = JSON.parse(localStorage.getItem(STORAGE_KEYS.driverProfiles) || '{}') || {}; } catch(e) { driverProfiles = {}; }
   try { driverOverrides = JSON.parse(localStorage.getItem(STORAGE_KEYS.driverOverrides) || '{}') || {}; } catch(e) { driverOverrides = {}; }
+  try { knownEmployees = JSON.parse(localStorage.getItem(STORAGE_KEYS.knownEmployees) || '[]') || []; } catch(e) { knownEmployees = []; }
   try {
     const settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || '{}');
     ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id => {
@@ -560,7 +556,7 @@ function loadLocalData(){
   renderMileageExclusions();
   renderCurrentCrewMileageButtons();
   renderReportDayChoices();
-  renderDriverProfiles();
+  renderEmployeeDriverList();
   renderDailyDriverOverrides();
 }
 
@@ -926,7 +922,7 @@ function driverKey(name){
 }
 function saveDriverProfiles(){
   localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
-  renderDriverProfiles();
+  renderEmployeeDriverList();
   renderDailyDriverOverrides();
 }
 function saveDriverOverrides(){
@@ -982,6 +978,139 @@ function renderDriverProfiles(){
     holder.appendChild(wrap);
   });
 }
+
+function saveKnownEmployees(){
+  knownEmployees=[...new Set(knownEmployees.map(cleanCrewToken).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b));
+  localStorage.setItem(STORAGE_KEYS.knownEmployees,JSON.stringify(knownEmployees));
+}
+function collectEmployeesFromReport(report){
+  if(!report) return;
+  const found=[];
+  report.crews.forEach(c=>parseCrewMembers(c.name).forEach(n=>found.push(n)));
+  knownEmployees=[...new Set([...knownEmployees,...found].map(cleanCrewToken).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b));
+  saveKnownEmployees();
+}
+function renderEmployeeDriverList(){
+  const holder=$('#employeeDriverList');
+  if(!holder) return;
+  holder.innerHTML='';
+
+  const names=[...new Set([
+    ...knownEmployees,
+    ...Object.values(driverProfiles).map(p=>p.name).filter(Boolean)
+  ])].sort((a,b)=>a.localeCompare(b));
+
+  if(!names.length){
+    holder.innerHTML='<span class="muted small">Analyze a schedule first, then click Refresh Employee List.</span>';
+    return;
+  }
+
+  const table=document.createElement('table');
+  table.style.width='100%';
+  table.innerHTML=`
+    <thead>
+      <tr>
+        <th>Employee</th>
+        <th>Normal Mileage Status</th>
+      </tr>
+    </thead>
+    <tbody></tbody>`;
+  const tbody=table.querySelector('tbody');
+
+  names.forEach(name=>{
+    const key=driverKey(name);
+    const profile=driverProfiles[key];
+    const current=profile?.type || 'nondriver';
+
+    const tr=document.createElement('tr');
+    const nameTd=document.createElement('td');
+    nameTd.textContent=name;
+
+    const statusTd=document.createElement('td');
+    const select=document.createElement('select');
+    select.className='employee-driver-status';
+    select.dataset.name=name;
+    [
+      ['driver','Regular Driver'],
+      ['trainee','Trainee / Separate Vehicle'],
+      ['mileiq','MileIQ / Excluded'],
+      ['nondriver','Not a Driver']
+    ].forEach(([value,label])=>{
+      const opt=document.createElement('option');
+      opt.value=value;
+      opt.textContent=label;
+      if(value===current) opt.selected=true;
+      select.appendChild(opt);
+    });
+    statusTd.appendChild(select);
+
+    tr.append(nameTd,statusTd);
+    tbody.appendChild(tr);
+  });
+
+  holder.appendChild(table);
+}
+function saveEmployeeDriverListFromUi(){
+  const selects=[...document.querySelectorAll('.employee-driver-status')];
+  selects.forEach(sel=>{
+    const name=cleanCrewToken(sel.dataset.name);
+    const key=driverKey(name);
+    if(!key) return;
+    driverProfiles[key]={name,type:sel.value};
+  });
+  saveKnownEmployees();
+  localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
+  renderEmployeeDriverList();
+  renderDailyDriverOverrides();
+  alert('Driver list saved in this browser.');
+}
+function refreshEmployeeDriverList(){
+  collectEmployeesFromReport(currentReport);
+  renderEmployeeDriverList();
+}
+function exportDriverList(){
+  const payload={
+    format:'vip-driver-list',
+    version:1,
+    exportedAt:new Date().toISOString(),
+    employees:knownEmployees,
+    driverProfiles
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`VIP-Driver-List-${localIsoDate()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function importDriverList(file){
+  let data;
+  try{
+    data=JSON.parse(await file.text());
+  }catch(e){
+    alert('That driver list file could not be read.');
+    return;
+  }
+  if(!data || data.format!=='vip-driver-list'){
+    alert('That file is not a VIP Driver List export.');
+    return;
+  }
+
+  knownEmployees=Array.isArray(data.employees)?data.employees:[];
+  driverProfiles=(data.driverProfiles && typeof data.driverProfiles==='object')?data.driverProfiles:{};
+
+  saveKnownEmployees();
+  localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
+  renderEmployeeDriverList();
+  renderDailyDriverOverrides();
+  alert('Driver list loaded.');
+}
+
 function defaultMileageDriversForCrew(crewName){
   const members=parseCrewMembers(crewName);
   const found=[];
@@ -1261,6 +1390,7 @@ function backupSettingsPayload(){
     settings,
     driverProfiles,
     driverOverrides,
+    knownEmployees,
     mileageExclusions,
     reportSelectedDates,
     floorplanData,
@@ -1288,6 +1418,7 @@ async function exportSavedDataBackup(){
   zip.file('settings/report-settings.json',JSON.stringify(config.settings,null,2));
   zip.file('settings/driver-profiles.json',JSON.stringify(config.driverProfiles,null,2));
   zip.file('settings/driver-overrides.json',JSON.stringify(config.driverOverrides,null,2));
+  zip.file('settings/known-employees.json',JSON.stringify(config.knownEmployees,null,2));
   zip.file('settings/mileage-exclusions.json',JSON.stringify(config.mileageExclusions,null,2));
   zip.file('settings/report-selected-dates.json',JSON.stringify(config.reportSelectedDates,null,2));
   zip.file('reference/floorplans.json',JSON.stringify(config.floorplanData,null,2));
@@ -1355,6 +1486,7 @@ async function importSavedDataBackup(file){
   const importedSettings=await readZipJson(zip,'settings/report-settings.json',{});
   const importedDriverProfiles=await readZipJson(zip,'settings/driver-profiles.json',{});
   const importedDriverOverrides=await readZipJson(zip,'settings/driver-overrides.json',{});
+  const importedKnownEmployees=await readZipJson(zip,'settings/known-employees.json',[]);
   const importedMileageExclusions=await readZipJson(zip,'settings/mileage-exclusions.json',[]);
   const importedReportDates=await readZipJson(zip,'settings/report-selected-dates.json',[]);
   const importedFloorplans=await readZipJson(zip,'reference/floorplans.json',[]);
@@ -1369,6 +1501,7 @@ async function importSavedDataBackup(file){
   mileageHistory=replace ? foundDays : {...(mileageHistory||{}),...foundDays};
   driverProfiles=importedDriverProfiles||{};
   driverOverrides=importedDriverOverrides||{};
+  knownEmployees=Array.isArray(importedKnownEmployees)?importedKnownEmployees:[];
   mileageExclusions=Array.isArray(importedMileageExclusions)?importedMileageExclusions:[];
   reportSelectedDates=Array.isArray(importedReportDates)?importedReportDates:[];
   floorplanData=Array.isArray(importedFloorplans)?importedFloorplans:[];
@@ -1377,6 +1510,7 @@ async function importSavedDataBackup(file){
   localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
   localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
   localStorage.setItem(STORAGE_KEYS.driverOverrides,JSON.stringify(driverOverrides));
+  localStorage.setItem(STORAGE_KEYS.knownEmployees,JSON.stringify(knownEmployees));
   localStorage.setItem(STORAGE_KEYS.mileageExclusions,JSON.stringify(mileageExclusions));
   localStorage.setItem(STORAGE_KEYS.reportSelectedDates,JSON.stringify(reportSelectedDates));
   localStorage.setItem(STORAGE_KEYS.floorplans,JSON.stringify(floorplanData));
@@ -2753,19 +2887,14 @@ $('#clearFloorplansBtn').onclick=()=>{
 ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id=>{
   $('#'+id).addEventListener('change',()=>{saveSettings(); if(currentReport) render(currentReport=parseReport($('#pasteBox').value));});
 });
-$('#saveDriverProfileBtn').onclick=()=>{
-  const name=$('#driverProfileName').value.trim();
-  const type=$('#driverProfileType').value;
-  if(!name){alert('Enter a person name first.');return;}
-  setDriverProfile(name,type);
-  $('#driverProfileName').value='';
+$('#refreshEmployeeDriverListBtn').onclick=refreshEmployeeDriverList;
+$('#saveEmployeeDriverListBtn').onclick=saveEmployeeDriverListFromUi;
+$('#exportDriverListBtn').onclick=exportDriverList;
+$('#importDriverListFile').onchange=async e=>{
+  const file=e.target.files[0];
+  if(file) await importDriverList(file);
+  e.target.value='';
 };
-$('#driverProfileName').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    e.preventDefault();
-    $('#saveDriverProfileBtn').click();
-  }
-});
 $('#operationDate').addEventListener('change',renderDailyDriverOverrides);
 $('#addMileageExcludeBtn').onclick=()=>{
   addMileageExclusion($('#mileageExcludeInput').value);
