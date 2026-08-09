@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.20</title>
+<title>VIP Crew Efficiency & Travel Report v3.21</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.20</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.21</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.20</div>
+    <div class="version">Version 3.21</div>
   </div>
 
   <div class="input-grid">
@@ -785,7 +785,8 @@ function selectMonthOfLatestSaved(){
 }
 
 function budgetTaskLabel(job){
-  const t=String(job.left||'').toLowerCase();
+  const raw=String(job.left||'').trim();
+  const t=raw.toLowerCase();
 
   if(t.includes('rewash') && t.includes('window')) return 'Rewash Windows';
   if(t.includes('1st w/water') || t.includes('1st with water')) return '1st w/water Reclean';
@@ -801,7 +802,16 @@ function budgetTaskLabel(job){
   if(hasReclean) return 'Reclean';
   if(hasWindows) return 'Windows';
 
-  return job.jobType && job.jobType!=='Other' ? job.jobType : 'Other';
+  if(job.jobType && job.jobType!=='Other') return job.jobType;
+
+  // For "Other", use the task text from the schedule instead of showing "Other".
+  // Remove the leading lot/token and common address separator leftovers.
+  let label=raw
+    .replace(/^[^\s]+\s+/, '')
+    .replace(/\s*-\s*$/, '')
+    .trim();
+
+  return label || 'Other';
 }
 async function importFloorplanWorkbook(file){
   let XLSXLib;
@@ -1667,7 +1677,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.20',
+    appVersion:'3.21',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -2551,12 +2561,12 @@ function outlookEmailHtml(){
           <div style="font-size:14px;font-weight:700;color:#333333;margin:12px 0 5px">${esc(group.name)}</div>
           <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
             <thead><tr>
-              <th style="${th}text-align:center">Lot</th>
-              <th style="${th}text-align:center">Task</th>
-              <th style="${th}text-align:center">Floor Plan</th>
-              <th style="${th}text-align:center">Actual Man Hours</th>
-              <th style="${th}text-align:center">Budget</th>
-              <th style="${th}text-align:center">Status</th>
+              <th style="padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;font-size:13px;text-align:center;color:#000000;font-weight:700">Lot</th>
+              <th style="padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;font-size:13px;text-align:center;color:#000000;font-weight:700">Task</th>
+              <th style="padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;font-size:13px;text-align:center;color:#000000;font-weight:700">Floor Plan</th>
+              <th style="padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;font-size:13px;text-align:center;color:#000000;font-weight:700">Actual Man Hours</th>
+              <th style="padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;font-size:13px;text-align:center;color:#000000;font-weight:700">Budget</th>
+              <th style="padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;font-size:13px;text-align:center;color:#000000;font-weight:700">Status</th>
             </tr></thead>
             <tbody>${jobRows}</tbody>
           </table>`;
