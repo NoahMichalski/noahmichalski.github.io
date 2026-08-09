@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.19</title>
+<title>VIP Crew Efficiency & Travel Report v3.20</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -194,10 +194,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.19</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.20</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.19</div>
+    <div class="version">Version 3.20</div>
   </div>
 
   <div class="input-grid">
@@ -1021,8 +1021,12 @@ function renderDriverProfiles(){
 }
 
 function saveKnownEmployees(){
-  knownEmployees=[...new Set(knownEmployees.map(canonicalEmployeeName).filter(Boolean))]
-    .sort((a,b)=>a.localeCompare(b));
+  const dedup=new Map();
+  knownEmployees.map(canonicalEmployeeName).filter(Boolean).forEach(name=>{
+    const key=normalizePersonName(name);
+    if(key && !dedup.has(key)) dedup.set(key,name);
+  });
+  knownEmployees=[...dedup.values()].sort((a,b)=>a.localeCompare(b));
   localStorage.setItem(STORAGE_KEYS.knownEmployees,JSON.stringify(knownEmployees));
 }
 function collectEmployeesFromSavedDays(){
@@ -1048,11 +1052,16 @@ function collectEmployeesFromSavedDays(){
     });
   });
 
-  knownEmployees=[...new Set([
-    ...knownEmployees,
-    ...found
-  ].map(cleanCrewToken).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-
+  const dedup=new Map();
+  [...knownEmployees,...found]
+    .map(cleanCrewToken)
+    .filter(Boolean)
+    .map(name=>employeeAliases[normalizePersonName(name)] || name)
+    .forEach(name=>{
+      const key=normalizePersonName(name);
+      if(key && !dedup.has(key)) dedup.set(key,name);
+    });
+  knownEmployees=[...dedup.values()].sort((a,b)=>a.localeCompare(b));
   saveKnownEmployees();
 }
 function collectEmployeesFromReport(report){
@@ -1185,43 +1194,72 @@ function renderEmployeeDriverList(){
 
   holder.appendChild(table);
 }
-function saveEmployeeDriverListFromUi(){
+function syncDriverListFromUi(showMessage=false){
   const corrections=[...document.querySelectorAll('.employee-correct-name')];
+
+  // Capture Correct Name fields first, including values that may still have focus.
   corrections.forEach(input=>{
     const original=cleanCrewToken(input.dataset.original);
     const corrected=cleanCrewToken(input.value);
     if(!original || !corrected) return;
     const originalKey=normalizePersonName(original);
-    if(normalizePersonName(corrected)!==originalKey){
+
+    if(normalizePersonName(corrected)!==originalKey || corrected!==original){
       employeeAliases[originalKey]=corrected;
     }else{
       delete employeeAliases[originalKey];
     }
   });
-  localStorage.setItem(STORAGE_KEYS.employeeAliases,JSON.stringify(employeeAliases));
 
+  // Rebuild profile entries from exactly what is visible in the table.
+  const nextProfiles={...driverProfiles};
   const selects=[...document.querySelectorAll('.employee-driver-status')];
   selects.forEach(sel=>{
     const original=cleanCrewToken(sel.dataset.name);
-    const name=canonicalEmployeeName(original);
-    const key=driverKey(name);
+    if(!original) return;
+
+    const correction=corrections.find(input=>input.dataset.original===sel.dataset.name);
+    const corrected=cleanCrewToken(correction?.value)||canonicalEmployeeName(original);
+    const key=normalizePersonName(corrected);
     if(!key) return;
+
     const dateInput=[...document.querySelectorAll('.employee-driver-effective-date')]
       .find(input=>input.dataset.name===sel.dataset.name);
-    driverProfiles[key]={
-      name,
-      type:sel.value,
-      effectiveDate:dateInput?.value || ''
+
+    nextProfiles[key]={
+      ...(nextProfiles[key]||{}),
+      name:corrected,
+      type:sel.value||'nondriver',
+      effectiveDate:String(dateInput?.value||'').trim()
     };
   });
 
-  knownEmployees=knownEmployees.map(canonicalEmployeeName);
-  saveKnownEmployees();
+  driverProfiles=nextProfiles;
+
+  // Canonicalize/dedupe known employees without losing Correct Name values.
+  const employeeMap=new Map();
+  [...knownEmployees, ...Object.values(driverProfiles).map(p=>p?.name).filter(Boolean)].forEach(raw=>{
+    const clean=cleanCrewToken(raw);
+    if(!clean) return;
+    const corrected=employeeAliases[normalizePersonName(clean)] || clean;
+    const key=normalizePersonName(corrected);
+    if(key && !employeeMap.has(key)) employeeMap.set(key,corrected);
+  });
+  knownEmployees=[...employeeMap.values()].sort((a,b)=>a.localeCompare(b));
+
+  localStorage.setItem(STORAGE_KEYS.employeeAliases,JSON.stringify(employeeAliases));
+  localStorage.setItem(STORAGE_KEYS.knownEmployees,JSON.stringify(knownEmployees));
   localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
-  renderEmployeeDriverList();
-  renderDailyDriverOverrides();
-  renderSavedMileageDays();
-  alert('Driver list and employee name corrections saved.');
+
+  if(showMessage){
+    renderEmployeeDriverList();
+    renderDailyDriverOverrides();
+    renderSavedMileageDays();
+    alert('Driver list, Correct Names, and Effective Driver Dates saved.');
+  }
+}
+function saveEmployeeDriverListFromUi(){
+  syncDriverListFromUi(true);
 }
 function refreshEmployeeDriverList(){
   collectEmployeesFromSavedDays();
@@ -1229,6 +1267,7 @@ function refreshEmployeeDriverList(){
   renderEmployeeDriverList();
 }
 function exportDriverList(){
+  syncDriverListFromUi(false);
   const payload={
     format:'vip-driver-list',
     version:1,
@@ -1628,7 +1667,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.19',
+    appVersion:'3.20',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -1656,6 +1695,7 @@ function backupSettingsPayload(){
   };
 }
 async function exportSavedDataBackup(){
+  syncDriverListFromUi(false);
   let JSZipLib;
   try{
     JSZipLib=await ensureZipLibrary();
@@ -1789,29 +1829,72 @@ async function importSavedDataBackup(file){
 
   mileageHistory=replace ? foundDays : {...(mileageHistory||{}),...foundDays};
 
-  // Restore Correct Name aliases first so every other employee setting uses the same canonical identity.
-  employeeAliases=(importedEmployeeAliases && typeof importedEmployeeAliases==='object')?importedEmployeeAliases:{};
-  knownEmployees=Array.isArray(importedKnownEmployees)?importedKnownEmployees.map(canonicalEmployeeName):[];
+  // Restore Correct Name aliases FIRST.
+  employeeAliases={};
+  if(importedEmployeeAliases && typeof importedEmployeeAliases==='object'){
+    Object.entries(importedEmployeeAliases).forEach(([rawKey,rawValue])=>{
+      const key=normalizePersonName(rawKey);
+      const value=cleanCrewToken(rawValue);
+      if(key && value) employeeAliases[key]=value;
+    });
+  }
 
-  // Re-key imported driver profiles from their canonical corrected names. This preserves status + Effective Driver Date on a clean browser.
+  // Re-key and merge profiles under their restored Correct Name.
+  // When duplicate typo/case variants collapse to one employee, keep the
+  // non-empty Effective Driver Date and the imported status.
   driverProfiles={};
   if(importedDriverProfiles && typeof importedDriverProfiles==='object'){
     Object.entries(importedDriverProfiles).forEach(([oldKey,p])=>{
       if(!p || typeof p!=='object') return;
-      const rawName=String(p.name||oldKey||'').trim();
-      const name=canonicalEmployeeName(rawName);
-      const key=normalizePersonName(name);
+
+      const rawName=cleanCrewToken(p.name||oldKey||'');
+      if(!rawName) return;
+
+      const corrected=employeeAliases[normalizePersonName(rawName)] || rawName;
+      const key=normalizePersonName(corrected);
       if(!key) return;
-      driverProfiles[key]={
+
+      const incoming={
         ...p,
-        name,
+        name:corrected,
         type:p.type||'nondriver',
         effectiveDate:String(p.effectiveDate||'').trim()
       };
+      const existing=driverProfiles[key];
+
+      if(!existing){
+        driverProfiles[key]=incoming;
+      }else{
+        driverProfiles[key]={
+          ...existing,
+          ...incoming,
+          name:corrected,
+          type:incoming.type||existing.type||'nondriver',
+          effectiveDate:incoming.effectiveDate || existing.effectiveDate || ''
+        };
+      }
     });
   }
-  driverOverrides=(importedDriverOverrides && typeof importedDriverOverrides==='object')?importedDriverOverrides:{};
-  mileageExclusions=Array.isArray(importedMileageExclusions)?importedMileageExclusions.map(canonicalEmployeeName):[];
+
+  driverOverrides=(importedDriverOverrides && typeof importedDriverOverrides==='object')
+    ? importedDriverOverrides
+    : {};
+
+  // Canonicalize and case-insensitively dedupe employees after aliases/profiles exist.
+  const restoredEmployeeMap=new Map();
+  const restoredEmployees=Array.isArray(importedKnownEmployees)?importedKnownEmployees:[];
+  [...restoredEmployees, ...Object.values(driverProfiles).map(p=>p?.name).filter(Boolean)].forEach(raw=>{
+    const clean=cleanCrewToken(raw);
+    if(!clean) return;
+    const corrected=employeeAliases[normalizePersonName(clean)] || clean;
+    const key=normalizePersonName(corrected);
+    if(key && !restoredEmployeeMap.has(key)) restoredEmployeeMap.set(key,corrected);
+  });
+  knownEmployees=[...restoredEmployeeMap.values()].sort((a,b)=>a.localeCompare(b));
+
+  mileageExclusions=Array.isArray(importedMileageExclusions)
+    ? importedMileageExclusions.map(name=>employeeAliases[normalizePersonName(name)] || cleanCrewToken(name)).filter(Boolean)
+    : [];
   reportSelectedDates=Array.isArray(importedReportDates)?importedReportDates:[];
   floorplanData=Array.isArray(importedFloorplans)?importedFloorplans:[];
   subdivisionData=Array.isArray(importedSubdivisions)?importedSubdivisions:[];
@@ -1821,10 +1904,10 @@ async function importSavedDataBackup(file){
   };
 
   localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
+  localStorage.setItem(STORAGE_KEYS.employeeAliases,JSON.stringify(employeeAliases));
+  localStorage.setItem(STORAGE_KEYS.knownEmployees,JSON.stringify(knownEmployees));
   localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
   localStorage.setItem(STORAGE_KEYS.driverOverrides,JSON.stringify(driverOverrides));
-  localStorage.setItem(STORAGE_KEYS.knownEmployees,JSON.stringify(knownEmployees));
-  localStorage.setItem(STORAGE_KEYS.employeeAliases,JSON.stringify(employeeAliases));
   localStorage.setItem(STORAGE_KEYS.mileageExclusions,JSON.stringify(mileageExclusions));
   localStorage.setItem(STORAGE_KEYS.reportSelectedDates,JSON.stringify(reportSelectedDates));
   localStorage.setItem(STORAGE_KEYS.floorplans,JSON.stringify(floorplanData));
@@ -1836,7 +1919,6 @@ async function importSavedDataBackup(file){
   updateFloorplanStatus();
   renderSavedMileageDays();
   renderReportDayChoices();
-  collectEmployeesFromSavedDays();
   renderEmployeeDriverList();
   renderDailyDriverOverrides();
   renderMileageExclusions();
@@ -2985,7 +3067,8 @@ function weeklyOperationsReportText(){
 }
 function previewWeeklyOperations(){
   if(!reportDates().length){alert('Select at least one saved report day first.');return;}
-  const blob=new Blob(['\ufeff',weeklyOperationsReportHtml()],{type:'text/html;charset=utf-8'});
+  const previewHtml=weeklyOperationsReportHtml().replace('</body>',previewOutlookToolbarHtml()+'</body>');
+  const blob=new Blob(['\ufeff',previewHtml],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob),w=window.open(url,'_blank');
   if(!w){URL.revokeObjectURL(url);alert('Allow pop-ups to preview the weekly operations report.');return;}
   setTimeout(()=>URL.revokeObjectURL(url),60000);
@@ -3089,7 +3172,8 @@ async function previewWeeklyMileage(){
   $('#savedMileageStatus').textContent='Checking selected saved days and repairing older mileage data if needed…';
   await repairSelectedMileageDays();
   renderSavedMileageDays();
-  const blob=new Blob(['\ufeff',weeklyMileageReportHtml()],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),w=window.open(url,'_blank');
+  const previewHtml=weeklyMileageReportHtml().replace('</body>',previewOutlookToolbarHtml()+'</body>');
+  const blob=new Blob(['\ufeff',previewHtml],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),w=window.open(url,'_blank');
   if(!w){URL.revokeObjectURL(url);alert('Allow pop-ups to preview the mileage report.');return;}
   setTimeout(()=>URL.revokeObjectURL(url),60000);
 }
@@ -3125,6 +3209,47 @@ async function importMileageFiles(files){
   for(let i=0;i<list.length;i++){const text=await list[i].text(),report=parseReport(text);if(!report.crews.length)continue;$('#savedMileageStatus').textContent=`Calculating imported day ${i+1} of ${list.length}…`;await calculateMileageRoutes(report);const date=addDaysIso(start,i);mileageHistory[date]=mileageSnapshot(report,date,text);saved++;}
   saveMileageHistory();alert(`${saved} daily mileage report${saved===1?' was':'s were'} imported and saved for the selected Monday–Friday week.`);
 }
+function previewOutlookToolbarHtml(){
+  return `
+    <div class="vip-preview-controls" style="font-family:Segoe UI,Arial,sans-serif;max-width:1600px;margin:0 auto 30px;padding:0 20px;display:flex;gap:10px;flex-wrap:wrap">
+      <button onclick="copyVipPreviewForOutlook()" style="background:#1f4e78;color:white;border:0;border-radius:4px;padding:10px 15px;font-weight:700;cursor:pointer">Copy for Outlook</button>
+      <button onclick="window.print()" style="background:#1f4e78;color:white;border:0;border-radius:4px;padding:10px 15px;font-weight:700;cursor:pointer">Print / Save PDF</button>
+    </div>
+    <script>
+      async function copyVipPreviewForOutlook(){
+        const clone=document.body.cloneNode(true);
+        clone.querySelectorAll('.vip-preview-controls,script').forEach(el=>el.remove());
+        const html=clone.innerHTML;
+        const plain=(clone.innerText||clone.textContent||'').trim();
+        try{
+          if(navigator.clipboard && window.ClipboardItem){
+            await navigator.clipboard.write([
+              new ClipboardItem({
+                'text/html':new Blob([html],{type:'text/html'}),
+                'text/plain':new Blob([plain],{type:'text/plain'})
+              })
+            ]);
+          }else{
+            throw new Error('Rich clipboard unavailable');
+          }
+          alert('Formatted report copied. Paste it into Outlook.');
+        }catch(err){
+          const range=document.createRange();
+          range.selectNodeContents(clone);
+          const sel=window.getSelection();
+          sel.removeAllRanges();
+          document.body.appendChild(clone);
+          sel.addRange(range);
+          let ok=false;
+          try{ok=document.execCommand('copy');}catch(e){}
+          sel.removeAllRanges();
+          clone.remove();
+          alert(ok?'Report copied. Paste it into Outlook.':'Clipboard access was blocked. Use the normal email download instead.');
+        }
+      }
+    <\/script>`;
+}
+
 function previewOutlookEmail(){
   if(!currentReport){alert('Analyze a report first.');return;}
   if(!travelCalculationComplete){
@@ -3132,10 +3257,7 @@ function previewOutlookEmail(){
     return;
   }
   ensureMissingFloorplansForReport(currentReport);
-  const previewHtml=outlookEmailHtml().replace('</body>',`
-    <div style="font-family:Segoe UI,Arial,sans-serif;max-width:1600px;margin:0 auto 30px;padding:0 20px">
-      <button onclick="window.print()" style="background:#1f4e78;color:white;border:0;border-radius:4px;padding:10px 15px;font-weight:700;cursor:pointer">Print / Save PDF</button>
-    </div></body>`);
+  const previewHtml=outlookEmailHtml().replace('</body>',previewOutlookToolbarHtml()+'</body>');
   const blob=new Blob(['\ufeff',previewHtml],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const w=window.open(url,'_blank');
