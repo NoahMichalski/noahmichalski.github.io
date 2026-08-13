@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Builder New Lot Checker - All Builders + DR Schedule v1.13</title>
-<!-- Version: v1.13 DR schedule pulled-lots debug box + stricter DR address matching -->
+<title>Builder New Lot Checker - All Builders v1.16</title>
+<!-- Version: v1.16 MI Homes import includes American Homes 4 Rent rows -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -49,8 +49,8 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Builder New Lot Checker <span class="version-pill">Version 1.14</span></h1>
-  <p class="sub">Upload your <b>Floor Plans</b> sheet, optionally upload your <b>Subdivisions</b> sheet for exact names, pick the builder/export type, then upload that builder export. The tool compares lots by <b>subdivision + lot</b>, with an address fallback, and shows anything missing from the Floor Plans sheet. Version 1.14 exports new lots using the exact columns from your uploaded Floor Plans sheet and still shows every parsed lot in the All pulled lots box.</p>
+  <h1>Builder New Lot Checker <span class="version-pill">Version 1.16</span></h1>
+  <p class="sub">Upload your <b>Floor Plans</b> sheet, optionally upload your <b>Subdivisions</b> sheet for exact names, pick the builder/export type, then upload that builder export. The tool compares lots by <b>subdivision + lot</b>, with an address fallback, and shows anything missing from the Floor Plans sheet. Version 1.16 includes American Homes 4 Rent rows inside the MI Homes future-orders import, exports using the exact columns from your uploaded Floor Plans sheet, and Copy New Lots omits column headers so you can paste directly under existing data.</p>
 
   <div class="grid">
     <div class="card">
@@ -143,7 +143,7 @@
   <div class="two">
     <div class="card">
       <h2>Paste-ready rows for Floor Plans</h2>
-      <p>These rows/export columns follow the headers from your uploaded Floor Plans sheet. Any date column like lastUpdated/Date Added ignores all dates from uploaded files and always uses today.</p>
+      <p>These rows follow the headers from your uploaded Floor Plans sheet, but the copy box intentionally does not include the header row so you can paste directly below existing data. Any date column like lastUpdated/Date Added ignores all dates from uploaded files and always uses today.</p>
       <textarea id="pasteBox" readonly></textarea>
     </div>
     <div class="card">
@@ -366,6 +366,20 @@ function deriveEpconLotFromHouseNumber(v){
 function titleCase(v){ return cleanText(v).toLowerCase().replace(/\b\w/g, ch => ch.toUpperCase()); }
 function parseMIAddress(job){
   let s = cleanText(job);
+
+  // American Homes 4 Rent rows inside the MI future-orders export look like:
+  // 77849 - OH18680_78/_9053 Lucy Drive_0078 9053 Lucy Drive
+  // Prefer the underscore segment that is a real street address, not the OH/code portion.
+  if (s.includes('_')) {
+    const parts = s.split('_').map(cleanText).filter(Boolean);
+    const addressParts = parts.filter(p => /^\d+\s+[A-Za-z]/.test(p));
+    if (addressParts.length) {
+      // If there are two address-looking parts, the cleaner one is usually the shorter one
+      // without the repeated lot prefix.
+      s = addressParts.sort((a,b)=>a.length-b.length)[0];
+    }
+  }
+
   const m = s.match(/\)\s*-\s*(.+)$/); if (m) s = cleanText(m[1]);
   else if (s.includes('-')) s = cleanText(s.split('-').slice(2).join('-') || s.split('-').pop());
   s = s.replace(/_\d+\s+/g, ' ').replace(/^\d{6,}\s*/, '').trim();
@@ -508,7 +522,7 @@ function guessBuilder(base){
 }
 function isFloorBuilderMatch(r){
   const b = norm(r.Builder + ' ' + r.Subdivision);
-  if (sourceType === 'mi') return b.includes('mihomes') || b.includes('mi');
+  if (sourceType === 'mi') return b.includes('mihomes') || b.includes('mi') || b.includes('amh') || b.includes('americanhomes4rent') || b.includes('americahomes4rent');
   if (sourceType === 'fischer') return b.includes('fischer');
   if (sourceType === 'arbor') return b.includes('arbor');
   if (sourceType === 'dr' || sourceType === 'drschedule') return b.includes('drhorton') || b.includes('drh') || b.includes('dr');
@@ -516,7 +530,7 @@ function isFloorBuilderMatch(r){
   return b.includes('pulte') || b.includes('centex') || b.includes('delwebb');
 }
 function builderAliasesForSource(){
-  if (sourceType === 'mi') return ['mi homes','mi'];
+  if (sourceType === 'mi') return ['mi homes','mi','amh','american homes 4 rent','america homes 4 rent'];
   if (sourceType === 'fischer') return ['fischer homes','fischer'];
   if (sourceType === 'arbor') return ['arbor homes','arbor'];
   if (sourceType === 'dr' || sourceType === 'drschedule') return ['dr horton','drhorton','dr','drh'];
@@ -703,13 +717,16 @@ function normalizeJobsFromRaw(){
   for (const r of rawRows) {
     if (sourceType === 'mi') {
       const acct = cleanText(r.Account);
-      if (acct && !/m\/?i homes/i.test(acct)) continue;
+      const isAMH = /american homes 4 rent|america homes 4 rent|amh/i.test(acct);
+      const isMI = /m\/?i homes/i.test(acct);
+      if (acct && !isMI && !isAMH) continue;
       const community = cleanMISubdivision(r.Subdivision);
       const lot = cleanLot(r['Lot/Block']) || cleanLot(r.Job);
       if (!community || !lot) continue;
       jobRows.push({
         RawCommunity: community,
         Community: community,
+        Builder: isAMH ? 'AMH' : 'MI Homes',
         Lot: lot,
         Plan: cleanMIPlan(r.Plan),
         Address: parseMIAddress(r.Job),
@@ -855,14 +872,15 @@ function compare(){
     const match = subLotMatch || addressMatch;
     const city = cleanText(j.City);
     const plan = sourceType === 'mi' ? cleanMIPlan(j.Plan) : cleanText(j.Plan);
-    const builder = guessBuilder(mappedBase);
+    const builder = cleanText(j.Builder) || guessBuilder(mappedBase);
+    const sourceLabel = builder || (sourceType === 'mi' ? 'MI Homes' : (sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : ((sourceType === 'dr' || sourceType === 'drschedule') ? 'DR Horton' : (sourceType === 'epcon' ? 'Epcon' : 'Pulte')))));
     const subdivisionBuilder = sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : (sourceType === 'epcon' ? 'Epcon' : builder));
     const subdivision = resolved.displaySubdivision || subdivisionWithStars(mappedBase, subdivisionBuilder, city);
     const planKeyForExport = `${norm(mappedBase)}|${norm(plan)}`;
     const hours = idx.hoursBySubPlan.get(planKeyForExport) || idx.hoursByPlan.get(norm(plan)) || {Original:'',Reclean:'',Windows:''};
     const exportTemplate = idx.templateBySubPlan.get(planKeyForExport) || idx.templateByPlan.get(norm(plan)) || {};
     allPulledRows.push({
-      Source: sourceType === 'mi' ? 'MI Homes' : (sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : ((sourceType === 'dr' || sourceType === 'drschedule') ? 'DR Horton' : (sourceType === 'epcon' ? 'Epcon' : 'Pulte')))),
+      Source: sourceLabel,
       Community: community,
       Subdivision: subdivision,
       NameSource: resolved.source,
@@ -875,7 +893,7 @@ function compare(){
     });
     if (match) { matched++; continue; }
     resultRows.push({
-      Source: sourceType === 'mi' ? 'MI Homes' : (sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : ((sourceType === 'dr' || sourceType === 'drschedule') ? 'DR Horton' : (sourceType === 'epcon' ? 'Epcon' : 'Pulte')))),
+      Source: sourceLabel,
       Community: community,
       MatchedSubdivisionBase: mappedBase,
       NameSource: resolved.source,
@@ -935,7 +953,7 @@ function renderResults(){
   const labels = {DateAdded:'Date Added', NameSource:'Name Source'};
   $('resultsTable').querySelector('thead').innerHTML = `<tr>${cols.map(c=>`<th>${labels[c] || c}</th>`).join('')}</tr>`;
   $('resultsTable').querySelector('tbody').innerHTML = rows.map(r => `<tr>${cols.map(c=>`<td>${escapeHtml(r[c] ?? '')}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${cols.length}" class="muted">No matching rows for the current filters.</td></tr>`;
-  $('pasteBox').value = toTSV(rows.map(toFloorPlanRow), getExportHeaders());
+  $('pasteBox').value = toTSVNoHeaders(rows.map(toFloorPlanRow), getExportHeaders());
 }
 function renderNewLotsBox(rows){
   $('newLotsBadge').textContent = rows.length;
@@ -968,6 +986,7 @@ function toFloorPlanRow(r){
   return out;
 }
 function toTSV(rows, headers){ return [headers.join('\t'), ...rows.map(r=>headers.map(h=>r[h] ?? '').join('\t'))].join('\n'); }
+function toTSVNoHeaders(rows, headers){ return rows.map(r=>headers.map(h=>r[h] ?? '').join('\t')).join('\n'); }
 function toCSV(rows, headers){ const esc = v => '"' + String(v ?? '').replace(/"/g,'""') + '"'; return [headers.map(esc).join(','), ...rows.map(r=>headers.map(h=>esc(r[h])).join(','))].join('\n'); }
 function refreshCommunityFilter(){
   const cur = $('communityFilter').value; const comms = [...new Set(resultRows.map(r=>r.Community))].sort();
@@ -1074,8 +1093,8 @@ function updateSourceUI(){
   $('copyBtn').disabled = $('csvBtn').disabled = $('xlsxBtn').disabled = true;
 
   if (sourceType === 'mi') {
-    $('sourceHelp').textContent = 'MI expected columns: Account, Subdivision, Lot/Block, Plan, Job, Task. Multiple task rows for the same lot are deduped into one lot.';
-    $('jobCountLabel').textContent = 'MI 90-day job rows';
+    $('sourceHelp').textContent = 'MI Homes / AMH Future Orders expected columns: Account, Subdivision, Lot/Block, Plan, Job, Task. This option includes both M/I Homes and American Homes 4 Rent rows from the same import and dedupes repeated task rows into one lot.';
+    $('jobCountLabel').textContent = 'MI / AMH job rows';
   } else if (sourceType === 'fischer') {
     $('sourceHelp').textContent = 'Fischer: copy the job list from the website/export and paste it below. The tool reads community code, floorplan, address, and lot, then dedupes repeated task rows.';
     $('jobCountLabel').textContent = 'Fischer pasted rows';
@@ -1086,7 +1105,7 @@ function updateSourceUI(){
     $('sourceHelp').textContent = 'DR Horton active lots CSV columns: Community, Address, City, State, Zip, Plan, Lot. Community codes like “Bishop Estates - 97800” are cleaned to “Bishop Estates”.';
     $('jobCountLabel').textContent = 'DR Horton lot rows';
   } else if (sourceType === 'drschedule') {
-    $('sourceHelp').textContent = 'DR Horton schedule CSV columns: Date, Project, Address, Job Number, Plat Lot/Block/Phase, Plan, Elevation, Description. Version 1.14 reads the CSV as text, strips Excel formula wrappers like ="6396 Silver...", shows every parsed lot in the All pulled lots box, and exports using your Floor Plans columns.';
+    $('sourceHelp').textContent = 'DR Horton schedule CSV columns: Date, Project, Address, Job Number, Plat Lot/Block/Phase, Plan, Elevation, Description. Version 1.16 reads the CSV as text, strips Excel formula wrappers like ="6396 Silver...", shows every parsed lot in the All pulled lots box, and exports using your Floor Plans columns.';
     $('jobCountLabel').textContent = 'DR Horton schedule rows';
   } else if (sourceType === 'epcon') {
     $('sourceHelp').textContent = 'Epcon: upload one or more monthly schedule files. Block/Lot uses the number after the slash as the lot. If Block/Lot is missing, the tool derives the lot from the House number code. Epcon has no floorplan in this schedule, so Floorplan is left blank.';
