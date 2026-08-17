@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.23</title>
+<title>VIP Crew Efficiency & Travel Report v3.24</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -200,10 +200,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.23</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.24</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.23</div>
+    <div class="version">Version 3.24</div>
   </div>
 
   <div class="input-grid">
@@ -1635,8 +1635,16 @@ function isMileageNameMatch(crewName,excludedName){
   return crewNameParts(crewName).some(part=>part===key || part.includes(key) || key.includes(part));
 }
 function operationSnapshot(report){
-  const crews=report.crews.map(c=>({
+  const crews=report.crews.map(c=>{
+    const work=crewEffectiveWorkMetrics(c);
+    return {
     name:c.name,
+    people:work.people,
+    jobsPerPerson:+work.jobsPerPerson.toFixed(2),
+    firstIn:work.firstIn,
+    lastOut:work.lastOut,
+    effectiveWorkHours:+work.effectiveWorkHours.toFixed(2),
+    effectiveManHours:+work.effectiveManHours.toFixed(2),
     completed:c.completed,
     cancelled:c.cancelled,
     actual:+c.actual.toFixed(1),
@@ -1661,7 +1669,8 @@ function operationSnapshot(report){
       out:j.out||'',
       address:j.address||''
     }))
-  }));
+  };
+  });
   return {
     completed:report.jobs.length,
     cancelled:report.cancelled.length,
@@ -1670,11 +1679,16 @@ function operationSnapshot(report){
     efficiency:report.actual?+((report.budget/report.actual*100).toFixed(1)):0,
     travelDelays:crews.reduce((s,c)=>s+c.travelDelays,0),
     travelDelayMinutes:crews.reduce((s,c)=>s+c.travelDelayMinutes,0),
+    effectiveWorkHours:crews.reduce((s,c)=>s+(Number(c.effectiveWorkHours)||0),0),
+    effectiveManHours:crews.reduce((s,c)=>s+(Number(c.effectiveManHours)||0),0),
     crews
   };
 }
 function ensureDayOperations(day){
-  const needsTaskRefresh=day.operations && (day.operations.crews||[]).some(c=>(c.jobs||[]).some(j=>!j.task || (j.jobType==='Other' && !j.left && !j.raw)));
+  const needsTaskRefresh=day.operations && (
+    (day.operations.crews||[]).some(c=>(c.jobs||[]).some(j=>!j.task || (j.jobType==='Other' && !j.left && !j.raw))) ||
+    (day.operations.crews||[]).some(c=>c.people==null || c.effectiveWorkHours==null || c.effectiveManHours==null)
+  );
   if(day.operations && !needsTaskRefresh) return day.operations;
   if(day.rawText){
     try{
@@ -1723,7 +1737,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.23',
+    appVersion:'3.24',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -2443,6 +2457,25 @@ function getReportDateLabel(){
   return `${weekday}, ${dateText}`;
 }
 
+function crewPersonCount(crewName){
+  return Math.max(1,String(crewName||'').split('/').map(cleanCrewToken).map(x=>x.trim()).filter(Boolean).length);
+}
+function crewEffectiveWorkMetrics(crew){
+  const timed=(crew?.jobs||[]).filter(j=>!j.cancelled).map(j=>({i:timeToMin(j.in),o:timeToMin(j.out)})).filter(x=>x.i!=null&&x.o!=null&&x.o>=x.i);
+  const people=crewPersonCount(crew?.name), completed=Number(crew?.completed)||0;
+  if(!timed.length) return {people,jobsPerPerson:people?completed/people:0,firstIn:null,lastOut:null,effectiveWorkHours:0,effectiveManHours:0};
+  const firstIn=Math.min(...timed.map(x=>x.i)), lastOut=Math.max(...timed.map(x=>x.o));
+  const effectiveWorkHours=Math.max(0,(lastOut-firstIn)/60);
+  return {people,jobsPerPerson:people?completed/people:0,firstIn,lastOut,effectiveWorkHours,effectiveManHours:effectiveWorkHours*people};
+}
+function formatClockMinutes(v){
+  if(v==null||!Number.isFinite(Number(v))) return '—';
+  let h=Math.floor(Number(v)/60)%24,m=Math.round(Number(v)%60),ap=h>=12?'PM':'AM',d=h%12||12;
+  return `${d}:${String(m).padStart(2,'0')} ${ap}`;
+}
+function formatWorkSpan(first,last,hours){
+  return hours?`${formatClockMinutes(first)} – ${formatClockMinutes(last)} (${fmt(hours)} hr)`:'—';
+}
 function exactTaskLabel(job){
   return budgetTaskLabel(job);
 }
@@ -2515,14 +2548,19 @@ function outlookEmailHtml(){
   const crewRows=crews.map(c=>{
     const bg=c.eff>=100?'#e2f0d9':c.eff>=85?'#fff2cc':'#f4cccc';
     const color=c.eff>=100?'#274e13':c.eff>=85?'#7f6000':'#990000';
+    const work=crewEffectiveWorkMetrics(c);
     return `<tr>
       <td style="${td}font-weight:600">${esc(c.name)}</td>
+      <td style="${td}text-align:center">${work.people}</td>
       <td style="${td}text-align:center">${c.completed}</td>
+      <td style="${td}text-align:center">${fmt(work.jobsPerPerson)}</td>
       <td style="${td}text-align:center">${c.cancelled}</td>
       <td style="${td}text-align:right">${fmt(c.actual)}</td>
       <td style="${td}text-align:right">${fmt(c.budget)}</td>
       <td style="${td}">${varianceText(c)}</td>
       <td style="${td}background:${bg};color:${color};font-weight:700;text-align:center">${c.actual?c.eff.toFixed(1)+'%':'N/A'}</td>
+      <td style="${td}text-align:center">${formatWorkSpan(work.firstIn,work.lastOut,work.effectiveWorkHours)}</td>
+      <td style="${td}text-align:center">${fmt(work.effectiveManHours)}</td>
       <td style="${td}text-align:center">${c.trips.filter(t=>t.late).length}</td>
       <td style="${td}text-align:center">${formatDriveMinutes(crewTotalDriveMinutes(c))}</td>
     </tr>`;
@@ -3073,7 +3111,7 @@ function weeklyOperationsData(){
   days.forEach(day=>(day.operations.crews||[]).forEach(c=>{
     const crewName=canonicalCrewName(c.name) || c.name;
     if(!crewMap.has(crewName)){
-      crewMap.set(crewName,{name:crewName,byDate:{},completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0,jobs:[]});
+      crewMap.set(crewName,{name:crewName,byDate:{},completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0,effectiveWorkHours:0,effectiveManHours:0,jobs:[]});
     }
     const row=crewMap.get(crewName);
     const existing=row.byDate[day.date]||{completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0};
@@ -3093,12 +3131,16 @@ function weeklyOperationsData(){
     row.budget+=Number(c.budget)||0;
     row.travelDelays+=Number(c.travelDelays)||0;
     row.travelDelayMinutes+=Number(c.travelDelayMinutes)||0;
+    row.effectiveWorkHours+=Number(c.effectiveWorkHours)||0;
+    row.effectiveManHours+=Number(c.effectiveManHours)||0;
     (c.jobs||[]).forEach(j=>row.jobs.push({...j,date:day.date,weekday:day.weekday,crew:crewName}));
   }));
   const crews=[...crewMap.values()].map(c=>({
     ...c,
     efficiency:c.actual?c.budget/c.actual*100:0,
-    variance:c.actual-c.budget
+    variance:c.actual-c.budget,
+    people:crewPersonCount(c.name),
+    jobsPerPerson:c.completed/crewPersonCount(c.name)
   })).sort((a,b)=>b.efficiency-a.efficiency);
   crews.forEach((c,i)=>c.rank=i+1);
   const travelRankings=[...crews]
@@ -3111,7 +3153,9 @@ function weeklyOperationsData(){
     actual:days.reduce((s,d)=>s+(Number(d.operations.actual)||0),0),
     budget:days.reduce((s,d)=>s+(Number(d.operations.budget)||0),0),
     travelDelays:days.reduce((s,d)=>s+(Number(d.operations.travelDelays)||0),0),
-    travelDelayMinutes:days.reduce((s,d)=>s+(Number(d.operations.travelDelayMinutes)||0),0)
+    travelDelayMinutes:days.reduce((s,d)=>s+(Number(d.operations.travelDelayMinutes)||0),0),
+    effectiveWorkHours:days.reduce((s,d)=>s+(Number(d.operations.effectiveWorkHours)||0),0),
+    effectiveManHours:days.reduce((s,d)=>s+(Number(d.operations.effectiveManHours)||0),0)
   };
   totals.efficiency=totals.actual?totals.budget/totals.actual*100:0;
   totals.variance=totals.actual-totals.budget;
@@ -3156,7 +3200,9 @@ function weeklyOperationsReportHtml(){
   const crewRows=w.crews.length?w.crews.map(c=>`<tr>
     <td style="${td}text-align:center;font-weight:700">${c.rank}</td>
     <td style="${td}font-weight:600">${esc(c.name)}</td>
+    <td style="${td}text-align:center">${c.people}</td>
     <td style="${td}text-align:center">${c.completed}</td>
+    <td style="${td}text-align:center">${fmt(c.jobsPerPerson)}</td>
     <td style="${td}text-align:center">${c.cancelled}</td>
     <td style="${td}text-align:right">${fmt(c.actual)}</td>
     <td style="${td}text-align:right">${fmt(c.budget)}</td>
@@ -3213,11 +3259,13 @@ function weeklyOperationsReportHtml(){
       <td style="padding:12px;border:1px solid #d9e2f3;background:${effBg(w.totals.efficiency)};text-align:center"><div style="font-size:11px;color:#666">EFFICIENCY</div><div style="font-size:24px;font-weight:700;color:${effColor(w.totals.efficiency)}">${fmt(w.totals.efficiency)}%</div></td>
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">TRAVEL DELAYS</div><div style="font-size:24px;font-weight:700">${w.totals.travelDelays}</div></td>
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">DELAY MINUTES</div><div style="font-size:24px;font-weight:700">${w.totals.travelDelayMinutes}</div></td>
+      <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">EFFECTIVE WORK HOURS</div><div style="font-size:24px;font-weight:700">${fmt(w.totals.effectiveWorkHours)}</div></td>
+      <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">EFFECTIVE MAN HOURS</div><div style="font-size:24px;font-weight:700">${fmt(w.totals.effectiveManHours)}</div></td>
     </tr></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Breakdown</h2>
     <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Efficiency</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${dailyRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cumulative Crew Rankings</h2>
-    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Crew</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th><th style="${th}">Efficiency</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${crewRows}</tbody></table>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Crew</th><th style="${th}">People</th><th style="${th}">Completed</th><th style="${th}">Jobs / Person</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th><th style="${th}">Efficiency</th><th style="${th}">Effective Work Hours</th><th style="${th}">Effective Man Hours</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${crewRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cumulative Travel Delay Rankings</h2>
     <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Crew</th><th style="${th}">Delay Count</th><th style="${th}">Delay Minutes</th><th style="${th}">Days With Delays</th></tr></thead><tbody>${travelRankingRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Job Type Breakdown</h2>
@@ -3235,7 +3283,7 @@ function weeklyOperationsReportText(){
   let out=`VIP Operations Report\n${reportRangeLabel(w.dates)}\n\nCompleted: ${w.totals.completed}\nCancelled: ${w.totals.cancelled}\nActual Hours: ${fmt(w.totals.actual)}\nBudget Hours: ${fmt(w.totals.budget)}\nEfficiency: ${fmt(w.totals.efficiency)}%\nTravel Delays: ${w.totals.travelDelays}\n\nDAILY BREAKDOWN\n`;
   w.days.forEach(d=>out+=`\n${d.weekday}: ${d.operations.completed} completed, ${d.operations.cancelled} cancelled, ${fmt(d.operations.actual)} actual, ${fmt(d.operations.budget)} budget, ${fmt(d.operations.efficiency)}% efficiency`);
   out+='\n\nCUMULATIVE CREW RANKINGS\n';
-  w.crews.forEach(c=>out+=`\n#${c.rank} ${c.name}: ${c.completed} completed, ${c.cancelled} cancelled, ${fmt(c.actual)} actual, ${fmt(c.budget)} budget, ${fmt(c.efficiency)}% efficiency, ${c.travelDelays} travel delays`);
+  w.crews.forEach(c=>out+=`\n#${c.rank} ${c.name}: ${c.people} people, ${c.completed} completed, ${fmt(c.jobsPerPerson)} jobs/person, ${c.cancelled} cancelled, ${fmt(c.actual)} actual, ${fmt(c.budget)} budget, ${fmt(c.efficiency)}% efficiency, ${fmt(c.effectiveWorkHours)} effective work hours, ${fmt(c.effectiveManHours)} effective man hours, ${c.travelDelays} travel delays`);
   out+='\n\nCUMULATIVE TRAVEL DELAY RANKINGS\n';
   w.travelRankings.forEach(c=>out+=`\n#${c.travelRank} ${c.name}: ${c.travelDelays} delays, ${c.travelDelayMinutes} delay minutes`);
   out+='\n\nJOB DETAIL BY CREW & DAY\n';
@@ -3263,8 +3311,8 @@ function downloadWeeklyOperationsEml(){
 function downloadWeeklyOperationsCsv(){
   if(!reportDates().length){alert('Select at least one saved report day first.');return;}
   const w=weeklyOperationsData();
-  const rows=[['Rank','Crew','Completed','Cancelled','Actual Hours','Budget Hours','Variance','Efficiency %','Travel Delays','Travel Delay Minutes']];
-  w.crews.forEach(c=>rows.push([c.rank,c.name,c.completed,c.cancelled,+c.actual.toFixed(1),+c.budget.toFixed(1),+c.variance.toFixed(1),+c.efficiency.toFixed(1),c.travelDelays,c.travelDelayMinutes]));
+  const rows=[['Rank','Crew','People','Completed','Jobs per Person','Cancelled','Actual Hours','Budget Hours','Variance','Efficiency %','Effective Work Hours','Effective Man Hours','Travel Delays','Travel Delay Minutes']];
+  w.crews.forEach(c=>rows.push([c.rank,c.name,c.people,c.completed,+c.jobsPerPerson.toFixed(2),c.cancelled,+c.actual.toFixed(1),+c.budget.toFixed(1),+c.variance.toFixed(1),+c.efficiency.toFixed(1),+c.effectiveWorkHours.toFixed(2),+c.effectiveManHours.toFixed(2),c.travelDelays,c.travelDelayMinutes]));
   rows.push([]);
   rows.push(['Report Total',w.totals.completed,w.totals.cancelled,+w.totals.actual.toFixed(1),+w.totals.budget.toFixed(1),+w.totals.variance.toFixed(1),+w.totals.efficiency.toFixed(1),w.totals.travelDelays,w.totals.travelDelayMinutes]);
   const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
