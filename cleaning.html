@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.25</title>
+<title>VIP Crew Efficiency & Travel Report v3.26</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -26,7 +26,7 @@ input{width:100%;background:#0b1424;color:var(--text);border:1px solid var(--bor
 .buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 button{border:0;border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer;background:#24334c;color:var(--text)}
 button.primary{background:var(--accent)}button:hover{filter:brightness(1.08)}
-.cards{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:12px}.wide-cards{grid-template-columns:repeat(6,minmax(130px,1fr))}
+.cards{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:12px}.wide-cards{grid-template-columns:repeat(8,minmax(120px,1fr))}
 .card{background:var(--panel2);border:1px solid var(--border);border-radius:14px;padding:14px}
 .card .label{font-size:12px;color:var(--muted)}.card .value{font-size:24px;font-weight:800;margin-top:5px}
 .section{margin-top:18px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
@@ -200,10 +200,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.25</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.26</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.25</div>
+    <div class="version">Version 3.26</div>
   </div>
 
   <div class="input-grid">
@@ -454,6 +454,8 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
         <span class="muted small">Completed jobs only; cancelled jobs are excluded from the job mix.</span>
       </div>
       <div class="cards wide-cards">
+        <div class="card"><div class="label">People Working</div><div class="value" id="mixPeople">0</div></div>
+        <div class="card"><div class="label">Jobs / Person</div><div class="value" id="mixJobsPerPerson">0</div></div>
         <div class="card"><div class="label">Originals</div><div class="value" id="mixOriginal">0</div></div>
         <div class="card"><div class="label">Recleans</div><div class="value" id="mixReclean">0</div></div>
         <div class="card"><div class="label">Windows</div><div class="value" id="mixWindows">0</div></div>
@@ -1672,6 +1674,8 @@ function operationSnapshot(report){
   };
   });
   return {
+    people:reportPersonCount(report),
+    jobsPerPerson:+reportJobsPerPerson(report).toFixed(2),
     completed:report.jobs.length,
     cancelled:report.cancelled.length,
     actual:+report.actual.toFixed(1),
@@ -1687,7 +1691,8 @@ function operationSnapshot(report){
 function ensureDayOperations(day){
   const needsTaskRefresh=day.operations && (
     (day.operations.crews||[]).some(c=>(c.jobs||[]).some(j=>!j.task || (j.jobType==='Other' && !j.left && !j.raw))) ||
-    (day.operations.crews||[]).some(c=>c.people==null || c.effectiveWorkHours==null || c.effectiveManHours==null)
+    (day.operations.crews||[]).some(c=>c.people==null || c.effectiveWorkHours==null || c.effectiveManHours==null) ||
+    day.operations.people==null || day.operations.jobsPerPerson==null
   );
   if(day.operations && !needsTaskRefresh) return day.operations;
   if(day.rawText){
@@ -1737,7 +1742,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.25',
+    appVersion:'3.26',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -2390,6 +2395,8 @@ function render(report){
   $('#overallEff').textContent=overall.toFixed(1)+'%';
 
   const buckets=dailyJobBucketCounts(report.jobs);
+  $('#mixPeople').textContent=reportPersonCount(report);
+  $('#mixJobsPerPerson').textContent=fmt(reportJobsPerPerson(report));
   $('#mixOriginal').textContent=buckets.original;
   $('#mixReclean').textContent=buckets.reclean;
   $('#mixWindows').textContent=buckets.windows;
@@ -2455,6 +2462,26 @@ function getReportDateLabel(){
   const now=new Date();
   const dateText=now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
   return `${weekday}, ${dateText}`;
+}
+
+function reportPeopleNames(report){
+  const seen=new Map();
+  (report?.crews||[]).forEach(c=>{
+    parseCrewMembers(c.name).forEach(name=>{
+      const clean=canonicalEmployeeName(name);
+      const key=normalizePersonName(clean);
+      if(key && !seen.has(key)) seen.set(key,clean);
+    });
+  });
+  return [...seen.values()];
+}
+function reportPersonCount(report){
+  return reportPeopleNames(report).length;
+}
+function reportJobsPerPerson(report){
+  const people=reportPersonCount(report);
+  const jobs=Number(report?.jobs?.length)||0;
+  return people?jobs/people:0;
 }
 
 function crewPersonCount(crewName){
@@ -2553,7 +2580,6 @@ function outlookEmailHtml(){
       <td style="${td}font-weight:600">${esc(c.name)}</td>
       <td style="${td}text-align:center">${work.people}</td>
       <td style="${td}text-align:center">${c.completed}</td>
-      <td style="${td}text-align:center">${fmt(work.jobsPerPerson)}</td>
       <td style="${td}text-align:center">${c.cancelled}</td>
       <td style="${td}text-align:right">${fmt(c.actual)}</td>
       <td style="${td}text-align:right">${fmt(c.budget)}</td>
@@ -2630,6 +2656,8 @@ function outlookEmailHtml(){
     <h2 style="${section}">Job Mix — ${r.jobs.length} completed jobs</h2>
   <table style="width:100%;border-collapse:collapse;margin-bottom:8px">
     <tr>
+      ${card('People',reportPersonCount(r))}
+      ${card('Jobs / Person',fmt(reportJobsPerPerson(r)))}
       ${card('Originals',jobBuckets.original)}
       ${card('Recleans',jobBuckets.reclean)}
       ${card('Windows',jobBuckets.windows)}
@@ -2652,7 +2680,6 @@ function outlookEmailHtml(){
         <th style="${th}">Crew</th>
         <th style="${th}">People</th>
         <th style="${th}">Jobs</th>
-        <th style="${th}">Jobs / Person</th>
         <th style="${th}">Cancelled</th>
         <th style="${th}">Actual</th>
         <th style="${th}">Budget</th>
@@ -3149,8 +3176,7 @@ function weeklyOperationsData(){
     ...c,
     efficiency:c.actual?c.budget/c.actual*100:0,
     variance:c.actual-c.budget,
-    people:crewPersonCount(c.name),
-    jobsPerPerson:c.completed/crewPersonCount(c.name)
+    people:crewPersonCount(c.name)
   })).sort((a,b)=>b.efficiency-a.efficiency);
   crews.forEach((c,i)=>c.rank=i+1);
   const travelRankings=[...crews]
@@ -3200,6 +3226,8 @@ function weeklyOperationsReportHtml(){
   const dailyRows=w.days.map(d=>`<tr>
     <td style="${td}font-weight:600">${esc(d.weekday)}</td>
     <td style="${td}">${esc(shortDateLabel(d.date))}</td>
+    <td style="${td}text-align:center">${d.operations.people||0}</td>
+    <td style="${td}text-align:center">${fmt(d.operations.jobsPerPerson||0)}</td>
     <td style="${td}text-align:center">${d.operations.completed}</td>
     <td style="${td}text-align:center">${d.operations.cancelled}</td>
     <td style="${td}text-align:right">${fmt(d.operations.actual)}</td>
@@ -3212,7 +3240,6 @@ function weeklyOperationsReportHtml(){
     <td style="${td}font-weight:600">${esc(c.name)}</td>
     <td style="${td}text-align:center">${c.people}</td>
     <td style="${td}text-align:center">${c.completed}</td>
-    <td style="${td}text-align:center">${fmt(c.jobsPerPerson)}</td>
     <td style="${td}text-align:center">${c.cancelled}</td>
     <td style="${td}text-align:right">${fmt(c.actual)}</td>
     <td style="${td}text-align:right">${fmt(c.budget)}</td>
@@ -3273,9 +3300,9 @@ function weeklyOperationsReportHtml(){
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">EFFECTIVE MAN HOURS</div><div style="font-size:24px;font-weight:700">${fmt(w.totals.effectiveManHours)}</div></td>
     </tr></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Breakdown</h2>
-    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Efficiency</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${dailyRows}</tbody></table>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">People</th><th style="${th}">Jobs / Person</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Efficiency</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${dailyRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cumulative Crew Rankings</h2>
-    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Crew</th><th style="${th}">People</th><th style="${th}">Completed</th><th style="${th}">Jobs / Person</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th><th style="${th}">Efficiency</th><th style="${th}">Effective Work Hours</th><th style="${th}">Effective Man Hours</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${crewRows}</tbody></table>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Crew</th><th style="${th}">People</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th><th style="${th}">Efficiency</th><th style="${th}">Effective Work Hours</th><th style="${th}">Effective Man Hours</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${crewRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cumulative Travel Delay Rankings</h2>
     <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Crew</th><th style="${th}">Delay Count</th><th style="${th}">Delay Minutes</th><th style="${th}">Days With Delays</th></tr></thead><tbody>${travelRankingRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Job Type Breakdown</h2>
@@ -3291,9 +3318,9 @@ function weeklyOperationsReportHtml(){
 function weeklyOperationsReportText(){
   const w=weeklyOperationsData();
   let out=`VIP Operations Report\n${reportRangeLabel(w.dates)}\n\nCompleted: ${w.totals.completed}\nCancelled: ${w.totals.cancelled}\nActual Hours: ${fmt(w.totals.actual)}\nBudget Hours: ${fmt(w.totals.budget)}\nEfficiency: ${fmt(w.totals.efficiency)}%\nTravel Delays: ${w.totals.travelDelays}\n\nDAILY BREAKDOWN\n`;
-  w.days.forEach(d=>out+=`\n${d.weekday}: ${d.operations.completed} completed, ${d.operations.cancelled} cancelled, ${fmt(d.operations.actual)} actual, ${fmt(d.operations.budget)} budget, ${fmt(d.operations.efficiency)}% efficiency`);
+  w.days.forEach(d=>out+=`\n${d.weekday}: ${d.operations.people||0} people, ${fmt(d.operations.jobsPerPerson||0)} jobs/person, ${d.operations.completed} completed, ${d.operations.cancelled} cancelled, ${fmt(d.operations.actual)} actual, ${fmt(d.operations.budget)} budget, ${fmt(d.operations.efficiency)}% efficiency`);
   out+='\n\nCUMULATIVE CREW RANKINGS\n';
-  w.crews.forEach(c=>out+=`\n#${c.rank} ${c.name}: ${c.people} people, ${c.completed} completed, ${fmt(c.jobsPerPerson)} jobs/person, ${c.cancelled} cancelled, ${fmt(c.actual)} actual, ${fmt(c.budget)} budget, ${fmt(c.efficiency)}% efficiency, ${fmt(c.effectiveWorkHours)} effective work hours, ${fmt(c.effectiveManHours)} effective man hours, ${c.travelDelays} travel delays`);
+  w.crews.forEach(c=>out+=`\n#${c.rank} ${c.name}: ${c.people} people, ${c.completed} completed, ${c.cancelled} cancelled, ${fmt(c.actual)} actual, ${fmt(c.budget)} budget, ${fmt(c.efficiency)}% efficiency, ${fmt(c.effectiveWorkHours)} effective work hours, ${fmt(c.effectiveManHours)} effective man hours, ${c.travelDelays} travel delays`);
   out+='\n\nCUMULATIVE TRAVEL DELAY RANKINGS\n';
   w.travelRankings.forEach(c=>out+=`\n#${c.travelRank} ${c.name}: ${c.travelDelays} delays, ${c.travelDelayMinutes} delay minutes`);
   out+='\n\nJOB DETAIL BY CREW & DAY\n';
@@ -3321,8 +3348,8 @@ function downloadWeeklyOperationsEml(){
 function downloadWeeklyOperationsCsv(){
   if(!reportDates().length){alert('Select at least one saved report day first.');return;}
   const w=weeklyOperationsData();
-  const rows=[['Rank','Crew','People','Completed','Jobs per Person','Cancelled','Actual Hours','Budget Hours','Variance','Efficiency %','Effective Work Hours','Effective Man Hours','Travel Delays','Travel Delay Minutes']];
-  w.crews.forEach(c=>rows.push([c.rank,c.name,c.people,c.completed,+c.jobsPerPerson.toFixed(2),c.cancelled,+c.actual.toFixed(1),+c.budget.toFixed(1),+c.variance.toFixed(1),+c.efficiency.toFixed(1),+c.effectiveWorkHours.toFixed(2),+c.effectiveManHours.toFixed(2),c.travelDelays,c.travelDelayMinutes]));
+  const rows=[['Rank','Crew','People','Completed','Cancelled','Actual Hours','Budget Hours','Variance','Efficiency %','Effective Work Hours','Effective Man Hours','Travel Delays','Travel Delay Minutes']];
+  w.crews.forEach(c=>rows.push([c.rank,c.name,c.people,c.completed,c.cancelled,+c.actual.toFixed(1),+c.budget.toFixed(1),+c.variance.toFixed(1),+c.efficiency.toFixed(1),+c.effectiveWorkHours.toFixed(2),+c.effectiveManHours.toFixed(2),c.travelDelays,c.travelDelayMinutes]));
   rows.push([]);
   rows.push(['Report Total',w.totals.completed,w.totals.cancelled,+w.totals.actual.toFixed(1),+w.totals.budget.toFixed(1),+w.totals.variance.toFixed(1),+w.totals.efficiency.toFixed(1),w.totals.travelDelays,w.totals.travelDelayMinutes]);
   const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
