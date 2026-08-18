@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Builder New Lot Checker - All Builders v1.16</title>
-<!-- Version: v1.16 MI Homes import includes American Homes 4 Rent rows -->
+<title>Builder New Lot Checker - All Builders v1.17</title>
+<!-- Version: v1.17 adds Tentative Schedule paste checker -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -49,8 +49,8 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Builder New Lot Checker <span class="version-pill">Version 1.16</span></h1>
-  <p class="sub">Upload your <b>Floor Plans</b> sheet, optionally upload your <b>Subdivisions</b> sheet for exact names, pick the builder/export type, then upload that builder export. The tool compares lots by <b>subdivision + lot</b>, with an address fallback, and shows anything missing from the Floor Plans sheet. Version 1.16 includes American Homes 4 Rent rows inside the MI Homes future-orders import, exports using the exact columns from your uploaded Floor Plans sheet, and Copy New Lots omits column headers so you can paste directly under existing data.</p>
+  <h1>Builder New Lot Checker <span class="version-pill">Version 1.17</span></h1>
+  <p class="sub">Upload your <b>Floor Plans</b> sheet, optionally upload your <b>Subdivisions</b> sheet for exact names, pick the builder/export type, then upload that builder export. The tool compares lots by <b>subdivision + lot</b>, with an address fallback, and shows anything missing from the Floor Plans sheet. Version 1.17 adds a Tentative Schedule paste checker for vacation/week-ahead review, keeps export columns from your Floor Plans sheet, and Copy New Lots omits column headers so you can paste directly under existing data.</p>
 
   <div class="grid">
     <div class="card">
@@ -78,6 +78,7 @@
             <option value="dr">DR Horton active lots CSV</option>
             <option value="drschedule">DR Horton schedule CSV</option>
             <option value="epcon">Epcon monthly schedule</option>
+            <option value="tentative">Tentative schedule paste</option>
           </select>
         </div>
         <p id="sourceHelp">Pulte expected columns: Community, Job #, Street Address, City, State, Zip, Plan Name.</p>
@@ -252,6 +253,53 @@ const DEFAULT_MAPPINGS = {
     "HC":"Haines Creek",
     "WO":"White Oaks",
     "CN":"Concord"
+  },
+  tentative: {
+    "AMH":"Eastwood",
+    "Amrine":"Amrine",
+    "Berlin":"Berlin Farm",
+    "Bishop":"Bishop Estates",
+    "Bloomfield":"Bloomfield Hills",
+    "Buckstone":"Buckstone Bend",
+    "Carr Farms":"Carr",
+    "Chase Landing":"Chase Landings",
+    "Chase Landings":"Chase Landings",
+    "Clarkshaw":"Clarkshaw Crossing",
+    "Clover":"Clover Run",
+    "Concord":"Concord",
+    "Eagle":"Eagle Creek",
+    "Eastwood":"Eastwood",
+    "Galloway East":"Galloway East",
+    "Glacier":"Glacier Pointe",
+    "Haines Creek":"Haines Creek",
+    "Hazelton":"Hazelton",
+    "Hebron":"Hebron Landing",
+    "Hyatts":"Hyatts Meadows",
+    "Hyland":"Hyland Meadows",
+    "Johnson's Creek":"Johnson's Creek",
+    "Johnsons Creek":"Johnson's Creek",
+    "Leasure Farms":"Leasure Farms",
+    "Liberty Crossing":"Liberty Crossing",
+    "London Landing":"London Landing *Arbor Homes *London",
+    "Magnolia":"Magnolia Park",
+    "Maris Park":"Maris Park",
+    "MD":"Madison Meadows",
+    "Miller":"Miller Farm",
+    "Mulberry":"Mulberry",
+    "Nelson":"Nelson Farms",
+    "Northwood":"Northwood",
+    "Nottingham":"Nottingham Trace",
+    "Overlook":"The Overlook",
+    "Pioneer":"Pioneer Crossing",
+    "Price Ponds":"Price Ponds",
+    "Scotts":"Homestead at Scotts Farm",
+    "Slate":"Slate Ridge",
+    "Sugar Farms":"Sugar Farms",
+    "Sycamore Grove":"Sycamore Grove",
+    "Towns Greenway":"Towns on the Greenway",
+    "Towns Parkway":"Towns On The Parkway",
+    "Villages at Galloway":"Villages at Galloway",
+    "Walnut":"Walnut Mill"
   }
 };
 
@@ -321,7 +369,7 @@ function cleanMappingObject(obj){
   return out;
 }
 function sourceLabel(type){
-  return {pulte:'Pulte', mi:'MI Homes', fischer:'Fischer Homes', arbor:'Arbor Homes', dr:'DR Horton', drschedule:'DR Horton Schedule', epcon:'Epcon'}[type] || type;
+  return {pulte:'Pulte', mi:'MI Homes', fischer:'Fischer Homes', arbor:'Arbor Homes', dr:'DR Horton', drschedule:'DR Horton Schedule', epcon:'Epcon', tentative:'Tentative Schedule'}[type] || type;
 }
 function setMappingStatus(msg){
   const el = $('mappingStatus');
@@ -389,6 +437,97 @@ function parseMIAddress(job){
     if (norm(words.slice(0, half).join(' ')) === norm(words.slice(half).join(' '))) s = words.slice(0, half).join(' ');
   }
   return s;
+}
+
+function stripTentativeNoise(v){
+  let s = cleanText(v)
+    .replace(/\\\*/g, '*')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/\b(?:NHO|P\/W|PW|Power Wash(?:ing)?|First Clean|Final Clean|Reclean(?:\s*\d+)?|Original|Windows|Window|Model|Floor Prep|remove all floor coverings|cardboard|plastic|stairs included)\b/ig, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return s.replace(/[.;:,]+$/g, '').replace(/\*+$/g, '*').trim();
+}
+function splitTentativeCells(text){
+  let t = String(text || '')
+    .replace(/<br\s*\/?\s*>/gi, '\n')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\\\*/g, '*');
+  // Markdown tables use pipes as cell separators. Treat each cell as a possible schedule line.
+  t = t.replace(/\|/g, '\n');
+  const lines = [];
+  for (const raw of t.split(/\r?\n/)) {
+    let line = raw.replace(/^-{3,}$/g, '').trim();
+    if (!line || /^[-\s]+$/.test(line)) continue;
+    // Sometimes multiple lots are pasted in one cell separated only by large spacing.
+    line = line.replace(/\s{2,}/g, '\n');
+    for (const piece of line.split(/\n/)) {
+      const p = piece.trim();
+      if (p) lines.push(p);
+    }
+  }
+  return lines;
+}
+function parseTentativeLine(rawLine){
+  let line = stripTentativeNoise(rawLine);
+  if (!line) return null;
+  if (/^(i\s+need|these\s+should|maybe\s+make|drees\s+model|model\s*-)/i.test(line)) return null;
+  const m = line.match(/^(\d{1,6})\s+(.+)$/);
+  if (!m) return null;
+  const lot = cleanLot(m[1]);
+  let rest = stripTentativeNoise(m[2]);
+  if (!lot || !rest) return null;
+
+  let builder = '';
+  // Starred builder notation: 242 London Landing *Arbor, 35 Hazelton *Rockford, 31 Glacier *Fischer
+  if (rest.includes('*')) {
+    const parts = rest.split('*').map(cleanText).filter(Boolean);
+    rest = parts.shift() || rest;
+    const b = parts.join(' ');
+    if (/fischer/i.test(b)) builder = 'Fischer Homes';
+    else if (/arbor/i.test(b)) builder = 'Arbor Homes';
+    else if (/rockford/i.test(b)) builder = 'Rockford Homes';
+    else if (/bob\s*webb/i.test(b)) builder = 'Bob Webb';
+    else if (/mi\b|m\/i/i.test(b)) builder = 'MI Homes';
+    else if (/epcon/i.test(b)) builder = 'Epcon';
+    else if (/dr\b|horton/i.test(b)) builder = 'DR Horton';
+    else if (/pulte/i.test(b)) builder = 'Pulte';
+  }
+
+  // Trailing builder words without a star: 7202 Hyatts MI, 1960 Ridgeview Rd Bob Webb
+  const trailingBuilders = [
+    [/\s+American Homes 4 Rent$/i, 'American Homes 4 Rent'],
+    [/\s+Bob\s+Webb$/i, 'Bob Webb'],
+    [/\s+Rockford$/i, 'Rockford Homes'],
+    [/\s+Fischer$/i, 'Fischer Homes'],
+    [/\s+Arbor$/i, 'Arbor Homes'],
+    [/\s+MI$/i, 'MI Homes'],
+    [/\s+DR$/i, 'DR Horton'],
+    [/\s+Pulte$/i, 'Pulte'],
+    [/\s+Epcon$/i, 'Epcon']
+  ];
+  for (const [re,b] of trailingBuilders) {
+    if (re.test(rest)) { builder = builder || b; rest = rest.replace(re, '').trim(); break; }
+  }
+
+  rest = stripTentativeNoise(rest);
+  if (!rest || /^(rd|road|st|street|dr|drive|lane|ln|ave|avenue)$/i.test(rest)) return null;
+  return {Community: rest, RawCommunity: rest, Lot: lot, Plan: '', Address: '', City: '', Builder: builder, Task: 'Tentative schedule'};
+}
+function parseTentativeScheduleText(text){
+  const parsed = [];
+  const seen = new Set();
+  for (const rawLine of splitTentativeCells(text)) {
+    const row = parseTentativeLine(rawLine);
+    if (!row) continue;
+    const key = `${norm(row.Community)}|${cleanLot(row.Lot)}|${norm(row.Builder)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    parsed.push(row);
+  }
+  return parsed;
 }
 function parseCopiedJobListText(text){
   const parsed = [];
@@ -516,11 +655,13 @@ function guessBuilder(base){
   if (sourceType === 'arbor') return 'Arbor Homes';
   if (sourceType === 'dr' || sourceType === 'drschedule') return 'DR Horton';
   if (sourceType === 'epcon') return 'Epcon';
+  if (sourceType === 'tentative') return '';
   if (/maygrass|northstar/i.test(base)) return 'Del Webb';
   if (/bloomfield|clover/i.test(base)) return 'Centex';
   return 'Pulte';
 }
 function isFloorBuilderMatch(r){
+  if (sourceType === 'tentative') return true;
   const b = norm(r.Builder + ' ' + r.Subdivision);
   if (sourceType === 'mi') return b.includes('mihomes') || b.includes('mi') || b.includes('amh') || b.includes('americanhomes4rent') || b.includes('americahomes4rent');
   if (sourceType === 'fischer') return b.includes('fischer');
@@ -530,6 +671,7 @@ function isFloorBuilderMatch(r){
   return b.includes('pulte') || b.includes('centex') || b.includes('delwebb');
 }
 function builderAliasesForSource(){
+  if (sourceType === 'tentative') return [''];
   if (sourceType === 'mi') return ['mi homes','mi','amh','american homes 4 rent','america homes 4 rent'];
   if (sourceType === 'fischer') return ['fischer homes','fischer'];
   if (sourceType === 'arbor') return ['arbor homes','arbor'];
@@ -538,6 +680,7 @@ function builderAliasesForSource(){
   return ['pulte','centex','del webb','delwebb'];
 }
 function isSubdivisionBuilderMatch(r){
+  if (sourceType === 'tentative') return true;
   const hay = norm((r.Builder || '') + ' ' + (r.Subdivision || ''));
   return builderAliasesForSource().some(alias => hay.includes(norm(alias)));
 }
@@ -705,9 +848,9 @@ async function loadBuilderExport(files){
 }
 function loadPastedBuilderExport(){
   const text = $('builderPasteText').value;
-  rawRows = parseCopiedJobListText(text);
+  rawRows = sourceType === 'tentative' ? parseTentativeScheduleText(text) : parseCopiedJobListText(text);
   normalizeJobsFromRaw();
-  const label = sourceType === 'arbor' ? 'Arbor pasted rows' : 'Fischer pasted rows';
+  const label = sourceType === 'tentative' ? 'tentative schedule lots' : (sourceType === 'arbor' ? 'Arbor pasted rows' : 'Fischer pasted rows');
   $('jobsStatus').innerHTML = `<span class="ok">Loaded ${rawRows.length} ${label}. Parsed ${jobRows.length} usable rows.</span>`;
   $('jobCount').textContent = rawRows.length;
   addMissingMappingsFromJobs(); checkReady();
@@ -726,7 +869,7 @@ function normalizeJobsFromRaw(){
       jobRows.push({
         RawCommunity: community,
         Community: community,
-        Builder: isAMH ? 'AMH' : 'MI Homes',
+        Builder: isAMH ? 'American Homes 4 Rent' : 'MI Homes',
         Lot: lot,
         Plan: cleanMIPlan(r.Plan),
         Address: parseMIAddress(r.Job),
@@ -812,6 +955,24 @@ function normalizeJobsFromRaw(){
         TaskCode: cleanText(r.TaskCode),
         Status: cleanText(r.Status)
       });
+    } else if (sourceType === 'tentative') {
+      const community = cleanText(r.Community);
+      const lot = cleanLot(r.Lot);
+      if (!community || !lot) continue;
+      jobRows.push({
+        RawCommunity: community,
+        Community: community,
+        Builder: cleanText(r.Builder),
+        Lot: lot,
+        Plan: '',
+        Address: cleanText(r.Address),
+        City: cleanText(r.City),
+        Elevation: '',
+        Phase: '',
+        Task: cleanText(r.Task) || 'Tentative schedule',
+        TaskCode: '',
+        Status: ''
+      });
     } else {
       const community = cleanText(r.Community);
       const lot = cleanLot(r['Job #']);
@@ -872,8 +1033,8 @@ function compare(){
     const match = subLotMatch || addressMatch;
     const city = cleanText(j.City);
     const plan = sourceType === 'mi' ? cleanMIPlan(j.Plan) : cleanText(j.Plan);
-    const builder = cleanText(j.Builder) || guessBuilder(mappedBase);
-    const sourceLabel = builder || (sourceType === 'mi' ? 'MI Homes' : (sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : ((sourceType === 'dr' || sourceType === 'drschedule') ? 'DR Horton' : (sourceType === 'epcon' ? 'Epcon' : 'Pulte')))));
+    const builder = cleanText(j.Builder) || guessBuilder(mappedBase) || cleanText(subdivision.match(/\*([^*]+)/)?.[1]);
+    const sourceLabel = builder || (sourceType === 'mi' ? 'MI Homes' : (sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : ((sourceType === 'dr' || sourceType === 'drschedule') ? 'DR Horton' : (sourceType === 'epcon' ? 'Epcon' : (sourceType === 'tentative' ? (builder || 'Tentative') : 'Pulte'))))));
     const subdivisionBuilder = sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : (sourceType === 'epcon' ? 'Epcon' : builder));
     const subdivision = resolved.displaySubdivision || subdivisionWithStars(mappedBase, subdivisionBuilder, city);
     const planKeyForExport = `${norm(mappedBase)}|${norm(plan)}`;
@@ -897,7 +1058,7 @@ function compare(){
       Community: community,
       MatchedSubdivisionBase: mappedBase,
       NameSource: resolved.source,
-      Builder: (sourceType === 'mi' || sourceType === 'fischer' || sourceType === 'arbor' || sourceType === 'dr' || sourceType === 'drschedule' || sourceType === 'epcon') ? builder : ((subdivision.match(/\*([^*]+)\*/)?.[1] || builder).trim()),
+      Builder: (sourceType === 'mi' || sourceType === 'fischer' || sourceType === 'arbor' || sourceType === 'dr' || sourceType === 'drschedule' || sourceType === 'epcon' || sourceType === 'tentative') ? (builder || (subdivision.match(/\*([^*]+)/)?.[1] || '').trim()) : ((subdivision.match(/\*([^*]+)\*/)?.[1] || builder).trim()),
       Subdivision: subdivision,
       Lot: lot,
       Floorplan: plan,
@@ -1084,7 +1245,7 @@ async function importSettingsFile(file){
 }
 function updateSourceUI(){
   sourceType = $('sourceSelect').value; mappings = loadMappings(sourceType); rawRows = []; jobRows = []; resultRows = [];
-  const isPasteSource = sourceType === 'fischer' || sourceType === 'arbor';
+  const isPasteSource = sourceType === 'fischer' || sourceType === 'arbor' || sourceType === 'tentative';
   $('jobsFile').multiple = sourceType === 'epcon';
   $('jobsFile').value = ''; $('builderPasteText').value = ''; $('jobsStatus').textContent = isPasteSource ? 'No pasted data loaded.' : 'No builder export loaded.';
   $('jobsFile').classList.toggle('hide', isPasteSource);
@@ -1093,8 +1254,8 @@ function updateSourceUI(){
   $('copyBtn').disabled = $('csvBtn').disabled = $('xlsxBtn').disabled = true;
 
   if (sourceType === 'mi') {
-    $('sourceHelp').textContent = 'MI Homes / AMH Future Orders expected columns: Account, Subdivision, Lot/Block, Plan, Job, Task. This option includes both M/I Homes and American Homes 4 Rent rows from the same import and dedupes repeated task rows into one lot.';
-    $('jobCountLabel').textContent = 'MI / AMH job rows';
+    $('sourceHelp').textContent = 'MI Homes / American Homes 4 Rent Future Orders expected columns: Account, Subdivision, Lot/Block, Plan, Job, Task. This option includes both M/I Homes and American Homes 4 Rent rows from the same import and dedupes repeated task rows into one lot.';
+    $('jobCountLabel').textContent = 'MI / American Homes job rows';
   } else if (sourceType === 'fischer') {
     $('sourceHelp').textContent = 'Fischer: copy the job list from the website/export and paste it below. The tool reads community code, floorplan, address, and lot, then dedupes repeated task rows.';
     $('jobCountLabel').textContent = 'Fischer pasted rows';
@@ -1105,11 +1266,14 @@ function updateSourceUI(){
     $('sourceHelp').textContent = 'DR Horton active lots CSV columns: Community, Address, City, State, Zip, Plan, Lot. Community codes like “Bishop Estates - 97800” are cleaned to “Bishop Estates”.';
     $('jobCountLabel').textContent = 'DR Horton lot rows';
   } else if (sourceType === 'drschedule') {
-    $('sourceHelp').textContent = 'DR Horton schedule CSV columns: Date, Project, Address, Job Number, Plat Lot/Block/Phase, Plan, Elevation, Description. Version 1.16 reads the CSV as text, strips Excel formula wrappers like ="6396 Silver...", shows every parsed lot in the All pulled lots box, and exports using your Floor Plans columns.';
+    $('sourceHelp').textContent = 'DR Horton schedule CSV columns: Date, Project, Address, Job Number, Plat Lot/Block/Phase, Plan, Elevation, Description. Version 1.17 reads the CSV as text, strips Excel formula wrappers like ="6396 Silver...", shows every parsed lot in the All pulled lots box, and exports using your Floor Plans columns.';
     $('jobCountLabel').textContent = 'DR Horton schedule rows';
   } else if (sourceType === 'epcon') {
     $('sourceHelp').textContent = 'Epcon: upload one or more monthly schedule files. Block/Lot uses the number after the slash as the lot. If Block/Lot is missing, the tool derives the lot from the House number code. Epcon has no floorplan in this schedule, so Floorplan is left blank.';
     $('jobCountLabel').textContent = 'Epcon schedule rows';
+  } else if (sourceType === 'tentative') {
+    $('sourceHelp').textContent = 'Tentative schedule paste: paste next-week schedule text/table cells like “242 London Landing *Arbor” or “7202 Hyatts MI”. It pulls the first number as Lot, the rest as subdivision, uses your Subdivisions sheet/settings for exact names, and shows which possible lots are missing.';
+    $('jobCountLabel').textContent = 'Tentative lots parsed';
   } else {
     $('sourceHelp').textContent = 'Pulte expected columns: Community, Job #, Street Address, City, State, Zip, Plan Name.';
     $('jobCountLabel').textContent = 'Pulte export rows';
