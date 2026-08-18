@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Builder New Lot Checker - All Builders v1.18</title>
-<!-- Version: v1.18 auto-loads paste data before compare and fixes Tentative Schedule compare flow -->
+<title>Builder New Lot Checker - All Builders v1.19</title>
+<!-- Version: v1.19 fixes Schedule paste vs Floor Plans mode and removes builder-export dependency for schedule checks -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -49,8 +49,8 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Builder New Lot Checker <span class="version-pill">Version 1.18</span></h1>
-  <p class="sub">Upload your <b>Floor Plans</b> sheet, optionally upload your <b>Subdivisions</b> sheet for exact names, pick the builder/export type, then upload that builder export. The tool compares lots by <b>subdivision + lot</b>, with an address fallback, and shows anything missing from the Floor Plans sheet. Version 1.18 adds a Tentative Schedule paste checker for vacation/week-ahead review, auto-loads pasted schedule text when you click Compare Lots, keeps export columns from your Floor Plans sheet, and Copy New Lots omits column headers so you can paste directly under existing data.</p>
+  <h1>Builder New Lot Checker <span class="version-pill">Version 1.19</span></h1>
+  <p class="sub">Upload your <b>Floor Plans</b> sheet, optionally upload your <b>Subdivisions</b> sheet for exact names, pick the builder/export type, then upload that builder export. The tool compares lots by <b>subdivision + lot</b>, with an address fallback, and shows anything missing from the Floor Plans sheet. Version 1.19 adds a Schedule paste vs Floor Plans checker for vacation/week-ahead review. In that mode, it ignores builder-export logic and checks the pasted schedule directly against your Floor Plans sheet. Copy New Lots omits column headers so you can paste directly under existing data.</p>
 
   <div class="grid">
     <div class="card">
@@ -78,7 +78,7 @@
             <option value="dr">DR Horton active lots CSV</option>
             <option value="drschedule">DR Horton schedule CSV</option>
             <option value="epcon">Epcon monthly schedule</option>
-            <option value="tentative">Tentative schedule paste</option>
+            <option value="tentative">Schedule paste vs Floor Plans</option>
           </select>
         </div>
         <p id="sourceHelp">Pulte expected columns: Community, Job #, Street Address, City, State, Zip, Plan Name.</p>
@@ -369,7 +369,7 @@ function cleanMappingObject(obj){
   return out;
 }
 function sourceLabel(type){
-  return {pulte:'Pulte', mi:'MI Homes', fischer:'Fischer Homes', arbor:'Arbor Homes', dr:'DR Horton', drschedule:'DR Horton Schedule', epcon:'Epcon', tentative:'Tentative Schedule'}[type] || type;
+  return {pulte:'Pulte', mi:'MI Homes', fischer:'Fischer Homes', arbor:'Arbor Homes', dr:'DR Horton', drschedule:'DR Horton Schedule', epcon:'Epcon', tentative:'Schedule Paste'}[type] || type;
 }
 function setMappingStatus(msg){
   const el = $('mappingStatus');
@@ -648,7 +648,7 @@ function parseEpconScheduleRows(rows){
   }
   return parsed;
 }
-function subdivisionWithStars(base, builder, city){ const b = cleanText(builder); const c = cleanText(city); return base ? `${base} *${b}${c ? ' *' + c : ''}`.trim() : ''; }
+function subdivisionWithStars(base, builder, city){ const b = cleanText(builder); const c = cleanText(city); if (!base) return ''; if (!b) return cleanText(base); return `${base} *${b}${c ? ' *' + c : ''}`.trim(); }
 function guessBuilder(base){
   if (sourceType === 'mi') return 'MI Homes';
   if (sourceType === 'fischer') return 'Fischer Homes';
@@ -850,7 +850,7 @@ function loadPastedBuilderExport(){
   const text = $('builderPasteText').value;
   rawRows = sourceType === 'tentative' ? parseTentativeScheduleText(text) : parseCopiedJobListText(text);
   normalizeJobsFromRaw();
-  const label = sourceType === 'tentative' ? 'tentative schedule lots' : (sourceType === 'arbor' ? 'Arbor pasted rows' : 'Fischer pasted rows');
+  const label = sourceType === 'tentative' ? 'schedule lots' : (sourceType === 'arbor' ? 'Arbor pasted rows' : 'Fischer pasted rows');
   $('jobsStatus').innerHTML = `<span class="ok">Loaded ${rawRows.length} ${label}. Parsed ${jobRows.length} usable rows.</span>`;
   $('jobCount').textContent = rawRows.length;
   addMissingMappingsFromJobs(); checkReady();
@@ -1017,19 +1017,19 @@ function buildIndexes(){
 }
 function compare(){
   // Paste sources are easy to forget to load first. Auto-load them here.
-  // This fixes Tentative Schedule cases like "1000 MD" showing nothing after clicking Compare Lots.
+  // This fixes Schedule paste cases like "1000 MD" showing nothing after clicking Compare Lots.
   if (isPasteSourceActive() && hasPasteText()) {
     const parsedNow = sourceType === 'tentative' ? parseTentativeScheduleText($('builderPasteText').value) : parseCopiedJobListText($('builderPasteText').value);
     rawRows = parsedNow;
     normalizeJobsFromRaw();
-    const label = sourceType === 'tentative' ? 'tentative schedule lots' : (sourceType === 'arbor' ? 'Arbor pasted rows' : 'Fischer pasted rows');
+    const label = sourceType === 'tentative' ? 'schedule lots' : (sourceType === 'arbor' ? 'Arbor pasted rows' : 'Fischer pasted rows');
     $('jobsStatus').innerHTML = `<span class="ok">Loaded ${rawRows.length} ${label}. Parsed ${jobRows.length} usable rows.</span>`;
     $('jobCount').textContent = rawRows.length;
     addMissingMappingsFromJobs();
   }
   if (!floorRows.length || !jobRows.length) {
     renderPulledLots([]);
-    $('newLotsList').innerHTML = `<div class="empty-newlots">No lots were parsed from the selected import. For Tentative schedule paste, try a simple test like <b>1000 MD</b>.</div>`;
+    $('newLotsList').innerHTML = `<div class="empty-newlots">No lots were parsed from the schedule paste. Try a simple test like <b>1000 MD</b>.</div>`;
     $('newLotsBadge').textContent = '0';
     return;
   }
@@ -1056,10 +1056,13 @@ function compare(){
     const match = subLotMatch || addressMatch;
     const city = cleanText(j.City);
     const plan = sourceType === 'mi' ? cleanMIPlan(j.Plan) : cleanText(j.Plan);
-    const builder = cleanText(j.Builder) || guessBuilder(mappedBase) || cleanText(subdivision.match(/\*([^*]+)/)?.[1]);
-    const sourceLabel = builder || (sourceType === 'mi' ? 'MI Homes' : (sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : ((sourceType === 'dr' || sourceType === 'drschedule') ? 'DR Horton' : (sourceType === 'epcon' ? 'Epcon' : (sourceType === 'tentative' ? (builder || 'Tentative') : 'Pulte'))))));
-    const subdivisionBuilder = sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : (sourceType === 'epcon' ? 'Epcon' : builder));
+    // Schedule paste mode is not a builder export. Do not require/guess a builder before resolving the subdivision.
+    // The old order referenced `subdivision` before it existed, which made simple schedule checks like "1000 MD" fail.
+    let builder = cleanText(j.Builder) || guessBuilder(mappedBase);
+    let subdivisionBuilder = sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : (sourceType === 'epcon' ? 'Epcon' : builder));
     const subdivision = resolved.displaySubdivision || subdivisionWithStars(mappedBase, subdivisionBuilder, city);
+    if (!builder) builder = cleanText((subdivision.match(/\*([^*]+)/) || [])[1]);
+    const sourceLabel = builder || (sourceType === 'mi' ? 'MI Homes' : (sourceType === 'fischer' ? 'Fischer Homes' : (sourceType === 'arbor' ? 'Arbor Homes' : ((sourceType === 'dr' || sourceType === 'drschedule') ? 'DR Horton' : (sourceType === 'epcon' ? 'Epcon' : (sourceType === 'tentative' ? 'Schedule Paste' : 'Pulte'))))));
     const planKeyForExport = `${norm(mappedBase)}|${norm(plan)}`;
     const hours = idx.hoursBySubPlan.get(planKeyForExport) || idx.hoursByPlan.get(norm(plan)) || {Original:'',Reclean:'',Windows:''};
     const exportTemplate = idx.templateBySubPlan.get(planKeyForExport) || idx.templateByPlan.get(norm(plan)) || {};
@@ -1289,14 +1292,14 @@ function updateSourceUI(){
     $('sourceHelp').textContent = 'DR Horton active lots CSV columns: Community, Address, City, State, Zip, Plan, Lot. Community codes like “Bishop Estates - 97800” are cleaned to “Bishop Estates”.';
     $('jobCountLabel').textContent = 'DR Horton lot rows';
   } else if (sourceType === 'drschedule') {
-    $('sourceHelp').textContent = 'DR Horton schedule CSV columns: Date, Project, Address, Job Number, Plat Lot/Block/Phase, Plan, Elevation, Description. Version 1.18 reads the CSV as text, strips Excel formula wrappers like ="6396 Silver...", shows every parsed lot in the All pulled lots box, and exports using your Floor Plans columns.';
+    $('sourceHelp').textContent = 'DR Horton schedule CSV columns: Date, Project, Address, Job Number, Plat Lot/Block/Phase, Plan, Elevation, Description. Version 1.19 reads the CSV as text, strips Excel formula wrappers like ="6396 Silver...", shows every parsed lot in the All pulled lots box, and exports using your Floor Plans columns.';
     $('jobCountLabel').textContent = 'DR Horton schedule rows';
   } else if (sourceType === 'epcon') {
     $('sourceHelp').textContent = 'Epcon: upload one or more monthly schedule files. Block/Lot uses the number after the slash as the lot. If Block/Lot is missing, the tool derives the lot from the House number code. Epcon has no floorplan in this schedule, so Floorplan is left blank.';
     $('jobCountLabel').textContent = 'Epcon schedule rows';
   } else if (sourceType === 'tentative') {
-    $('sourceHelp').textContent = 'Tentative schedule paste: paste next-week schedule text/table cells like “242 London Landing *Arbor” or “7202 Hyatts MI”. It pulls the first number as Lot, the rest as subdivision, uses your Subdivisions sheet/settings for exact names, and shows which possible lots are missing.';
-    $('jobCountLabel').textContent = 'Tentative lots parsed';
+    $('sourceHelp').textContent = 'Schedule paste vs Floor Plans: paste next-week schedule text/table cells like “1000 MD”, “242 London Landing *Arbor”, or “7202 Hyatts MI”. This mode ignores builder-export rules and simply checks parsed schedule lot + subdivision against every row in your Floor Plans sheet.';
+    $('jobCountLabel').textContent = 'Schedule lots parsed';
   } else {
     $('sourceHelp').textContent = 'Pulte expected columns: Community, Job #, Street Address, City, State, Zip, Plan Name.';
     $('jobCountLabel').textContent = 'Pulte export rows';
