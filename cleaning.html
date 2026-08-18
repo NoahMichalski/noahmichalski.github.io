@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.27</title>
+<title>VIP Crew Efficiency & Travel Report v3.28</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -200,10 +200,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.27</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.28</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.27</div>
+    <div class="version">Version 3.28</div>
   </div>
 
   <div class="input-grid">
@@ -1637,19 +1637,65 @@ function isMileageNameMatch(crewName,excludedName){
   return crewNameParts(crewName).some(part=>part===key || part.includes(key) || key.includes(part));
 }
 
-function crewOperationTravelMinutes(crew){
-  const efficiencyMinutes=(crew?.trips||[])
-    .reduce((sum,t)=>sum+(t?.route && Number.isFinite(Number(t.route.minutes)) ? Number(t.route.minutes) : 0),0);
-  if(efficiencyMinutes>0) return efficiencyMinutes;
+function crewActualBetweenJobMinutes(crew){
+  // Actual elapsed clock time from one timed job's clock-out
+  // to the next timed job's clock-in. This is intentionally NOT routed drive time.
+  let total=0;
+  let previousTimed=null;
+  let cancelledSincePrevious=false;
 
-  return (crew?.mileageTrips||[])
-    .reduce((sum,t)=>sum+(t?.route && Number.isFinite(Number(t.route.minutes)) ? Number(t.route.minutes) : 0),0);
+  for(const job of (crew?.jobs||[])){
+    if(job.cancelled){
+      // Keep the same cancellation-chain behavior used by the efficiency travel logic.
+      cancelledSincePrevious=true;
+      continue;
+    }
+
+    const inMin=timeToMin(job.in);
+    const outMin=timeToMin(job.out);
+    if(inMin==null || outMin==null) continue;
+
+    if(previousTimed && !cancelledSincePrevious){
+      const previousOut=timeToMin(previousTimed.out);
+      if(previousOut!=null){
+        const gap=inMin-previousOut;
+        if(gap>=0) total+=gap;
+      }
+    }
+
+    previousTimed=job;
+    cancelledSincePrevious=false;
+  }
+  return total;
 }
-function savedDayCrewTravelMinutes(day,crewName){
-  const target=canonicalCrewName(crewName)||crewName;
-  const saved=(day?.crews||[]).find(c=>(canonicalCrewName(c.name)||c.name)===target);
-  if(!saved) return 0;
-  return (saved.routes||[]).reduce((sum,r)=>sum+(Number.isFinite(Number(r.minutes))?Number(r.minutes):0),0);
+function savedOperationsClockGapMinutes(crewSnapshot){
+  // Rebuild from the saved job clock times when the raw daily report
+  // is not being reparsed.
+  let total=0;
+  let previousTimed=null;
+  let cancelledSincePrevious=false;
+
+  for(const job of (crewSnapshot?.jobs||[])){
+    if(job.cancelled){
+      cancelledSincePrevious=true;
+      continue;
+    }
+    const inMin=timeToMin(job.in);
+    const outMin=timeToMin(job.out);
+    if(inMin==null || outMin==null) continue;
+
+    if(previousTimed && !cancelledSincePrevious){
+      const previousOut=timeToMin(previousTimed.out);
+      if(previousOut!=null){
+        const gap=inMin-previousOut;
+        if(gap>=0) total+=gap;
+      }
+    }
+
+    previousTimed=job;
+    cancelledSincePrevious=false;
+  }
+  return total;
 }
 function operationSnapshot(report){
   const crews=report.crews.map(c=>{
@@ -1670,7 +1716,7 @@ function operationSnapshot(report){
     efficiency:c.actual?+(c.eff.toFixed(1)):0,
     travelDelays:c.trips.filter(t=>t.late).length,
     travelDelayMinutes:c.trips.filter(t=>t.late).reduce((s,t)=>s+(Number(t.travelDelay)||0),0),
-    travelTimeMinutes:crewOperationTravelMinutes(c),
+    travelTimeMinutes:crewActualBetweenJobMinutes(c),
     jobs:c.jobs.map(j=>({
       subdivision:j.subdivision,
       builder:j.builder,
@@ -1724,16 +1770,16 @@ function ensureDayOperations(day){
           if(old){
             c.travelDelays=Number(old.travelDelays)||0;
             c.travelDelayMinutes=Number(old.travelDelayMinutes)||0;
-            c.travelTimeMinutes=Number(old.travelTimeMinutes)||savedDayCrewTravelMinutes(day,c.name);
+            c.travelTimeMinutes=savedOperationsClockGapMinutes(c);
           }else{
-            c.travelTimeMinutes=savedDayCrewTravelMinutes(day,c.name);
+            c.travelTimeMinutes=savedOperationsClockGapMinutes(c);
           }
         });
         rebuilt.travelDelays=rebuilt.crews.reduce((s,c)=>s+c.travelDelays,0);
         rebuilt.travelDelayMinutes=rebuilt.crews.reduce((s,c)=>s+c.travelDelayMinutes,0);
         rebuilt.travelTimeMinutes=rebuilt.crews.reduce((s,c)=>s+(Number(c.travelTimeMinutes)||0),0);
       }else{
-        rebuilt.crews.forEach(c=>{ c.travelTimeMinutes=savedDayCrewTravelMinutes(day,c.name); });
+        rebuilt.crews.forEach(c=>{ c.travelTimeMinutes=savedOperationsClockGapMinutes(c); });
         rebuilt.travelTimeMinutes=rebuilt.crews.reduce((s,c)=>s+(Number(c.travelTimeMinutes)||0),0);
       }
       day.operations=rebuilt;
@@ -1766,7 +1812,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.27',
+    appVersion:'3.28',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -3330,14 +3376,14 @@ function weeklyOperationsReportHtml(){
       <td style="padding:12px;border:1px solid #d9e2f3;background:${effBg(w.totals.efficiency)};text-align:center"><div style="font-size:11px;color:#666">EFFICIENCY</div><div style="font-size:24px;font-weight:700;color:${effColor(w.totals.efficiency)}">${fmt(w.totals.efficiency)}%</div></td>
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">TRAVEL DELAYS</div><div style="font-size:24px;font-weight:700">${w.totals.travelDelays}</div></td>
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">DELAY MINUTES</div><div style="font-size:24px;font-weight:700">${w.totals.travelDelayMinutes}</div></td>
-      <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">TRAVEL TIME</div><div style="font-size:24px;font-weight:700">${formatDriveMinutes(w.totals.travelTimeMinutes)}</div></td>
+      <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">ACTUAL BETWEEN-JOB TIME</div><div style="font-size:24px;font-weight:700">${formatDriveMinutes(w.totals.travelTimeMinutes)}</div></td>
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">EFFECTIVE WORK HOURS</div><div style="font-size:24px;font-weight:700">${fmt(w.totals.effectiveWorkHours)}</div></td>
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">EFFECTIVE MAN HOURS</div><div style="font-size:24px;font-weight:700">${fmt(w.totals.effectiveManHours)}</div></td>
     </tr></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Breakdown</h2>
-    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">People</th><th style="${th}">Jobs / Person</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Efficiency</th><th style="${th}">Travel Time</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${dailyRows}</tbody></table>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">People</th><th style="${th}">Jobs / Person</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Efficiency</th><th style="${th}">Actual Between-Job Time</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${dailyRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cumulative Crew Rankings</h2>
-    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Crew</th><th style="${th}">People</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th><th style="${th}">Efficiency</th><th style="${th}">Effective Work Hours</th><th style="${th}">Effective Man Hours</th><th style="${th}">Travel Time</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${crewRows}</tbody></table>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Crew</th><th style="${th}">People</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th><th style="${th}">Efficiency</th><th style="${th}">Effective Work Hours</th><th style="${th}">Effective Man Hours</th><th style="${th}">Actual Between-Job Time</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${crewRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cumulative Travel Delay Rankings</h2>
     <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Crew</th><th style="${th}">Delay Count</th><th style="${th}">Delay Minutes</th><th style="${th}">Days With Delays</th></tr></thead><tbody>${travelRankingRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Job Type Breakdown</h2>
@@ -3352,8 +3398,8 @@ function weeklyOperationsReportHtml(){
 }
 function weeklyOperationsReportText(){
   const w=weeklyOperationsData();
-  let out=`VIP Operations Report\n${reportRangeLabel(w.dates)}\n\nCompleted: ${w.totals.completed}\nCancelled: ${w.totals.cancelled}\nActual Hours: ${fmt(w.totals.actual)}\nBudget Hours: ${fmt(w.totals.budget)}\nEfficiency: ${fmt(w.totals.efficiency)}%\nTravel Time: ${formatDriveMinutes(w.totals.travelTimeMinutes)}\nTravel Delays: ${w.totals.travelDelays}\nJobs / Person: ${fmt(w.totals.jobsPerPerson)}\n\nDAILY BREAKDOWN\n`;
-  w.days.forEach(d=>out+=`\n${d.weekday}: ${d.operations.people||0} people, ${fmt(d.operations.jobsPerPerson||0)} jobs/person, ${d.operations.completed} completed, ${d.operations.cancelled} cancelled, ${fmt(d.operations.actual)} actual, ${fmt(d.operations.budget)} budget, ${fmt(d.operations.efficiency)}% efficiency, ${formatDriveMinutes(Number(d.operations.travelTimeMinutes)||0)} travel time`);
+  let out=`VIP Operations Report\n${reportRangeLabel(w.dates)}\n\nCompleted: ${w.totals.completed}\nCancelled: ${w.totals.cancelled}\nActual Hours: ${fmt(w.totals.actual)}\nBudget Hours: ${fmt(w.totals.budget)}\nEfficiency: ${fmt(w.totals.efficiency)}%\nActual Between-Job Time: ${formatDriveMinutes(w.totals.travelTimeMinutes)}\nTravel Delays: ${w.totals.travelDelays}\nJobs / Person: ${fmt(w.totals.jobsPerPerson)}\n\nDAILY BREAKDOWN\n`;
+  w.days.forEach(d=>out+=`\n${d.weekday}: ${d.operations.people||0} people, ${fmt(d.operations.jobsPerPerson||0)} jobs/person, ${d.operations.completed} completed, ${d.operations.cancelled} cancelled, ${fmt(d.operations.actual)} actual, ${fmt(d.operations.budget)} budget, ${fmt(d.operations.efficiency)}% efficiency, ${formatDriveMinutes(Number(d.operations.travelTimeMinutes)||0)} actual between-job time`);
   out+='\n\nCUMULATIVE CREW RANKINGS\n';
   w.crews.forEach(c=>out+=`\n#${c.rank} ${c.name}: ${c.people} people, ${c.completed} completed, ${c.cancelled} cancelled, ${fmt(c.actual)} actual, ${fmt(c.budget)} budget, ${fmt(c.efficiency)}% efficiency, ${fmt(c.effectiveWorkHours)} effective work hours, ${fmt(c.effectiveManHours)} effective man hours, ${formatDriveMinutes(Number(c.travelTimeMinutes)||0)} travel time, ${c.travelDelays} travel delays`);
   out+='\n\nCUMULATIVE TRAVEL DELAY RANKINGS\n';
@@ -3383,7 +3429,7 @@ function downloadWeeklyOperationsEml(){
 function downloadWeeklyOperationsCsv(){
   if(!reportDates().length){alert('Select at least one saved report day first.');return;}
   const w=weeklyOperationsData();
-  const rows=[['Rank','Crew','People','Completed','Cancelled','Actual Hours','Budget Hours','Variance','Efficiency %','Effective Work Hours','Effective Man Hours','Travel Time Minutes','Travel Delays','Travel Delay Minutes']];
+  const rows=[['Rank','Crew','People','Completed','Cancelled','Actual Hours','Budget Hours','Variance','Efficiency %','Effective Work Hours','Effective Man Hours','Actual Between-Job Minutes','Travel Delays','Travel Delay Minutes']];
   w.crews.forEach(c=>rows.push([c.rank,c.name,c.people,c.completed,c.cancelled,+c.actual.toFixed(1),+c.budget.toFixed(1),+c.variance.toFixed(1),+c.efficiency.toFixed(1),+c.effectiveWorkHours.toFixed(2),+c.effectiveManHours.toFixed(2),+c.travelTimeMinutes.toFixed(1),c.travelDelays,c.travelDelayMinutes]));
   rows.push([]);
   rows.push(['Report Total',w.totals.completed,w.totals.cancelled,+w.totals.actual.toFixed(1),+w.totals.budget.toFixed(1),+w.totals.variance.toFixed(1),+w.totals.efficiency.toFixed(1),w.totals.travelDelays,w.totals.travelDelayMinutes]);
