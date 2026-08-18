@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.28</title>
+<title>VIP Crew Efficiency & Travel Report v3.29</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -200,10 +200,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.28</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.29</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.28</div>
+    <div class="version">Version 3.29</div>
   </div>
 
   <div class="input-grid">
@@ -997,6 +997,16 @@ function canonicalCrewName(name){
     .map(canonicalEmployeeName);
   return parts.join('/');
 }
+
+function crewIdentityKey(name){
+  return String(name||'')
+    .split('/')
+    .map(cleanCrewToken)
+    .map(canonicalEmployeeName)
+    .map(normalizePersonName)
+    .filter(Boolean)
+    .join('/');
+}
 function driverKey(name){
   return normalizePersonName(canonicalEmployeeName(name));
 }
@@ -1752,43 +1762,87 @@ function operationSnapshot(report){
   };
 }
 function ensureDayOperations(day){
-  const needsTaskRefresh=day.operations && (
-    (day.operations.crews||[]).some(c=>(c.jobs||[]).some(j=>!j.task || (j.jobType==='Other' && !j.left && !j.raw))) ||
-    (day.operations.crews||[]).some(c=>c.people==null || c.effectiveWorkHours==null || c.effectiveManHours==null || c.travelTimeMinutes==null) ||
-    day.operations.people==null || day.operations.jobsPerPerson==null || day.operations.travelTimeMinutes==null
-  );
-  if(day.operations && !needsTaskRefresh) return day.operations;
+  // The raw saved schedule is the source of truth for:
+  // - employee counts
+  // - job/task detail
+  // - effective work hours
+  // - effective man hours
+  // - actual between-job clock time
+  //
+  // Always rebuild these when rawText exists so older cached snapshots
+  // cannot leave stale 0-minute travel-time values behind.
   if(day.rawText){
     try{
       const parsed=parseReport(day.rawText);
       const rebuilt=operationSnapshot(parsed);
-      // Preserve already-calculated travel-delay totals from the saved snapshot.
+
+      // Travel-delay findings depend on the routed efficiency calculation,
+      // so preserve those from the previously saved snapshot when available.
       if(day.operations){
-        const oldByName=new Map((day.operations.crews||[]).map(c=>[canonicalCrewName(c.name)||c.name,c]));
-        rebuilt.crews.forEach(c=>{
-          const old=oldByName.get(canonicalCrewName(c.name)||c.name);
-          if(old){
-            c.travelDelays=Number(old.travelDelays)||0;
-            c.travelDelayMinutes=Number(old.travelDelayMinutes)||0;
-            c.travelTimeMinutes=savedOperationsClockGapMinutes(c);
+        const oldByCrew=new Map();
+        (day.operations.crews||[]).forEach(c=>{
+          const key=crewIdentityKey(c.name);
+          if(!key) return;
+          if(!oldByCrew.has(key)){
+            oldByCrew.set(key,{
+              travelDelays:Number(c.travelDelays)||0,
+              travelDelayMinutes:Number(c.travelDelayMinutes)||0
+            });
           }else{
-            c.travelTimeMinutes=savedOperationsClockGapMinutes(c);
+            const old=oldByCrew.get(key);
+            old.travelDelays+=Number(c.travelDelays)||0;
+            old.travelDelayMinutes+=Number(c.travelDelayMinutes)||0;
           }
         });
-        rebuilt.travelDelays=rebuilt.crews.reduce((s,c)=>s+c.travelDelays,0);
-        rebuilt.travelDelayMinutes=rebuilt.crews.reduce((s,c)=>s+c.travelDelayMinutes,0);
-        rebuilt.travelTimeMinutes=rebuilt.crews.reduce((s,c)=>s+(Number(c.travelTimeMinutes)||0),0);
-      }else{
-        rebuilt.crews.forEach(c=>{ c.travelTimeMinutes=savedOperationsClockGapMinutes(c); });
-        rebuilt.travelTimeMinutes=rebuilt.crews.reduce((s,c)=>s+(Number(c.travelTimeMinutes)||0),0);
+
+        rebuilt.crews.forEach(c=>{
+          const old=oldByCrew.get(crewIdentityKey(c.name));
+          if(old){
+            c.travelDelays=old.travelDelays;
+            c.travelDelayMinutes=old.travelDelayMinutes;
+          }
+          // DO NOT preserve travelTimeMinutes.
+          // operationSnapshot() just recalculated it from actual clocks.
+        });
+
+        rebuilt.travelDelays=rebuilt.crews.reduce((s,c)=>s+(Number(c.travelDelays)||0),0);
+        rebuilt.travelDelayMinutes=rebuilt.crews.reduce((s,c)=>s+(Number(c.travelDelayMinutes)||0),0);
       }
+
+      // Always recalculate these totals from rebuilt crews.
+      rebuilt.travelTimeMinutes=rebuilt.crews.reduce((s,c)=>s+(Number(c.travelTimeMinutes)||0),0);
+      rebuilt.effectiveWorkHours=rebuilt.crews.reduce((s,c)=>s+(Number(c.effectiveWorkHours)||0),0);
+      rebuilt.effectiveManHours=rebuilt.crews.reduce((s,c)=>s+(Number(c.effectiveManHours)||0),0);
+
       day.operations=rebuilt;
-      localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
-      return day.operations;
+
+      // Persist the repaired snapshot back into the saved day.
+      if(day.date && mileageHistory[day.date]){
+        mileageHistory[day.date].operations=rebuilt;
+        localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
+      }
+
+      return rebuilt;
     }catch(e){}
   }
-  if(day.operations) return day.operations;
-  return {people:0,jobsPerPerson:0,completed:0,cancelled:0,actual:0,budget:0,efficiency:0,travelDelays:0,travelDelayMinutes:0,travelTimeMinutes:0,effectiveWorkHours:0,effectiveManHours:0,crews:[]};
+
+  // For very old records without rawText, repair actual between-job time
+  // directly from the stored job clock fields if possible.
+  if(day.operations){
+    (day.operations.crews||[]).forEach(c=>{
+      c.travelTimeMinutes=savedOperationsClockGapMinutes(c);
+      if(c.people==null) c.people=crewPersonCount(c.name);
+    });
+    day.operations.travelTimeMinutes=(day.operations.crews||[])
+      .reduce((s,c)=>s+(Number(c.travelTimeMinutes)||0),0);
+    return day.operations;
+  }
+
+  return {
+    people:0,jobsPerPerson:0,completed:0,cancelled:0,actual:0,budget:0,
+    efficiency:0,travelDelays:0,travelDelayMinutes:0,travelTimeMinutes:0,
+    effectiveWorkHours:0,effectiveManHours:0,crews:[]
+  };
 }
 
 let zipLibraryPromise=null;
@@ -1812,7 +1866,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.28',
+    appVersion:'3.29',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -3217,10 +3271,11 @@ function weeklyOperationsData(){
   const crewMap=new Map();
   days.forEach(day=>(day.operations.crews||[]).forEach(c=>{
     const crewName=canonicalCrewName(c.name) || c.name;
-    if(!crewMap.has(crewName)){
-      crewMap.set(crewName,{name:crewName,byDate:{},completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0,travelTimeMinutes:0,effectiveWorkHours:0,effectiveManHours:0,jobs:[]});
+    const crewKey=crewIdentityKey(crewName);
+    if(!crewMap.has(crewKey)){
+      crewMap.set(crewKey,{name:crewName,byDate:{},completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0,travelTimeMinutes:0,effectiveWorkHours:0,effectiveManHours:0,jobs:[]});
     }
-    const row=crewMap.get(crewName);
+    const row=crewMap.get(crewKey);
     const existing=row.byDate[day.date]||{completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0,travelTimeMinutes:0};
     row.byDate[day.date]={
       ...existing,
@@ -3242,7 +3297,7 @@ function weeklyOperationsData(){
     row.travelTimeMinutes+=Number(c.travelTimeMinutes)||0;
     row.effectiveWorkHours+=Number(c.effectiveWorkHours)||0;
     row.effectiveManHours+=Number(c.effectiveManHours)||0;
-    (c.jobs||[]).forEach(j=>row.jobs.push({...j,date:day.date,weekday:day.weekday,crew:crewName}));
+    (c.jobs||[]).forEach(j=>row.jobs.push({...j,date:day.date,weekday:day.weekday,crew:row.name}));
   }));
   const crews=[...crewMap.values()].map(c=>({
     ...c,
