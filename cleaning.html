@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.33</title>
+<title>VIP Crew Efficiency & Travel Report v3.34</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -211,10 +211,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.33</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.34</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.33</div>
+    <div class="version">Version 3.34</div>
   </div>
 
   <div class="input-grid">
@@ -627,6 +627,7 @@ function loadLocalData(){
   try { employeeAliases = JSON.parse(localStorage.getItem(STORAGE_KEYS.employeeAliases) || '{}') || {}; } catch(e) { employeeAliases = {}; }
   try { referenceUploads = JSON.parse(localStorage.getItem(STORAGE_KEYS.referenceUploads) || '{}') || {}; } catch(e) { referenceUploads = {}; }
   referenceUploads={subdivisions:String(referenceUploads.subdivisions||''),floorplans:String(referenceUploads.floorplans||'')};
+  compactExistingMileageHistoryStorage();
   try {
     const settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || '{}');
     ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id => {
@@ -1846,7 +1847,7 @@ function ensureDayOperations(day){
       day.operations=rebuilt;
       if(day.date && mileageHistory[day.date]){
         mileageHistory[day.date].operations=rebuilt;
-        localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
+        persistMileageHistory({showAlert:false});
       }
       return rebuilt;
     }catch(e){}
@@ -1885,7 +1886,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.33',
+    appVersion:'3.34',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -2121,7 +2122,7 @@ async function importSavedDataBackup(file){
     floorplans:String(importedReferenceUploads?.floorplans||'')
   };
 
-  localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
+  persistMileageHistory({showAlert:true});
   localStorage.setItem(STORAGE_KEYS.employeeAliases,JSON.stringify(employeeAliases));
   localStorage.setItem(STORAGE_KEYS.knownEmployees,JSON.stringify(knownEmployees));
   localStorage.setItem(STORAGE_KEYS.driverProfiles,JSON.stringify(driverProfiles));
@@ -2171,11 +2172,80 @@ function initializeMileageDates(){
   if($('#mileageWeekStart')&&!$('#mileageWeekStart').value) $('#mileageWeekStart').value=mondayOf($('#operationDate')?.value);
 }
 
+function compactOperationsForStorage(operations){
+  if(!operations || typeof operations!=='object') return null;
+  return {
+    travelDelays:Number(operations.travelDelays)||0,
+    travelDelayMinutes:Number(operations.travelDelayMinutes)||0,
+    crews:Array.isArray(operations.crews)
+      ? operations.crews.map(c=>({
+          name:String(c?.name||''),
+          travelDelays:Number(c?.travelDelays)||0,
+          travelDelayMinutes:Number(c?.travelDelayMinutes)||0
+        }))
+      : []
+  };
+}
+
+function compactSavedDayForStorage(day){
+  if(!day || typeof day!=='object') return day;
+
+  // Newer saved days always keep rawText. That lets Operations rebuild job,
+  // people, budget, actual, and effective-hour detail when a report is opened,
+  // so storing the same job objects again inside operations wastes a large
+  // amount of localStorage space.
+  if(String(day.rawText||'').trim()){
+    const compact={...day};
+    compact.operations=compactOperationsForStorage(day.operations);
+
+    // Driver mileage is derived from the saved crew route payload + the current
+    // driver list. Keeping another full per-driver route copy duplicates data.
+    delete compact.driverMileage;
+    return compact;
+  }
+
+  // Preserve old records that do not have rawText because they cannot rebuild
+  // their operations detail later.
+  return day;
+}
+
+function mileageHistoryForStorage(){
+  const compact={};
+  Object.keys(mileageHistory||{}).forEach(date=>{
+    compact[date]=compactSavedDayForStorage(mileageHistory[date]);
+  });
+  return compact;
+}
+
+function persistMileageHistory(options={}){
+  const showAlert=!!options.showAlert;
+  try{
+    const payload=JSON.stringify(mileageHistoryForStorage());
+    localStorage.setItem(STORAGE_KEYS.mileageHistory,payload);
+    return {ok:true,bytes:payload.length*2};
+  }catch(e){
+    const quota=(e && (e.name==='QuotaExceededError' || e.name==='NS_ERROR_DOM_QUOTA_REACHED'));
+    console.error('Could not save mileage history:',e);
+    if(showAlert){
+      alert(quota
+        ? 'Browser storage is full. This day was NOT permanently saved. Export a backup before removing anything.\n\nThe new compact storage format could not free enough space.'
+        : `The saved-day history could not be written to browser storage. This day was NOT permanently saved.\n\n${e?.message||e}`);
+    }
+    return {ok:false,error:e};
+  }
+}
+
+function compactExistingMileageHistoryStorage(){
+  // Rewrites older bloated history using the compact representation. This is
+  // safe because mileageHistory remains fully loaded in memory for this page.
+  try{return persistMileageHistory({showAlert:false});}catch(e){return {ok:false,error:e};}
+}
+
 function savedDaysDebugReport(){
   const lines=[];
   const now=new Date().toLocaleString();
 
-  lines.push(`VIP Saved Days Debug — v3.33`);
+  lines.push(`VIP Saved Days Debug — v3.34`);
   lines.push(`Generated: ${now}`);
   lines.push('');
 
@@ -2203,6 +2273,8 @@ function savedDaysDebugReport(){
   lines.push('');
   lines.push(`localStorage mileageHistory count: ${storageKeys.length}`);
   lines.push(`localStorage keys: ${storageKeys.join(', ') || '(none)'}`);
+  lines.push(`localStorage mileageHistory size: ${Math.round(raw.length*2/1024)} KB`);
+  try{const compactJson=JSON.stringify(mileageHistoryForStorage());lines.push(`Compact in-memory history size: ${Math.round(compactJson.length*2/1024)} KB`);}catch(e){}
   lines.push('');
 
   const body=$('#savedMileageDaysTable');
@@ -2301,20 +2373,13 @@ async function copySavedDaysDebug(){
   }
 }
 
-function saveMileageHistory(){
-  localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
+function saveMileageHistory(options={}){
+  const result=persistMileageHistory({showAlert:!!options.showAlert});
 
-  try{
-    renderSavedMileageDays();
-  }catch(e){
-    console.error('Saved Days refresh failed:',e);
-  }
+  try{renderSavedMileageDays();}catch(e){console.error('Saved Days refresh failed:',e);}
+  try{renderReportDayChoices();}catch(e){console.error('Report Days refresh failed:',e);}
 
-  try{
-    renderReportDayChoices();
-  }catch(e){
-    console.error('Report Days refresh failed:',e);
-  }
+  return result.ok;
 }
 function drivingRouteKey(a,b){
   return `${a.lat.toFixed(5)},${a.lon.toFixed(5)}>${b.lat.toFixed(5)},${b.lon.toFixed(5)}`;
@@ -2552,7 +2617,7 @@ async function repairSavedMileageDayIfNeeded(date){
   // Preserve any older operations snapshot if it was richer.
   if(stored.operations) repaired.operations=stored.operations;
   mileageHistory[date]=repaired;
-  localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
+  persistMileageHistory({showAlert:false});
   return true;
 }
 async function repairSelectedMileageDays(){
@@ -3815,26 +3880,30 @@ async function saveCurrentMileageDay(){
   if(!date){alert('Select the date of operation.');return;}
   if(mileageHistory[date]&&!confirm(`Replace the saved mileage for ${shortDateLabel(date)}?`)) return;
 
+  const previous=mileageHistory[date];
   mileageHistory[date]=mileageSnapshot(currentReport,date,$('#pasteBox').value);
   $('#mileageWeekStart').value=mondayOf(date);
 
-  saveMileageHistory();
+  const saved=saveMileageHistory({showAlert:true});
+  if(!saved){
+    if(previous) mileageHistory[date]=previous;
+    else delete mileageHistory[date];
+    renderSavedMileageDays();
+    renderReportDayChoices();
+    return;
+  }
 
-  // Explicitly refresh these after the week control changes as well.
-  try{renderSavedMileageDays();}catch(e){console.error(e);}
-  try{renderReportDayChoices();}catch(e){console.error(e);}
   renderDailyDriverOverrides();
-
   alert(`Mileage for ${shortDateLabel(date)} was saved in this browser.`);
 }
 async function importMileageFiles(files){
   const list=[...files].slice(0,5);if(!list.length)return;
   const start=$('#mileageWeekStart').value||mondayOf();$('#mileageWeekStart').value=start;let saved=0;
   for(let i=0;i<list.length;i++){const text=await list[i].text(),report=parseReport(text);if(!report.crews.length)continue;$('#savedMileageStatus').textContent=`Calculating imported day ${i+1} of ${list.length}…`;await calculateMileageRoutes(report);const date=addDaysIso(start,i);mileageHistory[date]=mileageSnapshot(report,date,text);saved++;}
-  saveMileageHistory();
+  const persisted=saveMileageHistory({showAlert:true});
   try{renderSavedMileageDays();}catch(e){console.error(e);}
   try{renderReportDayChoices();}catch(e){console.error(e);}
-  alert(`${saved} daily mileage report${saved===1?' was':'s were'} imported and saved for the selected Monday–Friday week.`);
+  if(persisted) alert(`${saved} daily mileage report${saved===1?' was':'s were'} imported and saved for the selected Monday–Friday week.`);
 }
 function previewOutlookToolbarHtml(){
   return `
