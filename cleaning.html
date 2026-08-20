@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.37</title>
+<title>VIP Crew Efficiency & Travel Report v3.38</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -217,10 +217,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.37</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.38</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.37</div>
+    <div class="version">Version 3.38</div>
   </div>
 
   <div class="input-grid">
@@ -2385,7 +2385,7 @@ function savedDaysDebugReport(){
   const lines=[];
   const now=new Date().toLocaleString();
 
-  lines.push(`VIP Saved Days Debug — v3.37`);
+  lines.push(`VIP Saved Days Debug — v3.38`);
   lines.push(`Generated: ${now}`);
   lines.push('');
 
@@ -3734,28 +3734,122 @@ function analyticsReportShell(title,subtitle,body,extraToolbar='',headExtra=''){
 }
 function analyticsPreviewToolbarHtml(extra=''){
   return `<div style="font-family:Segoe UI,Arial,sans-serif;max-width:1700px;margin:12px auto 0;padding:0 20px;display:flex;gap:10px;flex-wrap:wrap">
-    <button type="button" onclick="copyAnalyticsReportForOutlook()" style="background:#1f4e78;color:#fff;border:0;border-radius:5px;padding:10px 16px;font-weight:700;cursor:pointer">Copy for Outlook</button>
+    <button type="button" id="copyAnalyticsOutlookBtn" onclick="copyAnalyticsReportForOutlook()" style="background:#1f4e78;color:#fff;border:0;border-radius:5px;padding:10px 16px;font-weight:700;cursor:pointer">Copy for Outlook</button>
     ${extra}
   </div>
   <script>
-  function copyAnalyticsReportForOutlook(){
+  async function captureAreaMapDataUrl(){
+    var visual=document.getElementById('areaMapVisual');
+    if(!visual || !window.html2canvas) return '';
+    try{
+      var canvas=await html2canvas(visual,{
+        useCORS:true,
+        allowTaint:false,
+        backgroundColor:'#ffffff',
+        scale:1.35,
+        logging:false,
+        onclone:function(doc){
+          doc.querySelectorAll('.leaflet-control-zoom').forEach(function(el){el.style.display='none';});
+        }
+      });
+      return canvas.toDataURL('image/png');
+    }catch(e){
+      console.error('Map snapshot failed',e);
+      return '';
+    }
+  }
+
+  async function copyAnalyticsReportForOutlook(){
     var node=document.getElementById('reportContent');
     if(!node){alert('Report content was not found.');return;}
-    var range=document.createRange();range.selectNodeContents(node);
-    var sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
-    var ok=false;try{ok=document.execCommand('copy');}catch(e){}
-    sel.removeAllRanges();
-    alert(ok?'Formatted report copied. Paste it into Outlook.':'Copy was blocked by the browser. Select the report and copy it manually.');
-  }
-  async function copyAnalyticsMapImage(){
-    var img=document.getElementById('areaMapImage');
-    if(!img){alert('Map image was not found.');return;}
+
+    var btn=document.getElementById('copyAnalyticsOutlookBtn');
+    var oldText=btn?btn.textContent:'';
+    if(btn){btn.textContent='Preparing Outlook Copy...';btn.disabled=true;}
+
     try{
-      var res=await fetch(img.src);var blob=await res.blob();
-      await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-      alert('Map image copied.');
+      var clone=node.cloneNode(true);
+      clone.querySelectorAll('script').forEach(function(el){el.remove();});
+
+      var liveMap=document.getElementById('areaMapCapture');
+      var clonedMap=clone.querySelector('#areaMapCapture');
+      if(liveMap && clonedMap){
+        var mapDataUrl=await captureAreaMapDataUrl();
+        if(mapDataUrl){
+          var metric=document.getElementById('areaMapMetric');
+          var builder=document.getElementById('areaMapBuilder');
+          var task=document.getElementById('areaMapTask');
+          var filters=[];
+          if(metric && metric.options[metric.selectedIndex]) filters.push('Metric: '+metric.options[metric.selectedIndex].text);
+          if(builder && builder.value && builder.options[builder.selectedIndex]) filters.push('Builder: '+builder.options[builder.selectedIndex].text);
+          if(task && task.value && task.options[task.selectedIndex]) filters.push('Task: '+task.options[task.selectedIndex].text);
+
+          var replacement=document.createElement('div');
+          replacement.style.cssText='margin-top:8px;border:1px solid #d9e2f3;background:#ffffff;padding:10px;';
+          if(filters.length){
+            var note=document.createElement('div');
+            note.style.cssText='font-family:Segoe UI,Arial,sans-serif;font-size:12px;color:#555;margin-bottom:8px;';
+            note.textContent=filters.join('  |  ');
+            replacement.appendChild(note);
+          }
+          var img=document.createElement('img');
+          img.src=mapDataUrl;
+          img.alt='Subdivision activity map';
+          img.style.cssText='display:block;width:100%;max-width:1500px;height:auto;border:0;';
+          replacement.appendChild(img);
+          clonedMap.replaceWith(replacement);
+        }else{
+          clonedMap.querySelectorAll('button,select,label').forEach(function(el){el.remove();});
+          var leaflet=clonedMap.querySelector('#areaLeafletMap');
+          if(leaflet) leaflet.innerHTML='<div style="padding:18px;color:#666;border:1px solid #d9e2f3">Interactive map could not be captured. Open the report preview to view the map.</div>';
+        }
+      }
+
+      clone.querySelectorAll('button,select,input').forEach(function(el){el.remove();});
+      clone.querySelectorAll('[id]').forEach(function(el){el.removeAttribute('id');});
+
+      var wrapper=document.createElement('div');
+      wrapper.appendChild(clone);
+      var html=wrapper.innerHTML;
+      var plain=(clone.innerText||clone.textContent||'').trim();
+
+      if(navigator.clipboard && window.ClipboardItem){
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/html':new Blob([html],{type:'text/html'}),
+            'text/plain':new Blob([plain],{type:'text/plain'})
+          })
+        ]);
+        alert('Full report copied with the map. Paste it into Outlook.');
+        return;
+      }
+
+      var temp=document.createElement('div');
+      temp.style.cssText='position:fixed;left:-10000px;top:0;width:1600px;background:#fff;';
+      temp.appendChild(clone);
+      document.body.appendChild(temp);
+      var range=document.createRange();range.selectNodeContents(temp);
+      var sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
+      var ok=false;try{ok=document.execCommand('copy');}catch(e){}
+      sel.removeAllRanges();temp.remove();
+      alert(ok?'Full report copied with the map. Paste it into Outlook.':'Copy was blocked by the browser.');
     }catch(e){
-      alert('Direct image copy was blocked. Right-click the map and choose Copy Image instead.');
+      console.error(e);
+      alert('The Outlook copy could not be prepared. '+(e&&e.message?e.message:e));
+    }finally{
+      if(btn){btn.textContent=oldText;btn.disabled=false;}
+    }
+  }
+
+  async function copyAnalyticsMapImage(){
+    var dataUrl=await captureAreaMapDataUrl();
+    if(!dataUrl){alert('Map image could not be prepared yet. Try again in a moment.');return;}
+    try{
+      var res=await fetch(dataUrl);var blob=await res.blob();
+      await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+      alert('Clean map image copied. Paste it into Outlook.');
+    }catch(e){
+      alert('Direct image copy was blocked by the browser.');
     }
   }
   <\/script>`;
@@ -4129,7 +4223,7 @@ function areaLeafletMapSection(rows,taskNames=[]){
       <button id="areaMapCopyBtn" type="button" style="padding:9px 14px;border:0;border-radius:5px;background:#1f4e78;color:#fff;font-weight:700;cursor:pointer">Copy Map Image</button>
     </div>
     <div style="font-size:12px;color:#666;margin-bottom:10px">OpenStreetMap basemap. Bubbles cluster automatically in dense areas; zoom in or click a cluster to separate nearby subdivisions. Bubble size follows the selected metric.</div>
-    <div style="display:grid;grid-template-columns:minmax(650px,1fr) 390px;gap:16px;align-items:start">
+    <div id="areaMapVisual" style="display:grid;grid-template-columns:minmax(650px,1fr) 390px;gap:16px;align-items:start;background:#ffffff">
       <div id="areaLeafletMap" style="height:720px;border:1px solid #d9e2f3;background:#eef3f8"></div>
       <div style="border:1px solid #d9e2f3;background:#ffffff;padding:14px 16px;max-height:720px;overflow:auto">
         <div style="font-size:18px;font-weight:700;color:#1f4e78" id="areaMapLegendTitle">Top Areas</div>
@@ -4215,18 +4309,10 @@ function areaLeafletMapSection(rows,taskNames=[]){
       taskSelect.addEventListener('change',update);
       resetBtn.addEventListener('click',function(){metricSelect.value='totalLaborHours';builderSelect.value='';taskSelect.value='';update();});
       copyBtn.addEventListener('click',async function(){
-        var capture=document.getElementById('areaMapCapture');
-        if(!capture || !window.html2canvas){alert('Map capture library is still loading. Try again in a moment.');return;}
+        if(!window.copyAnalyticsMapImage){alert('Map copy is still loading. Try again in a moment.');return;}
         var old=copyBtn.textContent;copyBtn.textContent='Preparing Map...';copyBtn.disabled=true;
-        try{
-          var canvas=await html2canvas(capture,{useCORS:true,allowTaint:false,backgroundColor:'#ffffff',scale:1.5,logging:false});
-          var blob=await new Promise(function(resolve){canvas.toBlob(resolve,'image/png');});
-          if(!blob)throw new Error('Map image could not be created');
-          await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-          alert('Map image copied. Paste it into Outlook.');
-        }catch(e){
-          alert('The browser blocked direct map copying. You can still use the normal screenshot/copy-image tools.');
-        }finally{copyBtn.textContent=old;copyBtn.disabled=false;}
+        try{await window.copyAnalyticsMapImage();}
+        finally{copyBtn.textContent=old;copyBtn.disabled=false;}
       });
 
       update();
