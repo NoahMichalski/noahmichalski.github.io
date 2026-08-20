@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.30</title>
+<title>VIP Crew Efficiency & Travel Report v3.31</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -200,10 +200,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.30</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.31</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.30</div>
+    <div class="version">Version 3.31</div>
   </div>
 
   <div class="input-grid">
@@ -1840,7 +1840,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.30',
+    appVersion:'3.31',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -2127,8 +2127,18 @@ function initializeMileageDates(){
 }
 function saveMileageHistory(){
   localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
-  renderSavedMileageDays();
-  renderReportDayChoices();
+
+  try{
+    renderSavedMileageDays();
+  }catch(e){
+    console.error('Saved Days refresh failed:',e);
+  }
+
+  try{
+    renderReportDayChoices();
+  }catch(e){
+    console.error('Report Days refresh failed:',e);
+  }
 }
 function drivingRouteKey(a,b){
   return `${a.lat.toFixed(5)},${a.lon.toFixed(5)}>${b.lat.toFixed(5)},${b.lon.toFixed(5)}`;
@@ -2219,28 +2229,65 @@ function mileageSnapshot(report,date,rawText=''){
 function renderSavedMileageDays(){
   const body=$('#savedMileageDaysTable');
   if(!body) return;
-  // The localStorage key is the canonical saved date. Older/imported records can
-  // contain a stale internal day.date, which made a newly saved day selectable
-  // but invisible from this list.
-  const entries=Object.entries(mileageHistory)
-    .map(([date,day])=>({date,day:day||{}}))
+
+  // The object key is always the authoritative saved date.
+  const entries=Object.keys(mileageHistory||{})
+    .map(date=>({date,day:mileageHistory[date]||{}}))
     .sort((a,b)=>b.date.localeCompare(a.date));
-  $('#savedMileageStatus').textContent=`${entries.length} saved day${entries.length===1?'':'s'} in this browser`;
+
+  if($('#savedMileageStatus')){
+    $('#savedMileageStatus').textContent=
+      `${entries.length} saved day${entries.length===1?'':'s'} in this browser`;
+  }
+
   body.innerHTML='';
+
   if(!entries.length){
     body.innerHTML='<tr><td colspan="6" class="muted">No mileage days saved yet.</td></tr>';
     return;
   }
+
   entries.forEach(entry=>{
     const date=entry.date;
     const day={...entry.day,date};
+
+    let miles=0;
+    let missing=0;
+    let crewCount=0;
+
+    try{
+      const drivers=rebuildDriverMileageFromSavedDay(date,day);
+      miles=drivers.reduce((s,d)=>s+(Number(d.miles)||0),0);
+      missing=drivers.reduce((s,d)=>s+(Number(d.missingRoutes)||0),0);
+
+      // Keep the Saved Days "Crews" count based on the saved schedule,
+      // not on how many mileage drivers happened to be reconstructed.
+      crewCount=Array.isArray(day.operations?.crews)
+        ? day.operations.crews.length
+        : (Array.isArray(day.crews)?day.crews.length:0);
+    }catch(e){
+      console.warn(`Could not rebuild mileage summary for ${date}:`,e);
+
+      // Never let one saved day disappear from the list.
+      // Fall back to the values already stored in that day's snapshot.
+      miles=Number(day.totalMiles)||0;
+      missing=Number(day.missingRoutes)||0;
+      crewCount=Array.isArray(day.operations?.crews)
+        ? day.operations.crews.length
+        : (Array.isArray(day.crews)?day.crews.length:0);
+    }
+
     const tr=document.createElement('tr');
-    const drivers=rebuildDriverMileageFromSavedDay(date,day);
-    const miles=drivers.reduce((s,d)=>s+(Number(d.miles)||0),0);
-    const missing=drivers.reduce((s,d)=>s+(Number(d.missingRoutes)||0),0);
-    tr.innerHTML=`<td><strong>${esc(shortDateLabel(date))}</strong></td><td>${esc(day.weekday||dayLabel(date))}</td><td>${drivers.length}</td><td><strong>${fmt(miles)} mi</strong></td><td>${missing}</td><td><button class="delete-mileage-day" data-date="${esc(date)}">Remove</button></td>`;
+    tr.innerHTML=`
+      <td><strong>${esc(shortDateLabel(date))}</strong></td>
+      <td>${esc(day.weekday||dayLabel(date))}</td>
+      <td>${crewCount}</td>
+      <td><strong>${fmt(miles)} mi</strong></td>
+      <td>${missing}</td>
+      <td><button class="delete-mileage-day" data-date="${esc(date)}">Remove</button></td>`;
     body.appendChild(tr);
   });
+
   body.querySelectorAll('.delete-mileage-day').forEach(btn=>btn.addEventListener('click',()=>{
     if(confirm(`Remove saved mileage for ${shortDateLabel(btn.dataset.date)}?`)){
       delete mileageHistory[btn.dataset.date];
@@ -3599,15 +3646,30 @@ async function downloadWeeklyMileageCsv(){
 async function saveCurrentMileageDay(){
   if(!currentReport){alert('Analyze a report first.');return;}
   if(!currentReport.mileageCalculationComplete){alert('Mileage routes are still calculating.');return;}
-  const date=$('#operationDate').value;if(!date){alert('Select the date of operation.');return;}
+  const date=$('#operationDate').value;
+  if(!date){alert('Select the date of operation.');return;}
   if(mileageHistory[date]&&!confirm(`Replace the saved mileage for ${shortDateLabel(date)}?`)) return;
-  mileageHistory[date]=mileageSnapshot(currentReport,date,$('#pasteBox').value);saveMileageHistory();$('#mileageWeekStart').value=mondayOf(date);renderDailyDriverOverrides();alert(`Mileage for ${shortDateLabel(date)} was saved in this browser.`);
+
+  mileageHistory[date]=mileageSnapshot(currentReport,date,$('#pasteBox').value);
+  $('#mileageWeekStart').value=mondayOf(date);
+
+  saveMileageHistory();
+
+  // Explicitly refresh these after the week control changes as well.
+  try{renderSavedMileageDays();}catch(e){console.error(e);}
+  try{renderReportDayChoices();}catch(e){console.error(e);}
+  renderDailyDriverOverrides();
+
+  alert(`Mileage for ${shortDateLabel(date)} was saved in this browser.`);
 }
 async function importMileageFiles(files){
   const list=[...files].slice(0,5);if(!list.length)return;
   const start=$('#mileageWeekStart').value||mondayOf();$('#mileageWeekStart').value=start;let saved=0;
   for(let i=0;i<list.length;i++){const text=await list[i].text(),report=parseReport(text);if(!report.crews.length)continue;$('#savedMileageStatus').textContent=`Calculating imported day ${i+1} of ${list.length}…`;await calculateMileageRoutes(report);const date=addDaysIso(start,i);mileageHistory[date]=mileageSnapshot(report,date,text);saved++;}
-  saveMileageHistory();alert(`${saved} daily mileage report${saved===1?' was':'s were'} imported and saved for the selected Monday–Friday week.`);
+  saveMileageHistory();
+  try{renderSavedMileageDays();}catch(e){console.error(e);}
+  try{renderReportDayChoices();}catch(e){console.error(e);}
+  alert(`${saved} daily mileage report${saved===1?' was':'s were'} imported and saved for the selected Monday–Friday week.`);
 }
 function previewOutlookToolbarHtml(){
   return `
