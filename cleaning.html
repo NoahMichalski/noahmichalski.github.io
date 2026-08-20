@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.34</title>
+<title>VIP Crew Efficiency & Travel Report v3.35</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -211,10 +211,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.34</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.35</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.34</div>
+    <div class="version">Version 3.35</div>
   </div>
 
   <div class="input-grid">
@@ -466,6 +466,73 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
             <div id="currentCrewMileageButtons" class="buttons"></div>
           </div>
         </div>
+  </section>
+
+  <section class="panel report-workspace" style="margin-top:18px">
+    <div class="section-head" style="margin-bottom:10px">
+      <h2>Analytics Reports</h2>
+      <span class="muted small">Each report uses only the Report Days selected above.</span>
+    </div>
+
+    <details id="floorplanPerformancePanel" style="margin-top:14px" open>
+      <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
+        Floorplan Performance Report
+      </summary>
+      <div style="padding-top:14px">
+        <div class="notice">
+          Tracks average actual man-hours per clean by floorplan, then separates the same floorplan by subdivision. Only Original, Reclean, and Windows are included. Rewash Windows is excluded.
+        </div>
+        <div class="buttons">
+          <button id="previewFloorplanPerformanceBtn" class="primary">Preview Floorplan Report</button>
+          <button id="downloadFloorplanPerformanceCsvBtn">Export Floorplan CSV</button>
+        </div>
+      </div>
+    </details>
+
+    <details id="cancellationAnalyticsPanel" style="margin-top:14px" open>
+      <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
+        Cancellation Report
+      </summary>
+      <div style="padding-top:14px">
+        <div class="notice">
+          Shows where cancellations are coming from by builder and subdivision, including cancellation counts and rates.
+        </div>
+        <div class="buttons">
+          <button id="previewCancellationAnalyticsBtn" class="primary">Preview Cancellation Report</button>
+          <button id="downloadCancellationAnalyticsCsvBtn">Export Cancellation CSV</button>
+        </div>
+      </div>
+    </details>
+
+    <details id="travelAreaAnalyticsPanel" style="margin-top:14px" open>
+      <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
+        Travel & Hot Areas Report
+      </summary>
+      <div style="padding-top:14px">
+        <div class="notice">
+          Shows where crews are driving the most, total drive time, drive man-hours, high-activity areas, low-activity areas, and a copyable subdivision activity map.
+        </div>
+        <div class="buttons">
+          <button id="previewTravelAreaAnalyticsBtn" class="primary">Preview Travel & Hot Areas</button>
+          <button id="downloadTravelAreaAnalyticsCsvBtn">Export Travel Areas CSV</button>
+        </div>
+      </div>
+    </details>
+
+    <details id="manHourAnalyticsPanel" style="margin-top:14px" open>
+      <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
+        Man-Hour Report
+      </summary>
+      <div style="padding-top:14px">
+        <div class="notice">
+          Ranks subdivisions and builders by cleaning man-hours, including highest workload, lowest workload, average man-hours per completed job, budget, and efficiency.
+        </div>
+        <div class="buttons">
+          <button id="previewManHourAnalyticsBtn" class="primary">Preview Man-Hour Report</button>
+          <button id="downloadManHourAnalyticsCsvBtn">Export Man-Hour CSV</button>
+        </div>
+      </div>
+    </details>
   </section>
 
   <div id="results" class="hidden">
@@ -777,6 +844,10 @@ function crewTotalDriveMinutes(crew){
     }
     return sum;
   },0);
+}
+function crewDriveManHours(crew,minutes=null){
+  const driveMinutes=minutes==null?crewTotalDriveMinutes(crew):Number(minutes)||0;
+  return (driveMinutes/60)*crewPersonCount(crew?.name||crew);
 }
 function formatDriveMinutes(minutes){
   const total=Math.round(Number(minutes)||0);
@@ -1860,7 +1931,7 @@ function ensureDayOperations(day){
 
   return {
     people:0,jobsPerPerson:0,completed:0,cancelled:0,actual:0,budget:0,
-    efficiency:0,travelDelays:0,travelDelayMinutes:0,travelTimeMinutes:0,
+    efficiency:0,travelDelays:0,travelDelayMinutes:0,travelTimeMinutes:0,driveManHours:0,
     effectiveWorkHours:0,effectiveManHours:0,crews:[]
   };
 }
@@ -2245,7 +2316,7 @@ function savedDaysDebugReport(){
   const lines=[];
   const now=new Date().toLocaleString();
 
-  lines.push(`VIP Saved Days Debug — v3.34`);
+  lines.push(`VIP Saved Days Debug — v3.35`);
   lines.push(`Generated: ${now}`);
   lines.push('');
 
@@ -2583,9 +2654,12 @@ function applySavedDriveTimeToOperations(day,operations){
   if(!operations) return operations;
   (operations.crews||[]).forEach(c=>{
     c.travelTimeMinutes=savedCrewDriveMinutes(day,c.name);
+    c.driveManHours=(Number(c.travelTimeMinutes)||0)/60*crewPersonCount(c.name);
   });
   operations.travelTimeMinutes=(operations.crews||[])
     .reduce((s,c)=>s+(Number(c.travelTimeMinutes)||0),0);
+  operations.driveManHours=(operations.crews||[])
+    .reduce((s,c)=>s+(Number(c.driveManHours)||0),0);
   return operations;
 }
 
@@ -2988,6 +3062,7 @@ function outlookEmailHtml(){
       <td style="${td}text-align:center">${fmt(work.effectiveManHours)}</td>
       <td style="${td}text-align:center">${c.trips.filter(t=>t.late).length}</td>
       <td style="${td}text-align:center">${formatDriveMinutes(crewTotalDriveMinutes(c))}</td>
+      <td style="${td}text-align:center">${fmt(crewDriveManHours(c))} hr</td>
     </tr>`;
   }).join('');
 
@@ -3088,6 +3163,7 @@ function outlookEmailHtml(){
         <th style="${th}">Effective Man Hours</th>
         <th style="${th}">Travel Delays</th>
         <th style="${th}">Total Drive Time</th>
+        <th style="${th}">Actual Drive Man Hours</th>
       </tr></thead>
       <tbody>${crewRows}</tbody>
     </table>
@@ -3537,6 +3613,253 @@ function downloadMileageCsv(){
 }
 
 
+
+function analyticsBaseData(){
+  const dates=reportDates();
+  const days=[];
+  dates.forEach(date=>{
+    const stored=mileageHistory[date];
+    if(!stored || !String(stored.rawText||'').trim()) return;
+    try{
+      const report=parseReport(stored.rawText);
+      days.push({date,weekday:stored.weekday||dayLabel(date),stored,report});
+    }catch(e){
+      console.error(`Analytics could not parse ${date}:`,e);
+    }
+  });
+  return {dates,days};
+}
+function requireAnalyticsDays(){
+  if(!reportDates().length){alert('Select at least one saved report day first.');return null;}
+  const data=analyticsBaseData();
+  if(!data.days.length){alert('The selected saved days do not contain raw cleaning schedule data.');return null;}
+  return data;
+}
+function analyticsTaskTypes(job){
+  const raw=String(job?.left||job?.raw||'').toLowerCase();
+  if(raw.includes('rewash') && raw.includes('window')) return [];
+  const out=[];
+  if(raw.includes('original')) out.push('Original');
+  if(raw.includes('reclean')) out.push('Reclean');
+  if(raw.includes('window')) out.push('Windows');
+  return out;
+}
+function analyticsReportShell(title,subtitle,body,extraToolbar=''){
+  return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff">
+    ${analyticsPreviewToolbarHtml(extraToolbar)}
+    <div id="reportContent" style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1700px;margin:0 auto;padding:20px">
+      <div style="background:#1f4e78;color:#ffffff;padding:20px 24px;border-radius:4px">
+        <div style="font-size:25px;font-weight:700">${esc(title)}</div>
+        <div style="font-size:14px;margin-top:5px;color:#dbe8f4">${esc(subtitle)}</div>
+      </div>
+      ${body}
+    </div>
+  </body></html>`;
+}
+function analyticsPreviewToolbarHtml(extra=''){
+  return `<div style="font-family:Segoe UI,Arial,sans-serif;max-width:1700px;margin:12px auto 0;padding:0 20px;display:flex;gap:10px;flex-wrap:wrap">
+    <button type="button" onclick="copyAnalyticsReportForOutlook()" style="background:#1f4e78;color:#fff;border:0;border-radius:5px;padding:10px 16px;font-weight:700;cursor:pointer">Copy for Outlook</button>
+    ${extra}
+  </div>
+  <script>
+  function copyAnalyticsReportForOutlook(){
+    var node=document.getElementById('reportContent');
+    if(!node){alert('Report content was not found.');return;}
+    var range=document.createRange();range.selectNodeContents(node);
+    var sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
+    var ok=false;try{ok=document.execCommand('copy');}catch(e){}
+    sel.removeAllRanges();
+    alert(ok?'Formatted report copied. Paste it into Outlook.':'Copy was blocked by the browser. Select the report and copy it manually.');
+  }
+  async function copyAnalyticsMapImage(){
+    var img=document.getElementById('areaMapImage');
+    if(!img){alert('Map image was not found.');return;}
+    try{
+      var res=await fetch(img.src);var blob=await res.blob();
+      await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+      alert('Map image copied.');
+    }catch(e){
+      alert('Direct image copy was blocked. Right-click the map and choose Copy Image instead.');
+    }
+  }
+  <\/script>`;
+}
+function openAnalyticsPreview(html){
+  const blob=new Blob(['\ufeff',html],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob),w=window.open(url,'_blank');
+  if(!w){URL.revokeObjectURL(url);alert('Allow pop-ups to preview this report.');return;}
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+function downloadAnalyticsCsv(filename,rows){
+  const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function analyticsTableStyles(){
+  return {
+    td:'padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;',
+    th:'padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;color:#000000;font-size:13px;text-align:left;font-weight:700;'
+  };
+}
+function analyticsCard(label,value){
+  return `<td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">${esc(label)}</div><div style="font-size:24px;font-weight:700">${value}</div></td>`;
+}
+
+function floorplanPerformanceData(){
+  const base=analyticsBaseData();
+  const map=new Map();let unmapped=0,sourceJobs=0;
+  base.days.forEach(day=>day.report.crews.forEach(c=>c.jobs.forEach(j=>{
+    if(j.cancelled || !(Number(j.actual)>0)) return;
+    const types=analyticsTaskTypes(j);
+    if(!types.length) return;
+    sourceJobs++;
+    const floorplan=lookupFloorplan(j);
+    if(!floorplan){unmapped++;return;}
+    types.forEach(task=>{
+      const key=`${normalizeName(floorplan)}|${task}`;
+      if(!map.has(key)) map.set(key,{floorplan,task,count:0,actual:0,budget:0,subs:new Map()});
+      const row=map.get(key);row.count++;row.actual+=Number(j.actual)||0;row.budget+=Number(j.budget)||0;
+      const skey=`${normalizeName(j.builder)}|${normalizeName(j.subdivision)}`;
+      if(!row.subs.has(skey)) row.subs.set(skey,{builder:j.builder||'Unknown Builder',subdivision:j.subdivision||'Unknown Subdivision',count:0,actual:0,budget:0});
+      const sub=row.subs.get(skey);sub.count++;sub.actual+=Number(j.actual)||0;sub.budget+=Number(j.budget)||0;
+    });
+  })));
+  const rows=[...map.values()].map(r=>({...r,avg:r.count?r.actual/r.count:0,avgBudget:r.count?r.budget/r.count:0,eff:r.actual?r.budget/r.actual*100:0,subdivisions:[...r.subs.values()].map(x=>({...x,avg:x.count?x.actual/x.count:0,avgBudget:x.count?x.budget/x.count:0,eff:x.actual?x.budget/x.actual*100:0})).sort((a,b)=>b.count-a.count||b.actual-a.actual)})).sort((a,b)=>b.count-a.count||a.floorplan.localeCompare(b.floorplan));
+  return {...base,rows,unmapped,sourceJobs};
+}
+function floorplanPerformanceReportHtml(){
+  const d=floorplanPerformanceData(),{td,th}=analyticsTableStyles();
+  const summaryRows=d.rows.map(r=>`<tr><td style="${td}font-weight:600">${esc(r.floorplan)}</td><td style="${td}">${esc(r.task)}</td><td style="${td}text-align:center">${r.count}</td><td style="${td}text-align:right">${fmt(r.avg)}</td><td style="${td}text-align:right">${fmt(r.avgBudget)}</td><td style="${td}text-align:right">${fmt(r.actual)}</td><td style="${td}text-align:center">${fmt(r.eff)}%</td></tr>`).join('');
+  const detail=d.rows.map(r=>`<h3 style="font-size:16px;color:#1f4e78;margin:22px 0 7px">${esc(r.floorplan)} — ${esc(r.task)}</h3><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Cleans</th><th style="${th}">Avg Actual MH / Clean</th><th style="${th}">Avg Budget</th><th style="${th}">Total Actual MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${r.subdivisions.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:center">${x.count}</td><td style="${td}text-align:right">${fmt(x.avg)}</td><td style="${td}text-align:right">${fmt(x.avgBudget)}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:center">${fmt(x.eff)}%</td></tr>`).join('')}</tbody></table>`).join('');
+  const totalCount=d.rows.reduce((s,r)=>s+r.count,0),floorplans=new Set(d.rows.map(r=>normalizeName(r.floorplan))).size;
+  const body=`<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>${analyticsCard('Floorplans',floorplans)}${analyticsCard('Task Samples',totalCount)}${analyticsCard('Unmapped Jobs',d.unmapped)}${analyticsCard('Selected Days',d.days.length)}</tr></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Floorplan Summary</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Floorplan</th><th style="${th}">Task</th><th style="${th}">Cleans</th><th style="${th}">Avg Actual MH / Clean</th><th style="${th}">Avg Budget</th><th style="${th}">Total Actual MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${summaryRows||`<tr><td colspan="7" style="${td}color:#666">No matching floorplan jobs found.</td></tr>`}</tbody></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Floorplan by Subdivision</h2>${detail||'<div style="color:#666">No subdivision detail available.</div>'}
+  <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Only Original, Reclean, and Windows are included. Rewash Windows is excluded. A combined Original & Windows or Reclean & Windows job contributes its full recorded actual man-hours to each applicable category because the source schedule does not split the man-hours between tasks.</div>`;
+  return analyticsReportShell('VIP Floorplan Performance Report',reportRangeLabel(d.dates),body);
+}
+function previewFloorplanPerformance(){const d=requireAnalyticsDays();if(!d)return;openAnalyticsPreview(floorplanPerformanceReportHtml());}
+function downloadFloorplanPerformanceCsv(){
+  const base=requireAnalyticsDays();if(!base)return;const d=floorplanPerformanceData();
+  const rows=[['Floorplan','Task','Subdivision','Builder','Cleans','Avg Actual MH / Clean','Avg Budget','Total Actual MH','Total Budget MH','Efficiency %']];
+  d.rows.forEach(r=>r.subdivisions.forEach(x=>rows.push([r.floorplan,r.task,x.subdivision,x.builder,x.count,+x.avg.toFixed(2),+x.avgBudget.toFixed(2),+x.actual.toFixed(2),+x.budget.toFixed(2),+x.eff.toFixed(1)])));
+  downloadAnalyticsCsv(`VIP-Floorplan-Performance-${d.dates[0]}.csv`,rows);
+}
+
+function cancellationAnalyticsData(){
+  const base=analyticsBaseData();
+  const builders=new Map(),subs=new Map();let total=0,scheduled=0;
+  base.days.forEach(day=>day.report.crews.forEach(c=>c.jobs.forEach(j=>{
+    scheduled++;const cancelled=!!j.cancelled;if(cancelled)total++;
+    const builder=j.builder||'Unknown Builder',subdivision=j.subdivision||'Unknown Subdivision';
+    const bk=normalizeName(builder)||builder.toLowerCase();if(!builders.has(bk))builders.set(bk,{builder,scheduled:0,cancelled:0});
+    const br=builders.get(bk);br.scheduled++;if(cancelled)br.cancelled++;
+    const sk=`${bk}|${normalizeName(subdivision)}`;if(!subs.has(sk))subs.set(sk,{builder,subdivision,scheduled:0,cancelled:0});
+    const sr=subs.get(sk);sr.scheduled++;if(cancelled)sr.cancelled++;
+  })));
+  const prep=r=>({...r,rate:r.scheduled?r.cancelled/r.scheduled*100:0});
+  return {...base,total,scheduled,builders:[...builders.values()].map(prep).sort((a,b)=>b.cancelled-a.cancelled||b.rate-a.rate),subdivisions:[...subs.values()].map(prep).sort((a,b)=>b.cancelled-a.cancelled||b.rate-a.rate)};
+}
+function cancellationAnalyticsReportHtml(){
+  const d=cancellationAnalyticsData(),{td,th}=analyticsTableStyles();
+  const builderRows=d.builders.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.builder)}</td><td style="${td}text-align:center">${x.cancelled}</td><td style="${td}text-align:center">${x.scheduled}</td><td style="${td}text-align:center">${fmt(x.rate)}%</td></tr>`).join('');
+  const subRows=d.subdivisions.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:center">${x.cancelled}</td><td style="${td}text-align:center">${x.scheduled}</td><td style="${td}text-align:center">${fmt(x.rate)}%</td></tr>`).join('');
+  const body=`<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>${analyticsCard('Cancellations',d.total)}${analyticsCard('Scheduled Jobs',d.scheduled)}${analyticsCard('Cancellation Rate',fmt(d.scheduled?d.total/d.scheduled*100:0)+'%')}${analyticsCard('Affected Subdivisions',d.subdivisions.filter(x=>x.cancelled>0).length)}</tr></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cancellations by Builder</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Builder</th><th style="${th}">Cancelled</th><th style="${th}">Scheduled</th><th style="${th}">Cancellation Rate</th></tr></thead><tbody>${builderRows}</tbody></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cancellations by Subdivision</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Cancelled</th><th style="${th}">Scheduled</th><th style="${th}">Cancellation Rate</th></tr></thead><tbody>${subRows}</tbody></table>`;
+  return analyticsReportShell('VIP Cancellation Report',reportRangeLabel(d.dates),body);
+}
+function previewCancellationAnalytics(){const d=requireAnalyticsDays();if(!d)return;openAnalyticsPreview(cancellationAnalyticsReportHtml());}
+function downloadCancellationAnalyticsCsv(){const base=requireAnalyticsDays();if(!base)return;const d=cancellationAnalyticsData(),rows=[['Subdivision','Builder','Cancelled','Scheduled','Cancellation Rate %']];d.subdivisions.forEach(x=>rows.push([x.subdivision,x.builder,x.cancelled,x.scheduled,+x.rate.toFixed(1)]));rows.push([]);rows.push(['BUILDER SUMMARY']);rows.push(['Builder','Cancelled','Scheduled','Cancellation Rate %']);d.builders.forEach(x=>rows.push([x.builder,x.cancelled,x.scheduled,+x.rate.toFixed(1)]));downloadAnalyticsCsv(`VIP-Cancellations-${d.dates[0]}.csv`,rows);}
+
+function areaAnalyticsData(){
+  const base=analyticsBaseData(),map=new Map();
+  function get(builder,subdivision){
+    builder=builder||'Unknown Builder';subdivision=subdivision||'Unknown Subdivision';
+    const key=`${normalizeName(builder)}|${normalizeName(subdivision)}`;
+    if(!map.has(key))map.set(key,{builder,subdivision,completed:0,scheduledStops:0,cancelled:0,workManHours:0,budget:0,miles:0,driveMinutes:0,driveManHours:0,missingRoutes:0});
+    return map.get(key);
+  }
+  base.days.forEach(day=>{
+    day.report.crews.forEach(c=>c.jobs.forEach(j=>{
+      const a=get(j.builder,j.subdivision);a.scheduledStops++;if(j.cancelled)a.cancelled++;
+      if(!j.cancelled && Number(j.actual)>0){a.completed++;a.workManHours+=Number(j.actual)||0;a.budget+=Number(j.budget)||0;}
+    }));
+    (day.stored.crews||[]).forEach(savedCrew=>{
+      const parsedCrew=day.report.crews.find(c=>crewIdentityKey(c.name)===crewIdentityKey(savedCrew.name));
+      const people=crewPersonCount(savedCrew.name);
+      (savedCrew.routes||[]).forEach(r=>{
+        let job=null;
+        if(parsedCrew) job=parsedCrew.jobs.find(j=>normalizeName(j.subdivision)===normalizeName(r.to));
+        if(!job){
+          job=day.report.crews.flatMap(c=>c.jobs).find(j=>normalizeName(j.subdivision)===normalizeName(r.to));
+        }
+        const a=get(job?.builder||'',r.to||job?.subdivision||'Unknown Subdivision');
+        if(Number.isFinite(Number(r.miles)))a.miles+=Number(r.miles)||0;else a.missingRoutes++;
+        if(Number.isFinite(Number(r.minutes))){a.driveMinutes+=Number(r.minutes)||0;a.driveManHours+=(Number(r.minutes)||0)/60*people;}
+      });
+    });
+  });
+  const rows=[...map.values()].map(x=>({...x,totalLaborHours:x.workManHours+x.driveManHours,eff:x.workManHours?x.budget/x.workManHours*100:0}));
+  const byDriving=[...rows].sort((a,b)=>b.miles-a.miles||b.driveMinutes-a.driveMinutes);
+  const hot=[...rows].filter(x=>x.completed>0).sort((a,b)=>b.totalLaborHours-a.totalLaborHours);
+  const slow=[...rows].filter(x=>x.completed>0).sort((a,b)=>a.totalLaborHours-b.totalLaborHours);
+  return {...base,rows,byDriving,hot,slow,totals:{miles:rows.reduce((s,x)=>s+x.miles,0),driveMinutes:rows.reduce((s,x)=>s+x.driveMinutes,0),driveManHours:rows.reduce((s,x)=>s+x.driveManHours,0),workManHours:rows.reduce((s,x)=>s+x.workManHours,0),completed:rows.reduce((s,x)=>s+x.completed,0)}};
+}
+function areaMapDataUrl(rows){
+  const pts=rows.map(r=>{const loc=findSubdivision(r.subdivision,r.builder,'');return loc&&Number.isFinite(Number(loc.lat))&&Number.isFinite(Number(loc.lon))?{...r,lat:Number(loc.lat),lon:Number(loc.lon)}:null;}).filter(Boolean);
+  if(!pts.length)return '';
+  const canvas=document.createElement('canvas');canvas.width=1500;canvas.height=900;const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);
+  const pad=80,minLat=Math.min(...pts.map(p=>p.lat)),maxLat=Math.max(...pts.map(p=>p.lat)),minLon=Math.min(...pts.map(p=>p.lon)),maxLon=Math.max(...pts.map(p=>p.lon));
+  const latSpan=Math.max(.01,maxLat-minLat),lonSpan=Math.max(.01,maxLon-minLon),metricMax=Math.max(1,...pts.map(p=>p.totalLaborHours));
+  ctx.strokeStyle='#d9e2f3';ctx.lineWidth=1;for(let i=0;i<=8;i++){const x=pad+(canvas.width-pad*2)*i/8;ctx.beginPath();ctx.moveTo(x,pad);ctx.lineTo(x,canvas.height-pad);ctx.stroke();}for(let i=0;i<=5;i++){const y=pad+(canvas.height-pad*2)*i/5;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(canvas.width-pad,y);ctx.stroke();}
+  pts.forEach(p=>{p.x=pad+(p.lon-minLon)/lonSpan*(canvas.width-pad*2);p.y=canvas.height-pad-(p.lat-minLat)/latSpan*(canvas.height-pad*2);const rad=7+Math.sqrt(p.totalLaborHours/metricMax)*34;ctx.beginPath();ctx.arc(p.x,p.y,rad,0,Math.PI*2);ctx.fillStyle='rgba(31,78,121,.58)';ctx.fill();ctx.strokeStyle='#1f4e78';ctx.lineWidth=2;ctx.stroke();});
+  const labels=[...pts].sort((a,b)=>b.totalLaborHours-a.totalLaborHours).slice(0,18);ctx.font='bold 15px Segoe UI, Arial';ctx.fillStyle='#1f1f1f';labels.forEach((p,i)=>{ctx.fillText(`${i+1}. ${p.subdivision}`,p.x+10,p.y-10);});
+  ctx.font='bold 24px Segoe UI, Arial';ctx.fillStyle='#1f4e78';ctx.fillText('Subdivision Activity Map',pad,38);ctx.font='14px Segoe UI, Arial';ctx.fillStyle='#555';ctx.fillText('Bubble size = cleaning man-hours + drive man-hours. Geographic positions use saved subdivision coordinates.',pad,62);
+  return canvas.toDataURL('image/png');
+}
+function travelAreaAnalyticsReportHtml(){
+  const d=areaAnalyticsData(),{td,th}=analyticsTableStyles(),mapUrl=areaMapDataUrl(d.rows);
+  const driveRows=d.byDriving.map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:right">${fmt(x.miles)} mi</td><td style="${td}text-align:center">${formatDriveMinutes(x.driveMinutes)}</td><td style="${td}text-align:right">${fmt(x.driveManHours)} hr</td><td style="${td}text-align:center">${x.missingRoutes}</td></tr>`).join('');
+  const areaRows=(arr,limit=12)=>arr.slice(0,limit).map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:center">${x.completed}</td><td style="${td}text-align:right">${fmt(x.workManHours)}</td><td style="${td}text-align:right">${fmt(x.driveManHours)}</td><td style="${td}text-align:right;font-weight:700">${fmt(x.totalLaborHours)}</td></tr>`).join('');
+  const mapHtml=mapUrl?`<img id="areaMapImage" src="${mapUrl}" alt="Subdivision activity map" style="display:block;width:100%;height:auto;border:1px solid #d9e2f3;margin-top:8px">`:`<div style="padding:18px;border:1px solid #d9e2f3;color:#666">No saved subdivision coordinates matched the selected data, so a map could not be drawn.</div>`;
+  const body=`<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>${analyticsCard('Road Miles',fmt(d.totals.miles))}${analyticsCard('Total Drive Time',formatDriveMinutes(d.totals.driveMinutes))}${analyticsCard('Drive Man Hours',fmt(d.totals.driveManHours))}${analyticsCard('Cleaning Man Hours',fmt(d.totals.workManHours))}${analyticsCard('Completed Jobs',d.totals.completed)}</tr></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Subdivision Activity Map</h2>${mapHtml}
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Where We Are Driving the Most</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Road Miles</th><th style="${th}">Drive Time</th><th style="${th}">Actual Drive Man Hours</th><th style="${th}">Missing Routes</th></tr></thead><tbody>${driveRows}</tbody></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Hot Areas — Highest Total Labor Burden</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Jobs</th><th style="${th}">Cleaning MH</th><th style="${th}">Drive MH</th><th style="${th}">Total Labor MH</th></tr></thead><tbody>${areaRows(d.hot)}</tbody></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Slow Areas — Lowest Total Labor Burden</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Jobs</th><th style="${th}">Cleaning MH</th><th style="${th}">Drive MH</th><th style="${th}">Total Labor MH</th></tr></thead><tbody>${areaRows(d.slow)}</tbody></table>
+  <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Drive mileage/time is assigned to the destination subdivision of each saved route leg. First-job travel from home/shop is not included because the existing mileage logic starts at the first scheduled job.</div>`;
+  const extra=mapUrl?'<button type="button" onclick="copyAnalyticsMapImage()" style="background:#24334c;color:#fff;border:0;border-radius:5px;padding:10px 16px;font-weight:700;cursor:pointer">Copy Map Image</button>':'';
+  return analyticsReportShell('VIP Travel & Hot Areas Report',reportRangeLabel(d.dates),body,extra);
+}
+function previewTravelAreaAnalytics(){const d=requireAnalyticsDays();if(!d)return;openAnalyticsPreview(travelAreaAnalyticsReportHtml());}
+function downloadTravelAreaAnalyticsCsv(){const base=requireAnalyticsDays();if(!base)return;const d=areaAnalyticsData(),rows=[['Subdivision','Builder','Completed Jobs','Scheduled Stops','Cancelled','Cleaning Man Hours','Budget Hours','Road Miles','Drive Time Minutes','Drive Man Hours','Total Labor Man Hours','Missing Routes']];d.byDriving.forEach(x=>rows.push([x.subdivision,x.builder,x.completed,x.scheduledStops,x.cancelled,+x.workManHours.toFixed(2),+x.budget.toFixed(2),+x.miles.toFixed(1),Math.round(x.driveMinutes),+x.driveManHours.toFixed(2),+x.totalLaborHours.toFixed(2),x.missingRoutes]));downloadAnalyticsCsv(`VIP-Travel-Hot-Areas-${d.dates[0]}.csv`,rows);}
+
+function manHourAnalyticsData(){
+  const base=analyticsBaseData(),subs=new Map(),builders=new Map();
+  base.days.forEach(day=>day.report.crews.forEach(c=>c.jobs.forEach(j=>{
+    if(j.cancelled || !(Number(j.actual)>0))return;
+    const builder=j.builder||'Unknown Builder',subdivision=j.subdivision||'Unknown Subdivision',actual=Number(j.actual)||0,budget=Number(j.budget)||0;
+    const sk=`${normalizeName(builder)}|${normalizeName(subdivision)}`;if(!subs.has(sk))subs.set(sk,{builder,subdivision,jobs:0,actual:0,budget:0});const sr=subs.get(sk);sr.jobs++;sr.actual+=actual;sr.budget+=budget;
+    const bk=normalizeName(builder)||builder.toLowerCase();if(!builders.has(bk))builders.set(bk,{builder,jobs:0,actual:0,budget:0});const br=builders.get(bk);br.jobs++;br.actual+=actual;br.budget+=budget;
+  })));
+  const prep=x=>({...x,avg:x.jobs?x.actual/x.jobs:0,avgBudget:x.jobs?x.budget/x.jobs:0,eff:x.actual?x.budget/x.actual*100:0});
+  const subRows=[...subs.values()].map(prep).sort((a,b)=>b.actual-a.actual),builderRows=[...builders.values()].map(prep).sort((a,b)=>b.actual-a.actual);
+  return {...base,subRows,builderRows,low:[...subRows].sort((a,b)=>a.actual-b.actual),totals:{jobs:subRows.reduce((s,x)=>s+x.jobs,0),actual:subRows.reduce((s,x)=>s+x.actual,0),budget:subRows.reduce((s,x)=>s+x.budget,0)}};
+}
+function manHourAnalyticsReportHtml(){
+  const d=manHourAnalyticsData(),{td,th}=analyticsTableStyles();
+  const makeRows=(arr,limit)=>arr.slice(0,limit??arr.length).map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.subdivision||x.builder)}</td>${x.subdivision?`<td style="${td}">${esc(x.builder)}</td>`:''}<td style="${td}text-align:center">${x.jobs}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:right">${fmt(x.avg)}</td><td style="${td}text-align:right">${fmt(x.budget)}</td><td style="${td}text-align:center">${fmt(x.eff)}%</td></tr>`).join('');
+  const body=`<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>${analyticsCard('Completed Jobs',d.totals.jobs)}${analyticsCard('Cleaning Man Hours',fmt(d.totals.actual))}${analyticsCard('Avg MH / Job',fmt(d.totals.jobs?d.totals.actual/d.totals.jobs:0))}${analyticsCard('Subdivisions',d.subRows.length)}</tr></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Most Cleaning Man-Hours by Subdivision</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Jobs</th><th style="${th}">Actual MH</th><th style="${th}">Avg MH / Job</th><th style="${th}">Budget MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${makeRows(d.subRows,d.subRows.length)}</tbody></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Least Cleaning Man-Hours by Subdivision</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Jobs</th><th style="${th}">Actual MH</th><th style="${th}">Avg MH / Job</th><th style="${th}">Budget MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${makeRows(d.low,Math.min(20,d.low.length))}</tbody></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cleaning Man-Hours by Builder</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Builder</th><th style="${th}">Jobs</th><th style="${th}">Actual MH</th><th style="${th}">Avg MH / Job</th><th style="${th}">Budget MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${d.builderRows.map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.builder)}</td><td style="${td}text-align:center">${x.jobs}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:right">${fmt(x.avg)}</td><td style="${td}text-align:right">${fmt(x.budget)}</td><td style="${td}text-align:center">${fmt(x.eff)}%</td></tr>`).join('')}</tbody></table>`;
+  return analyticsReportShell('VIP Man-Hour Report',reportRangeLabel(d.dates),body);
+}
+function previewManHourAnalytics(){const d=requireAnalyticsDays();if(!d)return;openAnalyticsPreview(manHourAnalyticsReportHtml());}
+function downloadManHourAnalyticsCsv(){const base=requireAnalyticsDays();if(!base)return;const d=manHourAnalyticsData(),rows=[['Subdivision','Builder','Completed Jobs','Actual Man Hours','Average Man Hours / Job','Budget Man Hours','Efficiency %']];d.subRows.forEach(x=>rows.push([x.subdivision,x.builder,x.jobs,+x.actual.toFixed(2),+x.avg.toFixed(2),+x.budget.toFixed(2),+x.eff.toFixed(1)]));rows.push([]);rows.push(['BUILDER SUMMARY']);rows.push(['Builder','Completed Jobs','Actual Man Hours','Average Man Hours / Job','Budget Man Hours','Efficiency %']);d.builderRows.forEach(x=>rows.push([x.builder,x.jobs,+x.actual.toFixed(2),+x.avg.toFixed(2),+x.budget.toFixed(2),+x.eff.toFixed(1)]));downloadAnalyticsCsv(`VIP-Man-Hours-${d.dates[0]}.csv`,rows);}
+
 function weeklyOperationsData(){
   const dates=reportDates();
   const days=dates.map(date=>{
@@ -3549,10 +3872,10 @@ function weeklyOperationsData(){
     const crewName=canonicalCrewName(c.name) || c.name;
     const crewKey=crewIdentityKey(crewName);
     if(!crewMap.has(crewKey)){
-      crewMap.set(crewKey,{name:crewName,byDate:{},completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0,travelTimeMinutes:0,effectiveWorkHours:0,effectiveManHours:0,jobs:[]});
+      crewMap.set(crewKey,{name:crewName,byDate:{},completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0,travelTimeMinutes:0,driveManHours:0,effectiveWorkHours:0,effectiveManHours:0,jobs:[]});
     }
     const row=crewMap.get(crewKey);
-    const existing=row.byDate[day.date]||{completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0,travelTimeMinutes:0};
+    const existing=row.byDate[day.date]||{completed:0,cancelled:0,actual:0,budget:0,travelDelays:0,travelDelayMinutes:0,travelTimeMinutes:0,driveManHours:0};
     row.byDate[day.date]={
       ...existing,
       name:crewName,
@@ -3562,7 +3885,8 @@ function weeklyOperationsData(){
       budget:(Number(existing.budget)||0)+(Number(c.budget)||0),
       travelDelays:(Number(existing.travelDelays)||0)+(Number(c.travelDelays)||0),
       travelDelayMinutes:(Number(existing.travelDelayMinutes)||0)+(Number(c.travelDelayMinutes)||0),
-      travelTimeMinutes:(Number(existing.travelTimeMinutes)||0)+(Number(c.travelTimeMinutes)||0)
+      travelTimeMinutes:(Number(existing.travelTimeMinutes)||0)+(Number(c.travelTimeMinutes)||0),
+      driveManHours:(Number(existing.driveManHours)||0)+(Number(c.driveManHours)||0)
     };
     row.completed+=Number(c.completed)||0;
     row.cancelled+=Number(c.cancelled)||0;
@@ -3571,6 +3895,7 @@ function weeklyOperationsData(){
     row.travelDelays+=Number(c.travelDelays)||0;
     row.travelDelayMinutes+=Number(c.travelDelayMinutes)||0;
     row.travelTimeMinutes+=Number(c.travelTimeMinutes)||0;
+    row.driveManHours+=Number(c.driveManHours)||0;
     row.effectiveWorkHours+=Number(c.effectiveWorkHours)||0;
     row.effectiveManHours+=Number(c.effectiveManHours)||0;
     (c.jobs||[]).forEach(j=>row.jobs.push({...j,date:day.date,weekday:day.weekday,crew:row.name}));
@@ -3594,6 +3919,7 @@ function weeklyOperationsData(){
     travelDelays:days.reduce((s,d)=>s+(Number(d.operations.travelDelays)||0),0),
     travelDelayMinutes:days.reduce((s,d)=>s+(Number(d.operations.travelDelayMinutes)||0),0),
     travelTimeMinutes:days.reduce((s,d)=>s+(Number(d.operations.travelTimeMinutes)||0),0),
+    driveManHours:days.reduce((s,d)=>s+(Number(d.operations.driveManHours)||0),0),
     personDays:days.reduce((s,d)=>s+(Number(d.operations.people)||0),0),
     effectiveWorkHours:days.reduce((s,d)=>s+(Number(d.operations.effectiveWorkHours)||0),0),
     effectiveManHours:days.reduce((s,d)=>s+(Number(d.operations.effectiveManHours)||0),0)
@@ -3640,6 +3966,7 @@ function weeklyOperationsReportHtml(){
     <td style="${td}text-align:right">${fmt(d.operations.budget)}</td>
     <td style="${td}background:${effBg(d.operations.efficiency)};color:${effColor(d.operations.efficiency)};font-weight:700;text-align:center">${fmt(d.operations.efficiency)}%</td>
     <td style="${td}text-align:center">${formatDriveMinutes(Number(d.operations.travelTimeMinutes)||0)}</td>
+    <td style="${td}text-align:center">${fmt(Number(d.operations.driveManHours)||0)} hr</td>
     <td style="${td}text-align:center">${d.operations.travelDelays}</td>
   </tr>`).join('');
   const crewRows=w.crews.length?w.crews.map(c=>`<tr>
@@ -3655,8 +3982,9 @@ function weeklyOperationsReportHtml(){
     <td style="${td}text-align:center">${fmt(c.effectiveWorkHours)} hr</td>
     <td style="${td}text-align:center">${fmt(c.effectiveManHours)}</td>
     <td style="${td}text-align:center">${formatDriveMinutes(Number(c.travelTimeMinutes)||0)}</td>
+    <td style="${td}text-align:center">${fmt(Number(c.driveManHours)||0)} hr</td>
     <td style="${td}text-align:center">${c.travelDelays}</td>
-  </tr>`).join(''):`<tr><td colspan="13" style="${td}color:#666666">No saved operations were found for this report period.</td></tr>`;
+  </tr>`).join(''):`<tr><td colspan="14" style="${td}color:#666666">No saved operations were found for this report period.</td></tr>`;
   const jobTypeMap=new Map();
   w.days.forEach(day=>(day.operations.crews||[]).forEach(c=>(c.jobs||[]).forEach(j=>{
     const key=j.task || (j.jobType==='Other' ? (j.left||j.raw||'Other') : (j.jobType||'Other'));
@@ -3708,13 +4036,14 @@ function weeklyOperationsReportHtml(){
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">TRAVEL DELAYS</div><div style="font-size:24px;font-weight:700">${w.totals.travelDelays}</div></td>
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">DELAY MINUTES</div><div style="font-size:24px;font-weight:700">${w.totals.travelDelayMinutes}</div></td>
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">TOTAL DRIVE TIME</div><div style="font-size:24px;font-weight:700">${formatDriveMinutes(w.totals.travelTimeMinutes)}</div></td>
+      <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">ACTUAL DRIVE MAN HOURS</div><div style="font-size:24px;font-weight:700">${fmt(w.totals.driveManHours)}</div></td>
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">EFFECTIVE WORK HOURS</div><div style="font-size:24px;font-weight:700">${fmt(w.totals.effectiveWorkHours)}</div></td>
       <td style="padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666">EFFECTIVE MAN HOURS</div><div style="font-size:24px;font-weight:700">${fmt(w.totals.effectiveManHours)}</div></td>
     </tr></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Breakdown</h2>
-    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">People</th><th style="${th}">Jobs / Person</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Efficiency</th><th style="${th}">Total Drive Time</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${dailyRows}</tbody></table>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">People</th><th style="${th}">Jobs / Person</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Efficiency</th><th style="${th}">Total Drive Time</th><th style="${th}">Actual Drive Man Hours</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${dailyRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cumulative Crew Rankings</h2>
-    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Crew</th><th style="${th}">People</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th><th style="${th}">Efficiency</th><th style="${th}">Effective Work Hours</th><th style="${th}">Effective Man Hours</th><th style="${th}">Total Drive Time</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${crewRows}</tbody></table>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Crew</th><th style="${th}">People</th><th style="${th}">Completed</th><th style="${th}">Cancelled</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Variance</th><th style="${th}">Efficiency</th><th style="${th}">Effective Work Hours</th><th style="${th}">Effective Man Hours</th><th style="${th}">Total Drive Time</th><th style="${th}">Actual Drive Man Hours</th><th style="${th}">Travel Delays</th></tr></thead><tbody>${crewRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cumulative Travel Delay Rankings</h2>
     <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Crew</th><th style="${th}">Delay Count</th><th style="${th}">Delay Minutes</th><th style="${th}">Days With Delays</th></tr></thead><tbody>${travelRankingRows}</tbody></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Job Type Breakdown</h2>
@@ -3729,10 +4058,10 @@ function weeklyOperationsReportHtml(){
 }
 function weeklyOperationsReportText(){
   const w=weeklyOperationsData();
-  let out=`VIP Operations Report\n${reportRangeLabel(w.dates)}\n\nCompleted: ${w.totals.completed}\nCancelled: ${w.totals.cancelled}\nActual Hours: ${fmt(w.totals.actual)}\nBudget Hours: ${fmt(w.totals.budget)}\nEfficiency: ${fmt(w.totals.efficiency)}%\nTotal Drive Time: ${formatDriveMinutes(w.totals.travelTimeMinutes)}\nTravel Delays: ${w.totals.travelDelays}\nJobs / Person: ${fmt(w.totals.jobsPerPerson)}\n\nDAILY BREAKDOWN\n`;
-  w.days.forEach(d=>out+=`\n${d.weekday}: ${d.operations.people||0} people, ${fmt(d.operations.jobsPerPerson||0)} jobs/person, ${d.operations.completed} completed, ${d.operations.cancelled} cancelled, ${fmt(d.operations.actual)} actual, ${fmt(d.operations.budget)} budget, ${fmt(d.operations.efficiency)}% efficiency, ${formatDriveMinutes(Number(d.operations.travelTimeMinutes)||0)} total drive time`);
+  let out=`VIP Operations Report\n${reportRangeLabel(w.dates)}\n\nCompleted: ${w.totals.completed}\nCancelled: ${w.totals.cancelled}\nActual Hours: ${fmt(w.totals.actual)}\nBudget Hours: ${fmt(w.totals.budget)}\nEfficiency: ${fmt(w.totals.efficiency)}%\nTotal Drive Time: ${formatDriveMinutes(w.totals.travelTimeMinutes)}\nActual Drive Man Hours: ${fmt(w.totals.driveManHours)}\nTravel Delays: ${w.totals.travelDelays}\nJobs / Person: ${fmt(w.totals.jobsPerPerson)}\n\nDAILY BREAKDOWN\n`;
+  w.days.forEach(d=>out+=`\n${d.weekday}: ${d.operations.people||0} people, ${fmt(d.operations.jobsPerPerson||0)} jobs/person, ${d.operations.completed} completed, ${d.operations.cancelled} cancelled, ${fmt(d.operations.actual)} actual, ${fmt(d.operations.budget)} budget, ${fmt(d.operations.efficiency)}% efficiency, ${formatDriveMinutes(Number(d.operations.travelTimeMinutes)||0)} total drive time, ${fmt(Number(d.operations.driveManHours)||0)} actual drive man hours`);
   out+='\n\nCUMULATIVE CREW RANKINGS\n';
-  w.crews.forEach(c=>out+=`\n#${c.rank} ${c.name}: ${c.people} people, ${c.completed} completed, ${c.cancelled} cancelled, ${fmt(c.actual)} actual, ${fmt(c.budget)} budget, ${fmt(c.efficiency)}% efficiency, ${fmt(c.effectiveWorkHours)} effective work hours, ${fmt(c.effectiveManHours)} effective man hours, ${formatDriveMinutes(Number(c.travelTimeMinutes)||0)} travel time, ${c.travelDelays} travel delays`);
+  w.crews.forEach(c=>out+=`\n#${c.rank} ${c.name}: ${c.people} people, ${c.completed} completed, ${c.cancelled} cancelled, ${fmt(c.actual)} actual, ${fmt(c.budget)} budget, ${fmt(c.efficiency)}% efficiency, ${fmt(c.effectiveWorkHours)} effective work hours, ${fmt(c.effectiveManHours)} effective man hours, ${formatDriveMinutes(Number(c.travelTimeMinutes)||0)} travel time, ${fmt(Number(c.driveManHours)||0)} drive man hours, ${c.travelDelays} travel delays`);
   out+='\n\nCUMULATIVE TRAVEL DELAY RANKINGS\n';
   w.travelRankings.forEach(c=>out+=`\n#${c.travelRank} ${c.name}: ${c.travelDelays} delays, ${c.travelDelayMinutes} delay minutes`);
   out+='\n\nJOB DETAIL BY CREW & DAY\n';
@@ -3760,8 +4089,8 @@ function downloadWeeklyOperationsEml(){
 function downloadWeeklyOperationsCsv(){
   if(!reportDates().length){alert('Select at least one saved report day first.');return;}
   const w=weeklyOperationsData();
-  const rows=[['Rank','Crew','People','Completed','Cancelled','Actual Hours','Budget Hours','Variance','Efficiency %','Effective Work Hours','Effective Man Hours','Total Drive Time Minutes','Travel Delays','Travel Delay Minutes']];
-  w.crews.forEach(c=>rows.push([c.rank,c.name,c.people,c.completed,c.cancelled,+c.actual.toFixed(1),+c.budget.toFixed(1),+c.variance.toFixed(1),+c.efficiency.toFixed(1),+c.effectiveWorkHours.toFixed(2),+c.effectiveManHours.toFixed(2),+c.travelTimeMinutes.toFixed(1),c.travelDelays,c.travelDelayMinutes]));
+  const rows=[['Rank','Crew','People','Completed','Cancelled','Actual Hours','Budget Hours','Variance','Efficiency %','Effective Work Hours','Effective Man Hours','Total Drive Time Minutes','Actual Drive Man Hours','Travel Delays','Travel Delay Minutes']];
+  w.crews.forEach(c=>rows.push([c.rank,c.name,c.people,c.completed,c.cancelled,+c.actual.toFixed(1),+c.budget.toFixed(1),+c.variance.toFixed(1),+c.efficiency.toFixed(1),+c.effectiveWorkHours.toFixed(2),+c.effectiveManHours.toFixed(2),+c.travelTimeMinutes.toFixed(1),+c.driveManHours.toFixed(2),c.travelDelays,c.travelDelayMinutes]));
   rows.push([]);
   rows.push(['Report Total',w.totals.completed,w.totals.cancelled,+w.totals.actual.toFixed(1),+w.totals.budget.toFixed(1),+w.totals.variance.toFixed(1),+w.totals.efficiency.toFixed(1),w.totals.travelDelays,w.totals.travelDelayMinutes]);
   const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
@@ -4199,6 +4528,14 @@ $('#mileageExcludeInput').addEventListener('keydown',e=>{
     $('#mileageExcludeInput').value='';
   }
 });
+$('#previewFloorplanPerformanceBtn').onclick=previewFloorplanPerformance;
+$('#downloadFloorplanPerformanceCsvBtn').onclick=downloadFloorplanPerformanceCsv;
+$('#previewCancellationAnalyticsBtn').onclick=previewCancellationAnalytics;
+$('#downloadCancellationAnalyticsCsvBtn').onclick=downloadCancellationAnalyticsCsv;
+$('#previewTravelAreaAnalyticsBtn').onclick=previewTravelAreaAnalytics;
+$('#downloadTravelAreaAnalyticsCsvBtn').onclick=downloadTravelAreaAnalyticsCsv;
+$('#previewManHourAnalyticsBtn').onclick=previewManHourAnalytics;
+$('#downloadManHourAnalyticsCsvBtn').onclick=downloadManHourAnalyticsCsv;
 $('#previewWeeklyOperationsBtn').onclick=previewWeeklyOperations;
 $('#downloadWeeklyOperationsEmlBtn').onclick=downloadWeeklyOperationsEml;
 $('#downloadWeeklyOperationsCsvBtn').onclick=downloadWeeklyOperationsCsv;
