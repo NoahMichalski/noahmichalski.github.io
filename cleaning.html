@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.32</title>
+<title>VIP Crew Efficiency & Travel Report v3.33</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -211,10 +211,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.32</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.33</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.32</div>
+    <div class="version">Version 3.33</div>
   </div>
 
   <div class="input-grid">
@@ -348,6 +348,26 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
               <tbody id="savedMileageDaysTable"></tbody>
             </table>
           </div>
+
+
+          <details id="savedDaysDebugPanel" style="margin-top:14px">
+            <summary>
+              <span>Saved Days Debug</span>
+              <span class="muted small">Use this only if a saved date is missing from the list</span>
+            </summary>
+            <div style="padding:0 16px 16px">
+              <div class="buttons" style="margin-bottom:10px">
+                <button id="runSavedDaysDebugBtn" type="button">Run Saved Days Debug</button>
+                <button id="copySavedDaysDebugBtn" type="button">Copy Debug Output</button>
+              </div>
+              <div class="notice" style="margin-bottom:10px">
+                This checks localStorage, saved-day keys, route data, driver rebuilds, and whether each saved date actually rendered into the Saved Days table.
+              </div>
+              <textarea id="savedDaysDebugOutput" readonly
+                style="width:100%;min-height:260px;resize:vertical;font-family:Consolas,monospace;font-size:12px;line-height:1.45"
+                placeholder="Click Run Saved Days Debug."></textarea>
+            </div>
+          </details>
 
           <div class="section-head" style="margin-top:18px">
             <h3>Report Days</h3>
@@ -511,6 +531,20 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 </div>
 
 <script>
+window.__vipDebugErrors=[];
+window.addEventListener('error',e=>{
+  try{
+    window.__vipDebugErrors.push({
+      time:new Date().toISOString(),
+      message:e.message||'Unknown error',
+      source:e.filename||'',
+      line:e.lineno||0,
+      column:e.colno||0
+    });
+    if(window.__vipDebugErrors.length>25) window.__vipDebugErrors.shift();
+  }catch(_){}
+});
+
 const $ = s => document.querySelector(s);
 
 let xlsxLibraryPromise=null;
@@ -1851,7 +1885,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.32',
+    appVersion:'3.33',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -2136,6 +2170,137 @@ function initializeMileageDates(){
   if($('#operationDate')&&!$('#operationDate').value) $('#operationDate').value=localIsoDate();
   if($('#mileageWeekStart')&&!$('#mileageWeekStart').value) $('#mileageWeekStart').value=mondayOf($('#operationDate')?.value);
 }
+
+function savedDaysDebugReport(){
+  const lines=[];
+  const now=new Date().toLocaleString();
+
+  lines.push(`VIP Saved Days Debug — v3.33`);
+  lines.push(`Generated: ${now}`);
+  lines.push('');
+
+  let raw='';
+  try{
+    raw=localStorage.getItem(STORAGE_KEYS.mileageHistory)||'';
+  }catch(e){
+    lines.push(`ERROR reading localStorage mileageHistory: ${e.message||e}`);
+  }
+
+  let parsedStorage={};
+  if(raw){
+    try{
+      parsedStorage=JSON.parse(raw)||{};
+    }catch(e){
+      lines.push(`ERROR parsing localStorage mileageHistory JSON: ${e.message||e}`);
+    }
+  }
+
+  const memoryKeys=Object.keys(mileageHistory||{}).sort();
+  const storageKeys=Object.keys(parsedStorage||{}).sort();
+
+  lines.push(`In-memory mileageHistory count: ${memoryKeys.length}`);
+  lines.push(`In-memory keys: ${memoryKeys.join(', ') || '(none)'}`);
+  lines.push('');
+  lines.push(`localStorage mileageHistory count: ${storageKeys.length}`);
+  lines.push(`localStorage keys: ${storageKeys.join(', ') || '(none)'}`);
+  lines.push('');
+
+  const body=$('#savedMileageDaysTable');
+  const renderedDates=body
+    ? [...body.querySelectorAll('button.delete-mileage-day')].map(b=>b.dataset.date).filter(Boolean)
+    : [];
+  lines.push(`Rendered Saved Days rows: ${renderedDates.length}`);
+  lines.push(`Rendered dates: ${renderedDates.join(', ') || '(none)'}`);
+  lines.push('');
+
+  const choiceDates=$('#reportDayChoices')
+    ? [...$('#reportDayChoices').querySelectorAll('.report-day-check')].map(x=>x.dataset.date).filter(Boolean)
+    : [];
+  lines.push(`Rendered Report Days choices: ${choiceDates.length}`);
+  lines.push(`Report Day dates: ${choiceDates.join(', ') || '(none)'}`);
+  lines.push('');
+
+  const allDates=[...new Set([...memoryKeys,...storageKeys])].sort().reverse();
+
+  allDates.forEach(date=>{
+    const day=(mileageHistory&&mileageHistory[date]) || parsedStorage[date] || {};
+    lines.push(`=== ${date} (${day.weekday||dayLabel(date)}) ===`);
+    lines.push(`savedAt: ${day.savedAt||'(none)'}`);
+    lines.push(`rawText length: ${String(day.rawText||'').length}`);
+    lines.push(`stored totalMiles: ${Number(day.totalMiles)||0}`);
+    lines.push(`stored missingRoutes: ${Number(day.missingRoutes)||0}`);
+
+    const opsCrews=Array.isArray(day.operations?.crews)?day.operations.crews:[];
+    const mileageCrews=Array.isArray(day.crews)?day.crews:[];
+    lines.push(`operations crews: ${opsCrews.length}`);
+    lines.push(`mileage crews: ${mileageCrews.length}`);
+
+    const routeCount=mileageCrews.reduce((s,c)=>s+(Array.isArray(c.routes)?c.routes.length:0),0);
+    const missingRouteLegs=mileageCrews.reduce((s,c)=>s+(Array.isArray(c.routes)?c.routes.filter(r=>r.miles==null).length:0),0);
+    lines.push(`saved route legs: ${routeCount}`);
+    lines.push(`saved route legs missing miles: ${missingRouteLegs}`);
+
+    try{
+      const rebuilt=rebuildDriverMileageFromSavedDay(date,{...day,date});
+      const rebuiltMiles=rebuilt.reduce((s,d)=>s+(Number(d.miles)||0),0);
+      const rebuiltMissing=rebuilt.reduce((s,d)=>s+(Number(d.missingRoutes)||0),0);
+      lines.push(`driver rebuild: OK`);
+      lines.push(`rebuilt drivers: ${rebuilt.length}`);
+      lines.push(`rebuilt miles: ${fmt(rebuiltMiles)}`);
+      lines.push(`rebuilt missing routes: ${rebuiltMissing}`);
+    }catch(e){
+      lines.push(`driver rebuild: ERROR — ${e && e.stack ? e.stack : (e.message||e)}`);
+    }
+
+    lines.push(`Saved Days row rendered: ${renderedDates.includes(date)?'YES':'NO'}`);
+    lines.push(`Report Days choice rendered: ${choiceDates.includes(date)?'YES':'NO'}`);
+    lines.push('');
+  });
+
+  lines.push('--- CAPTURED PAGE ERRORS ---');
+  if(Array.isArray(window.__vipDebugErrors) && window.__vipDebugErrors.length){
+    window.__vipDebugErrors.forEach(e=>{
+      lines.push(`${e.time} | ${e.message} | ${e.source}:${e.line}:${e.column}`);
+    });
+  }else{
+    lines.push('(none captured)');
+  }
+  lines.push('');
+
+  lines.push('--- STORAGE KEY CHECK ---');
+  Object.entries(STORAGE_KEYS||{}).forEach(([name,key])=>{
+    let exists=false;
+    try{exists=localStorage.getItem(key)!=null;}catch(e){}
+    lines.push(`${name}: ${key} = ${exists?'present':'missing'}`);
+  });
+
+  return lines.join('\n');
+}
+
+function runSavedDaysDebug(){
+  const out=$('#savedDaysDebugOutput');
+  if(!out) return;
+  try{
+    out.value=savedDaysDebugReport();
+  }catch(e){
+    out.value=`DEBUG TOOL ERROR:\n${e && e.stack ? e.stack : e}`;
+  }
+}
+
+async function copySavedDaysDebug(){
+  const out=$('#savedDaysDebugOutput');
+  if(!out) return;
+  if(!out.value) runSavedDaysDebug();
+  try{
+    await navigator.clipboard.writeText(out.value);
+    alert('Debug output copied.');
+  }catch(e){
+    out.focus();
+    out.select();
+    alert('Clipboard access was blocked. The debug text is selected — press Ctrl+C.');
+  }
+}
+
 function saveMileageHistory(){
   localStorage.setItem(STORAGE_KEYS.mileageHistory,JSON.stringify(mileageHistory));
 
@@ -3999,6 +4164,9 @@ Monday\tPeople\tIn\tOut\tActual Man Hours\tBudget\tEst. Complete
 209 Reclean - 7318 Upper Albany Drive\t2\tcancelled\t\t\t\t
 *Haines Creek *Epcon *New Albany\t\t\t\t\t\t
 104 Original - 5547 Wooster Dr.\t2\t10:49 AM\t3:41 PM\t9.7\t7\t2:19 PM`; };
+
+if($('#runSavedDaysDebugBtn')) $('#runSavedDaysDebugBtn').addEventListener('click',runSavedDaysDebug);
+if($('#copySavedDaysDebugBtn')) $('#copySavedDaysDebugBtn').addEventListener('click',copySavedDaysDebug);
 </script>
 </body>
 </html>
