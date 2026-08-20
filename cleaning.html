@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.36</title>
+<title>VIP Crew Efficiency & Travel Report v3.37</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -217,10 +217,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.36</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.37</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.36</div>
+    <div class="version">Version 3.37</div>
   </div>
 
   <div class="input-grid">
@@ -2385,7 +2385,7 @@ function savedDaysDebugReport(){
   const lines=[];
   const now=new Date().toLocaleString();
 
-  lines.push(`VIP Saved Days Debug — v3.36`);
+  lines.push(`VIP Saved Days Debug — v3.37`);
   lines.push(`Generated: ${now}`);
   lines.push('');
 
@@ -3706,15 +3706,22 @@ function requireAnalyticsDays(){
 }
 function analyticsTaskTypes(job){
   const raw=String(job?.left||job?.raw||'').toLowerCase();
+
+  // Rewash Windows never belongs in the floorplan performance report.
   if(raw.includes('rewash') && raw.includes('window')) return [];
+
   const out=[];
+  const firstWaterReclean=(raw.includes('1st w/water') || raw.includes('1st with water')) && raw.includes('reclean');
+
   if(raw.includes('original')) out.push('Original');
-  if(raw.includes('reclean')) out.push('Reclean');
+  if(firstWaterReclean) out.push('1st w/water Reclean');
+  else if(raw.includes('reclean')) out.push('Reclean');
   if(raw.includes('window')) out.push('Windows');
+
   return out;
 }
-function analyticsReportShell(title,subtitle,body,extraToolbar=''){
-  return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff">
+function analyticsReportShell(title,subtitle,body,extraToolbar='',headExtra=''){
+  return `<!doctype html><html><head><meta charset="UTF-8">${headExtra}</head><body style="margin:0;background:#ffffff">
     ${analyticsPreviewToolbarHtml(extraToolbar)}
     <div id="reportContent" style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1700px;margin:0 auto;padding:20px">
       <div style="background:#1f4e78;color:#ffffff;padding:20px 24px;border-radius:4px">
@@ -3804,7 +3811,7 @@ function floorplanPerformanceReportHtml(){
   const body=`<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>${analyticsCard('Floorplans',floorplans)}${analyticsCard('Task Samples',totalCount)}${analyticsCard('Unmapped Jobs',d.unmapped)}${analyticsCard('Selected Days',d.days.length)}</tr></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Floorplan Summary</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Floorplan</th><th style="${th}">Task</th><th style="${th}">Cleans</th><th style="${th}">Avg Actual MH / Clean</th><th style="${th}">Avg Budget</th><th style="${th}">Total Actual MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${summaryRows||`<tr><td colspan="7" style="${td}color:#666">No matching floorplan jobs found.</td></tr>`}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Floorplan by Subdivision</h2>${detail||'<div style="color:#666">No subdivision detail available.</div>'}
-  <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Only Original, Reclean, and Windows are included. Rewash Windows is excluded. A combined Original & Windows or Reclean & Windows job contributes its full recorded actual man-hours to each applicable category because the source schedule does not split the man-hours between tasks.</div>`;
+  <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Original, Reclean, 1st w/water Reclean, and Windows are tracked as separate floorplan metrics. 1st w/water Reclean is not included in normal Reclean averages. Rewash Windows is excluded. A combined Original & Windows or Reclean & Windows job contributes its full recorded actual man-hours to each applicable category because the source schedule does not split the man-hours between tasks.</div>`;
   return analyticsReportShell('VIP Floorplan Performance Report',reportRangeLabel(d.dates),body);
 }
 function previewFloorplanPerformance(){const d=requireAnalyticsDays();if(!d)return;openAnalyticsPreview(floorplanPerformanceReportHtml());}
@@ -3969,38 +3976,77 @@ function downloadCancellationAnalyticsCsv(){
 
 function areaAnalyticsData(){
   const base=analyticsBaseData(),map=new Map();
+  const taskNames=['Original','Reclean','1st w/water Reclean','Windows','Other / Special'];
+
+  function emptyTaskStats(){
+    const out={};
+    taskNames.forEach(name=>out[name]={completed:0,workManHours:0,budget:0,miles:0,driveMinutes:0,driveManHours:0});
+    return out;
+  }
   function get(builder,subdivision){
     builder=builder||'Unknown Builder';subdivision=subdivision||'Unknown Subdivision';
     const key=`${normalizeName(builder)}|${normalizeName(subdivision)}`;
-    if(!map.has(key))map.set(key,{builder,subdivision,completed:0,scheduledStops:0,cancelled:0,workManHours:0,budget:0,miles:0,driveMinutes:0,driveManHours:0,missingRoutes:0});
+    if(!map.has(key))map.set(key,{builder,subdivision,completed:0,scheduledStops:0,cancelled:0,workManHours:0,budget:0,miles:0,driveMinutes:0,driveManHours:0,missingRoutes:0,taskStats:emptyTaskStats()});
     return map.get(key);
   }
+  function areaTaskNames(job){
+    const raw=String(job?.left||job?.raw||'').toLowerCase();
+    if(raw.includes('rewash') && raw.includes('window')) return ['Other / Special'];
+    const firstWater=(raw.includes('1st w/water') || raw.includes('1st with water')) && raw.includes('reclean');
+    const names=[];
+    if(raw.includes('original')) names.push('Original');
+    if(firstWater) names.push('1st w/water Reclean');
+    else if(raw.includes('reclean')) names.push('Reclean');
+    if(raw.includes('window')) names.push('Windows');
+    if(!names.length) names.push('Other / Special');
+    return names;
+  }
+
   base.days.forEach(day=>{
     day.report.crews.forEach(c=>c.jobs.forEach(j=>{
       const a=get(j.builder,j.subdivision);a.scheduledStops++;if(j.cancelled)a.cancelled++;
-      if(!j.cancelled && Number(j.actual)>0){a.completed++;a.workManHours+=Number(j.actual)||0;a.budget+=Number(j.budget)||0;}
+      if(!j.cancelled && Number(j.actual)>0){
+        const actual=Number(j.actual)||0,budget=Number(j.budget)||0;
+        a.completed++;a.workManHours+=actual;a.budget+=budget;
+        areaTaskNames(j).forEach(task=>{
+          const t=a.taskStats[task]||(a.taskStats[task]={completed:0,workManHours:0,budget:0,miles:0,driveMinutes:0,driveManHours:0});
+          t.completed++;t.workManHours+=actual;t.budget+=budget;
+        });
+      }
     }));
+
     (day.stored.crews||[]).forEach(savedCrew=>{
       const parsedCrew=day.report.crews.find(c=>crewIdentityKey(c.name)===crewIdentityKey(savedCrew.name));
       const people=crewPersonCount(savedCrew.name);
       (savedCrew.routes||[]).forEach(r=>{
         let job=null;
         if(parsedCrew) job=parsedCrew.jobs.find(j=>normalizeName(j.subdivision)===normalizeName(r.to));
-        if(!job){
-          job=day.report.crews.flatMap(c=>c.jobs).find(j=>normalizeName(j.subdivision)===normalizeName(r.to));
-        }
+        if(!job) job=day.report.crews.flatMap(c=>c.jobs).find(j=>normalizeName(j.subdivision)===normalizeName(r.to));
+
         const a=get(job?.builder||'',r.to||job?.subdivision||'Unknown Subdivision');
-        if(Number.isFinite(Number(r.miles)))a.miles+=Number(r.miles)||0;else a.missingRoutes++;
-        if(Number.isFinite(Number(r.minutes))){a.driveMinutes+=Number(r.minutes)||0;a.driveManHours+=(Number(r.minutes)||0)/60*people;}
+        const miles=Number.isFinite(Number(r.miles))?Number(r.miles)||0:null;
+        const minutes=Number.isFinite(Number(r.minutes))?Number(r.minutes)||0:null;
+        if(miles!=null)a.miles+=miles;else a.missingRoutes++;
+        if(minutes!=null){a.driveMinutes+=minutes;a.driveManHours+=minutes/60*people;}
+
+        if(job){
+          areaTaskNames(job).forEach(task=>{
+            const t=a.taskStats[task]||(a.taskStats[task]={completed:0,workManHours:0,budget:0,miles:0,driveMinutes:0,driveManHours:0});
+            if(miles!=null)t.miles+=miles;
+            if(minutes!=null){t.driveMinutes+=minutes;t.driveManHours+=minutes/60*people;}
+          });
+        }
       });
     });
   });
+
   const rows=[...map.values()].map(x=>({...x,totalLaborHours:x.workManHours+x.driveManHours,eff:x.workManHours?x.budget/x.workManHours*100:0}));
   const byDriving=[...rows].sort((a,b)=>b.miles-a.miles||b.driveMinutes-a.driveMinutes);
   const hot=[...rows].filter(x=>x.completed>0).sort((a,b)=>b.totalLaborHours-a.totalLaborHours);
   const slow=[...rows].filter(x=>x.completed>0).sort((a,b)=>a.totalLaborHours-b.totalLaborHours);
-  return {...base,rows,byDriving,hot,slow,totals:{miles:rows.reduce((s,x)=>s+x.miles,0),driveMinutes:rows.reduce((s,x)=>s+x.driveMinutes,0),driveManHours:rows.reduce((s,x)=>s+x.driveManHours,0),workManHours:rows.reduce((s,x)=>s+x.workManHours,0),completed:rows.reduce((s,x)=>s+x.completed,0)}};
+  return {...base,rows,byDriving,hot,slow,taskNames,totals:{miles:rows.reduce((s,x)=>s+x.miles,0),driveMinutes:rows.reduce((s,x)=>s+x.driveMinutes,0),driveManHours:rows.reduce((s,x)=>s+x.driveManHours,0),workManHours:rows.reduce((s,x)=>s+x.workManHours,0),completed:rows.reduce((s,x)=>s+x.completed,0)}};
 }
+
 function areaMapDataUrl(rows){
   const pts=rows.map(r=>{const loc=findSubdivision(r.subdivision,r.builder,'');return loc&&Number.isFinite(Number(loc.lat))&&Number.isFinite(Number(loc.lon))?{...r,lat:Number(loc.lat),lon:Number(loc.lon)}:null;}).filter(Boolean);
   if(!pts.length)return '';
@@ -4033,20 +4079,178 @@ function areaMapDataUrl(rows){
   return canvas.toDataURL('image/png');
 }
 
+function areaLeafletMapSection(rows,taskNames=[]){
+  const points=rows.map(r=>{
+    const loc=findSubdivision(r.subdivision,r.builder,'');
+    if(!loc || !Number.isFinite(Number(loc.lat)) || !Number.isFinite(Number(loc.lon))) return null;
+    return {
+      subdivision:r.subdivision,
+      builder:r.builder,
+      lat:Number(loc.lat),
+      lon:Number(loc.lon),
+      completed:Number(r.completed)||0,
+      workManHours:+Number(r.workManHours||0).toFixed(2),
+      driveManHours:+Number(r.driveManHours||0).toFixed(2),
+      totalLaborHours:+Number(r.totalLaborHours||0).toFixed(2),
+      miles:+Number(r.miles||0).toFixed(1),
+      driveMinutes:Math.round(Number(r.driveMinutes)||0),
+      missingRoutes:Number(r.missingRoutes)||0,
+      taskStats:r.taskStats||{}
+    };
+  }).filter(Boolean);
+
+  if(!points.length){
+    return '<div style="padding:18px;border:1px solid #d9e2f3;color:#666">No saved subdivision coordinates matched the selected data, so a map could not be drawn.</div>';
+  }
+
+  const builders=[...new Set(points.map(p=>p.builder).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const payload=JSON.stringify(points).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
+  const builderOptions=builders.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  const taskOptions=(taskNames||[]).map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+
+  return `<div id="areaMapCapture" style="margin-top:8px;border:1px solid #d9e2f3;background:#ffffff;padding:12px">
+    <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:10px">
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#555;min-width:190px">Map metric
+        <select id="areaMapMetric" style="padding:8px;border:1px solid #c9d6e4;border-radius:5px;background:#fff;color:#222">
+          <option value="totalLaborHours">Total Labor Man Hours</option>
+          <option value="workManHours">Cleaning Man Hours</option>
+          <option value="driveManHours">Drive Man Hours</option>
+          <option value="miles">Road Miles</option>
+          <option value="completed">Completed Jobs</option>
+        </select>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#555;min-width:190px">Builder
+        <select id="areaMapBuilder" style="padding:8px;border:1px solid #c9d6e4;border-radius:5px;background:#fff;color:#222"><option value="">All Builders</option>${builderOptions}</select>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#555;min-width:210px">Task
+        <select id="areaMapTask" style="padding:8px;border:1px solid #c9d6e4;border-radius:5px;background:#fff;color:#222"><option value="">All Cleaning Tasks</option>${taskOptions}</select>
+      </label>
+      <button id="areaMapResetBtn" type="button" style="padding:9px 14px;border:0;border-radius:5px;background:#24334c;color:#fff;font-weight:700;cursor:pointer">Reset Map</button>
+      <button id="areaMapCopyBtn" type="button" style="padding:9px 14px;border:0;border-radius:5px;background:#1f4e78;color:#fff;font-weight:700;cursor:pointer">Copy Map Image</button>
+    </div>
+    <div style="font-size:12px;color:#666;margin-bottom:10px">OpenStreetMap basemap. Bubbles cluster automatically in dense areas; zoom in or click a cluster to separate nearby subdivisions. Bubble size follows the selected metric.</div>
+    <div style="display:grid;grid-template-columns:minmax(650px,1fr) 390px;gap:16px;align-items:start">
+      <div id="areaLeafletMap" style="height:720px;border:1px solid #d9e2f3;background:#eef3f8"></div>
+      <div style="border:1px solid #d9e2f3;background:#ffffff;padding:14px 16px;max-height:720px;overflow:auto">
+        <div style="font-size:18px;font-weight:700;color:#1f4e78" id="areaMapLegendTitle">Top Areas</div>
+        <div style="font-size:12px;color:#666;margin:4px 0 10px" id="areaMapLegendSubtitle">Ranked by total labor man-hours</div>
+        <div id="areaMapLegend"></div>
+      </div>
+    </div>
+    <script>
+    (function(){
+      var data=${payload};
+      var mapEl=document.getElementById('areaLeafletMap');
+      if(!mapEl || !window.L) return;
+
+      var map=L.map(mapEl,{zoomControl:true,scrollWheelZoom:true});
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        maxZoom:19,
+        crossOrigin:true,
+        attribution:'&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      var layer=L.markerClusterGroup({
+        showCoverageOnHover:false,
+        spiderfyOnMaxZoom:true,
+        zoomToBoundsOnClick:true,
+        maxClusterRadius:42,
+        disableClusteringAtZoom:14
+      });
+      map.addLayer(layer);
+
+      var metricSelect=document.getElementById('areaMapMetric');
+      var builderSelect=document.getElementById('areaMapBuilder');
+      var taskSelect=document.getElementById('areaMapTask');
+      var legend=document.getElementById('areaMapLegend');
+      var legendTitle=document.getElementById('areaMapLegendTitle');
+      var legendSubtitle=document.getElementById('areaMapLegendSubtitle');
+      var resetBtn=document.getElementById('areaMapResetBtn');
+      var copyBtn=document.getElementById('areaMapCopyBtn');
+
+      var metricLabels={totalLaborHours:'Total Labor Man Hours',workManHours:'Cleaning Man Hours',driveManHours:'Drive Man Hours',miles:'Road Miles',completed:'Completed Jobs'};
+      var metricUnits={totalLaborHours:'MH',workManHours:'MH',driveManHours:'MH',miles:'mi',completed:'jobs'};
+
+      function valuesForPoint(p,task){
+        if(!task) return {completed:p.completed,workManHours:p.workManHours,driveManHours:p.driveManHours,totalLaborHours:p.totalLaborHours,miles:p.miles,driveMinutes:p.driveMinutes};
+        var t=(p.taskStats&&p.taskStats[task])||{};
+        var work=Number(t.workManHours)||0,drive=Number(t.driveManHours)||0;
+        return {completed:Number(t.completed)||0,workManHours:work,driveManHours:drive,totalLaborHours:work+drive,miles:Number(t.miles)||0,driveMinutes:Number(t.driveMinutes)||0};
+      }
+      function escHtml(v){return String(v==null?'':v).replace(/[&<>\"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch];});}
+      function fmtLocal(v){var n=Number(v)||0;return Math.round(n*10)/10;}
+      function bubbleIcon(value,maxValue,rank){
+        var size=24+Math.sqrt(Math.max(0,value)/Math.max(1,maxValue))*42;
+        size=Math.max(24,Math.min(66,size));
+        var badge=rank<=20?'<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 11px Segoe UI,Arial;color:#153f66">'+rank+'</span>':'';
+        return L.divIcon({className:'',iconSize:[size,size],iconAnchor:[size/2,size/2],html:'<div style="position:relative;width:'+size+'px;height:'+size+'px;border-radius:50%;background:rgba(69,116,158,.52);border:2px solid #1f4e78;box-sizing:border-box">'+badge+'</div>'});
+      }
+      function update(){
+        layer.clearLayers();
+        var metric=metricSelect.value;
+        var builder=builderSelect.value;
+        var task=taskSelect.value;
+        var filtered=data.filter(function(p){return !builder || p.builder===builder;}).map(function(p){var vals=valuesForPoint(p,task);return {p:p,vals:vals,value:Number(vals[metric])||0};}).filter(function(x){return x.value>0;});
+        filtered.sort(function(a,b){return b.value-a.value;});
+        var maxValue=Math.max.apply(null,[1].concat(filtered.map(function(x){return x.value;})));
+        var bounds=[];
+        filtered.forEach(function(x,index){
+          var p=x.p,vals=x.vals,rank=index+1;
+          var marker=L.marker([p.lat,p.lon],{icon:bubbleIcon(x.value,maxValue,rank),title:p.subdivision});
+          marker.bindPopup('<div style="font-family:Segoe UI,Arial,sans-serif;line-height:1.45;min-width:220px"><div style="font-weight:700;font-size:14px;margin-bottom:3px">'+escHtml(p.subdivision)+'</div><div style="color:#555;margin-bottom:6px">'+escHtml(p.builder)+'</div>'+(task?'<div style="margin-bottom:6px"><b>Task:</b> '+escHtml(task)+'</div>':'')+'<div><b>Total labor:</b> '+fmtLocal(vals.totalLaborHours)+' MH</div><div><b>Cleaning:</b> '+fmtLocal(vals.workManHours)+' MH</div><div><b>Drive:</b> '+fmtLocal(vals.driveManHours)+' MH</div><div><b>Road miles:</b> '+fmtLocal(vals.miles)+' mi</div><div><b>Drive time:</b> '+Math.round(vals.driveMinutes)+' min</div><div><b>Completed jobs:</b> '+Math.round(vals.completed)+'</div>'+(p.missingRoutes?'<div><b>Missing routes:</b> '+p.missingRoutes+'</div>':'')+'</div>');
+          layer.addLayer(marker);bounds.push([p.lat,p.lon]);
+        });
+
+        var label=metricLabels[metric]||metric;
+        legendTitle.textContent='Top '+Math.min(20,filtered.length)+' Areas';
+        legendSubtitle.textContent='Ranked by '+label.toLowerCase()+(task?' · '+task:'');
+        legend.innerHTML=filtered.slice(0,20).map(function(x,i){return '<div style="display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #eef3f8"><div style="font-weight:700;color:#1f4e78">'+(i+1)+'.</div><div style="min-width:0"><div style="font-weight:600;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(x.p.subdivision)+'</div><div style="font-size:11px;color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(x.p.builder)+'</div></div><div style="color:#555;font-weight:600">'+fmtLocal(x.value)+' '+metricUnits[metric]+'</div></div>';}).join('')+(filtered.length>20?'<div style="font-size:12px;color:#666;margin-top:10px">+ '+(filtered.length-20)+' additional subdivisions shown on the map.</div>':'');
+
+        if(bounds.length===1)map.setView(bounds[0],11);
+        else if(bounds.length)map.fitBounds(bounds,{padding:[35,35],maxZoom:12});
+      }
+
+      metricSelect.addEventListener('change',update);
+      builderSelect.addEventListener('change',update);
+      taskSelect.addEventListener('change',update);
+      resetBtn.addEventListener('click',function(){metricSelect.value='totalLaborHours';builderSelect.value='';taskSelect.value='';update();});
+      copyBtn.addEventListener('click',async function(){
+        var capture=document.getElementById('areaMapCapture');
+        if(!capture || !window.html2canvas){alert('Map capture library is still loading. Try again in a moment.');return;}
+        var old=copyBtn.textContent;copyBtn.textContent='Preparing Map...';copyBtn.disabled=true;
+        try{
+          var canvas=await html2canvas(capture,{useCORS:true,allowTaint:false,backgroundColor:'#ffffff',scale:1.5,logging:false});
+          var blob=await new Promise(function(resolve){canvas.toBlob(resolve,'image/png');});
+          if(!blob)throw new Error('Map image could not be created');
+          await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+          alert('Map image copied. Paste it into Outlook.');
+        }catch(e){
+          alert('The browser blocked direct map copying. You can still use the normal screenshot/copy-image tools.');
+        }finally{copyBtn.textContent=old;copyBtn.disabled=false;}
+      });
+
+      update();
+      setTimeout(function(){map.invalidateSize();},100);
+    })();
+    <\/script>
+  </div>`;
+}
+
 function travelAreaAnalyticsReportHtml(){
-  const d=areaAnalyticsData(),{td,th}=analyticsTableStyles(),mapUrl=areaMapDataUrl(d.rows);
+  const d=areaAnalyticsData(),{td,th}=analyticsTableStyles();
   const driveRows=d.byDriving.map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:right">${fmt(x.miles)} mi</td><td style="${td}text-align:center">${formatDriveMinutes(x.driveMinutes)}</td><td style="${td}text-align:right">${fmt(x.driveManHours)} hr</td><td style="${td}text-align:center">${x.missingRoutes}</td></tr>`).join('');
   const areaRows=(arr,limit=12)=>arr.slice(0,limit).map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:center">${x.completed}</td><td style="${td}text-align:right">${fmt(x.workManHours)}</td><td style="${td}text-align:right">${fmt(x.driveManHours)}</td><td style="${td}text-align:right;font-weight:700">${fmt(x.totalLaborHours)}</td></tr>`).join('');
-  const mapHtml=mapUrl?`<img id="areaMapImage" src="${mapUrl}" alt="Subdivision activity map" style="display:block;width:100%;height:auto;border:1px solid #d9e2f3;margin-top:8px">`:`<div style="padding:18px;border:1px solid #d9e2f3;color:#666">No saved subdivision coordinates matched the selected data, so a map could not be drawn.</div>`;
+  const mapHtml=areaLeafletMapSection(d.rows,d.taskNames);
   const body=`<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>${analyticsCard('Road Miles',fmt(d.totals.miles))}${analyticsCard('Total Drive Time',formatDriveMinutes(d.totals.driveMinutes))}${analyticsCard('Drive Man Hours',fmt(d.totals.driveManHours))}${analyticsCard('Cleaning Man Hours',fmt(d.totals.workManHours))}${analyticsCard('Completed Jobs',d.totals.completed)}</tr></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Subdivision Activity Map</h2>${mapHtml}
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Where We Are Driving the Most</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Road Miles</th><th style="${th}">Drive Time</th><th style="${th}">Actual Drive Man Hours</th><th style="${th}">Missing Routes</th></tr></thead><tbody>${driveRows}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Hot Areas — Highest Total Labor Burden</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Jobs</th><th style="${th}">Cleaning MH</th><th style="${th}">Drive MH</th><th style="${th}">Total Labor MH</th></tr></thead><tbody>${areaRows(d.hot)}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Slow Areas — Lowest Total Labor Burden</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Jobs</th><th style="${th}">Cleaning MH</th><th style="${th}">Drive MH</th><th style="${th}">Total Labor MH</th></tr></thead><tbody>${areaRows(d.slow)}</tbody></table>
   <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Drive mileage/time is assigned to the destination subdivision of each saved route leg. First-job travel from home/shop is not included because the existing mileage logic starts at the first scheduled job.</div>`;
-  const extra=mapUrl?'<button type="button" onclick="copyAnalyticsMapImage()" style="background:#24334c;color:#fff;border:0;border-radius:5px;padding:10px 16px;font-weight:700;cursor:pointer">Copy Map Image</button>':'';
-  return analyticsReportShell('VIP Travel & Hot Areas Report',reportRangeLabel(d.dates),body,extra);
+  const headExtra='<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"><link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script><script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"><\/script><script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"><\/script>';
+  return analyticsReportShell('VIP Travel & Hot Areas Report',reportRangeLabel(d.dates),body,'',headExtra);
 }
+
 function previewTravelAreaAnalytics(){const d=requireAnalyticsDays();if(!d)return;openAnalyticsPreview(travelAreaAnalyticsReportHtml());}
 function downloadTravelAreaAnalyticsCsv(){const base=requireAnalyticsDays();if(!base)return;const d=areaAnalyticsData(),rows=[['Subdivision','Builder','Completed Jobs','Scheduled Stops','Cancelled','Cleaning Man Hours','Budget Hours','Road Miles','Drive Time Minutes','Drive Man Hours','Total Labor Man Hours','Missing Routes']];d.byDriving.forEach(x=>rows.push([x.subdivision,x.builder,x.completed,x.scheduledStops,x.cancelled,+x.workManHours.toFixed(2),+x.budget.toFixed(2),+x.miles.toFixed(1),Math.round(x.driveMinutes),+x.driveManHours.toFixed(2),+x.totalLaborHours.toFixed(2),x.missingRoutes]));downloadAnalyticsCsv(`VIP-Travel-Hot-Areas-${d.dates[0]}.csv`,rows);}
 
