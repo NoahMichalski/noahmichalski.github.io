@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.35</title>
+<title>VIP Crew Efficiency & Travel Report v3.36</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -42,6 +42,12 @@ button.primary{background:var(--accent)}button:hover{filter:brightness(1.08)}
   top:0;
   z-index:3;
 }
+
+.cancellation-review-scroll{max-height:620px;overflow:auto;border:1px solid var(--border);border-radius:12px}
+.cancellation-review-scroll thead th{position:sticky;top:0;z-index:3;background:#182338}
+.cancellation-review-table select,.cancellation-review-table input[type="text"]{background:#0b1424;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:7px 8px;min-width:135px}
+.cancellation-review-table input[type="checkbox"]{width:auto}
+.cancellation-review-table .related-select{min-width:240px}
 
 table{width:100%;border-collapse:collapse;min-width:900px}
 th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;font-size:13px}
@@ -211,10 +217,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.35</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.36</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.35</div>
+    <div class="version">Version 3.36</div>
   </div>
 
   <div class="input-grid">
@@ -307,7 +313,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
     <div class="section-head" style="margin-bottom:10px">
       <h2>Saved Reports & Reporting</h2>
     </div>
-      <details id="weeklyReportsPanel" style="margin-top:16px" open>
+      <details id="weeklyReportsPanel" style="margin-top:16px">
         <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
           Saved Daily Reports
         </summary>
@@ -388,7 +394,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
         </div>
       </details>
 
-      <details id="weeklyOperationsPanel" style="margin-top:14px" open>
+      <details id="weeklyOperationsPanel" style="margin-top:14px">
         <summary style="padding:12px 14px;background:#1f4e78;border:1px solid #315f89;border-radius:12px;cursor:pointer;font-weight:800;color:#ffffff">
           Operations Reports
         </summary>
@@ -404,7 +410,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
         </div>
       </details>
 
-      <details id="weeklyMileagePanel" style="margin-top:14px" open>
+      <details id="weeklyMileagePanel" style="margin-top:14px">
         <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
           Mileage Reports
         </summary>
@@ -474,7 +480,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
       <span class="muted small">Each report uses only the Report Days selected above.</span>
     </div>
 
-    <details id="floorplanPerformancePanel" style="margin-top:14px" open>
+    <details id="floorplanPerformancePanel" style="margin-top:14px">
       <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
         Floorplan Performance Report
       </summary>
@@ -489,7 +495,56 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
       </div>
     </details>
 
-    <details id="cancellationAnalyticsPanel" style="margin-top:14px" open>
+    <details id="cancellationReviewPanel" style="margin-top:14px">
+      <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
+        Cancellation Review
+      </summary>
+      <div style="padding-top:14px">
+        <div class="notice">
+          Review cancelled jobs from the selected Report Days and classify each as Builder / Super, VIP / Internal, Related Cancellation, or Unknown. These classifications are saved separately from the daily reports.
+        </div>
+        <div class="buttons">
+          <button id="refreshCancellationReviewBtn" class="primary" type="button">Load / Refresh Cancellation Review</button>
+          <button id="saveCancellationReviewBtn" type="button">Save Cancellation Reasons</button>
+          <span id="cancellationReviewStatus" class="muted small" style="align-self:center"></span>
+        </div>
+        <div class="controls" style="margin-top:12px;grid-template-columns:repeat(3,minmax(180px,1fr))">
+          <label>Show reason
+            <select id="cancellationReasonFilter" style="background:#0b1424;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px">
+              <option value="all">All Reasons</option>
+              <option value="unknown">Unknown Only</option>
+              <option value="builder">Builder / Super</option>
+              <option value="vip">VIP / Internal</option>
+              <option value="related">Related Cancellation</option>
+            </select>
+          </label>
+          <label>Builder
+            <select id="cancellationBuilderFilter" style="background:#0b1424;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px">
+              <option value="all">All Builders</option>
+            </select>
+          </label>
+          <label>Search subdivision / lot / task
+            <input id="cancellationReviewSearch" type="text" placeholder="Example: Nelson Farms or 214">
+          </label>
+        </div>
+        <div class="buttons" style="margin-top:10px">
+          <button id="selectVisibleCancellationsBtn" type="button">Select Visible</button>
+          <button id="clearCancellationSelectionBtn" type="button">Clear Selection</button>
+          <button id="batchBuilderCancellationBtn" type="button">Mark Selected Builder / Super</button>
+          <button id="batchVipCancellationBtn" type="button">Mark Selected VIP / Internal</button>
+          <button id="batchRelatedCancellationBtn" type="button">Mark Selected Related Cancellation</button>
+          <button id="batchUnknownCancellationBtn" type="button">Mark Selected Unknown</button>
+        </div>
+        <div class="cancellation-review-scroll" style="margin-top:12px">
+          <table class="cancellation-review-table" style="min-width:1350px">
+            <thead><tr><th>Select</th><th>Date</th><th>Crew</th><th>Builder</th><th>Subdivision</th><th>Lot</th><th>Task</th><th>Reason</th><th>Related To</th></tr></thead>
+            <tbody id="cancellationReviewTable"><tr><td colspan="9" class="muted">Click Load / Refresh Cancellation Review.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+
+    <details id="cancellationAnalyticsPanel" style="margin-top:14px">
       <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
         Cancellation Report
       </summary>
@@ -504,7 +559,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
       </div>
     </details>
 
-    <details id="travelAreaAnalyticsPanel" style="margin-top:14px" open>
+    <details id="travelAreaAnalyticsPanel" style="margin-top:14px">
       <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
         Travel & Hot Areas Report
       </summary>
@@ -519,7 +574,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
       </div>
     </details>
 
-    <details id="manHourAnalyticsPanel" style="margin-top:14px" open>
+    <details id="manHourAnalyticsPanel" style="margin-top:14px">
       <summary style="padding:12px 14px;background:#182338;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-weight:800">
         Man-Hour Report
       </summary>
@@ -646,7 +701,8 @@ const STORAGE_KEYS = {
   driverOverrides: 'vipCrewReport.driverOverrides.v1',
   knownEmployees: 'vipCrewReport.knownEmployees.v1',
   employeeAliases: 'vipCrewReport.employeeAliases.v1',
-  referenceUploads: 'vipCrewReport.referenceUploads.v1'
+  referenceUploads: 'vipCrewReport.referenceUploads.v1',
+  cancellationReasons: 'vipCrewReport.cancellationReasons.v1'
 };
 let subdivisionData = [];
 let routeCache = {};
@@ -660,6 +716,8 @@ let driverOverrides = {};
 let knownEmployees = [];
 let employeeAliases = {};
 let referenceUploads = {subdivisions:'',floorplans:''};
+let cancellationReasons = {};
+let cancellationReviewDraft = {};
 
 function normalizeName(value){
   return String(value || '')
@@ -693,6 +751,8 @@ function loadLocalData(){
   try { knownEmployees = JSON.parse(localStorage.getItem(STORAGE_KEYS.knownEmployees) || '[]') || []; } catch(e) { knownEmployees = []; }
   try { employeeAliases = JSON.parse(localStorage.getItem(STORAGE_KEYS.employeeAliases) || '{}') || {}; } catch(e) { employeeAliases = {}; }
   try { referenceUploads = JSON.parse(localStorage.getItem(STORAGE_KEYS.referenceUploads) || '{}') || {}; } catch(e) { referenceUploads = {}; }
+  try { cancellationReasons = JSON.parse(localStorage.getItem(STORAGE_KEYS.cancellationReasons) || '{}') || {}; } catch(e) { cancellationReasons = {}; }
+  cancellationReviewDraft={...cancellationReasons};
   referenceUploads={subdivisions:String(referenceUploads.subdivisions||''),floorplans:String(referenceUploads.floorplans||'')};
   compactExistingMileageHistoryStorage();
   try {
@@ -860,6 +920,7 @@ function saveReportSelectedDates(){
   reportSelectedDates=[...new Set(reportSelectedDates)].filter(d=>mileageHistory[d]).sort();
   localStorage.setItem(STORAGE_KEYS.reportSelectedDates,JSON.stringify(reportSelectedDates));
   renderReportDayChoices();
+  if($('#cancellationReviewTable') && $('#cancellationReviewTable').dataset.loaded==='1') renderCancellationReview();
 }
 function reportDates(){
   const selected=reportSelectedDates.filter(d=>mileageHistory[d]).sort();
@@ -1957,7 +2018,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.34',
+    appVersion:'3.36',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -1981,7 +2042,8 @@ function backupSettingsPayload(){
     reportSelectedDates,
     floorplanData,
     subdivisionData,
-    referenceUploads
+    referenceUploads,
+    cancellationReasons
   };
 }
 async function exportSavedDataBackup(){
@@ -2012,6 +2074,7 @@ This backup includes:
 - Subdivisions
 - Reference sheet Last Uploaded timestamps
 - Report settings
+- Cancellation review classifications
 
 Generated: ${new Date().toLocaleString()}
 `);
@@ -2030,6 +2093,7 @@ Generated: ${new Date().toLocaleString()}
   zip.file('settings/employee-aliases.json',JSON.stringify(config.employeeAliases,null,2));
   zip.file('settings/mileage-exclusions.json',JSON.stringify(config.mileageExclusions,null,2));
   zip.file('settings/report-selected-dates.json',JSON.stringify(config.reportSelectedDates,null,2));
+  zip.file('settings/cancellation-reasons.json',JSON.stringify(config.cancellationReasons,null,2));
   zip.file('reference/floorplans.json',JSON.stringify(config.floorplanData,null,2));
   zip.file('reference/subdivisions.json',JSON.stringify(config.subdivisionData,null,2));
   zip.file('reference/upload-times.json',JSON.stringify(config.referenceUploads,null,2));
@@ -2107,6 +2171,7 @@ async function importSavedDataBackup(file){
   const importedMileageExclusions=importedDriverConfig?.exclusions
     ?? await readZipJson(zip,'settings/mileage-exclusions.json',[]);
   const importedReportDates=await readZipJson(zip,'settings/report-selected-dates.json',[]);
+  const importedCancellationReasons=await readZipJson(zip,'settings/cancellation-reasons.json',{});
   const importedFloorplans=await readZipJson(zip,'reference/floorplans.json',[]);
   const importedSubdivisions=await readZipJson(zip,'reference/subdivisions.json',[]);
   const importedReferenceUploads=await readZipJson(zip,'reference/upload-times.json',{});
@@ -2186,6 +2251,9 @@ async function importSavedDataBackup(file){
     ? importedMileageExclusions.map(name=>employeeAliases[normalizePersonName(name)] || cleanCrewToken(name)).filter(Boolean)
     : [];
   reportSelectedDates=Array.isArray(importedReportDates)?importedReportDates:[];
+  const restoredCancellationReasons=(importedCancellationReasons && typeof importedCancellationReasons==='object')?importedCancellationReasons:{};
+  cancellationReasons=replace ? restoredCancellationReasons : {...(cancellationReasons||{}),...restoredCancellationReasons};
+  cancellationReviewDraft={...cancellationReasons};
   floorplanData=Array.isArray(importedFloorplans)?importedFloorplans:[];
   subdivisionData=Array.isArray(importedSubdivisions)?importedSubdivisions:[];
   referenceUploads={
@@ -2200,6 +2268,7 @@ async function importSavedDataBackup(file){
   localStorage.setItem(STORAGE_KEYS.driverOverrides,JSON.stringify(driverOverrides));
   localStorage.setItem(STORAGE_KEYS.mileageExclusions,JSON.stringify(mileageExclusions));
   localStorage.setItem(STORAGE_KEYS.reportSelectedDates,JSON.stringify(reportSelectedDates));
+  localStorage.setItem(STORAGE_KEYS.cancellationReasons,JSON.stringify(cancellationReasons));
   localStorage.setItem(STORAGE_KEYS.floorplans,JSON.stringify(floorplanData));
   localStorage.setItem(STORAGE_KEYS.subdivisions,JSON.stringify(subdivisionData));
   localStorage.setItem(STORAGE_KEYS.referenceUploads,JSON.stringify(referenceUploads));
@@ -2316,7 +2385,7 @@ function savedDaysDebugReport(){
   const lines=[];
   const now=new Date().toLocaleString();
 
-  lines.push(`VIP Saved Days Debug — v3.35`);
+  lines.push(`VIP Saved Days Debug — v3.36`);
   lines.push(`Generated: ${now}`);
   lines.push('');
 
@@ -3746,31 +3815,157 @@ function downloadFloorplanPerformanceCsv(){
   downloadAnalyticsCsv(`VIP-Floorplan-Performance-${d.dates[0]}.csv`,rows);
 }
 
+
+function cancellationReasonLabel(reason){
+  return {builder:'Builder / Super',vip:'VIP / Internal',related:'Related Cancellation',unknown:'Unknown'}[reason]||'Unknown';
+}
+function normalizeCancellationReason(reason){
+  return ['builder','vip','related'].includes(reason)?reason:'unknown';
+}
+function cancellationRecordKey(date,crewName,job){
+  const parts=[
+    date,
+    normalizeName(job?.builder||''),
+    normalizeName(job?.subdivision||''),
+    normalizeName(job?.lot||''),
+    normalizeName(job?.left||job?.raw||job?.jobType||''),
+    normalizeName(job?.address||'')
+  ];
+  return encodeURIComponent(parts.join('|'));
+}
+function cancellationClassification(key){
+  const raw=(cancellationReviewDraft&&cancellationReviewDraft[key]) || (cancellationReasons&&cancellationReasons[key]) || {};
+  return {reason:normalizeCancellationReason(raw.reason),relatedTo:String(raw.relatedTo||'')};
+}
+function cancellationReviewRecords(){
+  const base=analyticsBaseData(),records=[];
+  base.days.forEach(day=>day.report.crews.forEach(c=>c.jobs.filter(j=>j.cancelled).forEach(j=>{
+    const key=cancellationRecordKey(day.date,c.name,j);
+    records.push({
+      key,date:day.date,weekday:day.weekday,crew:c.name,
+      builder:j.builder||'Unknown Builder',subdivision:j.subdivision||'Unknown Subdivision',
+      lot:String(j.lot||'').trim(),task:budgetTaskLabel(j),raw:j.left||j.raw||j.jobType||'',address:j.address||''
+    });
+  })));
+  return records.sort((a,b)=>b.date.localeCompare(a.date)||a.builder.localeCompare(b.builder)||a.subdivision.localeCompare(b.subdivision));
+}
+function cancellationRelatedCandidates(record,records){
+  const sameLot=record.lot?records.filter(r=>r.key!==record.key && normalizeName(r.subdivision)===normalizeName(record.subdivision) && normalizeName(r.lot)===normalizeName(record.lot)):[];
+  const pool=sameLot.length?sameLot:records.filter(r=>r.key!==record.key && normalizeName(r.subdivision)===normalizeName(record.subdivision));
+  return pool.slice().sort((a,b)=>a.date.localeCompare(b.date));
+}
+function updateCancellationReviewFilters(records){
+  const builderSelect=$('#cancellationBuilderFilter');
+  if(!builderSelect)return;
+  const prior=builderSelect.value||'all';
+  const builders=[...new Set(records.map(r=>r.builder).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  builderSelect.innerHTML='<option value="all">All Builders</option>'+builders.map(b=>`<option value="${esc(normalizeName(b))}">${esc(b)}</option>`).join('');
+  if([...builderSelect.options].some(o=>o.value===prior))builderSelect.value=prior;
+}
+function renderCancellationReview(){
+  const body=$('#cancellationReviewTable');if(!body)return;body.dataset.loaded='1';
+  const records=cancellationReviewRecords();
+  updateCancellationReviewFilters(records);
+  const reasonFilter=$('#cancellationReasonFilter')?.value||'all';
+  const builderFilter=$('#cancellationBuilderFilter')?.value||'all';
+  const search=normalizeName($('#cancellationReviewSearch')?.value||'');
+  const visible=records.filter(r=>{
+    const cls=cancellationClassification(r.key);
+    if(reasonFilter!=='all' && cls.reason!==reasonFilter)return false;
+    if(builderFilter!=='all' && normalizeName(r.builder)!==builderFilter)return false;
+    if(search){
+      const hay=normalizeName([r.subdivision,r.builder,r.lot,r.task,r.crew,r.address].join(' '));
+      if(!hay.includes(search))return false;
+    }
+    return true;
+  });
+  if($('#cancellationReviewStatus')){
+    const unknown=records.filter(r=>cancellationClassification(r.key).reason==='unknown').length;
+    $('#cancellationReviewStatus').textContent=`${visible.length} shown · ${records.length} cancellations · ${unknown} unknown`;
+  }
+  if(!visible.length){body.innerHTML='<tr><td colspan="9" class="muted">No cancellations match the current filters.</td></tr>';return;}
+  body.innerHTML='';
+  visible.forEach(r=>{
+    const cls=cancellationClassification(r.key),candidates=cancellationRelatedCandidates(r,records);
+    const tr=document.createElement('tr');tr.dataset.key=r.key;
+    const options=['unknown','builder','vip','related'].map(v=>`<option value="${v}" ${cls.reason===v?'selected':''}>${cancellationReasonLabel(v)}</option>`).join('');
+    const relatedOptions='<option value="">'+(candidates.length?'Choose related cancellation…':'No matching cancellation found')+'</option>'+candidates.map(x=>`<option value="${x.key}" ${cls.relatedTo===x.key?'selected':''}>${esc(shortDateLabel(x.date))} · ${esc(x.lot||'No lot')} · ${esc(x.task)}</option>`).join('');
+    tr.innerHTML=`<td style="text-align:center"><input type="checkbox" class="cancel-review-check" data-key="${r.key}"></td><td><strong>${esc(shortDateLabel(r.date))}</strong><div class="muted small">${esc(r.weekday||dayLabel(r.date))}</div></td><td>${esc(r.crew)}</td><td>${esc(r.builder)}</td><td>${esc(r.subdivision)}</td><td>${esc(r.lot||'—')}</td><td>${esc(r.task)}</td><td><select class="cancel-reason-select" data-key="${r.key}">${options}</select></td><td><select class="related-select" data-key="${r.key}" ${cls.reason==='related'?'':'disabled'}>${relatedOptions}</select></td>`;
+    body.appendChild(tr);
+  });
+  body.querySelectorAll('.cancel-reason-select').forEach(sel=>sel.addEventListener('change',()=>{
+    const key=sel.dataset.key,current=cancellationClassification(key),reason=normalizeCancellationReason(sel.value);
+    cancellationReviewDraft[key]={...current,reason,relatedTo:reason==='related'?current.relatedTo:''};
+    const related=body.querySelector(`.related-select[data-key="${CSS.escape(key)}"]`);if(related){related.disabled=reason!=='related';if(reason!=='related')related.value='';}
+    if($('#cancellationReviewStatus'))$('#cancellationReviewStatus').textContent+=' · unsaved changes';
+  }));
+  body.querySelectorAll('.related-select').forEach(sel=>sel.addEventListener('change',()=>{
+    const key=sel.dataset.key,current=cancellationClassification(key);cancellationReviewDraft[key]={...current,reason:'related',relatedTo:sel.value||''};
+    if($('#cancellationReviewStatus'))$('#cancellationReviewStatus').textContent+=' · unsaved changes';
+  }));
+}
+function selectedCancellationReviewKeys(){return [...document.querySelectorAll('#cancellationReviewTable .cancel-review-check:checked')].map(x=>x.dataset.key).filter(Boolean);}
+function batchCancellationReason(reason){
+  const keys=selectedCancellationReviewKeys();if(!keys.length){alert('Select at least one cancellation first.');return;}
+  reason=normalizeCancellationReason(reason);
+  keys.forEach(key=>{const current=cancellationClassification(key);cancellationReviewDraft[key]={...current,reason,relatedTo:reason==='related'?current.relatedTo:''};});
+  renderCancellationReview();
+}
+function saveCancellationReview(){
+  cancellationReasons={...cancellationReasons,...cancellationReviewDraft};
+  try{
+    localStorage.setItem(STORAGE_KEYS.cancellationReasons,JSON.stringify(cancellationReasons));
+    cancellationReviewDraft={...cancellationReasons};
+    renderCancellationReview();
+    if($('#cancellationReviewStatus'))$('#cancellationReviewStatus').textContent+=' · saved';
+  }catch(e){alert(`Cancellation reasons could not be saved. ${e?.message||e}`);}
+}
+
 function cancellationAnalyticsData(){
   const base=analyticsBaseData();
   const builders=new Map(),subs=new Map();let total=0,scheduled=0;
+  const empty=()=>({scheduled:0,cancelled:0,builderSide:0,vip:0,related:0,unknown:0});
   base.days.forEach(day=>day.report.crews.forEach(c=>c.jobs.forEach(j=>{
-    scheduled++;const cancelled=!!j.cancelled;if(cancelled)total++;
+    scheduled++;
+    const cancelled=!!j.cancelled;
     const builder=j.builder||'Unknown Builder',subdivision=j.subdivision||'Unknown Subdivision';
-    const bk=normalizeName(builder)||builder.toLowerCase();if(!builders.has(bk))builders.set(bk,{builder,scheduled:0,cancelled:0});
-    const br=builders.get(bk);br.scheduled++;if(cancelled)br.cancelled++;
-    const sk=`${bk}|${normalizeName(subdivision)}`;if(!subs.has(sk))subs.set(sk,{builder,subdivision,scheduled:0,cancelled:0});
-    const sr=subs.get(sk);sr.scheduled++;if(cancelled)sr.cancelled++;
+    const bk=normalizeName(builder)||builder.toLowerCase();
+    if(!builders.has(bk))builders.set(bk,{builder,...empty()});
+    const br=builders.get(bk);br.scheduled++;
+    const sk=`${bk}|${normalizeName(subdivision)}`;
+    if(!subs.has(sk))subs.set(sk,{builder,subdivision,...empty()});
+    const sr=subs.get(sk);sr.scheduled++;
+    if(!cancelled)return;
+    total++;br.cancelled++;sr.cancelled++;
+    const key=cancellationRecordKey(day.date,c.name,j),reason=cancellationClassification(key).reason;
+    const field=reason==='builder'?'builderSide':reason==='vip'?'vip':reason==='related'?'related':'unknown';
+    br[field]++;sr[field]++;
   })));
   const prep=r=>({...r,rate:r.scheduled?r.cancelled/r.scheduled*100:0});
-  return {...base,total,scheduled,builders:[...builders.values()].map(prep).sort((a,b)=>b.cancelled-a.cancelled||b.rate-a.rate),subdivisions:[...subs.values()].map(prep).sort((a,b)=>b.cancelled-a.cancelled||b.rate-a.rate)};
+  const builderRows=[...builders.values()].map(prep).sort((a,b)=>b.cancelled-a.cancelled||b.rate-a.rate);
+  const subRows=[...subs.values()].map(prep).sort((a,b)=>b.cancelled-a.cancelled||b.rate-a.rate);
+  const totals=builderRows.reduce((a,x)=>{a.builderSide+=x.builderSide;a.vip+=x.vip;a.related+=x.related;a.unknown+=x.unknown;return a;},{builderSide:0,vip:0,related:0,unknown:0});
+  return {...base,total,scheduled,...totals,builders:builderRows,subdivisions:subRows};
 }
 function cancellationAnalyticsReportHtml(){
   const d=cancellationAnalyticsData(),{td,th}=analyticsTableStyles();
-  const builderRows=d.builders.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.builder)}</td><td style="${td}text-align:center">${x.cancelled}</td><td style="${td}text-align:center">${x.scheduled}</td><td style="${td}text-align:center">${fmt(x.rate)}%</td></tr>`).join('');
-  const subRows=d.subdivisions.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:center">${x.cancelled}</td><td style="${td}text-align:center">${x.scheduled}</td><td style="${td}text-align:center">${fmt(x.rate)}%</td></tr>`).join('');
-  const body=`<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>${analyticsCard('Cancellations',d.total)}${analyticsCard('Scheduled Jobs',d.scheduled)}${analyticsCard('Cancellation Rate',fmt(d.scheduled?d.total/d.scheduled*100:0)+'%')}${analyticsCard('Affected Subdivisions',d.subdivisions.filter(x=>x.cancelled>0).length)}</tr></table>
-  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cancellations by Builder</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Builder</th><th style="${th}">Cancelled</th><th style="${th}">Scheduled</th><th style="${th}">Cancellation Rate</th></tr></thead><tbody>${builderRows}</tbody></table>
-  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cancellations by Subdivision</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Cancelled</th><th style="${th}">Scheduled</th><th style="${th}">Cancellation Rate</th></tr></thead><tbody>${subRows}</tbody></table>`;
+  const builderRows=d.builders.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.builder)}</td><td style="${td}text-align:center;font-weight:700">${x.cancelled}</td><td style="${td}text-align:center">${x.builderSide}</td><td style="${td}text-align:center">${x.vip}</td><td style="${td}text-align:center">${x.related}</td><td style="${td}text-align:center">${x.unknown}</td><td style="${td}text-align:center">${x.scheduled}</td><td style="${td}text-align:center">${fmt(x.rate)}%</td></tr>`).join('');
+  const subRows=d.subdivisions.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:center;font-weight:700">${x.cancelled}</td><td style="${td}text-align:center">${x.builderSide}</td><td style="${td}text-align:center">${x.vip}</td><td style="${td}text-align:center">${x.related}</td><td style="${td}text-align:center">${x.unknown}</td><td style="${td}text-align:center">${x.scheduled}</td><td style="${td}text-align:center">${fmt(x.rate)}%</td></tr>`).join('');
+  const body=`<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>${analyticsCard('All Cancellations',d.total)}${analyticsCard('Builder / Super',d.builderSide)}${analyticsCard('VIP / Internal',d.vip)}${analyticsCard('Related',d.related)}${analyticsCard('Unknown',d.unknown)}</tr><tr>${analyticsCard('Scheduled Jobs',d.scheduled)}${analyticsCard('Cancellation Rate',fmt(d.scheduled?d.total/d.scheduled*100:0)+'%')}${analyticsCard('Affected Subdivisions',d.subdivisions.filter(x=>x.cancelled>0).length)}<td colspan="2" style="border:0"></td></tr></table>
+  <div style="margin-top:12px;padding:10px 12px;background:#eef3f8;border:1px solid #d9e2f3;font-size:12px;color:#555">Related Cancellation means a downstream job was cancelled because another related job was removed or moved. Unknown is intentionally left unassigned rather than guessed.</div>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cancellations by Builder</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Builder</th><th style="${th}">All</th><th style="${th}">Builder / Super</th><th style="${th}">VIP / Internal</th><th style="${th}">Related</th><th style="${th}">Unknown</th><th style="${th}">Scheduled</th><th style="${th}">Rate</th></tr></thead><tbody>${builderRows}</tbody></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cancellations by Subdivision</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">All</th><th style="${th}">Builder / Super</th><th style="${th}">VIP / Internal</th><th style="${th}">Related</th><th style="${th}">Unknown</th><th style="${th}">Scheduled</th><th style="${th}">Rate</th></tr></thead><tbody>${subRows}</tbody></table>`;
   return analyticsReportShell('VIP Cancellation Report',reportRangeLabel(d.dates),body);
 }
 function previewCancellationAnalytics(){const d=requireAnalyticsDays();if(!d)return;openAnalyticsPreview(cancellationAnalyticsReportHtml());}
-function downloadCancellationAnalyticsCsv(){const base=requireAnalyticsDays();if(!base)return;const d=cancellationAnalyticsData(),rows=[['Subdivision','Builder','Cancelled','Scheduled','Cancellation Rate %']];d.subdivisions.forEach(x=>rows.push([x.subdivision,x.builder,x.cancelled,x.scheduled,+x.rate.toFixed(1)]));rows.push([]);rows.push(['BUILDER SUMMARY']);rows.push(['Builder','Cancelled','Scheduled','Cancellation Rate %']);d.builders.forEach(x=>rows.push([x.builder,x.cancelled,x.scheduled,+x.rate.toFixed(1)]));downloadAnalyticsCsv(`VIP-Cancellations-${d.dates[0]}.csv`,rows);}
+function downloadCancellationAnalyticsCsv(){
+  const base=requireAnalyticsDays();if(!base)return;const d=cancellationAnalyticsData();
+  const rows=[['Subdivision','Builder','All Cancellations','Builder / Super','VIP / Internal','Related Cancellation','Unknown','Scheduled','Cancellation Rate %']];
+  d.subdivisions.forEach(x=>rows.push([x.subdivision,x.builder,x.cancelled,x.builderSide,x.vip,x.related,x.unknown,x.scheduled,+x.rate.toFixed(1)]));
+  rows.push([]);rows.push(['BUILDER SUMMARY']);rows.push(['Builder','All Cancellations','Builder / Super','VIP / Internal','Related Cancellation','Unknown','Scheduled','Cancellation Rate %']);
+  d.builders.forEach(x=>rows.push([x.builder,x.cancelled,x.builderSide,x.vip,x.related,x.unknown,x.scheduled,+x.rate.toFixed(1)]));
+  downloadAnalyticsCsv(`VIP-Cancellations-${d.dates[0]}.csv`,rows);
+}
 
 function areaAnalyticsData(){
   const base=analyticsBaseData(),map=new Map();
@@ -3809,16 +4004,35 @@ function areaAnalyticsData(){
 function areaMapDataUrl(rows){
   const pts=rows.map(r=>{const loc=findSubdivision(r.subdivision,r.builder,'');return loc&&Number.isFinite(Number(loc.lat))&&Number.isFinite(Number(loc.lon))?{...r,lat:Number(loc.lat),lon:Number(loc.lon)}:null;}).filter(Boolean);
   if(!pts.length)return '';
-  const canvas=document.createElement('canvas');canvas.width=1500;canvas.height=900;const ctx=canvas.getContext('2d');
+  const ranked=[...pts].sort((a,b)=>b.totalLaborHours-a.totalLaborHours);
+  ranked.forEach((p,i)=>p.mapRank=i+1);
+  const canvas=document.createElement('canvas');canvas.width=1700;canvas.height=1000;const ctx=canvas.getContext('2d');
   ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);
-  const pad=80,minLat=Math.min(...pts.map(p=>p.lat)),maxLat=Math.max(...pts.map(p=>p.lat)),minLon=Math.min(...pts.map(p=>p.lon)),maxLon=Math.max(...pts.map(p=>p.lon));
+  const mapX=70,mapY=105,mapW=1040,mapH=820,legendX=1150,legendW=500;
+  const minLat=Math.min(...pts.map(p=>p.lat)),maxLat=Math.max(...pts.map(p=>p.lat)),minLon=Math.min(...pts.map(p=>p.lon)),maxLon=Math.max(...pts.map(p=>p.lon));
   const latSpan=Math.max(.01,maxLat-minLat),lonSpan=Math.max(.01,maxLon-minLon),metricMax=Math.max(1,...pts.map(p=>p.totalLaborHours));
-  ctx.strokeStyle='#d9e2f3';ctx.lineWidth=1;for(let i=0;i<=8;i++){const x=pad+(canvas.width-pad*2)*i/8;ctx.beginPath();ctx.moveTo(x,pad);ctx.lineTo(x,canvas.height-pad);ctx.stroke();}for(let i=0;i<=5;i++){const y=pad+(canvas.height-pad*2)*i/5;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(canvas.width-pad,y);ctx.stroke();}
-  pts.forEach(p=>{p.x=pad+(p.lon-minLon)/lonSpan*(canvas.width-pad*2);p.y=canvas.height-pad-(p.lat-minLat)/latSpan*(canvas.height-pad*2);const rad=7+Math.sqrt(p.totalLaborHours/metricMax)*34;ctx.beginPath();ctx.arc(p.x,p.y,rad,0,Math.PI*2);ctx.fillStyle='rgba(31,78,121,.58)';ctx.fill();ctx.strokeStyle='#1f4e78';ctx.lineWidth=2;ctx.stroke();});
-  const labels=[...pts].sort((a,b)=>b.totalLaborHours-a.totalLaborHours).slice(0,18);ctx.font='bold 15px Segoe UI, Arial';ctx.fillStyle='#1f1f1f';labels.forEach((p,i)=>{ctx.fillText(`${i+1}. ${p.subdivision}`,p.x+10,p.y-10);});
-  ctx.font='bold 24px Segoe UI, Arial';ctx.fillStyle='#1f4e78';ctx.fillText('Subdivision Activity Map',pad,38);ctx.font='14px Segoe UI, Arial';ctx.fillStyle='#555';ctx.fillText('Bubble size = cleaning man-hours + drive man-hours. Geographic positions use saved subdivision coordinates.',pad,62);
+  ctx.fillStyle='#f8fafc';ctx.fillRect(mapX,mapY,mapW,mapH);ctx.strokeStyle='#c8d4e3';ctx.lineWidth=2;ctx.strokeRect(mapX,mapY,mapW,mapH);
+  ctx.strokeStyle='#dfe7ef';ctx.lineWidth=1;for(let i=1;i<8;i++){const x=mapX+mapW*i/8;ctx.beginPath();ctx.moveTo(x,mapY);ctx.lineTo(x,mapY+mapH);ctx.stroke();}for(let i=1;i<6;i++){const y=mapY+mapH*i/6;ctx.beginPath();ctx.moveTo(mapX,y);ctx.lineTo(mapX+mapW,y);ctx.stroke();}
+  pts.forEach(p=>{p.x=mapX+(p.lon-minLon)/lonSpan*mapW;p.y=mapY+mapH-(p.lat-minLat)/latSpan*mapH;p.rad=5+Math.sqrt(p.totalLaborHours/metricMax)*27;});
+  [...pts].sort((a,b)=>a.totalLaborHours-b.totalLaborHours).forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.rad,0,Math.PI*2);ctx.fillStyle='rgba(31,78,121,.42)';ctx.fill();ctx.strokeStyle='rgba(31,78,121,.75)';ctx.lineWidth=1.5;ctx.stroke();});
+  const labelCount=Math.min(22,ranked.length);
+  ranked.slice(0,labelCount).forEach(p=>{
+    const markerR=12;ctx.beginPath();ctx.arc(p.x,p.y,markerR,0,Math.PI*2);ctx.fillStyle='#ffffff';ctx.fill();ctx.strokeStyle='#1f4e78';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#1f4e78';ctx.font='bold 12px Segoe UI, Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(p.mapRank),p.x,p.y+.5);
+  });
+  ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.fillStyle='#ffffff';ctx.fillRect(legendX,mapY,legendW,mapH);ctx.strokeStyle='#d9e2f3';ctx.strokeRect(legendX,mapY,legendW,mapH);
+  ctx.fillStyle='#1f4e78';ctx.font='bold 20px Segoe UI, Arial';ctx.fillText(`Top ${labelCount} Areas`,legendX+20,mapY+34);
+  ctx.fillStyle='#666';ctx.font='13px Segoe UI, Arial';ctx.fillText('Ranked by total labor man-hours',legendX+20,mapY+56);
+  ranked.slice(0,labelCount).forEach((p,i)=>{
+    const y=mapY+88+i*31;ctx.fillStyle='#1f4e78';ctx.font='bold 13px Segoe UI, Arial';ctx.fillText(`${p.mapRank}.`,legendX+20,y);ctx.fillStyle='#222';ctx.font='13px Segoe UI, Arial';
+    let name=String(p.subdivision||'Unknown');if(name.length>31)name=name.slice(0,29)+'…';ctx.fillText(name,legendX+52,y);ctx.fillStyle='#666';ctx.textAlign='right';ctx.fillText(`${fmt(p.totalLaborHours)} MH`,legendX+legendW-18,y);ctx.textAlign='left';
+  });
+  if(ranked.length>labelCount){ctx.fillStyle='#777';ctx.font='12px Segoe UI, Arial';ctx.fillText(`+ ${ranked.length-labelCount} additional subdivisions shown as unlabeled bubbles`,legendX+20,mapY+mapH-20);}
+  ctx.fillStyle='#1f4e78';ctx.font='bold 26px Segoe UI, Arial';ctx.fillText('Subdivision Activity Map',mapX,42);ctx.fillStyle='#555';ctx.font='14px Segoe UI, Arial';ctx.fillText('Bubble size = cleaning man-hours + drive man-hours. Numbered markers correspond to the ranked legend.',mapX,67);
+  ctx.fillStyle='#666';ctx.font='12px Segoe UI, Arial';ctx.fillText('Geographic position uses saved subdivision coordinates. The background grid is for orientation only.',mapX,88);
+  ctx.fillStyle='#1f4e78';ctx.font='bold 15px Segoe UI, Arial';ctx.fillText('N ↑',mapX+14,mapY+26);
   return canvas.toDataURL('image/png');
 }
+
 function travelAreaAnalyticsReportHtml(){
   const d=areaAnalyticsData(),{td,th}=analyticsTableStyles(),mapUrl=areaMapDataUrl(d.rows);
   const driveRows=d.byDriving.map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:right">${fmt(x.miles)} mi</td><td style="${td}text-align:center">${formatDriveMinutes(x.driveMinutes)}</td><td style="${td}text-align:right">${fmt(x.driveManHours)} hr</td><td style="${td}text-align:center">${x.missingRoutes}</td></tr>`).join('');
@@ -4530,6 +4744,17 @@ $('#mileageExcludeInput').addEventListener('keydown',e=>{
 });
 $('#previewFloorplanPerformanceBtn').onclick=previewFloorplanPerformance;
 $('#downloadFloorplanPerformanceCsvBtn').onclick=downloadFloorplanPerformanceCsv;
+$('#refreshCancellationReviewBtn').onclick=renderCancellationReview;
+$('#saveCancellationReviewBtn').onclick=saveCancellationReview;
+$('#cancellationReasonFilter').addEventListener('change',renderCancellationReview);
+$('#cancellationBuilderFilter').addEventListener('change',renderCancellationReview);
+$('#cancellationReviewSearch').addEventListener('input',renderCancellationReview);
+$('#selectVisibleCancellationsBtn').onclick=()=>document.querySelectorAll('#cancellationReviewTable .cancel-review-check').forEach(x=>x.checked=true);
+$('#clearCancellationSelectionBtn').onclick=()=>document.querySelectorAll('#cancellationReviewTable .cancel-review-check').forEach(x=>x.checked=false);
+$('#batchBuilderCancellationBtn').onclick=()=>batchCancellationReason('builder');
+$('#batchVipCancellationBtn').onclick=()=>batchCancellationReason('vip');
+$('#batchRelatedCancellationBtn').onclick=()=>batchCancellationReason('related');
+$('#batchUnknownCancellationBtn').onclick=()=>batchCancellationReason('unknown');
 $('#previewCancellationAnalyticsBtn').onclick=previewCancellationAnalytics;
 $('#downloadCancellationAnalyticsCsvBtn').onclick=downloadCancellationAnalyticsCsv;
 $('#previewTravelAreaAnalyticsBtn').onclick=previewTravelAreaAnalytics;
@@ -4562,6 +4787,7 @@ $('#mileageWeekStart').addEventListener('change',()=>{
   if(!reportSelectedDates.length) renderReportDayChoices();
 });
 loadLocalData();
+document.querySelectorAll('details').forEach(d=>d.open=false);
 
 $('#sampleBtn').onclick=()=>{ $('#pasteBox').value=`EVA/JOSE\t\t\t\t\t\t
 Monday\tPeople\tIn\tOut\tActual Man Hours\tBudget\tEst. Complete
