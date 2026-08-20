@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.31</title>
+<title>VIP Crew Efficiency & Travel Report v3.32</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -32,6 +32,17 @@ button.primary{background:var(--accent)}button:hover{filter:brightness(1.08)}
 .section{margin-top:18px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
 .muted{color:var(--muted)}.small{font-size:12px}
 .scroll{overflow:auto;border:1px solid var(--border);border-radius:12px}
+.saved-days-scroll{
+  max-height:560px;
+  overflow-y:auto;
+  overflow-x:auto;
+}
+.saved-days-scroll thead th{
+  position:sticky;
+  top:0;
+  z-index:3;
+}
+
 table{width:100%;border-collapse:collapse;min-width:900px}
 th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;font-size:13px}
 th{position:sticky;top:0;background:#182338;color:#cfe0f8;z-index:1}
@@ -200,10 +211,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.31</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.32</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.31</div>
+    <div class="version">Version 3.32</div>
   </div>
 
   <div class="input-grid">
@@ -331,7 +342,7 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
             <h3>Saved Days</h3>
             <span id="savedMileageStatus" class="muted small"></span>
           </div>
-          <div class="scroll">
+          <div class="scroll saved-days-scroll">
             <table>
               <thead><tr><th>Date</th><th>Day</th><th>Crews</th><th>Road Miles</th><th>Missing Routes</th><th>Action</th></tr></thead>
               <tbody id="savedMileageDaysTable"></tbody>
@@ -1840,7 +1851,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.31',
+    appVersion:'3.32',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -2230,7 +2241,6 @@ function renderSavedMileageDays(){
   const body=$('#savedMileageDaysTable');
   if(!body) return;
 
-  // The object key is always the authoritative saved date.
   const entries=Object.keys(mileageHistory||{})
     .map(date=>({date,day:mileageHistory[date]||{}}))
     .sort((a,b)=>b.date.localeCompare(a.date));
@@ -2243,49 +2253,39 @@ function renderSavedMileageDays(){
   body.innerHTML='';
 
   if(!entries.length){
-    body.innerHTML='<tr><td colspan="6" class="muted">No mileage days saved yet.</td></tr>';
+    body.innerHTML='<tr><td colspan="6" class="muted">No saved days yet.</td></tr>';
     return;
   }
 
-  entries.forEach(entry=>{
-    const date=entry.date;
-    const day={...entry.day,date};
-
-    let miles=0;
-    let missing=0;
-    let crewCount=0;
-
-    try{
-      const drivers=rebuildDriverMileageFromSavedDay(date,day);
-      miles=drivers.reduce((s,d)=>s+(Number(d.miles)||0),0);
-      missing=drivers.reduce((s,d)=>s+(Number(d.missingRoutes)||0),0);
-
-      // Keep the Saved Days "Crews" count based on the saved schedule,
-      // not on how many mileage drivers happened to be reconstructed.
-      crewCount=Array.isArray(day.operations?.crews)
-        ? day.operations.crews.length
-        : (Array.isArray(day.crews)?day.crews.length:0);
-    }catch(e){
-      console.warn(`Could not rebuild mileage summary for ${date}:`,e);
-
-      // Never let one saved day disappear from the list.
-      // Fall back to the values already stored in that day's snapshot.
-      miles=Number(day.totalMiles)||0;
-      missing=Number(day.missingRoutes)||0;
-      crewCount=Array.isArray(day.operations?.crews)
-        ? day.operations.crews.length
-        : (Array.isArray(day.crews)?day.crews.length:0);
-    }
-
+  entries.forEach(({date,day})=>{
     const tr=document.createElement('tr');
+
+    const crewCount=Array.isArray(day.operations?.crews)
+      ? day.operations.crews.length
+      : (Array.isArray(day.crews)?day.crews.length:0);
+
+    // Draw from saved snapshot first so the date can NEVER disappear.
     tr.innerHTML=`
       <td><strong>${esc(shortDateLabel(date))}</strong></td>
       <td>${esc(day.weekday||dayLabel(date))}</td>
-      <td>${crewCount}</td>
-      <td><strong>${fmt(miles)} mi</strong></td>
-      <td>${missing}</td>
+      <td class="saved-day-crews">${crewCount}</td>
+      <td class="saved-day-miles"><strong>${fmt(Number(day.totalMiles)||0)} mi</strong></td>
+      <td class="saved-day-missing">${Number(day.missingRoutes)||0}</td>
       <td><button class="delete-mileage-day" data-date="${esc(date)}">Remove</button></td>`;
     body.appendChild(tr);
+
+    // Secondary enrichment happens AFTER the row already exists.
+    try{
+      const stored={...day,date};
+      const drivers=rebuildDriverMileageFromSavedDay(date,stored);
+      const miles=drivers.reduce((s,d)=>s+(Number(d.miles)||0),0);
+      const missing=drivers.reduce((s,d)=>s+(Number(d.missingRoutes)||0),0);
+
+      tr.querySelector('.saved-day-miles').innerHTML=`<strong>${fmt(miles)} mi</strong>`;
+      tr.querySelector('.saved-day-missing').textContent=missing;
+    }catch(e){
+      console.warn(`Saved-day enrichment failed for ${date}:`,e);
+    }
   });
 
   body.querySelectorAll('.delete-mileage-day').forEach(btn=>btn.addEventListener('click',()=>{
