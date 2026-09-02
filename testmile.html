@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Subdivision 30-Mile Map</title>
+<title>Subdivision 29-Mile Driving Map</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 <style>
   :root{
@@ -22,7 +22,7 @@
   button:hover,.file-btn:hover{filter:brightness(1.08)}
   input[type=file]{display:none}
   .status{color:var(--muted);font-size:13px;margin-top:10px;line-height:1.5}
-  .cards{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .cards{display:grid;grid-template-columns:repeat(6,minmax(150px,1fr));gap:10px;margin-top:14px}
   .card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:12px}
   .card .label{font-size:11px;color:var(--muted);text-transform:uppercase}.card .value{font-size:22px;font-weight:800;margin-top:5px}
   .layout{display:grid;grid-template-columns:minmax(700px,1.7fr) minmax(340px,.7fr);gap:16px;margin-top:16px}
@@ -48,8 +48,8 @@
 <div class="wrap">
   <div class="top">
     <div>
-      <h1>Subdivision 30-Mile Map</h1>
-      <div class="sub">Upload your subdivision sheet to calculate the geographic center and identify subdivisions 30+ miles away.</div>
+      <h1>Subdivision 29-Mile Driving Map</h1>
+      <div class="sub">Upload your subdivision sheet to calculate the geographic center and identify subdivisions 29+ driving miles away.</div>
     </div>
   </div>
 
@@ -58,7 +58,7 @@
       <label class="file-btn primary" for="fileInput">Upload Subdivisions Sheet</label>
       <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
       <button id="fitBtn" type="button">Fit All Subdivisions</button>
-      <button id="radiusBtn" type="button">Fit 30-Mile Radius</button>
+      <button id="radiusBtn" type="button">Fit 29-Mile Radius</button>
       <button id="toggleLabelsBtn" type="button">Show Labels</button>
       <button id="printBtn" type="button">Print / Save PDF</button>
     </div>
@@ -66,26 +66,27 @@
 
     <div class="cards">
       <div class="card"><div class="label">Subdivisions Loaded</div><div class="value" id="totalCount">0</div></div>
-      <div class="card"><div class="label">Within 30 Miles</div><div class="value" id="insideCount">0</div></div>
-      <div class="card"><div class="label">30+ Miles Away</div><div class="value" id="outsideCount">0</div></div>
+      <div class="card"><div class="label">Within 29 Driving Miles</div><div class="value" id="insideCount">0</div></div>
+      <div class="card"><div class="label">29+ Driving Miles</div><div class="value" id="outsideCount">0</div></div>
       <div class="card"><div class="label">Center Latitude</div><div class="value" id="centerLat">—</div></div>
       <div class="card"><div class="label">Center Longitude</div><div class="value" id="centerLon">—</div></div>
+      <div class="card"><div class="label">Route Errors</div><div class="value" id="routeErrorCount">0</div></div>
     </div>
 
     <div class="legend">
       <span><span class="dot center"></span>Calculated center</span>
-      <span><span class="dot inside"></span>Within 30 miles</span>
-      <span><span class="dot outside"></span>30+ miles from center</span>
+      <span><span class="dot inside"></span>Within 29 driving miles</span>
+      <span><span class="dot outside"></span>29+ driving miles from center</span>
     </div>
 
     <div class="layout">
       <div>
         <div id="map"></div>
-        <div class="screenshot-tip"><strong>Screenshot-ready:</strong> use the map normally, then zoom/pan to the view you want and take a browser or Windows screenshot. The blue circle is exactly 30 road-independent miles from the calculated geographic center.</div>
+        <div class="screenshot-tip"><strong>Screenshot-ready:</strong> use the map normally, then zoom/pan to the view you want and take a browser or Windows screenshot. The blue circle is exactly 29 straight-line miles from the calculated geographic center. Red/green classification uses routed driving distance.</div>
       </div>
       <aside class="side">
-        <h2>Subdivisions 30+ Miles From Center</h2>
-        <div class="side-note">Sorted farthest first. Distance is straight-line geographic distance from the calculated center, not driving mileage.</div>
+        <h2>Subdivisions 29+ Driving Miles From Center</h2>
+        <div class="side-note">Sorted farthest first by routed driving distance. The calculated center is snapped to the nearest drivable road for routing.</div>
         <div id="outsideList" class="outside-list"><div class="empty">Upload a subdivision sheet to generate the list.</div></div>
       </aside>
     </div>
@@ -97,7 +98,8 @@
 <script>
 (() => {
   const MILES_TO_METERS = 1609.344;
-  const RADIUS_MILES = 30;
+  const RADIUS_MILES = 29;
+  const OSRM_BASE = 'https://router.project-osrm.org';
   let data = [];
   let center = null;
   let radiusCircle = null;
@@ -139,7 +141,7 @@
       const lon = parseNumber(pick(row,['Longitude','Lon','Lng','Long','X']));
       const address = norm(pick(row,['Address','Location','Street Address']));
       if(lat == null || lon == null || Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
-      return {name,builder,lat,lon,address};
+      return {name,builder,lat,lon,address,driveMiles:null,straightMiles:null,routeError:''};
     }).filter(Boolean);
   }
 
@@ -150,8 +152,7 @@
     return R*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));
   }
 
-  // Average Cartesian unit vectors instead of raw longitude values, so the
-  // geographic center remains correct even for wider data sets.
+  // Average Cartesian unit vectors instead of raw longitude values.
   function geographicCenter(points){
     let x=0,y=0,z=0;
     points.forEach(p=>{
@@ -167,62 +168,129 @@
     return {lat:lat*180/Math.PI,lon:lon*180/Math.PI};
   }
 
-  function render(){
+  async function fetchDrivingMiles(from,to,attempt=0){
+    const url=`${OSRM_BASE}/route/v1/driving/${from.lon},${from.lat};${to.lon},${to.lat}?overview=false&alternatives=false&steps=false`;
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),15000);
+    try{
+      const response=await fetch(url,{signal:controller.signal});
+      if(!response.ok) throw new Error(`HTTP ${response.status}`);
+      const json=await response.json();
+      const route=json.routes&&json.routes[0];
+      if(!route || !Number.isFinite(Number(route.distance))) throw new Error('No route returned');
+      return Number(route.distance)/MILES_TO_METERS;
+    }catch(err){
+      if(attempt<1){
+        await new Promise(r=>setTimeout(r,350));
+        return fetchDrivingMiles(from,to,attempt+1);
+      }
+      throw err;
+    }finally{
+      clearTimeout(timer);
+    }
+  }
+
+  async function routeAll(points){
+    let completed=0;
+    const total=points.length;
+    const workers=Math.min(4,total);
+    let index=0;
+
+    async function worker(){
+      while(true){
+        const i=index++;
+        if(i>=total) return;
+        const p=points[i];
+        el('status').innerHTML=`Routing subdivision <strong>${completed+1}</strong> of <strong>${total}</strong> from the calculated center…`;
+        try{
+          p.driveMiles=await fetchDrivingMiles(center,p);
+          p.routeError='';
+        }catch(err){
+          p.driveMiles=null;
+          p.routeError=String(err?.message||err);
+        }
+        completed++;
+      }
+    }
+    await Promise.all(Array.from({length:workers},()=>worker()));
+  }
+
+  async function render(){
     markerLayer.clearLayers();
     if(radiusCircle){map.removeLayer(radiusCircle);radiusCircle=null;}
     if(centerMarker){map.removeLayer(centerMarker);centerMarker=null;}
     if(!data.length) return;
 
     center = geographicCenter(data);
-    data = data.map(p=>({...p,distance:haversineMiles(center,p)}));
+    data = data.map(p=>({...p,straightMiles:haversineMiles(center,p),driveMiles:null,routeError:''}));
 
     radiusCircle=L.circle([center.lat,center.lon],{
       radius:RADIUS_MILES*MILES_TO_METERS,
       color:'#286aa6',weight:2,fillColor:'#4da3ff',fillOpacity:.07,dashArray:'7 6'
-    }).addTo(map).bindTooltip('30-mile radius',{sticky:true});
+    }).addTo(map).bindTooltip('29-mile straight-line radius (visual only)',{sticky:true});
 
     centerMarker=L.circleMarker([center.lat,center.lon],{
       radius:9,color:'#123c63',weight:3,fillColor:'#4da3ff',fillOpacity:1
-    }).addTo(map).bindPopup(`<b>Calculated geographic center</b><br>${center.lat.toFixed(5)}, ${center.lon.toFixed(5)}`);
+    }).addTo(map).bindPopup(`<b>Calculated geographic center</b><br>${center.lat.toFixed(5)}, ${center.lon.toFixed(5)}<br><span style="color:#666">Driving routes begin from the nearest routable road to this point.</span>`);
+
+    el('centerLat').textContent=center.lat.toFixed(4);
+    el('centerLon').textContent=center.lon.toFixed(4);
+    el('totalCount').textContent=data.length;
+    el('insideCount').textContent='…';
+    el('outsideCount').textContent='…';
+    el('routeErrorCount').textContent='…';
+    fitAll();
+
+    await routeAll(data);
 
     data.forEach(p=>{
-      const outside=p.distance>=RADIUS_MILES;
+      const routed=Number.isFinite(Number(p.driveMiles));
+      const outside=routed && p.driveMiles>=RADIUS_MILES;
+      const color=!routed ? {stroke:'#8a6d00',fill:'#f1c40f'} : outside ? {stroke:'#992d2d',fill:'#ff6b6b'} : {stroke:'#176b3a',fill:'#2ecc71'};
       const m=L.circleMarker([p.lat,p.lon],{
         radius:outside?8:6,
-        color:outside?'#992d2d':'#176b3a',
+        color:color.stroke,
         weight:outside?2.5:1.8,
-        fillColor:outside?'#ff6b6b':'#2ecc71',
-        fillOpacity:.8
+        fillColor:color.fill,
+        fillOpacity:.82
       });
-      m.bindPopup(`<div><b>${escapeHtml(p.name)}</b>${p.builder?`<br>${escapeHtml(p.builder)}`:''}<br><b>${p.distance.toFixed(1)} miles</b> from center${p.address?`<br><span style="color:#666">${escapeHtml(p.address)}</span>`:''}</div>`);
+      const drivingText=routed?`<b>${p.driveMiles.toFixed(1)} driving miles</b> from center`:`<b>Driving route unavailable</b>`;
+      const routeError=p.routeError?`<br><span style="color:#8a6d00">${escapeHtml(p.routeError)}</span>`:'';
+      m.bindPopup(`<div><b>${escapeHtml(p.name)}</b>${p.builder?`<br>${escapeHtml(p.builder)}`:''}<br>${drivingText}<br><span style="color:#666">${p.straightMiles.toFixed(1)} mi straight-line</span>${p.address?`<br><span style="color:#666">${escapeHtml(p.address)}</span>`:''}${routeError}</div>`);
       m.bindTooltip(p.name,{permanent:labelsVisible,direction:'top',className:'sub-label',offset:[0,-5]});
       m.addTo(markerLayer);
     });
 
-    const outside=data.filter(p=>p.distance>=RADIUS_MILES).sort((a,b)=>b.distance-a.distance);
-    const inside=data.length-outside.length;
-    el('totalCount').textContent=data.length;
+    const routed=data.filter(p=>Number.isFinite(Number(p.driveMiles)));
+    const outside=routed.filter(p=>p.driveMiles>=RADIUS_MILES).sort((a,b)=>b.driveMiles-a.driveMiles);
+    const inside=routed.length-outside.length;
+    const errors=data.length-routed.length;
     el('insideCount').textContent=inside;
     el('outsideCount').textContent=outside.length;
-    el('centerLat').textContent=center.lat.toFixed(4);
-    el('centerLon').textContent=center.lon.toFixed(4);
+    el('routeErrorCount').textContent=errors;
 
     const holder=el('outsideList');
     holder.innerHTML='';
     if(!outside.length){
-      holder.innerHTML='<div class="empty">No subdivisions are 30+ miles from the calculated center.</div>';
+      holder.innerHTML='<div class="empty">No successfully routed subdivisions are 29+ driving miles from the calculated center.</div>';
     }else{
       outside.forEach((p,i)=>{
         const row=document.createElement('div');
         row.className='row';
-        row.innerHTML=`<div class="rank">${i+1}.</div><div><div class="name">${escapeHtml(p.name)}</div><div class="builder">${escapeHtml(p.builder||'Builder not listed')}</div></div><div class="miles">${p.distance.toFixed(1)} mi</div>`;
+        row.innerHTML=`<div class="rank">${i+1}.</div><div><div class="name">${escapeHtml(p.name)}</div><div class="builder">${escapeHtml(p.builder||'Builder not listed')} · ${p.straightMiles.toFixed(1)} mi straight-line</div></div><div class="miles">${p.driveMiles.toFixed(1)} mi</div>`;
         row.addEventListener('click',()=>map.setView([p.lat,p.lon],12));
         holder.appendChild(row);
       });
     }
+    if(errors){
+      const warning=document.createElement('div');
+      warning.className='empty';
+      warning.style.color='#ffe27a';
+      warning.textContent=`${errors} subdivision route${errors===1?'':'s'} could not be calculated and are shown in yellow on the map.`;
+      holder.appendChild(warning);
+    }
 
-    fitAll();
-    el('status').innerHTML=`Loaded <strong>${data.length}</strong> subdivisions. Geographic center: <strong>${center.lat.toFixed(5)}, ${center.lon.toFixed(5)}</strong>. <strong>${outside.length}</strong> are 30+ miles away.`;
+    el('status').innerHTML=`Loaded <strong>${data.length}</strong> subdivisions. Geographic center: <strong>${center.lat.toFixed(5)}, ${center.lon.toFixed(5)}</strong>. <strong>${outside.length}</strong> are 29+ routed driving miles away. ${errors?`<strong>${errors}</strong> route${errors===1?'':'s'} unavailable.`:'All routes calculated successfully.'}`;
   }
 
   function escapeHtml(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
@@ -258,7 +326,7 @@
     const parsed=normalizeRows(rows);
     if(!parsed.length) throw new Error('No usable latitude/longitude rows were found. Expected columns such as Subdivision, Latitude/Lat, and Longitude/Lon/Lng.');
     data=parsed;
-    render();
+    await render();
   }
 
   el('fileInput').addEventListener('change',async e=>{
