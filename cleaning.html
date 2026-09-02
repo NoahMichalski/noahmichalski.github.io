@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.38</title>
+<title>VIP Crew Efficiency & Travel Report v3.40</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -217,10 +217,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.38</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.40</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.38</div>
+    <div class="version">Version 3.40</div>
   </div>
 
   <div class="input-grid">
@@ -422,9 +422,52 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
           </div>
 
           <div class="notice" style="margin-top:12px">
-            Cancelled jobs remain in the mileage route because the crew may still have driven there. Mileage uses routed driving distance only; unavailable routes are marked missing rather than replaced with straight-line mileage.
+            Cancelled jobs can be included or excluded from mileage in Cancellation Review. Count the stop when the crew drove there; exclude it when the cancellation happened before travel. Scheduled job-to-job mileage uses routed driving distance only. Additional Out-of-Area mileage is added from the editable policy list below.
           </div>
           <div id="mileageExclusionSummary" class="muted small" style="margin-top:8px;font-weight:700"></div>
+
+          <div class="notice" style="margin-top:12px">
+            <div class="section-head" style="margin-bottom:8px">
+              <div>
+                <strong>Out-of-Area Mileage</strong>
+                <div class="muted small" style="margin-top:4px">Designated Columbus calculation point: <strong>949 Spring Grove Ln, Columbus, OH 43235</strong></div>
+              </div>
+              <span id="outOfAreaActiveSummary" class="muted small"></span>
+            </div>
+            <div class="muted small" style="line-height:1.5">
+              This editable list controls the additional Out-of-Area mileage in Daily and multi-day Mileage Reports. The mileage entered below is the designated <strong>one-way driving mileage from the Columbus calculation point</strong>. Turn Active off to temporarily exclude a subdivision without deleting it.
+            </div>
+            <div class="controls" style="margin-top:10px;align-items:end">
+              <label>Subdivision
+                <input id="outOfAreaSubdivisionInput" type="text" list="outOfAreaSubdivisionOptions" placeholder="Example: Liberty Crossing">
+                <datalist id="outOfAreaSubdivisionOptions"></datalist>
+              </label>
+              <label>Builder
+                <input id="outOfAreaBuilderInput" type="text" placeholder="Example: DR">
+              </label>
+              <label>City / Area
+                <input id="outOfAreaCityInput" type="text" placeholder="Example: Mt Vernon">
+              </label>
+              <label>One-way miles
+                <input id="outOfAreaMilesInput" type="number" min="0" step="0.1" placeholder="44.6">
+              </label>
+              <label>&nbsp;
+                <button id="addOutOfAreaSubdivisionBtn" type="button">Add Out-of-Area Subdivision</button>
+              </label>
+              <label>&nbsp;
+                <button id="resetOutOfAreaDefaultsBtn" type="button">Restore Current 16</button>
+              </label>
+            </div>
+            <div class="scroll" style="margin-top:10px;max-height:520px;overflow:auto">
+              <table>
+                <thead><tr><th>Active</th><th>Subdivision</th><th>Builder</th><th>City / Area</th><th>One-way Miles</th><th></th></tr></thead>
+                <tbody id="outOfAreaMileageTable"></tbody>
+              </table>
+            </div>
+            <div class="muted small" style="margin-top:8px">
+              First scheduled job Out of Area: Columbus Center → first Out-of-Area stop, normal scheduled job-to-job mileage, then the final Out-of-Area stop → Columbus Center. If the first job is In Area, only the final Out-of-Area return to Columbus Center is added. Saved report days are recalculated against the currently active list when a Mileage Report is generated.
+            </div>
+          </div>
 
           <div class="notice" style="margin-top:12px">
             <strong>Employee Driver List</strong>
@@ -501,11 +544,11 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
       </summary>
       <div style="padding-top:14px">
         <div class="notice">
-          Review cancelled jobs from the selected Report Days and classify each as Builder / Super, VIP / Internal, Related Cancellation, or Unknown. These classifications are saved separately from the daily reports.
+          Review cancelled jobs from the selected Report Days and classify each as Builder / Super, VIP / Internal, Related Cancellation, or Unknown. Also choose whether each cancellation should count for mileage. Use <strong>Count Mileage</strong> when the crew drove to the cancelled stop; use <strong>Do Not Count Mileage</strong> when it was cancelled before the crew traveled there. These settings are saved separately from the daily reports.
         </div>
         <div class="buttons">
           <button id="refreshCancellationReviewBtn" class="primary" type="button">Load / Refresh Cancellation Review</button>
-          <button id="saveCancellationReviewBtn" type="button">Save Cancellation Reasons</button>
+          <button id="saveCancellationReviewBtn" type="button">Save Cancellation Review</button>
           <span id="cancellationReviewStatus" class="muted small" style="align-self:center"></span>
         </div>
         <div class="controls" style="margin-top:12px;grid-template-columns:repeat(3,minmax(180px,1fr))">
@@ -534,11 +577,13 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
           <button id="batchVipCancellationBtn" type="button">Mark Selected VIP / Internal</button>
           <button id="batchRelatedCancellationBtn" type="button">Mark Selected Related Cancellation</button>
           <button id="batchUnknownCancellationBtn" type="button">Mark Selected Unknown</button>
+          <button id="batchCountCancellationMileageBtn" type="button">Count Selected Mileage</button>
+          <button id="batchExcludeCancellationMileageBtn" type="button">Exclude Selected Mileage</button>
         </div>
         <div class="cancellation-review-scroll" style="margin-top:12px">
-          <table class="cancellation-review-table" style="min-width:1350px">
-            <thead><tr><th>Select</th><th>Date</th><th>Crew</th><th>Builder</th><th>Subdivision</th><th>Lot</th><th>Task</th><th>Reason</th><th>Related To</th></tr></thead>
-            <tbody id="cancellationReviewTable"><tr><td colspan="9" class="muted">Click Load / Refresh Cancellation Review.</td></tr></tbody>
+          <table class="cancellation-review-table" style="min-width:1510px">
+            <thead><tr><th>Select</th><th>Date</th><th>Crew</th><th>Builder</th><th>Subdivision</th><th>Lot</th><th>Task</th><th>Mileage?</th><th>Reason</th><th>Related To</th></tr></thead>
+            <tbody id="cancellationReviewTable"><tr><td colspan="10" class="muted">Click Load / Refresh Cancellation Review.</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -702,7 +747,8 @@ const STORAGE_KEYS = {
   knownEmployees: 'vipCrewReport.knownEmployees.v1',
   employeeAliases: 'vipCrewReport.employeeAliases.v1',
   referenceUploads: 'vipCrewReport.referenceUploads.v1',
-  cancellationReasons: 'vipCrewReport.cancellationReasons.v1'
+  cancellationReasons: 'vipCrewReport.cancellationReasons.v1',
+  outOfAreaMileage: 'vipCrewReport.outOfAreaMileage.v1'
 };
 let subdivisionData = [];
 let routeCache = {};
@@ -718,6 +764,212 @@ let employeeAliases = {};
 let referenceUploads = {subdivisions:'',floorplans:''};
 let cancellationReasons = {};
 let cancellationReviewDraft = {};
+const OUT_OF_AREA_CENTER = {
+  name:'Columbus Center',
+  address:'949 Spring Grove Ln, Columbus, OH 43235'
+};
+const DEFAULT_OUT_OF_AREA_MILEAGE = [
+  {subdivision:'Leasure Farms',builder:'DR',city:'Zanesville',miles:60.5,enabled:true},
+  {subdivision:'Trotters Pointe',builder:'Arbor',city:'Washington Courthouse',miles:49.9,enabled:true},
+  {subdivision:'Bishop Estates',builder:'DR',city:'Washington Courthouse',miles:49.4,enabled:true},
+  {subdivision:'Sugar Creek',builder:'DR',city:'Jeffersonville',miles:48.7,enabled:true},
+  {subdivision:'Ludlow Ridge',builder:'DR',city:'Bellefontaine',miles:48.5,enabled:true},
+  {subdivision:'Maris',builder:'Arbor',city:'Bellefontaine',miles:45.5,enabled:true},
+  {subdivision:'Liberty Crossing',builder:'DR',city:'Mt Vernon',miles:44.6,enabled:true},
+  {subdivision:'Hebron',builder:'MI',city:'Hebron OH',miles:37.8,enabled:true},
+  {subdivision:'London Landing',builder:'Arbor',city:'London',miles:35.9,enabled:true},
+  {subdivision:'River Ridge',builder:'DR',city:'Circleville',miles:34.4,enabled:true},
+  {subdivision:'Overlook',builder:'DR',city:'Newark',miles:33.2,enabled:true},
+  {subdivision:"Johnson's Creek",builder:'DR',city:'London',miles:33.1,enabled:true},
+  {subdivision:'Stonehill Drive East',builder:'Monogram',city:'Carroll',miles:32.6,enabled:true},
+  {subdivision:'Willowbend',builder:'Rockford',city:'Newark',miles:31.8,enabled:true},
+  {subdivision:'Hazelton',builder:'Rockford',city:'Pataskala',miles:30.7,enabled:true},
+  {subdivision:'Sycamore Point',builder:'Arbor',city:'South Bloomfield',miles:29.7,enabled:true}
+];
+let outOfAreaMileageConfig={centerAddress:OUT_OF_AREA_CENTER.address,entries:DEFAULT_OUT_OF_AREA_MILEAGE.map(x=>({...x}))};
+
+function outOfAreaMatchKey(value){
+  return String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+}
+function sanitizeOutOfAreaConfig(raw){
+  const source=(raw&&typeof raw==='object')?raw:{};
+  const rows=Array.isArray(source.entries)?source.entries:DEFAULT_OUT_OF_AREA_MILEAGE;
+  const entries=rows.map((x,index)=>({
+    id:String(x?.id||`ooa-${Date.now()}-${index}-${Math.random().toString(36).slice(2,7)}`),
+    subdivision:String(x?.subdivision||'').trim(),
+    builder:String(x?.builder||'').trim(),
+    city:String(x?.city||'').trim(),
+    miles:Number.isFinite(Number(x?.miles))?Math.max(0,Number(x.miles)):0,
+    enabled:x?.enabled!==false
+  })).filter(x=>x.subdivision);
+  return {centerAddress:OUT_OF_AREA_CENTER.address,entries};
+}
+function saveOutOfAreaMileageConfig(){
+  outOfAreaMileageConfig=sanitizeOutOfAreaConfig(outOfAreaMileageConfig);
+  try{
+    localStorage.setItem(STORAGE_KEYS.outOfAreaMileage,JSON.stringify(outOfAreaMileageConfig));
+  }catch(e){
+    alert(`Out-of-Area mileage settings could not be saved. ${e?.message||e}`);
+    return false;
+  }
+  renderOutOfAreaMileageManager();
+  renderSavedMileageDays();
+  return true;
+}
+function outOfAreaEntryLabel(entry){
+  return [entry.subdivision,entry.builder,entry.city].filter(Boolean).join(' *');
+}
+function activeOutOfAreaEntries(){
+  return (outOfAreaMileageConfig?.entries||[]).filter(x=>x.enabled!==false && Number(x.miles)>=0);
+}
+function findOutOfAreaEntryForJob(job){
+  const subKey=outOfAreaMatchKey(job?.subdivision);
+  if(!subKey) return null;
+  const builderKey=outOfAreaMatchKey(job?.builder);
+  const candidates=activeOutOfAreaEntries().filter(x=>outOfAreaMatchKey(x.subdivision)===subKey);
+  if(!candidates.length) return null;
+  if(builderKey){
+    const exact=candidates.find(x=>!x.builder || outOfAreaMatchKey(x.builder)===builderKey);
+    if(exact) return exact;
+  }
+  return candidates[0];
+}
+function cancellationMileageStatus(date,crewName,job){
+  if(!job?.cancelled) return 'include';
+  if(!date) return 'include';
+  const key=cancellationRecordKey(date,crewName,job);
+  const cls=cancellationClassification(key);
+  return cls.mileage;
+}
+function cancellationCountsForMileage(date,crewName,job){
+  if(!job?.cancelled) return true;
+  return cancellationMileageStatus(date,crewName,job)!=='exclude';
+}
+function mileageScheduledJobsForCrew(crew,date=''){
+  return (crew?.jobs||[]).filter(j=>j.subdivision && cancellationCountsForMileage(date,crew?.name||'',j));
+}
+function outOfAreaMileageForCrew(crew,date=''){
+  const scheduled=mileageScheduledJobsForCrew(crew,date);
+  if(!scheduled.length) return [];
+  const matches=scheduled.map((job,index)=>({job,index,entry:findOutOfAreaEntryForJob(job)})).filter(x=>x.entry);
+  if(!matches.length) return [];
+  const first=matches[0],last=matches[matches.length-1];
+  const firstScheduledIsOut=first.index===0;
+  const center=OUT_OF_AREA_CENTER.name;
+  if(firstScheduledIsOut){
+    const outbound=Number(first.entry.miles)||0;
+    const back=Number(last.entry.miles)||0;
+    const same=outOfAreaMatchKey(first.entry.subdivision)===outOfAreaMatchKey(last.entry.subdivision);
+    const to=same
+      ? `${first.entry.subdivision} → ${center}`
+      : `${first.entry.subdivision} → … → ${last.entry.subdivision} → ${center}`;
+    return [{
+      outOfAreaType:'roundtrip',
+      typeLabel:'Out-of-Area Round Trip',
+      from:center,
+      to,
+      miles:+(outbound+back).toFixed(1),
+      legCount:2,
+      minutes:null,
+      source:'Out-of-Area designated mileage',
+      includesCancellation:!!(first.job.cancelled||last.job.cancelled),
+      outOfAreaSubdivision:last.entry.subdivision,
+      note:same
+        ? `${fmt(outbound)} mi out + ${fmt(back)} mi return`
+        : `${fmt(outbound)} mi to first Out-of-Area stop + ${fmt(back)} mi from final Out-of-Area stop back to Columbus Center`
+    }];
+  }
+  const back=Number(last.entry.miles)||0;
+  return [{
+    outOfAreaType:'return',
+    typeLabel:'Out-of-Area Return',
+    from:last.entry.subdivision,
+    to:center,
+    miles:+back.toFixed(1),
+    legCount:1,
+    minutes:null,
+    source:'Out-of-Area designated mileage',
+    includesCancellation:!!last.job.cancelled,
+    outOfAreaSubdivision:last.entry.subdivision,
+    note:`Final Out-of-Area stop → Columbus Center`
+  }];
+}
+function outOfAreaMileageTotalForCrew(crew,date=''){
+  return outOfAreaMileageForCrew(crew,date).reduce((s,r)=>s+(Number(r.miles)||0),0);
+}
+function renderOutOfAreaMileageManager(){
+  const body=$('#outOfAreaMileageTable');
+  const summary=$('#outOfAreaActiveSummary');
+  const datalist=$('#outOfAreaSubdivisionOptions');
+  const entries=outOfAreaMileageConfig?.entries||[];
+  const active=entries.filter(x=>x.enabled!==false);
+  if(summary) summary.textContent=`${active.length} active · ${entries.length} saved`;
+  if(datalist){
+    const seen=new Set();
+    datalist.innerHTML='';
+    (subdivisionData||[]).forEach(row=>{
+      const name=String(row?.subdivision||row?.Subdivision||'').trim();
+      if(!name || seen.has(outOfAreaMatchKey(name))) return;
+      seen.add(outOfAreaMatchKey(name));
+      const opt=document.createElement('option');opt.value=name;datalist.appendChild(opt);
+    });
+  }
+  if(!body) return;
+  body.innerHTML='';
+  if(!entries.length){body.innerHTML='<tr><td colspan="6" class="muted">No Out-of-Area subdivisions saved.</td></tr>';return;}
+  entries.slice().sort((a,b)=>(Number(b.miles)||0)-(Number(a.miles)||0)).forEach(entry=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td style="text-align:center"><input type="checkbox" class="ooa-enabled" ${entry.enabled!==false?'checked':''}></td>
+      <td><input type="text" class="ooa-subdivision" value="${esc(entry.subdivision)}" style="min-width:210px"></td>
+      <td><input type="text" class="ooa-builder" value="${esc(entry.builder||'')}" style="min-width:90px"></td>
+      <td><input type="text" class="ooa-city" value="${esc(entry.city||'')}" style="min-width:150px"></td>
+      <td><input type="number" class="ooa-miles" min="0" step="0.1" value="${Number(entry.miles)||0}" style="width:100px"></td>
+      <td><button type="button" class="ooa-remove">Remove</button></td>`;
+    const commit=()=>{
+      entry.enabled=tr.querySelector('.ooa-enabled').checked;
+      entry.subdivision=tr.querySelector('.ooa-subdivision').value.trim();
+      entry.builder=tr.querySelector('.ooa-builder').value.trim();
+      entry.city=tr.querySelector('.ooa-city').value.trim();
+      entry.miles=Math.max(0,Number(tr.querySelector('.ooa-miles').value)||0);
+      saveOutOfAreaMileageConfig();
+    };
+    tr.querySelectorAll('input').forEach(inp=>inp.addEventListener('change',commit));
+    tr.querySelector('.ooa-remove').addEventListener('click',()=>{
+      if(!confirm(`Remove ${outOfAreaEntryLabel(entry)} from the Out-of-Area list?`)) return;
+      outOfAreaMileageConfig.entries=outOfAreaMileageConfig.entries.filter(x=>x.id!==entry.id);
+      saveOutOfAreaMileageConfig();
+    });
+    body.appendChild(tr);
+  });
+}
+function addOutOfAreaSubdivisionFromUi(){
+  let subdivision=$('#outOfAreaSubdivisionInput')?.value.trim()||'';
+  let builder=$('#outOfAreaBuilderInput')?.value.trim()||'';
+  let city=$('#outOfAreaCityInput')?.value.trim()||'';
+  const miles=Number($('#outOfAreaMilesInput')?.value);
+  if(subdivision.includes('*')){
+    const parts=subdivision.split('*').map(x=>x.trim()).filter(Boolean);
+    subdivision=parts[0]||subdivision;
+    if(!builder) builder=parts[1]||'';
+    if(!city) city=parts[2]||'';
+  }
+  if(!subdivision){alert('Enter a subdivision name.');return;}
+  if(!Number.isFinite(miles) || miles<0){alert('Enter the designated one-way driving mileage.');return;}
+  const existing=(outOfAreaMileageConfig.entries||[]).find(x=>outOfAreaMatchKey(x.subdivision)===outOfAreaMatchKey(subdivision) && (!builder || !x.builder || outOfAreaMatchKey(x.builder)===outOfAreaMatchKey(builder)));
+  if(existing){
+    existing.subdivision=subdivision;existing.builder=builder||existing.builder;existing.city=city||existing.city;existing.miles=+miles.toFixed(1);existing.enabled=true;
+  }else{
+    outOfAreaMileageConfig.entries.push({id:`ooa-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,subdivision,builder,city,miles:+miles.toFixed(1),enabled:true});
+  }
+  ['outOfAreaSubdivisionInput','outOfAreaBuilderInput','outOfAreaCityInput','outOfAreaMilesInput'].forEach(id=>{if($('#'+id))$('#'+id).value='';});
+  saveOutOfAreaMileageConfig();
+}
+function restoreDefaultOutOfAreaMileage(){
+  if(!confirm('Replace the current Out-of-Area list with the current 16 Columbus defaults?')) return;
+  outOfAreaMileageConfig={centerAddress:OUT_OF_AREA_CENTER.address,entries:DEFAULT_OUT_OF_AREA_MILEAGE.map((x,i)=>({...x,id:`default-${i+1}`}))};
+  saveOutOfAreaMileageConfig();
+}
 
 function normalizeName(value){
   return String(value || '')
@@ -732,6 +984,7 @@ function saveSubdivisionData(data){
   subdivisionData = data;
   localStorage.setItem(STORAGE_KEYS.subdivisions, JSON.stringify(data));
   updateSubdivisionStatus();
+  renderOutOfAreaMileageManager();
 }
 function loadLocalData(){
   try {
@@ -752,6 +1005,11 @@ function loadLocalData(){
   try { employeeAliases = JSON.parse(localStorage.getItem(STORAGE_KEYS.employeeAliases) || '{}') || {}; } catch(e) { employeeAliases = {}; }
   try { referenceUploads = JSON.parse(localStorage.getItem(STORAGE_KEYS.referenceUploads) || '{}') || {}; } catch(e) { referenceUploads = {}; }
   try { cancellationReasons = JSON.parse(localStorage.getItem(STORAGE_KEYS.cancellationReasons) || '{}') || {}; } catch(e) { cancellationReasons = {}; }
+  try {
+    const rawOutOfArea=JSON.parse(localStorage.getItem(STORAGE_KEYS.outOfAreaMileage) || 'null');
+    outOfAreaMileageConfig=sanitizeOutOfAreaConfig(rawOutOfArea);
+    if(!rawOutOfArea) localStorage.setItem(STORAGE_KEYS.outOfAreaMileage,JSON.stringify(outOfAreaMileageConfig));
+  } catch(e) { outOfAreaMileageConfig=sanitizeOutOfAreaConfig(null); }
   cancellationReviewDraft={...cancellationReasons};
   referenceUploads={subdivisions:String(referenceUploads.subdivisions||''),floorplans:String(referenceUploads.floorplans||'')};
   compactExistingMileageHistoryStorage();
@@ -767,6 +1025,7 @@ function loadLocalData(){
   renderSavedMileageDays();
   renderMileageExclusions();
   renderCurrentCrewMileageButtons();
+  renderOutOfAreaMileageManager();
   renderReportDayChoices();
   collectEmployeesFromSavedDays();
   renderEmployeeDriverList();
@@ -1680,11 +1939,12 @@ function driverMileageSnapshotForDay(report,date){
     if(!drivers.length) return;
 
     const trips=mileageTripsForCrew(c);
+    const outOfAreaRoutes=outOfAreaMileageForCrew(c,date);
     drivers.forEach(driver=>{
       if(isMileageDriverExcluded(driver)) return;
       const key=driverKey(driver);
       if(!byDriver.has(key)){
-        byDriver.set(key,{name:driver,miles:0,trips:0,missingRoutes:0,routes:[]});
+        byDriver.set(key,{name:driver,miles:0,normalMiles:0,outOfAreaMiles:0,trips:0,missingRoutes:0,routes:[]});
       }
       const row=byDriver.get(key);
       trips.forEach(t=>{
@@ -1692,6 +1952,7 @@ function driverMileageSnapshotForDay(report,date){
         if(miles==null) row.missingRoutes++;
         else {
           row.miles+=miles;
+          row.normalMiles+=miles;
           row.trips++;
         }
         row.routes.push({
@@ -1701,13 +1962,20 @@ function driverMileageSnapshotForDay(report,date){
           minutes:t.route?Number(t.route.minutes):null,
           source:t.route?t.route.source:'route unavailable',
           includesCancellation:!!t.includesCancellation,
-          crew:c.name
+          crew:c.name,
+          routeType:'Scheduled Job-to-Job'
         });
+      });
+      outOfAreaRoutes.forEach(r=>{
+        row.miles+=Number(r.miles)||0;
+        row.outOfAreaMiles+=Number(r.miles)||0;
+        row.trips+=Number(r.legCount)||1;
+        row.routes.push({...r,crew:c.name,routeType:r.typeLabel});
       });
     });
   });
 
-  return [...byDriver.values()].map(x=>({...x,miles:+x.miles.toFixed(1)}));
+  return [...byDriver.values()].map(x=>({...x,miles:+x.miles.toFixed(1),normalMiles:+x.normalMiles.toFixed(1),outOfAreaMiles:+x.outOfAreaMiles.toFixed(1)}));
 }
 function normalizePersonName(value){
   return String(value||'')
@@ -2018,7 +2286,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.36',
+    appVersion:'3.40',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -2043,7 +2311,8 @@ function backupSettingsPayload(){
     floorplanData,
     subdivisionData,
     referenceUploads,
-    cancellationReasons
+    cancellationReasons,
+    outOfAreaMileageConfig
   };
 }
 async function exportSavedDataBackup(){
@@ -2075,6 +2344,7 @@ This backup includes:
 - Reference sheet Last Uploaded timestamps
 - Report settings
 - Cancellation review classifications
+- Editable Out-of-Area mileage list and designated one-way mileages
 
 Generated: ${new Date().toLocaleString()}
 `);
@@ -2094,6 +2364,7 @@ Generated: ${new Date().toLocaleString()}
   zip.file('settings/mileage-exclusions.json',JSON.stringify(config.mileageExclusions,null,2));
   zip.file('settings/report-selected-dates.json',JSON.stringify(config.reportSelectedDates,null,2));
   zip.file('settings/cancellation-reasons.json',JSON.stringify(config.cancellationReasons,null,2));
+  zip.file('settings/out-of-area-mileage.json',JSON.stringify(config.outOfAreaMileageConfig,null,2));
   zip.file('reference/floorplans.json',JSON.stringify(config.floorplanData,null,2));
   zip.file('reference/subdivisions.json',JSON.stringify(config.subdivisionData,null,2));
   zip.file('reference/upload-times.json',JSON.stringify(config.referenceUploads,null,2));
@@ -2172,6 +2443,7 @@ async function importSavedDataBackup(file){
     ?? await readZipJson(zip,'settings/mileage-exclusions.json',[]);
   const importedReportDates=await readZipJson(zip,'settings/report-selected-dates.json',[]);
   const importedCancellationReasons=await readZipJson(zip,'settings/cancellation-reasons.json',{});
+  const importedOutOfAreaMileage=await readZipJson(zip,'settings/out-of-area-mileage.json',null);
   const importedFloorplans=await readZipJson(zip,'reference/floorplans.json',[]);
   const importedSubdivisions=await readZipJson(zip,'reference/subdivisions.json',[]);
   const importedReferenceUploads=await readZipJson(zip,'reference/upload-times.json',{});
@@ -2254,6 +2526,7 @@ async function importSavedDataBackup(file){
   const restoredCancellationReasons=(importedCancellationReasons && typeof importedCancellationReasons==='object')?importedCancellationReasons:{};
   cancellationReasons=replace ? restoredCancellationReasons : {...(cancellationReasons||{}),...restoredCancellationReasons};
   cancellationReviewDraft={...cancellationReasons};
+  if(importedOutOfAreaMileage) outOfAreaMileageConfig=sanitizeOutOfAreaConfig(importedOutOfAreaMileage);
   floorplanData=Array.isArray(importedFloorplans)?importedFloorplans:[];
   subdivisionData=Array.isArray(importedSubdivisions)?importedSubdivisions:[];
   referenceUploads={
@@ -2269,6 +2542,7 @@ async function importSavedDataBackup(file){
   localStorage.setItem(STORAGE_KEYS.mileageExclusions,JSON.stringify(mileageExclusions));
   localStorage.setItem(STORAGE_KEYS.reportSelectedDates,JSON.stringify(reportSelectedDates));
   localStorage.setItem(STORAGE_KEYS.cancellationReasons,JSON.stringify(cancellationReasons));
+  localStorage.setItem(STORAGE_KEYS.outOfAreaMileage,JSON.stringify(outOfAreaMileageConfig));
   localStorage.setItem(STORAGE_KEYS.floorplans,JSON.stringify(floorplanData));
   localStorage.setItem(STORAGE_KEYS.subdivisions,JSON.stringify(subdivisionData));
   localStorage.setItem(STORAGE_KEYS.referenceUploads,JSON.stringify(referenceUploads));
@@ -2282,6 +2556,7 @@ async function importSavedDataBackup(file){
   renderDailyDriverOverrides();
   renderMileageExclusions();
   renderCurrentCrewMileageButtons();
+  renderOutOfAreaMileageManager();
 
   alert(`Backup imported successfully. ${Object.keys(mileageHistory).length} saved day(s) are now available.`);
 }
@@ -2385,7 +2660,7 @@ function savedDaysDebugReport(){
   const lines=[];
   const now=new Date().toLocaleString();
 
-  lines.push(`VIP Saved Days Debug — v3.38`);
+  lines.push(`VIP Saved Days Debug — v3.40`);
   lines.push(`Generated: ${now}`);
   lines.push('');
 
@@ -2540,18 +2815,20 @@ async function getDrivingRouteOnly(a,b){
     return result;
   }catch(e){ return null; }
 }
-function buildMileageTrips(report){
+function buildMileageTrips(report,date=''){
   report.crews.forEach(c=>{
     c.mileageTrips=[];
-    const scheduled=c.jobs.filter(j=>j.subdivision);
+    const scheduled=mileageScheduledJobsForCrew(c,date);
     for(let i=1;i<scheduled.length;i++){
       const from=scheduled[i-1],to=scheduled[i];
       c.mileageTrips.push({from,to,includesCancellation:!!(from.cancelled||to.cancelled),route:null,missing:[]});
     }
   });
 }
-async function calculateMileageRoutes(report,onProgress){
-  buildMileageTrips(report);
+async function calculateMileageRoutes(report,onProgress,date='',askCancellationMileage=false){
+  date=date||$('#operationDate')?.value||'';
+  if(askCancellationMileage && date) ensureCancellationMileageDecisions(report,date);
+  buildMileageTrips(report,date);
   const items=report.crews.flatMap(c=>c.mileageTrips.map(t=>({crew:c,trip:t})));
   let done=0;
   for(const item of items){
@@ -2573,19 +2850,26 @@ async function calculateMileageRoutes(report,onProgress){
   return report;
 }
 function mileageTripsForCrew(c){ return Array.isArray(c.mileageTrips)?c.mileageTrips:[]; }
-function crewMileageStats(report,includeExcluded=false){
+function crewMileageStats(report,includeExcluded=false,includeOutOfArea=true,date=''){
   return report.crews
     .filter(c=>includeExcluded || !isMileageCrewExcluded(c.name))
     .map(c=>{
       const trips=mileageTripsForCrew(c);
       const routed=trips.filter(t=>t.route&&Number.isFinite(Number(t.route.miles)));
       const missing=trips.filter(t=>!t.route||!Number.isFinite(Number(t.route.miles)));
-      const miles=routed.reduce((s,t)=>s+Number(t.route.miles),0);
-      return {crew:c,routed,missing,miles,average:routed.length?miles/routed.length:0,excluded:isMileageCrewExcluded(c.name)};
+      const normalMiles=routed.reduce((s,t)=>s+Number(t.route.miles),0);
+      const outOfAreaRoutes=includeOutOfArea?outOfAreaMileageForCrew(c,date||$('#operationDate')?.value||''):[];
+      const outOfAreaMiles=outOfAreaRoutes.reduce((s,t)=>s+(Number(t.miles)||0),0);
+      const miles=normalMiles+outOfAreaMiles;
+      const tripCount=routed.length+outOfAreaRoutes.reduce((s,t)=>s+(Number(t.legCount)||1),0);
+      return {
+        crew:c,routed,missing,normalMiles,outOfAreaRoutes,outOfAreaMiles,miles,
+        tripCount,average:tripCount?miles/tripCount:0,excluded:isMileageCrewExcluded(c.name)
+      };
     });
 }
 function mileageSnapshot(report,date,rawText=''){
-  const stats=crewMileageStats(report,true);
+  const stats=crewMileageStats(report,true,false,date);
   const driverMileage=driverMileageSnapshotForDay(report,date);
   return {
     date,weekday:dayLabel(date),savedAt:new Date().toISOString(),rawText,
@@ -2671,10 +2955,20 @@ function selectedWeekDays(){
 }
 function rebuildDriverMileageFromSavedDay(date,stored){
   const drivers=[];
+  let parsedByCrew=new Map();
+  if(String(stored?.rawText||'').trim()){
+    try{
+      const parsed=parseReport(stored.rawText);
+      (parsed.crews||[]).forEach(c=>parsedByCrew.set(crewIdentityKey(c.name),c));
+    }catch(e){}
+  }
 
   const crews=Array.isArray(stored?.crews)?stored.crews:[];
   crews.forEach(c=>{
     const names=mileageDriversForCrew(date,c.name);
+    const parsedCrew=parsedByCrew.get(crewIdentityKey(c.name));
+    const outOfAreaRoutes=parsedCrew?outOfAreaMileageForCrew(parsedCrew,date):[];
+    const outOfAreaMiles=outOfAreaRoutes.reduce((s,r)=>s+(Number(r.miles)||0),0);
     names.forEach(driver=>{
       const key=driverKey(driver);
       const profile=driverProfiles[key];
@@ -2683,21 +2977,28 @@ function rebuildDriverMileageFromSavedDay(date,stored){
 
       let row=drivers.find(x=>driverKey(x.name)===key);
       if(!row){
-        row={name:canonicalEmployeeName(driver),miles:0,trips:0,missingRoutes:0,routes:[]};
+        row={name:canonicalEmployeeName(driver),miles:0,normalMiles:0,outOfAreaMiles:0,trips:0,missingRoutes:0,routes:[]};
         drivers.push(row);
       }
 
-      row.miles+=Number(c.miles)||0;
-      row.trips+=Number(c.trips)||0;
+      const normalMiles=Number(c.miles)||0;
+      row.miles+=normalMiles+outOfAreaMiles;
+      row.normalMiles+=normalMiles;
+      row.outOfAreaMiles+=outOfAreaMiles;
+      row.trips+=(Number(c.trips)||0)+outOfAreaRoutes.reduce((s,r)=>s+(Number(r.legCount)||1),0);
       row.missingRoutes+=Number(c.missingRoutes)||0;
-      (c.routes||[]).forEach(r=>row.routes.push({...r,crew:c.name}));
+      (c.routes||[]).filter(r=>!r.outOfAreaType).forEach(r=>row.routes.push({...r,crew:c.name,routeType:r.routeType||'Scheduled Job-to-Job'}));
+      outOfAreaRoutes.forEach(r=>row.routes.push({...r,crew:c.name,routeType:r.typeLabel}));
     });
   });
 
-  drivers.forEach(d=>d.miles=+d.miles.toFixed(1));
+  drivers.forEach(d=>{
+    d.miles=+d.miles.toFixed(1);
+    d.normalMiles=+d.normalMiles.toFixed(1);
+    d.outOfAreaMiles=+d.outOfAreaMiles.toFixed(1);
+  });
 
-  // Transitional fallback: if an older saved day has a driver snapshot
-  // but no usable crew route payload, don't throw that mileage away.
+  // Transitional fallback for very old saved days with no crew route payload.
   if(!drivers.length && !savedDayHasUsableCrewMileage(stored) && Array.isArray(stored?.driverMileage)){
     return stored.driverMileage
       .filter(d=>{
@@ -2705,7 +3006,7 @@ function rebuildDriverMileageFromSavedDay(date,stored){
         if(profile && (profile.type==='mileiq' || profile.type==='nondriver')) return false;
         return !isMileageDriverExcluded(d.name);
       })
-      .map(d=>({...d,name:canonicalEmployeeName(d.name)}));
+      .map(d=>({...d,name:canonicalEmployeeName(d.name),normalMiles:Number(d.normalMiles??d.miles)||0,outOfAreaMiles:Number(d.outOfAreaMiles)||0}));
   }
 
   return drivers;
@@ -2754,7 +3055,7 @@ async function repairSavedMileageDayIfNeeded(date){
   }
   if(!report || !report.crews || !report.crews.length) return false;
 
-  await calculateMileageRoutes(report);
+  await calculateMileageRoutes(report,null,date,false);
   const repaired=mileageSnapshot(report,date,stored.rawText);
 
   // Preserve any older operations snapshot if it was richer.
@@ -2791,13 +3092,16 @@ function weeklyMileageData(){
   const days=dates.map(date=>{
     const stored=mileageHistory[date]||{date,weekday:dayLabel(date),crews:[]};
     const drivers=rebuildDriverMileageFromSavedDay(date,stored);
-
+    const normalMiles=drivers.reduce((s,d)=>s+(Number(d.normalMiles)||0),0);
+    const outOfAreaMiles=drivers.reduce((s,d)=>s+(Number(d.outOfAreaMiles)||0),0);
     return {
       ...stored,
       date,
       weekday:stored.weekday||dayLabel(date),
       driverMileage:drivers,
-      totalMiles:drivers.reduce((s,d)=>s+(Number(d.miles)||0),0),
+      normalMiles,
+      outOfAreaMiles,
+      totalMiles:normalMiles+outOfAreaMiles,
       missingRoutes:drivers.reduce((s,d)=>s+(Number(d.missingRoutes)||0),0)
     };
   });
@@ -2807,11 +3111,14 @@ function weeklyMileageData(){
     if(isMileageDriverExcluded(d.name)) return;
     const key=driverKey(d.name);
     if(!map.has(key)){
-      map.set(key,{name:d.name,byDate:{},totalMiles:0,totalTrips:0,missingRoutes:0});
+      map.set(key,{name:d.name,byDate:{},byDateOutOfArea:{},totalMiles:0,normalMiles:0,outOfAreaMiles:0,totalTrips:0,missingRoutes:0});
     }
     const row=map.get(key);
     row.byDate[day.date]=(row.byDate[day.date]||0)+(Number(d.miles)||0);
+    row.byDateOutOfArea[day.date]=(row.byDateOutOfArea[day.date]||0)+(Number(d.outOfAreaMiles)||0);
     row.totalMiles+=Number(d.miles)||0;
+    row.normalMiles+=Number(d.normalMiles)||0;
+    row.outOfAreaMiles+=Number(d.outOfAreaMiles)||0;
     row.totalTrips+=Number(d.trips)||0;
     row.missingRoutes+=Number(d.missingRoutes)||0;
   }));
@@ -2820,6 +3127,8 @@ function weeklyMileageData(){
     dates,
     days,
     crews:[...map.values()].sort((a,b)=>b.totalMiles-a.totalMiles),
+    normalMiles:days.reduce((s,d)=>s+(Number(d.normalMiles)||0),0),
+    outOfAreaMiles:days.reduce((s,d)=>s+(Number(d.outOfAreaMiles)||0),0),
     totalMiles:days.reduce((s,d)=>s+(Number(d.totalMiles)||0),0),
     missingRoutes:days.reduce((s,d)=>s+(Number(d.missingRoutes)||0),0),
     exclusions:[...mileageExclusions]
@@ -2864,7 +3173,7 @@ function parseReport(text){
 
     const looksLikeJob = crew && cols.length>=2 &&
       /^\s*(AM\s+|PM\s+)?\d/.test(first) &&
-      !/People/i.test(cols.join(' '));
+      !/People/i.test(cols.join('\n'));
     if(looksLikeJob){
       const people=n(cols[1]);
       const inVal=(cols[2]||'').trim();
@@ -3133,7 +3442,7 @@ function outlookEmailHtml(){
       <td style="${td}text-align:center">${formatDriveMinutes(crewTotalDriveMinutes(c))}</td>
       <td style="${td}text-align:center">${fmt(crewDriveManHours(c))} hr</td>
     </tr>`;
-  }).join('');
+  }).join('\n');
 
   const travelRows=lateTrips.length
     ? lateTrips.map(t=>`<tr>
@@ -3143,7 +3452,7 @@ function outlookEmailHtml(){
       <td style="${td}text-align:center">${t.gap} min</td>
       <td style="${td}text-align:center">${t.expected} min</td>
       <td style="${td}background:#f4cccc;color:#990000;font-weight:700">${t.travelDelay} min travel delay</td>
-    </tr>`).join('')
+    </tr>`).join('\n')
     : `<tr><td colspan="6" style="${td}color:#666666">No travel delays found.</td></tr>`;
 
   const cancelRows=r.cancelled.length?r.crews.flatMap(c=>c.jobs.filter(j=>j.cancelled).map(j=>`<tr>
@@ -3152,7 +3461,7 @@ function outlookEmailHtml(){
     <td style="${td}">${esc(j.lot)}</td>
     <td style="${td}">${esc(j.jobType)}</td>
     <td style="${td}">${esc(j.address)}</td>
-  </tr>`)).join(''):`<tr><td colspan="5" style="${td}color:#666666">No cancelled jobs.</td></tr>`;
+  </tr>`)).join('\n'):`<tr><td colspan="5" style="${td}color:#666666">No cancelled jobs.</td></tr>`;
 
   const incompleteRows=incomplete.length?incomplete.map(j=>`<tr>
     <td style="${td}font-weight:600">${esc(j.crew)}</td>
@@ -3160,7 +3469,7 @@ function outlookEmailHtml(){
     <td style="${td}">${esc(j.left)}</td>
     <td style="${td}">${esc(j.in||'Missing')}</td>
     <td style="${td}">${esc(j.out||'Missing')}</td>
-  </tr>`).join(''):`<tr><td colspan="5" style="${td}color:#666666">No incomplete jobs.</td></tr>`;
+  </tr>`).join('\n'):`<tr><td colspan="5" style="${td}color:#666666">No incomplete jobs.</td></tr>`;
 
   const jobMix=jobMixDataFromJobs(r.jobs);
   const jobMixRows=jobMix.length?jobMix.map(x=>`<tr>
@@ -3169,7 +3478,7 @@ function outlookEmailHtml(){
     <td style="${td}text-align:right">${fmt(x.actual)}</td>
     <td style="${td}text-align:right">${fmt(x.budget)}</td>
     <td style="${td}text-align:center">${x.actual?fmt(x.efficiency)+'%':'N/A'}</td>
-  </tr>`).join(''):`<tr><td colspan="5" style="${td}color:#666">No completed jobs.</td></tr>`;
+  </tr>`).join('\n'):`<tr><td colspan="5" style="${td}color:#666">No completed jobs.</td></tr>`;
   const jobBuckets=dailyJobBucketCounts(r.jobs);
 
   const highlightRows=[
@@ -3177,7 +3486,7 @@ function outlookEmailHtml(){
     highlights.worst?`<tr><td style="${td}font-weight:600">Most over budget</td><td style="${td}">${esc(highlights.worst.name)} &ndash; ${varianceText(highlights.worst)}</td></tr>`:'',
     highlights.mostCancelled&&highlights.mostCancelled.cancelled?`<tr><td style="${td}font-weight:600">Most cancelled jobs</td><td style="${td}">${esc(highlights.mostCancelled.name)} &ndash; ${highlights.mostCancelled.cancelled}</td></tr>`:'',
     highlights.longest?`<tr><td style="${td}font-weight:600">Longest travel delay</td><td style="${td}">${esc(highlights.longest.crew)} &ndash; ${highlights.longest.travelDelay} minutes travel delay</td></tr>`:''
-  ].filter(Boolean).join('');
+  ].filter(Boolean).join('\n');
 
   return `<!doctype html><html><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body style="margin:0;padding:0;background:#ffffff">
   <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
@@ -3297,7 +3606,7 @@ function outlookEmailHtml(){
             <td style="${td}text-align:center">${fmt(j.budget)}</td>
             <td style="${td}text-align:center;background:${status.bg};color:${status.color};font-weight:700">${status.label}</td>
           </tr>`;
-        }).join('');
+        }).join('\n');
 
         return `
           <div style="font-size:14px;font-weight:700;color:#333333;margin:12px 0 5px">${esc(group.name)}</div>
@@ -3312,12 +3621,12 @@ function outlookEmailHtml(){
             </tr></thead>
             <tbody>${jobRows}</tbody>
           </table>`;
-      }).join('');
+      }).join('\n');
 
       return `
         <div style="font-size:16px;font-weight:700;color:#1f4e78;margin:20px 0 6px">${esc(c.name)}</div>
         ${subdivisionSections}`;
-    }).join('')}
+    }).join('\n')}
   </div></body></html>`;
 }
 function emailText(){
@@ -3465,128 +3774,79 @@ function downloadOutlookEml(){
 
 function mileageReportHtml(){
   if(!currentReport) return '';
-
-  const r=currentReport;
-  const stats=crewMileageStats(r)
-    .filter(s=>s.routed.length || s.missing.length)
+  const stats=crewMileageStats(currentReport,false,true,$('#operationDate')?.value||'')
+    .filter(s=>s.routed.length || s.missing.length || s.outOfAreaRoutes.length)
     .sort((a,b)=>b.miles-a.miles);
-
-  const totalMiles=stats.reduce((sum,s)=>sum+s.miles,0);
-  const totalTrips=stats.reduce((sum,s)=>sum+s.routed.length,0);
-  const missingRoutes=stats.reduce((sum,s)=>sum+s.missing.length,0);
-
+  const normalMiles=stats.reduce((s,x)=>s+x.normalMiles,0);
+  const outOfAreaMiles=stats.reduce((s,x)=>s+x.outOfAreaMiles,0);
+  const totalMiles=normalMiles+outOfAreaMiles;
+  const missingRoutes=stats.reduce((s,x)=>s+x.missing.length,0);
   const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
   const th='padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;color:#000000;font-size:13px;text-align:left;font-weight:700;';
-
   const crewRows=stats.length?stats.map(s=>`<tr>
     <td style="${td}font-weight:600">${esc(s.crew.name)}</td>
-    <td style="${td}text-align:center">${s.routed.length}</td>
+    <td style="${td}text-align:right">${fmt(s.normalMiles)} mi</td>
+    <td style="${td}text-align:right;background:${s.outOfAreaMiles?'#fff2cc':'#fff'};font-weight:${s.outOfAreaMiles?'700':'400'}">${fmt(s.outOfAreaMiles)} mi</td>
     <td style="${td}text-align:right;font-weight:700">${fmt(s.miles)} mi</td>
-    <td style="${td}text-align:right">${s.routed.length?fmt(s.average)+' mi':'N/A'}</td>
     <td style="${td}text-align:center">${s.missing.length}</td>
-  </tr>`).join(''):`<tr><td colspan="5" style="${td}color:#666666">No mileage routes available.</td></tr>`;
-
+  </tr>`).join('\n'):`<tr><td colspan="5" style="${td}color:#666">No mileage routes available.</td></tr>`;
   const routeRows=[];
-  r.crews.forEach(c=>mileageTripsForCrew(c).forEach(t=>{
-    if(t.route && Number.isFinite(Number(t.route.miles))){
+  stats.forEach(s=>{
+    mileageTripsForCrew(s.crew).forEach(t=>{
       routeRows.push(`<tr>
-        <td style="${td}font-weight:600">${esc(c.name)}</td>
-        <td style="${td}">${esc(t.from.subdivision)}</td>
-        <td style="${td}">${esc(t.to.subdivision)}</td>
-        <td style="${td}text-align:right">${fmt(Number(t.route.miles))} mi</td>
-        <td style="${td}text-align:center">${t.route.minutes} min</td>
-        <td style="${td}">${esc(t.route.source)}${t.includesCancellation?' · cancelled stop':''}</td>
+        <td style="${td}font-weight:600">${esc(s.crew.name)}</td><td style="${td}">Scheduled Job-to-Job</td>
+        <td style="${td}">${esc(t.from.subdivision)}</td><td style="${td}">${esc(t.to.subdivision)}</td>
+        <td style="${td}text-align:right">${t.route&&Number.isFinite(Number(t.route.miles))?fmt(Number(t.route.miles))+' mi':'Missing'}</td>
+        <td style="${td}text-align:center">${t.route?t.route.minutes+' min':'—'}</td>
+        <td style="${td}">${t.route?esc(t.route.source):'Route unavailable'}${t.includesCancellation?' · cancelled stop':''}</td>
       </tr>`);
-    }else{
-      routeRows.push(`<tr>
-        <td style="${td}font-weight:600">${esc(c.name)}</td>
-        <td style="${td}">${esc(t.from.subdivision)}</td>
-        <td style="${td}">${esc(t.to.subdivision)}</td>
-        <td style="${td}" colspan="3">Route unavailable</td>
-      </tr>`);
-    }
-  }));
-
-  return `<!doctype html><html><head><meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head>
-  <body style="margin:0;padding:0;background:#ffffff">
-    <div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
-      <div style="background:#1f4e78;color:#ffffff;padding:20px 24px;border-radius:4px">
-        <div style="font-size:25px;font-weight:700">VIP Estimated Mileage Report</div>
-        <div style="font-size:14px;margin-top:5px;color:#dbe8f4">${getReportDateLabel()}</div>
-      </div>
-      ${mileageExclusions.length?`<div style="margin-top:10px;padding:8px 10px;background:#fff2cc;border:1px solid #e6d58c;font-size:12px"><strong>Excluded from mileage:</strong> ${esc(mileageExclusions.join(', '))}</div>`:''}
-
-      <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;margin-top:14px">
-        <tr>
-          <td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center">
-            <div style="font-size:11px;color:#666666;text-transform:uppercase">Estimated Road Miles</div>
-            <div style="font-size:24px;font-weight:700;margin-top:4px">${fmt(totalMiles)}</div>
-          </td>
-          <td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center">
-            <div style="font-size:11px;color:#666666;text-transform:uppercase">Trips Counted</div>
-            <div style="font-size:24px;font-weight:700;margin-top:4px">${totalTrips}</div>
-          </td>
-          <td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center">
-            <div style="font-size:11px;color:#666666;text-transform:uppercase">Routes Missing</div>
-            <div style="font-size:24px;font-weight:700;margin-top:4px">${missingRoutes}</div>
-          </td>
-        </tr>
-      </table>
-
-      <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Crew</h2>
-      <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
-        <thead><tr>
-          <th style="${th}">Crew</th>
-          <th style="${th}">Trips Counted</th>
-          <th style="${th}">Estimated Road Miles</th>
-          <th style="${th}">Average per Trip</th>
-          <th style="${th}">Routes Missing</th>
-        </tr></thead>
-        <tbody>${crewRows}</tbody>
-      </table>
-
-      <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Route Breakdown</h2>
-      <table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse">
-        <thead><tr>
-          <th style="${th}">Crew</th>
-          <th style="${th}">From</th>
-          <th style="${th}">To</th>
-          <th style="${th}">Road Miles</th>
-          <th style="${th}">Drive Time</th>
-          <th style="${th}">Route Source</th>
-        </tr></thead>
-        <tbody>${routeRows.join('')||`<tr><td colspan="6" style="${td}color:#666666">No routes found.</td></tr>`}</tbody>
-      </table>
-
-      <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666666;font-size:11px;line-height:1.5">
-        Mileage is estimated using routed road distance between consecutive scheduled subdivisions.
-        Travel chains interrupted by a cancelled job are excluded.
-      </div>
-    </div>
-  </body></html>`;
+    });
+    s.outOfAreaRoutes.forEach(r=>routeRows.push(`<tr style="background:#fff8df">
+      <td style="${td}font-weight:600">${esc(s.crew.name)}</td><td style="${td}font-weight:700;color:#8a5a00">${esc(r.typeLabel)}</td>
+      <td style="${td}">${esc(r.from)}</td><td style="${td}">${esc(r.to)}</td>
+      <td style="${td}text-align:right;font-weight:700">${fmt(r.miles)} mi</td><td style="${td}text-align:center">—</td>
+      <td style="${td}">${esc(r.note||r.source)}</td></tr>`));
+  });
+  const ooaRows=stats.flatMap(s=>s.outOfAreaRoutes.map(r=>`<tr><td style="${td}font-weight:600">${esc(s.crew.name)}</td><td style="${td}font-weight:700">${esc(r.typeLabel)}</td><td style="${td}">${esc(r.from)} → ${esc(r.to)}</td><td style="${td}text-align:right;font-weight:700">${fmt(r.miles)} mi</td></tr>`)).join('\n');
+  return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff"><div style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
+    <div style="background:#1f4e78;color:#fff;padding:20px 24px"><div style="font-size:25px;font-weight:700">VIP Estimated Mileage Report</div><div style="font-size:14px;margin-top:5px;color:#dbe8f4">${getReportDateLabel()}</div><div style="font-size:12px;margin-top:7px">Out-of-Area center: ${esc(OUT_OF_AREA_CENTER.address)}</div></div>
+    ${mileageExclusions.length?`<div style="margin-top:10px;padding:8px 10px;background:#fff2cc;border:1px solid #e6d58c;font-size:12px"><strong>Excluded from mileage:</strong> ${esc(mileageExclusions.join(', '))}</div>`:''}
+    <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>
+      <td style="width:25%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Scheduled Job-to-Job Miles</div><div style="font-size:24px;font-weight:700">${fmt(normalMiles)}</div></td>
+      <td style="width:25%;padding:12px;border:1px solid #e6d58c;background:#fff2cc;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Additional Out-of-Area Miles</div><div style="font-size:24px;font-weight:700">${fmt(outOfAreaMiles)}</div></td>
+      <td style="width:25%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Total Payable Miles</div><div style="font-size:24px;font-weight:700">${fmt(totalMiles)}</div></td>
+      <td style="width:25%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Routes Missing</div><div style="font-size:24px;font-weight:700">${missingRoutes}</div></td>
+    </tr></table>
+    <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Crew</h2>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th><th style="${th}">Scheduled Miles</th><th style="${th}">Out-of-Area</th><th style="${th}">Total</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
+    ${ooaRows?`<h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Additional Out-of-Area Mileage</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th><th style="${th}">Type</th><th style="${th}">Route</th><th style="${th}">Additional Miles</th></tr></thead><tbody>${ooaRows}</tbody></table>`:''}
+    <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Route Breakdown</h2>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th><th style="${th}">Type</th><th style="${th}">From</th><th style="${th}">To</th><th style="${th}">Miles</th><th style="${th}">Drive Time</th><th style="${th}">Note / Source</th></tr></thead><tbody>${routeRows.join('\n')||`<tr><td colspan="7" style="${td}color:#666">No routes found.</td></tr>`}</tbody></table>
+    <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px;line-height:1.5">Scheduled mileage uses routed road distance between mileage-eligible scheduled subdivisions. Cancellation Review controls whether each cancelled stop stays in or is removed from the mileage route. Additional Out-of-Area mileage is controlled by the editable Out-of-Area list and its designated one-way mileage from ${esc(OUT_OF_AREA_CENTER.address)}.</div>
+  </div></body></html>`;
 }
 function mileageReportText(){
   if(!currentReport) return '';
+  const stats=crewMileageStats(currentReport,false,true,$('#operationDate')?.value||'').filter(s=>s.routed.length||s.missing.length||s.outOfAreaRoutes.length).sort((a,b)=>b.miles-a.miles);
+  const normalMiles=stats.reduce((s,x)=>s+x.normalMiles,0),outOfAreaMiles=stats.reduce((s,x)=>s+x.outOfAreaMiles,0),totalMiles=normalMiles+outOfAreaMiles;
+  let out=`VIP Estimated Mileage Report
+${getReportDateLabel()}
+Out-of-Area Center: ${OUT_OF_AREA_CENTER.address}
 
-  const stats=crewMileageStats(currentReport)
-    .filter(s=>s.routed.length || s.missing.length)
-    .sort((a,b)=>b.miles-a.miles);
+Scheduled Job-to-Job Miles: ${fmt(normalMiles)}
+Additional Out-of-Area Miles: ${fmt(outOfAreaMiles)}
+Total Payable Miles: ${fmt(totalMiles)}
 
-  const totalMiles=stats.reduce((sum,s)=>sum+s.miles,0);
-  let out=`VIP Estimated Mileage Report\n${getReportDateLabel()}\n\nTotal Estimated Road Miles: ${fmt(totalMiles)}\n\nMILEAGE BY CREW\n`;
-
-  stats.forEach(s=>{
-    out+=`\n${s.crew.name}: ${fmt(s.miles)} miles across ${s.routed.length} trip${s.routed.length===1?'':'s'}`;
-    if(s.missing.length) out+=` — ${s.missing.length} missing route${s.missing.length===1?'':'s'}`;
-  });
-
+MILEAGE BY CREW
+`;
+  stats.forEach(s=>{out+=`
+${s.crew.name}: Scheduled ${fmt(s.normalMiles)} mi | Out-of-Area ${fmt(s.outOfAreaMiles)} mi | Total ${fmt(s.miles)} mi`;});
+  const extra=stats.flatMap(s=>s.outOfAreaRoutes.map(r=>({crew:s.crew.name,...r})));
+  if(extra.length){out+='\n\nADDITIONAL OUT-OF-AREA MILEAGE\n';extra.forEach(r=>out+=`
+${r.crew}: ${r.typeLabel}: ${r.from} -> ${r.to} — ${fmt(r.miles)} miles`);}
   out+='\n\nROUTE BREAKDOWN\n';
-  currentReport.crews.forEach(c=>mileageTripsForCrew(c).forEach(t=>{
-    if(t.route && Number.isFinite(Number(t.route.miles))){
-      out+=`\n${c.name}: ${t.from.subdivision} to ${t.to.subdivision} — ${fmt(Number(t.route.miles))} miles${t.includesCancellation?' — includes cancelled stop':''}`;
-    }
-  }));
-
+  stats.forEach(s=>mileageTripsForCrew(s.crew).forEach(t=>{if(t.route&&Number.isFinite(Number(t.route.miles)))out+=`
+${s.crew.name}: ${t.from.subdivision} to ${t.to.subdivision} — ${fmt(Number(t.route.miles))} miles${t.includesCancellation?' — includes cancelled stop':''}`;}));
   return out;
 }
 function previewMileageReport(){
@@ -3651,34 +3911,15 @@ function downloadMileageEml(){
 }
 function downloadMileageCsv(){
   if(!currentReport){alert('Analyze a report first.');return;}
-  if(!travelCalculationComplete){
-    alert('Travel calculations are still running. Wait until the page says Email export is ready.');
-    return;
-  }
-
-  const rows=[['Crew','From Subdivision','To Subdivision','Estimated Road Miles','Estimated Drive Minutes','Route Source']];
-
-  currentReport.crews.forEach(c=>mileageTripsForCrew(c).forEach(t=>{
-    rows.push([
-      c.name,
-      t.from.subdivision,
-      t.to.subdivision,
-      t.route&&Number.isFinite(Number(t.route.miles))?Number(t.route.miles):'',
-      t.route?t.route.minutes:'',
-      t.route?t.route.source:'Route unavailable'
-    ]);
-  }));
-
+  if(!travelCalculationComplete){alert('Travel calculations are still running. Wait until the page says Email export is ready.');return;}
+  const rows=[['Crew','Mileage Type','From','To','Road Miles','Drive Minutes','Source / Note']];
+  currentReport.crews.forEach(c=>{
+    mileageTripsForCrew(c).forEach(t=>rows.push([c.name,'Scheduled Job-to-Job',t.from.subdivision,t.to.subdivision,t.route&&Number.isFinite(Number(t.route.miles))?Number(t.route.miles):'',t.route?t.route.minutes:'',t.route?t.route.source:'Route unavailable']));
+    outOfAreaMileageForCrew(c,$('#operationDate')?.value||'').forEach(r=>rows.push([c.name,r.typeLabel,r.from,r.to,Number(r.miles)||0,'',r.note||r.source]));
+  });
   const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const link=document.createElement('a');
-  link.href=url;
-  link.download=`VIP-Estimated-Mileage-${safeFileDate()}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+  link.href=url;link.download=`VIP-Estimated-Mileage-${safeFileDate()}.csv`;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
 
@@ -3899,8 +4140,8 @@ function floorplanPerformanceData(){
 }
 function floorplanPerformanceReportHtml(){
   const d=floorplanPerformanceData(),{td,th}=analyticsTableStyles();
-  const summaryRows=d.rows.map(r=>`<tr><td style="${td}font-weight:600">${esc(r.floorplan)}</td><td style="${td}">${esc(r.task)}</td><td style="${td}text-align:center">${r.count}</td><td style="${td}text-align:right">${fmt(r.avg)}</td><td style="${td}text-align:right">${fmt(r.avgBudget)}</td><td style="${td}text-align:right">${fmt(r.actual)}</td><td style="${td}text-align:center">${fmt(r.eff)}%</td></tr>`).join('');
-  const detail=d.rows.map(r=>`<h3 style="font-size:16px;color:#1f4e78;margin:22px 0 7px">${esc(r.floorplan)} — ${esc(r.task)}</h3><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Cleans</th><th style="${th}">Avg Actual MH / Clean</th><th style="${th}">Avg Budget</th><th style="${th}">Total Actual MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${r.subdivisions.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:center">${x.count}</td><td style="${td}text-align:right">${fmt(x.avg)}</td><td style="${td}text-align:right">${fmt(x.avgBudget)}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:center">${fmt(x.eff)}%</td></tr>`).join('')}</tbody></table>`).join('');
+  const summaryRows=d.rows.map(r=>`<tr><td style="${td}font-weight:600">${esc(r.floorplan)}</td><td style="${td}">${esc(r.task)}</td><td style="${td}text-align:center">${r.count}</td><td style="${td}text-align:right">${fmt(r.avg)}</td><td style="${td}text-align:right">${fmt(r.avgBudget)}</td><td style="${td}text-align:right">${fmt(r.actual)}</td><td style="${td}text-align:center">${fmt(r.eff)}%</td></tr>`).join('\n');
+  const detail=d.rows.map(r=>`<h3 style="font-size:16px;color:#1f4e78;margin:22px 0 7px">${esc(r.floorplan)} — ${esc(r.task)}</h3><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Cleans</th><th style="${th}">Avg Actual MH / Clean</th><th style="${th}">Avg Budget</th><th style="${th}">Total Actual MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${r.subdivisions.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:center">${x.count}</td><td style="${td}text-align:right">${fmt(x.avg)}</td><td style="${td}text-align:right">${fmt(x.avgBudget)}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:center">${fmt(x.eff)}%</td></tr>`).join('\n')}</tbody></table>`).join('\n');
   const totalCount=d.rows.reduce((s,r)=>s+r.count,0),floorplans=new Set(d.rows.map(r=>normalizeName(r.floorplan))).size;
   const body=`<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>${analyticsCard('Floorplans',floorplans)}${analyticsCard('Task Samples',totalCount)}${analyticsCard('Unmapped Jobs',d.unmapped)}${analyticsCard('Selected Days',d.days.length)}</tr></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Floorplan Summary</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Floorplan</th><th style="${th}">Task</th><th style="${th}">Cleans</th><th style="${th}">Avg Actual MH / Clean</th><th style="${th}">Avg Budget</th><th style="${th}">Total Actual MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${summaryRows||`<tr><td colspan="7" style="${td}color:#666">No matching floorplan jobs found.</td></tr>`}</tbody></table>
@@ -3934,9 +4175,68 @@ function cancellationRecordKey(date,crewName,job){
   ];
   return encodeURIComponent(parts.join('|'));
 }
+function normalizeCancellationMileage(value){
+  return value==='include'||value===true?'include':value==='exclude'||value===false?'exclude':'unknown';
+}
+function cancellationMileageLabel(value){
+  return value==='include'?'Count Mileage':value==='exclude'?'Do Not Count Mileage':'Not Reviewed';
+}
 function cancellationClassification(key){
   const raw=(cancellationReviewDraft&&cancellationReviewDraft[key]) || (cancellationReasons&&cancellationReasons[key]) || {};
-  return {reason:normalizeCancellationReason(raw.reason),relatedTo:String(raw.relatedTo||'')};
+  return {reason:normalizeCancellationReason(raw.reason),relatedTo:String(raw.relatedTo||''),mileage:normalizeCancellationMileage(raw.mileage)};
+}
+function ensureCancellationMileageDecisions(report,date){
+  if(!report||!date)return false;
+  const unresolved=[];
+  (report.crews||[]).forEach(c=>(c.jobs||[]).filter(j=>j.cancelled).forEach(j=>{
+    const key=cancellationRecordKey(date,c.name,j),cls=cancellationClassification(key);
+    if(cls.mileage==='unknown') unresolved.push({key,crew:c.name,job:j,cls});
+  }));
+  if(!unresolved.length)return false;
+  if(unresolved.length>1) alert(`${unresolved.length} cancelled jobs need a mileage decision. For each one, choose OK if the crew drove to the cancelled stop, or Cancel if it was cancelled before they traveled there.`);
+  unresolved.forEach(x=>{
+    const job=x.job;
+    const count=confirm(`COUNT THIS CANCELLATION FOR MILEAGE?\n\n${shortDateLabel(date)}\n${x.crew}\n${job.subdivision||'Unknown Subdivision'} · Lot ${job.lot||'—'}\n${budgetTaskLabel(job)}\n\nOK = Count Mileage (crew drove there)\nCancel = Do Not Count Mileage (cancelled before travel)`);
+    const updated={...x.cls,mileage:count?'include':'exclude'};
+    cancellationReasons[x.key]=updated;
+    cancellationReviewDraft[x.key]=updated;
+  });
+  try{localStorage.setItem(STORAGE_KEYS.cancellationReasons,JSON.stringify(cancellationReasons));}catch(e){console.error('Cancellation mileage decision could not be saved:',e);}
+  if($('#cancellationReviewTable')?.dataset.loaded==='1') renderCancellationReview();
+  return true;
+}
+async function rebuildMileageForDates(dates){
+  let changed=0;
+  for(const date of [...new Set(dates||[])]){
+    const stored=mileageHistory[date];
+    if(!stored?.rawText)continue;
+    let report;
+    try{report=parseReport(stored.rawText);}catch(e){continue;}
+    if(!report?.crews?.length)continue;
+    await calculateMileageRoutes(report,null,date,false);
+    const rebuilt=mileageSnapshot(report,date,stored.rawText);
+    if(stored.operations) rebuilt.operations=stored.operations;
+    mileageHistory[date]=rebuilt;
+    changed++;
+  }
+  if(changed){persistMileageHistory({showAlert:false});renderSavedMileageDays();}
+  return changed;
+}
+async function resolveSavedCancellationMileageDecisions(dates=reportDates()){
+  const affected=[];
+  for(const date of dates||[]){
+    const stored=mileageHistory[date];
+    if(!stored?.rawText)continue;
+    let report;
+    try{report=parseReport(stored.rawText);}catch(e){continue;}
+    if(!report?.crews?.length)continue;
+    if(ensureCancellationMileageDecisions(report,date))affected.push(date);
+  }
+  if(affected.length){
+    if($('#savedMileageStatus'))$('#savedMileageStatus').textContent='Rebuilding saved mileage with cancellation choices…';
+    await rebuildMileageForDates(affected);
+  }
+  return affected.length;
 }
 function cancellationReviewRecords(){
   const base=analyticsBaseData(),records=[];
@@ -3960,7 +4260,7 @@ function updateCancellationReviewFilters(records){
   if(!builderSelect)return;
   const prior=builderSelect.value||'all';
   const builders=[...new Set(records.map(r=>r.builder).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-  builderSelect.innerHTML='<option value="all">All Builders</option>'+builders.map(b=>`<option value="${esc(normalizeName(b))}">${esc(b)}</option>`).join('');
+  builderSelect.innerHTML='<option value="all">All Builders</option>'+builders.map(b=>`<option value="${esc(normalizeName(b))}">${esc(b)}</option>`).join('\n');
   if([...builderSelect.options].some(o=>o.value===prior))builderSelect.value=prior;
 }
 function renderCancellationReview(){
@@ -3975,25 +4275,32 @@ function renderCancellationReview(){
     if(reasonFilter!=='all' && cls.reason!==reasonFilter)return false;
     if(builderFilter!=='all' && normalizeName(r.builder)!==builderFilter)return false;
     if(search){
-      const hay=normalizeName([r.subdivision,r.builder,r.lot,r.task,r.crew,r.address].join(' '));
+      const hay=normalizeName([r.subdivision,r.builder,r.lot,r.task,r.crew,r.address].join('\n'));
       if(!hay.includes(search))return false;
     }
     return true;
   });
   if($('#cancellationReviewStatus')){
     const unknown=records.filter(r=>cancellationClassification(r.key).reason==='unknown').length;
-    $('#cancellationReviewStatus').textContent=`${visible.length} shown · ${records.length} cancellations · ${unknown} unknown`;
+    const mileageUnknown=records.filter(r=>cancellationClassification(r.key).mileage==='unknown').length;
+    $('#cancellationReviewStatus').textContent=`${visible.length} shown · ${records.length} cancellations · ${unknown} reason unknown · ${mileageUnknown} mileage unreviewed`;
   }
-  if(!visible.length){body.innerHTML='<tr><td colspan="9" class="muted">No cancellations match the current filters.</td></tr>';return;}
+  if(!visible.length){body.innerHTML='<tr><td colspan="10" class="muted">No cancellations match the current filters.</td></tr>';return;}
   body.innerHTML='';
   visible.forEach(r=>{
     const cls=cancellationClassification(r.key),candidates=cancellationRelatedCandidates(r,records);
     const tr=document.createElement('tr');tr.dataset.key=r.key;
-    const options=['unknown','builder','vip','related'].map(v=>`<option value="${v}" ${cls.reason===v?'selected':''}>${cancellationReasonLabel(v)}</option>`).join('');
-    const relatedOptions='<option value="">'+(candidates.length?'Choose related cancellation…':'No matching cancellation found')+'</option>'+candidates.map(x=>`<option value="${x.key}" ${cls.relatedTo===x.key?'selected':''}>${esc(shortDateLabel(x.date))} · ${esc(x.lot||'No lot')} · ${esc(x.task)}</option>`).join('');
-    tr.innerHTML=`<td style="text-align:center"><input type="checkbox" class="cancel-review-check" data-key="${r.key}"></td><td><strong>${esc(shortDateLabel(r.date))}</strong><div class="muted small">${esc(r.weekday||dayLabel(r.date))}</div></td><td>${esc(r.crew)}</td><td>${esc(r.builder)}</td><td>${esc(r.subdivision)}</td><td>${esc(r.lot||'—')}</td><td>${esc(r.task)}</td><td><select class="cancel-reason-select" data-key="${r.key}">${options}</select></td><td><select class="related-select" data-key="${r.key}" ${cls.reason==='related'?'':'disabled'}>${relatedOptions}</select></td>`;
+    const options=['unknown','builder','vip','related'].map(v=>`<option value="${v}" ${cls.reason===v?'selected':''}>${cancellationReasonLabel(v)}</option>`).join('\n');
+    const mileageOptions=['unknown','include','exclude'].map(v=>`<option value="${v}" ${cls.mileage===v?'selected':''}>${cancellationMileageLabel(v)}</option>`).join('\n');
+    const relatedOptions='<option value="">'+(candidates.length?'Choose related cancellation…':'No matching cancellation found')+'</option>'+candidates.map(x=>`<option value="${x.key}" ${cls.relatedTo===x.key?'selected':''}>${esc(shortDateLabel(x.date))} · ${esc(x.lot||'No lot')} · ${esc(x.task)}</option>`).join('\n');
+    tr.innerHTML=`<td style="text-align:center"><input type="checkbox" class="cancel-review-check" data-key="${r.key}"></td><td><strong>${esc(shortDateLabel(r.date))}</strong><div class="muted small">${esc(r.weekday||dayLabel(r.date))}</div></td><td>${esc(r.crew)}</td><td>${esc(r.builder)}</td><td>${esc(r.subdivision)}</td><td>${esc(r.lot||'—')}</td><td>${esc(r.task)}</td><td><select class="cancel-mileage-select" data-key="${r.key}">${mileageOptions}</select></td><td><select class="cancel-reason-select" data-key="${r.key}">${options}</select></td><td><select class="related-select" data-key="${r.key}" ${cls.reason==='related'?'':'disabled'}>${relatedOptions}</select></td>`;
     body.appendChild(tr);
   });
+  body.querySelectorAll('.cancel-mileage-select').forEach(sel=>sel.addEventListener('change',()=>{
+    const key=sel.dataset.key,current=cancellationClassification(key);
+    cancellationReviewDraft[key]={...current,mileage:normalizeCancellationMileage(sel.value)};
+    if($('#cancellationReviewStatus'))$('#cancellationReviewStatus').textContent+=' · unsaved changes';
+  }));
   body.querySelectorAll('.cancel-reason-select').forEach(sel=>sel.addEventListener('change',()=>{
     const key=sel.dataset.key,current=cancellationClassification(key),reason=normalizeCancellationReason(sel.value);
     cancellationReviewDraft[key]={...current,reason,relatedTo:reason==='related'?current.relatedTo:''};
@@ -4012,14 +4319,38 @@ function batchCancellationReason(reason){
   keys.forEach(key=>{const current=cancellationClassification(key);cancellationReviewDraft[key]={...current,reason,relatedTo:reason==='related'?current.relatedTo:''};});
   renderCancellationReview();
 }
-function saveCancellationReview(){
+function batchCancellationMileage(value){
+  const keys=selectedCancellationReviewKeys();if(!keys.length){alert('Select at least one cancellation first.');return;}
+  value=normalizeCancellationMileage(value);
+  keys.forEach(key=>{const current=cancellationClassification(key);cancellationReviewDraft[key]={...current,mileage:value};});
+  renderCancellationReview();
+}
+async function saveCancellationReview(){
+  const before={...cancellationReasons};
+  const affectedDates=[];
+  Object.entries(cancellationReviewDraft||{}).forEach(([key,next])=>{
+    const oldMileage=normalizeCancellationMileage(before[key]?.mileage);
+    const newMileage=normalizeCancellationMileage(next?.mileage);
+    if(oldMileage!==newMileage){
+      const record=cancellationReviewRecords().find(r=>r.key===key);
+      if(record?.date)affectedDates.push(record.date);
+    }
+  });
   cancellationReasons={...cancellationReasons,...cancellationReviewDraft};
   try{
     localStorage.setItem(STORAGE_KEYS.cancellationReasons,JSON.stringify(cancellationReasons));
     cancellationReviewDraft={...cancellationReasons};
+    if(affectedDates.length){
+      if($('#cancellationReviewStatus'))$('#cancellationReviewStatus').textContent='Saving and rebuilding affected mileage…';
+      await rebuildMileageForDates(affectedDates);
+      const currentDate=$('#operationDate')?.value||'';
+      if(currentReport && affectedDates.includes(currentDate)){
+        await calculateMileageRoutes(currentReport,null,currentDate,false);
+      }
+    }
     renderCancellationReview();
     if($('#cancellationReviewStatus'))$('#cancellationReviewStatus').textContent+=' · saved';
-  }catch(e){alert(`Cancellation reasons could not be saved. ${e?.message||e}`);}
+  }catch(e){alert(`Cancellation review could not be saved. ${e?.message||e}`);}
 }
 
 function cancellationAnalyticsData(){
@@ -4050,8 +4381,8 @@ function cancellationAnalyticsData(){
 }
 function cancellationAnalyticsReportHtml(){
   const d=cancellationAnalyticsData(),{td,th}=analyticsTableStyles();
-  const builderRows=d.builders.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.builder)}</td><td style="${td}text-align:center;font-weight:700">${x.cancelled}</td><td style="${td}text-align:center">${x.builderSide}</td><td style="${td}text-align:center">${x.vip}</td><td style="${td}text-align:center">${x.related}</td><td style="${td}text-align:center">${x.unknown}</td><td style="${td}text-align:center">${x.scheduled}</td><td style="${td}text-align:center">${fmt(x.rate)}%</td></tr>`).join('');
-  const subRows=d.subdivisions.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:center;font-weight:700">${x.cancelled}</td><td style="${td}text-align:center">${x.builderSide}</td><td style="${td}text-align:center">${x.vip}</td><td style="${td}text-align:center">${x.related}</td><td style="${td}text-align:center">${x.unknown}</td><td style="${td}text-align:center">${x.scheduled}</td><td style="${td}text-align:center">${fmt(x.rate)}%</td></tr>`).join('');
+  const builderRows=d.builders.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.builder)}</td><td style="${td}text-align:center;font-weight:700">${x.cancelled}</td><td style="${td}text-align:center">${x.builderSide}</td><td style="${td}text-align:center">${x.vip}</td><td style="${td}text-align:center">${x.related}</td><td style="${td}text-align:center">${x.unknown}</td><td style="${td}text-align:center">${x.scheduled}</td><td style="${td}text-align:center">${fmt(x.rate)}%</td></tr>`).join('\n');
+  const subRows=d.subdivisions.map(x=>`<tr><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:center;font-weight:700">${x.cancelled}</td><td style="${td}text-align:center">${x.builderSide}</td><td style="${td}text-align:center">${x.vip}</td><td style="${td}text-align:center">${x.related}</td><td style="${td}text-align:center">${x.unknown}</td><td style="${td}text-align:center">${x.scheduled}</td><td style="${td}text-align:center">${fmt(x.rate)}%</td></tr>`).join('\n');
   const body=`<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>${analyticsCard('All Cancellations',d.total)}${analyticsCard('Builder / Super',d.builderSide)}${analyticsCard('VIP / Internal',d.vip)}${analyticsCard('Related',d.related)}${analyticsCard('Unknown',d.unknown)}</tr><tr>${analyticsCard('Scheduled Jobs',d.scheduled)}${analyticsCard('Cancellation Rate',fmt(d.scheduled?d.total/d.scheduled*100:0)+'%')}${analyticsCard('Affected Subdivisions',d.subdivisions.filter(x=>x.cancelled>0).length)}<td colspan="2" style="border:0"></td></tr></table>
   <div style="margin-top:12px;padding:10px 12px;background:#eef3f8;border:1px solid #d9e2f3;font-size:12px;color:#555">Related Cancellation means a downstream job was cancelled because another related job was removed or moved. Unknown is intentionally left unassigned rather than guessed.</div>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cancellations by Builder</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Builder</th><th style="${th}">All</th><th style="${th}">Builder / Super</th><th style="${th}">VIP / Internal</th><th style="${th}">Related</th><th style="${th}">Unknown</th><th style="${th}">Scheduled</th><th style="${th}">Rate</th></tr></thead><tbody>${builderRows}</tbody></table>
@@ -4112,7 +4443,7 @@ function areaAnalyticsData(){
     (day.stored.crews||[]).forEach(savedCrew=>{
       const parsedCrew=day.report.crews.find(c=>crewIdentityKey(c.name)===crewIdentityKey(savedCrew.name));
       const people=crewPersonCount(savedCrew.name);
-      (savedCrew.routes||[]).forEach(r=>{
+      (savedCrew.routes||[]).filter(r=>!r.outOfAreaType).forEach(r=>{
         let job=null;
         if(parsedCrew) job=parsedCrew.jobs.find(j=>normalizeName(j.subdivision)===normalizeName(r.to));
         if(!job) job=day.report.crews.flatMap(c=>c.jobs).find(j=>normalizeName(j.subdivision)===normalizeName(r.to));
@@ -4199,8 +4530,8 @@ function areaLeafletMapSection(rows,taskNames=[]){
 
   const builders=[...new Set(points.map(p=>p.builder).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   const payload=JSON.stringify(points).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
-  const builderOptions=builders.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
-  const taskOptions=(taskNames||[]).map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  const builderOptions=builders.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('\n');
+  const taskOptions=(taskNames||[]).map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('\n');
 
   return `<div id="areaMapCapture" style="margin-top:8px;border:1px solid #d9e2f3;background:#ffffff;padding:12px">
     <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:10px">
@@ -4298,7 +4629,7 @@ function areaLeafletMapSection(rows,taskNames=[]){
         var label=metricLabels[metric]||metric;
         legendTitle.textContent='Top '+Math.min(20,filtered.length)+' Areas';
         legendSubtitle.textContent='Ranked by '+label.toLowerCase()+(task?' · '+task:'');
-        legend.innerHTML=filtered.slice(0,20).map(function(x,i){return '<div style="display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #eef3f8"><div style="font-weight:700;color:#1f4e78">'+(i+1)+'.</div><div style="min-width:0"><div style="font-weight:600;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(x.p.subdivision)+'</div><div style="font-size:11px;color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(x.p.builder)+'</div></div><div style="color:#555;font-weight:600">'+fmtLocal(x.value)+' '+metricUnits[metric]+'</div></div>';}).join('')+(filtered.length>20?'<div style="font-size:12px;color:#666;margin-top:10px">+ '+(filtered.length-20)+' additional subdivisions shown on the map.</div>':'');
+        legend.innerHTML=filtered.slice(0,20).map(function(x,i){return '<div style="display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #eef3f8"><div style="font-weight:700;color:#1f4e78">'+(i+1)+'.</div><div style="min-width:0"><div style="font-weight:600;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(x.p.subdivision)+'</div><div style="font-size:11px;color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escHtml(x.p.builder)+'</div></div><div style="color:#555;font-weight:600">'+fmtLocal(x.value)+' '+metricUnits[metric]+'</div></div>';}).join('\n')+(filtered.length>20?'<div style="font-size:12px;color:#666;margin-top:10px">+ '+(filtered.length-20)+' additional subdivisions shown on the map.</div>':'');
 
         if(bounds.length===1)map.setView(bounds[0],11);
         else if(bounds.length)map.fitBounds(bounds,{padding:[35,35],maxZoom:12});
@@ -4324,8 +4655,8 @@ function areaLeafletMapSection(rows,taskNames=[]){
 
 function travelAreaAnalyticsReportHtml(){
   const d=areaAnalyticsData(),{td,th}=analyticsTableStyles();
-  const driveRows=d.byDriving.map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:right">${fmt(x.miles)} mi</td><td style="${td}text-align:center">${formatDriveMinutes(x.driveMinutes)}</td><td style="${td}text-align:right">${fmt(x.driveManHours)} hr</td><td style="${td}text-align:center">${x.missingRoutes}</td></tr>`).join('');
-  const areaRows=(arr,limit=12)=>arr.slice(0,limit).map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:center">${x.completed}</td><td style="${td}text-align:right">${fmt(x.workManHours)}</td><td style="${td}text-align:right">${fmt(x.driveManHours)}</td><td style="${td}text-align:right;font-weight:700">${fmt(x.totalLaborHours)}</td></tr>`).join('');
+  const driveRows=d.byDriving.map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:right">${fmt(x.miles)} mi</td><td style="${td}text-align:center">${formatDriveMinutes(x.driveMinutes)}</td><td style="${td}text-align:right">${fmt(x.driveManHours)} hr</td><td style="${td}text-align:center">${x.missingRoutes}</td></tr>`).join('\n');
+  const areaRows=(arr,limit=12)=>arr.slice(0,limit).map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.subdivision)}</td><td style="${td}">${esc(x.builder)}</td><td style="${td}text-align:center">${x.completed}</td><td style="${td}text-align:right">${fmt(x.workManHours)}</td><td style="${td}text-align:right">${fmt(x.driveManHours)}</td><td style="${td}text-align:right;font-weight:700">${fmt(x.totalLaborHours)}</td></tr>`).join('\n');
   const mapHtml=areaLeafletMapSection(d.rows,d.taskNames);
   const body=`<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>${analyticsCard('Road Miles',fmt(d.totals.miles))}${analyticsCard('Total Drive Time',formatDriveMinutes(d.totals.driveMinutes))}${analyticsCard('Drive Man Hours',fmt(d.totals.driveManHours))}${analyticsCard('Cleaning Man Hours',fmt(d.totals.workManHours))}${analyticsCard('Completed Jobs',d.totals.completed)}</tr></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Subdivision Activity Map</h2>${mapHtml}
@@ -4354,11 +4685,11 @@ function manHourAnalyticsData(){
 }
 function manHourAnalyticsReportHtml(){
   const d=manHourAnalyticsData(),{td,th}=analyticsTableStyles();
-  const makeRows=(arr,limit)=>arr.slice(0,limit??arr.length).map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.subdivision||x.builder)}</td>${x.subdivision?`<td style="${td}">${esc(x.builder)}</td>`:''}<td style="${td}text-align:center">${x.jobs}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:right">${fmt(x.avg)}</td><td style="${td}text-align:right">${fmt(x.budget)}</td><td style="${td}text-align:center">${fmt(x.eff)}%</td></tr>`).join('');
+  const makeRows=(arr,limit)=>arr.slice(0,limit??arr.length).map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.subdivision||x.builder)}</td>${x.subdivision?`<td style="${td}">${esc(x.builder)}</td>`:''}<td style="${td}text-align:center">${x.jobs}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:right">${fmt(x.avg)}</td><td style="${td}text-align:right">${fmt(x.budget)}</td><td style="${td}text-align:center">${fmt(x.eff)}%</td></tr>`).join('\n');
   const body=`<table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>${analyticsCard('Completed Jobs',d.totals.jobs)}${analyticsCard('Cleaning Man Hours',fmt(d.totals.actual))}${analyticsCard('Avg MH / Job',fmt(d.totals.jobs?d.totals.actual/d.totals.jobs:0))}${analyticsCard('Subdivisions',d.subRows.length)}</tr></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Most Cleaning Man-Hours by Subdivision</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Jobs</th><th style="${th}">Actual MH</th><th style="${th}">Avg MH / Job</th><th style="${th}">Budget MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${makeRows(d.subRows,d.subRows.length)}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Least Cleaning Man-Hours by Subdivision</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Subdivision</th><th style="${th}">Builder</th><th style="${th}">Jobs</th><th style="${th}">Actual MH</th><th style="${th}">Avg MH / Job</th><th style="${th}">Budget MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${makeRows(d.low,Math.min(20,d.low.length))}</tbody></table>
-  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cleaning Man-Hours by Builder</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Builder</th><th style="${th}">Jobs</th><th style="${th}">Actual MH</th><th style="${th}">Avg MH / Job</th><th style="${th}">Budget MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${d.builderRows.map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.builder)}</td><td style="${td}text-align:center">${x.jobs}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:right">${fmt(x.avg)}</td><td style="${td}text-align:right">${fmt(x.budget)}</td><td style="${td}text-align:center">${fmt(x.eff)}%</td></tr>`).join('')}</tbody></table>`;
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Cleaning Man-Hours by Builder</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Rank</th><th style="${th}">Builder</th><th style="${th}">Jobs</th><th style="${th}">Actual MH</th><th style="${th}">Avg MH / Job</th><th style="${th}">Budget MH</th><th style="${th}">Efficiency</th></tr></thead><tbody>${d.builderRows.map((x,i)=>`<tr><td style="${td}text-align:center;font-weight:700">${i+1}</td><td style="${td}font-weight:600">${esc(x.builder)}</td><td style="${td}text-align:center">${x.jobs}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:right">${fmt(x.avg)}</td><td style="${td}text-align:right">${fmt(x.budget)}</td><td style="${td}text-align:center">${fmt(x.eff)}%</td></tr>`).join('\n')}</tbody></table>`;
   return analyticsReportShell('VIP Man-Hour Report',reportRangeLabel(d.dates),body);
 }
 function previewManHourAnalytics(){const d=requireAnalyticsDays();if(!d)return;openAnalyticsPreview(manHourAnalyticsReportHtml());}
@@ -4472,7 +4803,7 @@ function weeklyOperationsReportHtml(){
     <td style="${td}text-align:center">${formatDriveMinutes(Number(d.operations.travelTimeMinutes)||0)}</td>
     <td style="${td}text-align:center">${fmt(Number(d.operations.driveManHours)||0)} hr</td>
     <td style="${td}text-align:center">${d.operations.travelDelays}</td>
-  </tr>`).join('');
+  </tr>`).join('\n');
   const crewRows=w.crews.length?w.crews.map(c=>`<tr>
     <td style="${td}text-align:center;font-weight:700">${c.rank}</td>
     <td style="${td}font-weight:600">${esc(c.name)}</td>
@@ -4488,7 +4819,7 @@ function weeklyOperationsReportHtml(){
     <td style="${td}text-align:center">${formatDriveMinutes(Number(c.travelTimeMinutes)||0)}</td>
     <td style="${td}text-align:center">${fmt(Number(c.driveManHours)||0)} hr</td>
     <td style="${td}text-align:center">${c.travelDelays}</td>
-  </tr>`).join(''):`<tr><td colspan="14" style="${td}color:#666666">No saved operations were found for this report period.</td></tr>`;
+  </tr>`).join('\n'):`<tr><td colspan="14" style="${td}color:#666666">No saved operations were found for this report period.</td></tr>`;
   const jobTypeMap=new Map();
   w.days.forEach(day=>(day.operations.crews||[]).forEach(c=>(c.jobs||[]).forEach(j=>{
     const key=j.task || (j.jobType==='Other' ? (j.left||j.raw||'Other') : (j.jobType||'Other'));
@@ -4497,7 +4828,7 @@ function weeklyOperationsReportHtml(){
     if(j.cancelled)x.cancelled++;else x.completed++;
     x.actual+=Number(j.actual)||0;x.budget+=Number(j.budget)||0;
   })));
-  const jobRows=[...jobTypeMap.values()].map(x=>`<tr><td style="${td}font-weight:600">${esc(x.type)}</td><td style="${td}text-align:center">${x.completed}</td><td style="${td}text-align:center">${x.cancelled}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:right">${fmt(x.budget)}</td><td style="${td}text-align:center">${x.actual?fmt(x.budget/x.actual*100)+'%':'N/A'}</td></tr>`).join('');
+  const jobRows=[...jobTypeMap.values()].map(x=>`<tr><td style="${td}font-weight:600">${esc(x.type)}</td><td style="${td}text-align:center">${x.completed}</td><td style="${td}text-align:center">${x.cancelled}</td><td style="${td}text-align:right">${fmt(x.actual)}</td><td style="${td}text-align:right">${fmt(x.budget)}</td><td style="${td}text-align:center">${x.actual?fmt(x.budget/x.actual*100)+'%':'N/A'}</td></tr>`).join('\n');
 
   const travelRankingRows=w.travelRankings.length?w.travelRankings.map(c=>`<tr>
     <td style="${td}text-align:center;font-weight:700">${c.travelRank}</td>
@@ -4505,7 +4836,7 @@ function weeklyOperationsReportHtml(){
     <td style="${td}text-align:center">${c.travelDelays}</td>
     <td style="${td}text-align:center">${c.travelDelayMinutes} min</td>
     <td style="${td}text-align:center">${w.dates.filter(d=>(c.byDate[d]?.travelDelays||0)>0).length}</td>
-  </tr>`).join(''):`<tr><td colspan="5" style="${td}color:#666">No travel delays in the selected days.</td></tr>`;
+  </tr>`).join('\n'):`<tr><td colspan="5" style="${td}color:#666">No travel delays in the selected days.</td></tr>`;
 
   const detailedJobs=[];
   w.crews.forEach(c=>(c.jobs||[]).forEach(j=>{
@@ -4555,7 +4886,7 @@ function weeklyOperationsReportHtml(){
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Job Detail by Crew & Day</h2>
     <table style="width:100%;border-collapse:collapse">
       <thead><tr><th style="${th}">Date</th><th style="${th}">Crew</th><th style="${th}">Subdivision</th><th style="${th}">Lot</th><th style="${th}">Task</th><th style="${th}">Actual</th><th style="${th}">Budget</th><th style="${th}">Status</th></tr></thead>
-      <tbody>${detailedJobs.join('')||`<tr><td colspan="8" style="${td}color:#666">No detailed jobs available.</td></tr>`}</tbody>
+      <tbody>${detailedJobs.join('\n')||`<tr><td colspan="8" style="${td}color:#666">No detailed jobs available.</td></tr>`}</tbody>
     </table>
     <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Weekly operations are built from the daily reports saved in local storage. Mileage exclusions do not remove anyone from this operations report.</div>
   </div></body></html>`;
@@ -4605,80 +4936,65 @@ function weeklyMileageReportHtml(){
   const w=weeklyMileageData();
   const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
   const th='padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;color:#000000;font-size:13px;text-align:left;font-weight:700;';
-  const headers=w.dates.map(d=>`<th style="${th}">${dayLabel(d).slice(0,3)}<br><span style="font-weight:400">${new Date(`${d}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'})}</span></th>`).join('');
-  const crewRows=w.crews.length?w.crews.map(c=>`<tr><td style="${td}font-weight:600">${esc(c.name)}</td>${w.dates.map(d=>`<td style="${td}text-align:right">${fmt(c.byDate[d]||0)} mi</td>`).join('')}<td style="${td}text-align:right;font-weight:700">${fmt(c.totalMiles)} mi</td><td style="${td}text-align:center">${c.missingRoutes}</td></tr>`).join(''):`<tr><td colspan="8" style="${td}color:#666666">No saved mileage was found for this week.</td></tr>`;
-  const dailyRows=w.days.map(d=>`<tr><td style="${td}font-weight:600">${esc(d.weekday)}</td><td style="${td}">${esc(shortDateLabel(d.date))}</td><td style="${td}text-align:right">${fmt(d.totalMiles||0)} mi</td><td style="${td}text-align:center">${d.missingRoutes||0}</td></tr>`).join('');
-  const detail=[];
-  w.days.forEach(day=>(day.driverMileage||[]).forEach(d=>(d.routes||[]).forEach(r=>detail.push(`<tr><td style="${td}">${esc(day.weekday)}</td><td style="${td}font-weight:600">${esc(d.name)}</td><td style="${td}">${esc(r.from)}</td><td style="${td}">${esc(r.to)}</td><td style="${td}text-align:right">${r.miles==null?'Missing':fmt(r.miles)+' mi'}</td><td style="${td}">${r.includesCancellation?'Includes cancelled stop':''}${r.crew?` · Crew ${esc(r.crew)}`:''}</td></tr>`))));
+  const headers=w.dates.map(d=>`<th style="${th}">${dayLabel(d).slice(0,3)}<br><span style="font-weight:400">${new Date(`${d}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'})}</span></th>`).join('\n');
+  const crewRows=w.crews.length?w.crews.map(c=>`<tr><td style="${td}font-weight:600">${esc(c.name)}</td>${w.dates.map(d=>`<td style="${td}text-align:right">${fmt(c.byDate[d]||0)} mi${c.byDateOutOfArea[d]?`<div style="font-size:10px;color:#8a5a00">+ ${fmt(c.byDateOutOfArea[d])} OOA</div>`:''}</td>`).join('\n')}<td style="${td}text-align:right">${fmt(c.normalMiles)} mi</td><td style="${td}text-align:right;background:#fff2cc;font-weight:700">${fmt(c.outOfAreaMiles)} mi</td><td style="${td}text-align:right;font-weight:700">${fmt(c.totalMiles)} mi</td><td style="${td}text-align:center">${c.missingRoutes}</td></tr>`).join('\n'):`<tr><td colspan="${w.dates.length+5}" style="${td}color:#666">No saved mileage was found for the selected days.</td></tr>`;
+  const dailyRows=w.days.map(d=>`<tr><td style="${td}font-weight:600">${esc(d.weekday)}</td><td style="${td}">${esc(shortDateLabel(d.date))}</td><td style="${td}text-align:right">${fmt(d.normalMiles||0)} mi</td><td style="${td}text-align:right;background:${d.outOfAreaMiles?'#fff2cc':'#fff'};font-weight:${d.outOfAreaMiles?'700':'400'}">${fmt(d.outOfAreaMiles||0)} mi</td><td style="${td}text-align:right;font-weight:700">${fmt(d.totalMiles||0)} mi</td><td style="${td}text-align:center">${d.missingRoutes||0}</td></tr>`).join('\n');
+  const ooaDetail=[];
+  w.days.forEach(day=>(day.driverMileage||[]).forEach(d=>(d.routes||[]).filter(r=>r.outOfAreaType).forEach(r=>ooaDetail.push(`<tr><td style="${td}">${esc(day.weekday)} ${esc(shortDateLabel(day.date))}</td><td style="${td}font-weight:600">${esc(d.name)}</td><td style="${td}">${esc(r.crew||'')}</td><td style="${td}font-weight:700">${esc(r.typeLabel||r.routeType||'Out-of-Area')}</td><td style="${td}">${esc(r.from)} → ${esc(r.to)}</td><td style="${td}text-align:right;font-weight:700">${fmt(r.miles||0)} mi</td></tr>`))));
   return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff">${previewCopyToolbarHtml()}<div id="reportContent" style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
-  <div style="background:#1f4e78;color:#ffffff;padding:20px 24px"><div style="font-size:25px;font-weight:700">VIP Mileage Report</div><div style="font-size:14px;margin-top:5px;color:#dbe8f4">${reportRangeLabel(w.dates)}</div>${w.exclusions.length?`<div style="font-size:13px;margin-top:7px;color:#ffffff"><strong>Excluding —</strong> ${esc([...new Set(w.exclusions.map(canonicalEmployeeName))].join(', '))}</div>`:''}</div>
-  <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Report Road Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.totalMiles)}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Drivers</div><div style="font-size:24px;font-weight:700">${w.crews.length}</div></td><td style="width:33%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Routes Missing</div><div style="font-size:24px;font-weight:700">${w.missingRoutes}</div></td></tr></table>
-  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Driver and Day</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Driver</th>${headers}<th style="${th}">Report Total</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
-  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Totals</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Road Miles</th><th style="${th}">Missing Routes</th></tr></thead><tbody>${dailyRows}</tbody></table>
+  <div style="background:#1f4e78;color:#fff;padding:20px 24px"><div style="font-size:25px;font-weight:700">VIP Mileage Report</div><div style="font-size:14px;margin-top:5px;color:#dbe8f4">${reportRangeLabel(w.dates)}</div><div style="font-size:12px;margin-top:7px">Out-of-Area center: ${esc(OUT_OF_AREA_CENTER.address)}</div>${w.exclusions.length?`<div style="font-size:13px;margin-top:7px"><strong>Excluding —</strong> ${esc([...new Set(w.exclusions.map(canonicalEmployeeName))].join(', '))}</div>`:''}</div>
+  <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>
+    <td style="width:25%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Scheduled Job-to-Job Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.normalMiles)}</div></td>
+    <td style="width:25%;padding:12px;border:1px solid #e6d58c;background:#fff2cc;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Additional Out-of-Area Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.outOfAreaMiles)}</div></td>
+    <td style="width:25%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Total Payable Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.totalMiles)}</div></td>
+    <td style="width:25%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Routes Missing</div><div style="font-size:24px;font-weight:700">${w.missingRoutes}</div></td>
+  </tr></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Driver and Day</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Driver</th>${headers}<th style="${th}">Scheduled</th><th style="${th}">Out-of-Area</th><th style="${th}">Report Total</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Totals</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Scheduled Miles</th><th style="${th}">Out-of-Area</th><th style="${th}">Total</th><th style="${th}">Missing</th></tr></thead><tbody>${dailyRows}</tbody></table>
+  ${ooaDetail.length?`<h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Additional Out-of-Area Mileage</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Driver</th><th style="${th}">Crew</th><th style="${th}">Type</th><th style="${th}">Route</th><th style="${th}">Additional Miles</th></tr></thead><tbody>${ooaDetail.join('\n')}</tbody></table>`:''}
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Driver / Crew Detail</h2>
   ${w.crews.map(summary=>{
     const driverName=summary.name;
     const dated=w.days.map(day=>{
-      const d=(day.driverMileage||[]).find(x=>driverKey(x.name)===driverKey(driverName));
-      if(!d) return '';
-
-      const routeRows=(d.routes||[]).map(r=>`<tr>
-        <td style="${td}">${esc(r.crew||'')}</td>
-        <td style="${td}">${esc(r.from)}</td>
-        <td style="${td}">${esc(r.to)}</td>
-        <td style="${td}text-align:right">${r.miles==null?'Missing':fmt(r.miles)+' mi'}</td>
-        <td style="${td}text-align:center">${r.minutes==null?'—':r.minutes+' min'}</td>
-        <td style="${td}">${r.includesCancellation?'Cancelled stop':''}</td>
-      </tr>`).join('');
-
-      return `
-        <div style="margin:12px 0 5px;font-size:14px;font-weight:700;color:#333333">
-          ${esc(new Date(`${day.date}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'}))}
-          — ${fmt(d.miles||0)} mi
-        </div>
-        <table style="width:100%;border-collapse:collapse">
-          <thead><tr>
-            <th style="${th}">Crew</th>
-            <th style="${th}">From</th>
-            <th style="${th}">To</th>
-            <th style="${th}">Distance</th>
-            <th style="${th}">Drive Time</th>
-            <th style="${th}">Note</th>
-          </tr></thead>
-          <tbody>${routeRows||`<tr><td colspan="6" style="${td}color:#666">No route legs.</td></tr>`}</tbody>
-        </table>`;
-    }).join('');
-
-    return `
-      <div style="font-size:17px;font-weight:700;color:#1f4e78;margin:22px 0 6px">
-        ${esc(driverName)} — ${fmt(summary.totalMiles||0)} mi report total
-      </div>
-      ${dated}`;
-  }).join('')}
-  <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Mileage uses routed driving distance only. Cancelled jobs remain in the route sequence. Missing road routes are not replaced with straight-line distance. Mileage exclusions are applied from the saved local browser settings.</div>
+      const d=(day.driverMileage||[]).find(x=>driverKey(x.name)===driverKey(driverName));if(!d)return '';
+      const routeRows=(d.routes||[]).map(r=>`<tr style="${r.outOfAreaType?'background:#fff8df':''}"><td style="${td}">${esc(r.crew||'')}</td><td style="${td}">${esc(r.routeType||r.typeLabel||'Scheduled Job-to-Job')}</td><td style="${td}">${esc(r.from)}</td><td style="${td}">${esc(r.to)}</td><td style="${td}text-align:right">${r.miles==null?'Missing':fmt(r.miles)+' mi'}</td><td style="${td}text-align:center">${r.minutes==null?'—':r.minutes+' min'}</td><td style="${td}">${esc(r.note||'')}${r.includesCancellation?' Cancelled stop':''}</td></tr>`).join('\n');
+      return `<div style="margin:12px 0 5px;font-size:14px;font-weight:700;color:#333">${esc(new Date(`${day.date}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'}))} — ${fmt(d.miles||0)} mi${d.outOfAreaMiles?` <span style="color:#8a5a00">(${fmt(d.outOfAreaMiles)} OOA)</span>`:''}</div><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th><th style="${th}">Type</th><th style="${th}">From</th><th style="${th}">To</th><th style="${th}">Distance</th><th style="${th}">Drive Time</th><th style="${th}">Note</th></tr></thead><tbody>${routeRows||`<tr><td colspan="7" style="${td}color:#666">No route legs.</td></tr>`}</tbody></table>`;
+    }).join('\n');
+    return `<div style="font-size:17px;font-weight:700;color:#1f4e78;margin:22px 0 6px">${esc(driverName)} — ${fmt(summary.totalMiles||0)} mi report total</div>${dated}`;
+  }).join('\n')}
+  <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Scheduled mileage uses routed driving distance between mileage-eligible scheduled stops. Cancellation Review controls whether a cancelled stop remains in the route or is excluded because the crew did not travel there. Additional Out-of-Area mileage is recalculated from the currently active editable Out-of-Area list using the designated one-way mileage from ${esc(OUT_OF_AREA_CENTER.address)}.</div>
   </div></body></html>`;
 }
 function weeklyMileageReportText(){
   const w=weeklyMileageData();
-  let out=`VIP Mileage Report\n${reportRangeLabel(w.dates)}${w.exclusions.length?`\nExcluding — ${[...new Set(w.exclusions.map(canonicalEmployeeName))].join(', ')}`:''}\n\nReport Road Miles: ${fmt(w.totalMiles)}\nRoutes Missing: ${w.missingRoutes}\n\nMILEAGE BY DRIVER AND DAY\n`;
-  w.crews.forEach(c=>{out+=`\n${c.name}`;w.dates.forEach(d=>out+=` | ${dayLabel(d).slice(0,3)}: ${fmt(c.byDate[d]||0)} mi`);out+=` | Total: ${fmt(c.totalMiles)} mi`;});
-  out+='\n\nDAILY TOTALS\n';w.days.forEach(d=>out+=`\n${d.weekday} ${shortDateLabel(d.date)}: ${fmt(d.totalMiles||0)} mi`);
+  let out=`VIP Mileage Report
+${reportRangeLabel(w.dates)}${w.exclusions.length?`
+Excluding — ${[...new Set(w.exclusions.map(canonicalEmployeeName))].join(', ')}`:''}
+Out-of-Area Center: ${OUT_OF_AREA_CENTER.address}
+
+Scheduled Job-to-Job Miles: ${fmt(w.normalMiles)}
+Additional Out-of-Area Miles: ${fmt(w.outOfAreaMiles)}
+Total Payable Miles: ${fmt(w.totalMiles)}
+Routes Missing: ${w.missingRoutes}
+
+MILEAGE BY DRIVER AND DAY
+`;
+  w.crews.forEach(c=>{out+=`
+${c.name}`;w.dates.forEach(d=>out+=` | ${dayLabel(d).slice(0,3)}: ${fmt(c.byDate[d]||0)} mi`);out+=` | Scheduled: ${fmt(c.normalMiles)} | OOA: ${fmt(c.outOfAreaMiles)} | Total: ${fmt(c.totalMiles)} mi`;});
+  out+='\n\nDAILY TOTALS\n';w.days.forEach(d=>out+=`
+${d.weekday} ${shortDateLabel(d.date)}: Scheduled ${fmt(d.normalMiles||0)} | OOA ${fmt(d.outOfAreaMiles||0)} | Total ${fmt(d.totalMiles||0)} mi`);
   out+='\n\nDRIVER / CREW DETAIL\n';
-  w.crews.forEach(summary=>{
-    out+=`\n\n${summary.name} — ${fmt(summary.totalMiles||0)} mi report total`;
-    w.days.forEach(day=>{
-      const d=(day.driverMileage||[]).find(x=>driverKey(x.name)===driverKey(summary.name));
-      if(!d) return;
-      out+=`\n  ${new Date(`${day.date}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'})} — ${fmt(d.miles||0)} mi`;
-      (d.routes||[]).forEach(r=>{
-        out+=`\n    ${r.crew||''}: ${r.from} -> ${r.to} | ${r.miles==null?'Missing':fmt(r.miles)+' mi'}${r.minutes==null?'':' | '+r.minutes+' min'}${r.includesCancellation?' | Cancelled stop':''}`;
-      });
-    });
-  });
+  w.crews.forEach(summary=>{out+=`
+
+${summary.name} — ${fmt(summary.totalMiles||0)} mi report total`;w.days.forEach(day=>{const d=(day.driverMileage||[]).find(x=>driverKey(x.name)===driverKey(summary.name));if(!d)return;out+=`
+  ${new Date(`${day.date}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'})} — ${fmt(d.miles||0)} mi`; (d.routes||[]).forEach(r=>{out+=`
+    ${r.crew||''}: [${r.routeType||r.typeLabel||'Scheduled Job-to-Job'}] ${r.from} -> ${r.to} | ${r.miles==null?'Missing':fmt(r.miles)+' mi'}${r.note?' | '+r.note:''}${r.includesCancellation?' | Cancelled stop':''}`;});});});
   return out;
 }
 async function previewWeeklyMileage(){
   if(!reportDates().length){alert('Select at least one saved report day first.');return;}
+  $('#savedMileageStatus').textContent='Checking cancellation mileage choices…';
+  await resolveSavedCancellationMileageDecisions(reportDates());
   $('#savedMileageStatus').textContent='Checking selected saved days and repairing older mileage data if needed…';
   await repairSelectedMileageDays();
   renderSavedMileageDays();
@@ -4689,6 +5005,8 @@ async function previewWeeklyMileage(){
 }
 async function downloadWeeklyMileageEml(){
   if(!reportDates().length){alert('Select at least one saved report day first.');return;}
+  $('#savedMileageStatus').textContent='Checking cancellation mileage choices…';
+  await resolveSavedCancellationMileageDecisions(reportDates());
   $('#savedMileageStatus').textContent='Checking selected saved days and repairing older mileage data if needed…';
   await repairSelectedMileageDays();
   renderSavedMileageDays();
@@ -4698,12 +5016,16 @@ async function downloadWeeklyMileageEml(){
 }
 async function downloadWeeklyMileageCsv(){
   if(!reportDates().length){alert('Select at least one saved report day first.');return;}
+  $('#savedMileageStatus').textContent='Checking cancellation mileage choices…';
+  await resolveSavedCancellationMileageDecisions(reportDates());
   $('#savedMileageStatus').textContent='Checking selected saved days and repairing older mileage data if needed…';
-  await repairSelectedMileageDays();
-  renderSavedMileageDays();
-  const w=weeklyMileageData(),rows=[['Driver',...w.dates.map(d=>`${dayLabel(d)} ${d}`),'Report Total Miles','Missing Routes']];
-  w.crews.forEach(c=>rows.push([c.name,...w.dates.map(d=>Number(c.byDate[d]||0)),+c.totalMiles.toFixed(1),c.missingRoutes]));
-  rows.push([]);rows.push(['Daily Total',...w.days.map(d=>Number(d.totalMiles||0)),+w.totalMiles.toFixed(1),w.missingRoutes]);
+  await repairSelectedMileageDays();renderSavedMileageDays();
+  const w=weeklyMileageData(),rows=[['Driver',...w.dates.map(d=>`${dayLabel(d)} ${d} Total Miles`),'Scheduled Miles','Out-of-Area Miles','Report Total Miles','Missing Routes']];
+  w.crews.forEach(c=>rows.push([c.name,...w.dates.map(d=>Number(c.byDate[d]||0)),+c.normalMiles.toFixed(1),+c.outOfAreaMiles.toFixed(1),+c.totalMiles.toFixed(1),c.missingRoutes]));
+  rows.push([]);rows.push(['DAILY TOTALS']);rows.push(['Date','Scheduled Miles','Out-of-Area Miles','Total Miles','Missing Routes']);
+  w.days.forEach(d=>rows.push([d.date,+Number(d.normalMiles||0).toFixed(1),+Number(d.outOfAreaMiles||0).toFixed(1),+Number(d.totalMiles||0).toFixed(1),d.missingRoutes||0]));
+  rows.push([]);rows.push(['OUT-OF-AREA DETAIL']);rows.push(['Date','Driver','Crew','Type','From','To','Additional Miles','Note']);
+  w.days.forEach(day=>(day.driverMileage||[]).forEach(d=>(d.routes||[]).filter(r=>r.outOfAreaType).forEach(r=>rows.push([day.date,d.name,r.crew||'',r.typeLabel||r.routeType||'',r.from,r.to,Number(r.miles)||0,r.note||'']))));
   const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n'),blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`VIP-Weekly-Mileage-${w.dates[0]}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 async function saveCurrentMileageDay(){
@@ -4712,6 +5034,11 @@ async function saveCurrentMileageDay(){
   const date=$('#operationDate').value;
   if(!date){alert('Select the date of operation.');return;}
   if(mileageHistory[date]&&!confirm(`Replace the saved mileage for ${shortDateLabel(date)}?`)) return;
+
+  if(ensureCancellationMileageDecisions(currentReport,date)){
+    $('#savedMileageStatus').textContent='Recalculating mileage with cancellation choices…';
+    await calculateMileageRoutes(currentReport,null,date,false);
+  }
 
   const previous=mileageHistory[date];
   mileageHistory[date]=mileageSnapshot(currentReport,date,$('#pasteBox').value);
@@ -4732,7 +5059,7 @@ async function saveCurrentMileageDay(){
 async function importMileageFiles(files){
   const list=[...files].slice(0,5);if(!list.length)return;
   const start=$('#mileageWeekStart').value||mondayOf();$('#mileageWeekStart').value=start;let saved=0;
-  for(let i=0;i<list.length;i++){const text=await list[i].text(),report=parseReport(text);if(!report.crews.length)continue;$('#savedMileageStatus').textContent=`Calculating imported day ${i+1} of ${list.length}…`;await calculateMileageRoutes(report);const date=addDaysIso(start,i);mileageHistory[date]=mileageSnapshot(report,date,text);saved++;}
+  for(let i=0;i<list.length;i++){const text=await list[i].text(),report=parseReport(text);if(!report.crews.length)continue;const date=addDaysIso(start,i);$('#savedMileageStatus').textContent=`Calculating imported day ${i+1} of ${list.length}…`;await calculateMileageRoutes(report,null,date,true);mileageHistory[date]=mileageSnapshot(report,date,text);saved++;}
   const persisted=saveMileageHistory({showAlert:true});
   try{renderSavedMileageDays();}catch(e){console.error(e);}
   try{renderReportDayChoices();}catch(e){console.error(e);}
@@ -4824,7 +5151,7 @@ async function calculateTravel(report){
     $('#emailStatus').textContent='Efficiency export is ready. Calculating driving mileage…';
     await calculateMileageRoutes(report,(done,total)=>{
       $('#emailStatus').textContent=`Efficiency export is ready. Calculating driving mileage ${done} of ${total}…`;
-    });
+    },$('#operationDate')?.value||'',true);
     $('#previewMileageBtn').disabled=false;
     $('#downloadMileageEmlBtn').disabled=false;
     $('#downloadMileageCsvBtn').disabled=false;
@@ -4877,7 +5204,7 @@ async function calculateTravel(report){
   $('#emailStatus').textContent='Efficiency export is ready. Calculating driving mileage…';
   await calculateMileageRoutes(report,(done,total)=>{
     $('#emailStatus').textContent=`Efficiency export is ready. Calculating driving mileage ${done} of ${total}…`;
-  });
+  },$('#operationDate')?.value||'',true);
   $('#previewMileageBtn').disabled=false;
   $('#downloadMileageEmlBtn').disabled=false;
   $('#downloadMileageCsvBtn').disabled=false;
@@ -4917,7 +5244,7 @@ function renderTravelFindings(report){
   }));
 
   $('#gapFindings').innerHTML=findings.length
-    ? findings.join('')
+    ? findings.join('\n')
     : 'No travel delays were found. Normal trips are hidden.';
 
   const rows=$('#crewTable').querySelectorAll('tr');
@@ -5021,6 +5348,9 @@ $('#importDriverListFile').onchange=async e=>{
   e.target.value='';
 };
 $('#operationDate').addEventListener('change',renderDailyDriverOverrides);
+$('#addOutOfAreaSubdivisionBtn').onclick=addOutOfAreaSubdivisionFromUi;
+$('#resetOutOfAreaDefaultsBtn').onclick=restoreDefaultOutOfAreaMileage;
+
 $('#addMileageExcludeBtn').onclick=()=>{
   addMileageExclusion($('#mileageExcludeInput').value);
   $('#mileageExcludeInput').value='';
@@ -5035,7 +5365,7 @@ $('#mileageExcludeInput').addEventListener('keydown',e=>{
 $('#previewFloorplanPerformanceBtn').onclick=previewFloorplanPerformance;
 $('#downloadFloorplanPerformanceCsvBtn').onclick=downloadFloorplanPerformanceCsv;
 $('#refreshCancellationReviewBtn').onclick=renderCancellationReview;
-$('#saveCancellationReviewBtn').onclick=saveCancellationReview;
+$('#saveCancellationReviewBtn').onclick=()=>saveCancellationReview();
 $('#cancellationReasonFilter').addEventListener('change',renderCancellationReview);
 $('#cancellationBuilderFilter').addEventListener('change',renderCancellationReview);
 $('#cancellationReviewSearch').addEventListener('input',renderCancellationReview);
@@ -5045,6 +5375,8 @@ $('#batchBuilderCancellationBtn').onclick=()=>batchCancellationReason('builder')
 $('#batchVipCancellationBtn').onclick=()=>batchCancellationReason('vip');
 $('#batchRelatedCancellationBtn').onclick=()=>batchCancellationReason('related');
 $('#batchUnknownCancellationBtn').onclick=()=>batchCancellationReason('unknown');
+$('#batchCountCancellationMileageBtn').onclick=()=>batchCancellationMileage('include');
+$('#batchExcludeCancellationMileageBtn').onclick=()=>batchCancellationMileage('exclude');
 $('#previewCancellationAnalyticsBtn').onclick=previewCancellationAnalytics;
 $('#downloadCancellationAnalyticsCsvBtn').onclick=downloadCancellationAnalyticsCsv;
 $('#previewTravelAreaAnalyticsBtn').onclick=previewTravelAreaAnalytics;
