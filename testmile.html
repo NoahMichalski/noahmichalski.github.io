@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Subdivision 30-Mile Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<style>
+  :root{
+    --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
+    --border:#2a3953;--accent:#4da3ff;--good:#2ecc71;--bad:#ff6b6b;--warn:#f1c40f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(180deg,#09101d,#0d1626 45%,#0b1220);color:var(--text)}
+  .wrap{max-width:1900px;margin:0 auto;padding:22px}
+  .top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px}
+  h1{margin:0;font-size:30px}.sub{margin-top:6px;color:var(--muted)}
+  .panel{background:rgba(18,27,45,.97);border:1px solid var(--border);border-radius:16px;padding:16px}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  button,.file-btn{border:0;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;background:#24334c;color:var(--text);font-size:14px}
+  button.primary,.file-btn.primary{background:var(--accent);color:#07101d}
+  button:hover,.file-btn:hover{filter:brightness(1.08)}
+  input[type=file]{display:none}
+  .status{color:var(--muted);font-size:13px;margin-top:10px;line-height:1.5}
+  .cards{display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:10px;margin-top:14px}
+  .card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:12px}
+  .card .label{font-size:11px;color:var(--muted);text-transform:uppercase}.card .value{font-size:22px;font-weight:800;margin-top:5px}
+  .layout{display:grid;grid-template-columns:minmax(700px,1.7fr) minmax(340px,.7fr);gap:16px;margin-top:16px}
+  #map{height:760px;border-radius:14px;border:1px solid var(--border);background:#dfe8ef}
+  .side{min-width:0}
+  .side h2{font-size:18px;margin:0 0 8px}.side-note{color:var(--muted);font-size:12px;margin-bottom:10px}
+  .outside-list{max-height:700px;overflow:auto;border:1px solid var(--border);border-radius:12px}
+  .row{display:grid;grid-template-columns:42px 1fr auto;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);background:#101a2b}
+  .row:last-child{border-bottom:0}.rank{font-weight:800;color:#8fc7ff}.name{font-weight:700}.builder{font-size:11px;color:var(--muted);margin-top:3px}.miles{font-weight:800;white-space:nowrap}.empty{padding:18px;color:var(--muted)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:10px}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}.inside{background:#2ecc71}.outside{background:#ff6b6b}.center{background:#4da3ff}
+  .leaflet-popup-content{font-family:Segoe UI,Arial,sans-serif;line-height:1.45}
+  .leaflet-tooltip.sub-label{background:rgba(255,255,255,.92);border:1px solid #aebdca;color:#17212b;box-shadow:none;font-weight:700;padding:3px 6px}
+  .screenshot-tip{margin-top:12px;padding:10px 12px;background:#0d1728;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:12px}
+  @media(max-width:1100px){.layout{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}#map{height:620px}}
+  @media(max-width:600px){.wrap{padding:12px}.cards{grid-template-columns:1fr 1fr}.card .value{font-size:18px}#map{height:520px}}
+  @media print{
+    body{background:#fff;color:#111}.wrap{max-width:none;padding:0}.panel{border:0;background:#fff;padding:0}.controls,.status,.screenshot-tip{display:none!important}.layout{grid-template-columns:1fr 360px}.side{color:#111}.row{background:#fff;color:#111;border-color:#ddd}.builder,.side-note{color:#666}#map{height:760px;border:1px solid #bbb}.cards{margin:12px 0}.card{background:#f4f7fa;color:#111;border-color:#ddd}.card .label{color:#666}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Subdivision 30-Mile Map</h1>
+      <div class="sub">Upload your subdivision sheet to calculate the geographic center and identify subdivisions 30+ miles away.</div>
+    </div>
+  </div>
+
+  <section class="panel">
+    <div class="controls">
+      <label class="file-btn primary" for="fileInput">Upload Subdivisions Sheet</label>
+      <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
+      <button id="fitBtn" type="button">Fit All Subdivisions</button>
+      <button id="radiusBtn" type="button">Fit 30-Mile Radius</button>
+      <button id="toggleLabelsBtn" type="button">Show Labels</button>
+      <button id="printBtn" type="button">Print / Save PDF</button>
+    </div>
+    <div id="status" class="status">Upload an Excel or CSV file with subdivision names and latitude/longitude columns. Builder is optional.</div>
+
+    <div class="cards">
+      <div class="card"><div class="label">Subdivisions Loaded</div><div class="value" id="totalCount">0</div></div>
+      <div class="card"><div class="label">Within 30 Miles</div><div class="value" id="insideCount">0</div></div>
+      <div class="card"><div class="label">30+ Miles Away</div><div class="value" id="outsideCount">0</div></div>
+      <div class="card"><div class="label">Center Latitude</div><div class="value" id="centerLat">—</div></div>
+      <div class="card"><div class="label">Center Longitude</div><div class="value" id="centerLon">—</div></div>
+    </div>
+
+    <div class="legend">
+      <span><span class="dot center"></span>Calculated center</span>
+      <span><span class="dot inside"></span>Within 30 miles</span>
+      <span><span class="dot outside"></span>30+ miles from center</span>
+    </div>
+
+    <div class="layout">
+      <div>
+        <div id="map"></div>
+        <div class="screenshot-tip"><strong>Screenshot-ready:</strong> use the map normally, then zoom/pan to the view you want and take a browser or Windows screenshot. The blue circle is exactly 30 road-independent miles from the calculated geographic center.</div>
+      </div>
+      <aside class="side">
+        <h2>Subdivisions 30+ Miles From Center</h2>
+        <div class="side-note">Sorted farthest first. Distance is straight-line geographic distance from the calculated center, not driving mileage.</div>
+        <div id="outsideList" class="outside-list"><div class="empty">Upload a subdivision sheet to generate the list.</div></div>
+      </aside>
+    </div>
+  </section>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+(() => {
+  const MILES_TO_METERS = 1609.344;
+  const RADIUS_MILES = 30;
+  let data = [];
+  let center = null;
+  let radiusCircle = null;
+  let centerMarker = null;
+  let labelsVisible = false;
+  const markerLayer = L.layerGroup();
+
+  const map = L.map('map', {zoomControl:true}).setView([39.9612,-82.9988], 8);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom:19,
+    attribution:'&copy; OpenStreetMap contributors'
+  }).addTo(map);
+  markerLayer.addTo(map);
+
+  const el = id => document.getElementById(id);
+  const norm = v => String(v ?? '').trim();
+  const normKey = v => norm(v).toLowerCase().replace(/[^a-z0-9]+/g,'');
+
+  function pick(row, candidates){
+    const keys = Object.keys(row);
+    for(const c of candidates){
+      const exact = keys.find(k => normKey(k) === normKey(c));
+      if(exact !== undefined && row[exact] !== '' && row[exact] != null) return row[exact];
+    }
+    return '';
+  }
+
+  function parseNumber(v){
+    if(typeof v === 'number') return Number.isFinite(v) ? v : null;
+    const n = Number(String(v ?? '').replace(/,/g,'').trim());
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function normalizeRows(rows){
+    return rows.map((row,i) => {
+      const name = norm(pick(row,['Subdivision','Subdivision Name','Name','Community','Full Name','FullName'])) || `Subdivision ${i+1}`;
+      const builder = norm(pick(row,['Builder','Builder Name','Company']));
+      const lat = parseNumber(pick(row,['Latitude','Lat','Y']));
+      const lon = parseNumber(pick(row,['Longitude','Lon','Lng','Long','X']));
+      const address = norm(pick(row,['Address','Location','Street Address']));
+      if(lat == null || lon == null || Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
+      return {name,builder,lat,lon,address};
+    }).filter(Boolean);
+  }
+
+  function haversineMiles(a,b){
+    const R=3958.7613, rad=x=>x*Math.PI/180;
+    const dLat=rad(b.lat-a.lat), dLon=rad(b.lon-a.lon);
+    const h=Math.sin(dLat/2)**2 + Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)**2;
+    return R*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));
+  }
+
+  // Average Cartesian unit vectors instead of raw longitude values, so the
+  // geographic center remains correct even for wider data sets.
+  function geographicCenter(points){
+    let x=0,y=0,z=0;
+    points.forEach(p=>{
+      const lat=p.lat*Math.PI/180, lon=p.lon*Math.PI/180;
+      x+=Math.cos(lat)*Math.cos(lon);
+      y+=Math.cos(lat)*Math.sin(lon);
+      z+=Math.sin(lat);
+    });
+    x/=points.length;y/=points.length;z/=points.length;
+    const lon=Math.atan2(y,x);
+    const hyp=Math.sqrt(x*x+y*y);
+    const lat=Math.atan2(z,hyp);
+    return {lat:lat*180/Math.PI,lon:lon*180/Math.PI};
+  }
+
+  function render(){
+    markerLayer.clearLayers();
+    if(radiusCircle){map.removeLayer(radiusCircle);radiusCircle=null;}
+    if(centerMarker){map.removeLayer(centerMarker);centerMarker=null;}
+    if(!data.length) return;
+
+    center = geographicCenter(data);
+    data = data.map(p=>({...p,distance:haversineMiles(center,p)}));
+
+    radiusCircle=L.circle([center.lat,center.lon],{
+      radius:RADIUS_MILES*MILES_TO_METERS,
+      color:'#286aa6',weight:2,fillColor:'#4da3ff',fillOpacity:.07,dashArray:'7 6'
+    }).addTo(map).bindTooltip('30-mile radius',{sticky:true});
+
+    centerMarker=L.circleMarker([center.lat,center.lon],{
+      radius:9,color:'#123c63',weight:3,fillColor:'#4da3ff',fillOpacity:1
+    }).addTo(map).bindPopup(`<b>Calculated geographic center</b><br>${center.lat.toFixed(5)}, ${center.lon.toFixed(5)}`);
+
+    data.forEach(p=>{
+      const outside=p.distance>=RADIUS_MILES;
+      const m=L.circleMarker([p.lat,p.lon],{
+        radius:outside?8:6,
+        color:outside?'#992d2d':'#176b3a',
+        weight:outside?2.5:1.8,
+        fillColor:outside?'#ff6b6b':'#2ecc71',
+        fillOpacity:.8
+      });
+      m.bindPopup(`<div><b>${escapeHtml(p.name)}</b>${p.builder?`<br>${escapeHtml(p.builder)}`:''}<br><b>${p.distance.toFixed(1)} miles</b> from center${p.address?`<br><span style="color:#666">${escapeHtml(p.address)}</span>`:''}</div>`);
+      m.bindTooltip(p.name,{permanent:labelsVisible,direction:'top',className:'sub-label',offset:[0,-5]});
+      m.addTo(markerLayer);
+    });
+
+    const outside=data.filter(p=>p.distance>=RADIUS_MILES).sort((a,b)=>b.distance-a.distance);
+    const inside=data.length-outside.length;
+    el('totalCount').textContent=data.length;
+    el('insideCount').textContent=inside;
+    el('outsideCount').textContent=outside.length;
+    el('centerLat').textContent=center.lat.toFixed(4);
+    el('centerLon').textContent=center.lon.toFixed(4);
+
+    const holder=el('outsideList');
+    holder.innerHTML='';
+    if(!outside.length){
+      holder.innerHTML='<div class="empty">No subdivisions are 30+ miles from the calculated center.</div>';
+    }else{
+      outside.forEach((p,i)=>{
+        const row=document.createElement('div');
+        row.className='row';
+        row.innerHTML=`<div class="rank">${i+1}.</div><div><div class="name">${escapeHtml(p.name)}</div><div class="builder">${escapeHtml(p.builder||'Builder not listed')}</div></div><div class="miles">${p.distance.toFixed(1)} mi</div>`;
+        row.addEventListener('click',()=>map.setView([p.lat,p.lon],12));
+        holder.appendChild(row);
+      });
+    }
+
+    fitAll();
+    el('status').innerHTML=`Loaded <strong>${data.length}</strong> subdivisions. Geographic center: <strong>${center.lat.toFixed(5)}, ${center.lon.toFixed(5)}</strong>. <strong>${outside.length}</strong> are 30+ miles away.`;
+  }
+
+  function escapeHtml(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+
+  function fitAll(){
+    if(!data.length) return;
+    const bounds=L.latLngBounds(data.map(p=>[p.lat,p.lon]));
+    if(center) bounds.extend([center.lat,center.lon]);
+    map.fitBounds(bounds,{padding:[35,35],maxZoom:11});
+  }
+
+  function fitRadius(){
+    if(!radiusCircle) return;
+    map.fitBounds(radiusCircle.getBounds(),{padding:[30,30]});
+  }
+
+  function refreshLabels(){
+    markerLayer.eachLayer(layer=>{
+      if(layer.getTooltip()){
+        layer.unbindTooltip();
+        const p=data.find(x=>Math.abs(x.lat-layer.getLatLng().lat)<1e-8 && Math.abs(x.lon-layer.getLatLng().lng)<1e-8);
+        if(p) layer.bindTooltip(p.name,{permanent:labelsVisible,direction:'top',className:'sub-label',offset:[0,-5]});
+      }
+    });
+    el('toggleLabelsBtn').textContent=labelsVisible?'Hide Labels':'Show Labels';
+  }
+
+  async function readFile(file){
+    const buffer=await file.arrayBuffer();
+    const workbook=XLSX.read(buffer,{type:'array'});
+    const sheet=workbook.Sheets[workbook.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(sheet,{defval:''});
+    const parsed=normalizeRows(rows);
+    if(!parsed.length) throw new Error('No usable latitude/longitude rows were found. Expected columns such as Subdivision, Latitude/Lat, and Longitude/Lon/Lng.');
+    data=parsed;
+    render();
+  }
+
+  el('fileInput').addEventListener('change',async e=>{
+    const file=e.target.files?.[0]; if(!file) return;
+    el('status').textContent=`Reading ${file.name}…`;
+    try{await readFile(file);}catch(err){el('status').innerHTML=`<span style="color:#ff9f9f"><strong>Could not load file:</strong> ${escapeHtml(err.message||err)}</span>`;}
+    e.target.value='';
+  });
+  el('fitBtn').addEventListener('click',fitAll);
+  el('radiusBtn').addEventListener('click',fitRadius);
+  el('toggleLabelsBtn').addEventListener('click',()=>{labelsVisible=!labelsVisible;refreshLabels();});
+  el('printBtn').addEventListener('click',()=>window.print());
+})();
+</script>
+</body>
+</html>
