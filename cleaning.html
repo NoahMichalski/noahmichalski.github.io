@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>VIP Crew Efficiency & Travel Report v3.40</title>
+<title>VIP Crew Efficiency & Travel Report v3.41</title>
 <style>
 :root{
   --bg:#0b1220;--panel:#121b2d;--panel2:#182338;--text:#eef4ff;--muted:#9fb0c9;
@@ -217,10 +217,10 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
 <div class="wrap">
   <div class="topbar">
     <div class="brand">
-      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.40</span></h1>
+      <h1>VIP Crew Efficiency & Travel Report <span style="font-size:14px;color:#9fb0c9">v3.41</span></h1>
       <p>Paste the daily crew sheet to review efficiency, gaps, delays, incomplete work, and cancelled jobs.</p>
     </div>
-    <div class="version">Version 3.40</div>
+    <div class="version">Version 3.41</div>
   </div>
 
   <div class="input-grid">
@@ -419,6 +419,25 @@ summary{cursor:pointer;padding:14px 16px;font-weight:800;display:flex;justify-co
             <button id="previewWeeklyMileageBtn">Preview Mileage Report</button>
             <button id="downloadWeeklyMileageEmlBtn">Download Mileage Email (.eml)</button>
             <button id="downloadWeeklyMileageCsvBtn">Export Mileage CSV</button>
+          </div>
+
+          <div class="notice" style="margin-top:12px">
+            <div class="section-head" style="margin-bottom:8px">
+              <div>
+                <strong>Mileage Reimbursement Rate</strong>
+                <div class="muted small" style="margin-top:4px">Used to calculate the estimated dollar reimbursement shown on Daily and multi-day Mileage Reports.</div>
+              </div>
+            </div>
+            <div class="controls" style="align-items:end">
+              <label>Rate per mile
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span style="font-weight:800;font-size:16px">$</span>
+                  <input id="mileageRate" type="number" min="0" step="0.01" value="0.50" style="width:110px">
+                  <span class="muted small">per mile</span>
+                </div>
+              </label>
+              <div class="muted small" style="padding-bottom:10px">Default: <strong>$0.50 / mile</strong>. Change this at any time before generating the report.</div>
+            </div>
           </div>
 
           <div class="notice" style="margin-top:12px">
@@ -1015,7 +1034,7 @@ function loadLocalData(){
   compactExistingMileageHistoryStorage();
   try {
     const settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || '{}');
-    ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id => {
+    ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance','mileageRate'].forEach(id => {
       if(settings[id] !== undefined && $('#'+id)) $('#'+id).value = settings[id];
     });
   } catch(e) {}
@@ -1311,8 +1330,15 @@ async function importFloorplanWorkbook(file){
 }
 function saveSettings(){
   const settings = {};
-  ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id => settings[id] = $('#'+id).value);
+  ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance','mileageRate'].forEach(id => { if($('#'+id)) settings[id] = $('#'+id).value; });
   localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings));
+}
+function mileageRatePerMile(){
+  const value=Number($('#mileageRate')?.value);
+  return Number.isFinite(value) && value>=0 ? value : 0.50;
+}
+function money(value){
+  return Number(value||0).toLocaleString('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2});
 }
 function formatReferenceUploadTime(value){
   if(!value) return 'Last uploaded: Not recorded';
@@ -2286,7 +2312,7 @@ function backupManifest(){
     format:'vip-crew-report-backup',
     version:1,
     exportedAt:new Date().toISOString(),
-    appVersion:'3.40',
+    appVersion:'3.41',
     savedDayCount:Object.keys(mileageHistory||{}).length
   };
 }
@@ -2345,6 +2371,7 @@ This backup includes:
 - Report settings
 - Cancellation review classifications
 - Editable Out-of-Area mileage list and designated one-way mileages
+- Mileage reimbursement rate
 
 Generated: ${new Date().toLocaleString()}
 `);
@@ -2547,6 +2574,7 @@ async function importSavedDataBackup(file){
   localStorage.setItem(STORAGE_KEYS.subdivisions,JSON.stringify(subdivisionData));
   localStorage.setItem(STORAGE_KEYS.referenceUploads,JSON.stringify(referenceUploads));
   localStorage.setItem(STORAGE_KEYS.settings,JSON.stringify(importedSettings||{}));
+  if(importedSettings?.mileageRate!==undefined && $('#mileageRate')) $('#mileageRate').value=importedSettings.mileageRate;
 
   updateSubdivisionStatus();
   updateFloorplanStatus();
@@ -2660,7 +2688,7 @@ function savedDaysDebugReport(){
   const lines=[];
   const now=new Date().toLocaleString();
 
-  lines.push(`VIP Saved Days Debug — v3.40`);
+  lines.push(`VIP Saved Days Debug — v3.41`);
   lines.push(`Generated: ${now}`);
   lines.push('');
 
@@ -3780,6 +3808,8 @@ function mileageReportHtml(){
   const normalMiles=stats.reduce((s,x)=>s+x.normalMiles,0);
   const outOfAreaMiles=stats.reduce((s,x)=>s+x.outOfAreaMiles,0);
   const totalMiles=normalMiles+outOfAreaMiles;
+  const mileageRate=mileageRatePerMile();
+  const estimatedReimbursement=totalMiles*mileageRate;
   const missingRoutes=stats.reduce((s,x)=>s+x.missing.length,0);
   const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
   const th='padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;color:#000000;font-size:13px;text-align:left;font-weight:700;';
@@ -3788,8 +3818,9 @@ function mileageReportHtml(){
     <td style="${td}text-align:right">${fmt(s.normalMiles)} mi</td>
     <td style="${td}text-align:right;background:${s.outOfAreaMiles?'#fff2cc':'#fff'};font-weight:${s.outOfAreaMiles?'700':'400'}">${fmt(s.outOfAreaMiles)} mi</td>
     <td style="${td}text-align:right;font-weight:700">${fmt(s.miles)} mi</td>
+    <td style="${td}text-align:right;font-weight:700">${money(s.miles*mileageRate)}</td>
     <td style="${td}text-align:center">${s.missing.length}</td>
-  </tr>`).join('\n'):`<tr><td colspan="5" style="${td}color:#666">No mileage routes available.</td></tr>`;
+  </tr>`).join('\n'):`<tr><td colspan="6" style="${td}color:#666">No mileage routes available.</td></tr>`;
   const routeRows=[];
   stats.forEach(s=>{
     mileageTripsForCrew(s.crew).forEach(t=>{
@@ -3817,8 +3848,12 @@ function mileageReportHtml(){
       <td style="width:25%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Total Payable Miles</div><div style="font-size:24px;font-weight:700">${fmt(totalMiles)}</div></td>
       <td style="width:25%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Routes Missing</div><div style="font-size:24px;font-weight:700">${missingRoutes}</div></td>
     </tr></table>
+    <table style="width:100%;border-collapse:collapse;margin-top:10px"><tr>
+      <td style="width:50%;padding:12px;border:1px solid #d9e2f3;background:#f7f9fc;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Mileage Rate</div><div style="font-size:22px;font-weight:700">${money(mileageRate)} / mile</div></td>
+      <td style="width:50%;padding:12px;border:1px solid #b7d7a8;background:#e2f0d9;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Estimated Mileage Reimbursement</div><div style="font-size:24px;font-weight:700;color:#274e13">${money(estimatedReimbursement)}</div></td>
+    </tr></table>
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Crew</h2>
-    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th><th style="${th}">Scheduled Miles</th><th style="${th}">Out-of-Area</th><th style="${th}">Total</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
+    <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th><th style="${th}">Scheduled Miles</th><th style="${th}">Out-of-Area</th><th style="${th}">Total</th><th style="${th}">Est. Reimbursement</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
     ${ooaRows?`<h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Additional Out-of-Area Mileage</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th><th style="${th}">Type</th><th style="${th}">Route</th><th style="${th}">Additional Miles</th></tr></thead><tbody>${ooaRows}</tbody></table>`:''}
     <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Route Breakdown</h2>
     <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th><th style="${th}">Type</th><th style="${th}">From</th><th style="${th}">To</th><th style="${th}">Miles</th><th style="${th}">Drive Time</th><th style="${th}">Note / Source</th></tr></thead><tbody>${routeRows.join('\n')||`<tr><td colspan="7" style="${td}color:#666">No routes found.</td></tr>`}</tbody></table>
@@ -3829,6 +3864,7 @@ function mileageReportText(){
   if(!currentReport) return '';
   const stats=crewMileageStats(currentReport,false,true,$('#operationDate')?.value||'').filter(s=>s.routed.length||s.missing.length||s.outOfAreaRoutes.length).sort((a,b)=>b.miles-a.miles);
   const normalMiles=stats.reduce((s,x)=>s+x.normalMiles,0),outOfAreaMiles=stats.reduce((s,x)=>s+x.outOfAreaMiles,0),totalMiles=normalMiles+outOfAreaMiles;
+  const mileageRate=mileageRatePerMile(),estimatedReimbursement=totalMiles*mileageRate;
   let out=`VIP Estimated Mileage Report
 ${getReportDateLabel()}
 Out-of-Area Center: ${OUT_OF_AREA_CENTER.address}
@@ -3836,11 +3872,13 @@ Out-of-Area Center: ${OUT_OF_AREA_CENTER.address}
 Scheduled Job-to-Job Miles: ${fmt(normalMiles)}
 Additional Out-of-Area Miles: ${fmt(outOfAreaMiles)}
 Total Payable Miles: ${fmt(totalMiles)}
+Mileage Rate: ${money(mileageRate)} / mile
+Estimated Mileage Reimbursement: ${money(estimatedReimbursement)}
 
 MILEAGE BY CREW
 `;
   stats.forEach(s=>{out+=`
-${s.crew.name}: Scheduled ${fmt(s.normalMiles)} mi | Out-of-Area ${fmt(s.outOfAreaMiles)} mi | Total ${fmt(s.miles)} mi`;});
+${s.crew.name}: Scheduled ${fmt(s.normalMiles)} mi | Out-of-Area ${fmt(s.outOfAreaMiles)} mi | Total ${fmt(s.miles)} mi | Reimbursement ${money(s.miles*mileageRate)}`;});
   const extra=stats.flatMap(s=>s.outOfAreaRoutes.map(r=>({crew:s.crew.name,...r})));
   if(extra.length){out+='\n\nADDITIONAL OUT-OF-AREA MILEAGE\n';extra.forEach(r=>out+=`
 ${r.crew}: ${r.typeLabel}: ${r.from} -> ${r.to} — ${fmt(r.miles)} miles`);}
@@ -3912,10 +3950,11 @@ function downloadMileageEml(){
 function downloadMileageCsv(){
   if(!currentReport){alert('Analyze a report first.');return;}
   if(!travelCalculationComplete){alert('Travel calculations are still running. Wait until the page says Email export is ready.');return;}
-  const rows=[['Crew','Mileage Type','From','To','Road Miles','Drive Minutes','Source / Note']];
+  const mileageRate=mileageRatePerMile();
+  const rows=[['Crew','Mileage Type','From','To','Road Miles','Mileage Rate','Estimated Reimbursement','Drive Minutes','Source / Note']];
   currentReport.crews.forEach(c=>{
-    mileageTripsForCrew(c).forEach(t=>rows.push([c.name,'Scheduled Job-to-Job',t.from.subdivision,t.to.subdivision,t.route&&Number.isFinite(Number(t.route.miles))?Number(t.route.miles):'',t.route?t.route.minutes:'',t.route?t.route.source:'Route unavailable']));
-    outOfAreaMileageForCrew(c,$('#operationDate')?.value||'').forEach(r=>rows.push([c.name,r.typeLabel,r.from,r.to,Number(r.miles)||0,'',r.note||r.source]));
+    mileageTripsForCrew(c).forEach(t=>rows.push([c.name,'Scheduled Job-to-Job',t.from.subdivision,t.to.subdivision,t.route&&Number.isFinite(Number(t.route.miles))?Number(t.route.miles):'',mileageRate,t.route&&Number.isFinite(Number(t.route.miles))?+(Number(t.route.miles)*mileageRate).toFixed(2):'',t.route?t.route.minutes:'',t.route?t.route.source:'Route unavailable']));
+    outOfAreaMileageForCrew(c,$('#operationDate')?.value||'').forEach(r=>rows.push([c.name,r.typeLabel,r.from,r.to,Number(r.miles)||0,mileageRate,+((Number(r.miles)||0)*mileageRate).toFixed(2),'',r.note||r.source]));
   });
   const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
@@ -4934,11 +4973,12 @@ function downloadWeeklyOperationsCsv(){
 }
 function weeklyMileageReportHtml(){
   const w=weeklyMileageData();
+  const mileageRate=mileageRatePerMile(),estimatedReimbursement=w.totalMiles*mileageRate;
   const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
   const th='padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;color:#000000;font-size:13px;text-align:left;font-weight:700;';
   const headers=w.dates.map(d=>`<th style="${th}">${dayLabel(d).slice(0,3)}<br><span style="font-weight:400">${new Date(`${d}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'})}</span></th>`).join('\n');
-  const crewRows=w.crews.length?w.crews.map(c=>`<tr><td style="${td}font-weight:600">${esc(c.name)}</td>${w.dates.map(d=>`<td style="${td}text-align:right">${fmt(c.byDate[d]||0)} mi${c.byDateOutOfArea[d]?`<div style="font-size:10px;color:#8a5a00">+ ${fmt(c.byDateOutOfArea[d])} OOA</div>`:''}</td>`).join('\n')}<td style="${td}text-align:right">${fmt(c.normalMiles)} mi</td><td style="${td}text-align:right;background:#fff2cc;font-weight:700">${fmt(c.outOfAreaMiles)} mi</td><td style="${td}text-align:right;font-weight:700">${fmt(c.totalMiles)} mi</td><td style="${td}text-align:center">${c.missingRoutes}</td></tr>`).join('\n'):`<tr><td colspan="${w.dates.length+5}" style="${td}color:#666">No saved mileage was found for the selected days.</td></tr>`;
-  const dailyRows=w.days.map(d=>`<tr><td style="${td}font-weight:600">${esc(d.weekday)}</td><td style="${td}">${esc(shortDateLabel(d.date))}</td><td style="${td}text-align:right">${fmt(d.normalMiles||0)} mi</td><td style="${td}text-align:right;background:${d.outOfAreaMiles?'#fff2cc':'#fff'};font-weight:${d.outOfAreaMiles?'700':'400'}">${fmt(d.outOfAreaMiles||0)} mi</td><td style="${td}text-align:right;font-weight:700">${fmt(d.totalMiles||0)} mi</td><td style="${td}text-align:center">${d.missingRoutes||0}</td></tr>`).join('\n');
+  const crewRows=w.crews.length?w.crews.map(c=>`<tr><td style="${td}font-weight:600">${esc(c.name)}</td>${w.dates.map(d=>`<td style="${td}text-align:right">${fmt(c.byDate[d]||0)} mi${c.byDateOutOfArea[d]?`<div style="font-size:10px;color:#8a5a00">+ ${fmt(c.byDateOutOfArea[d])} OOA</div>`:''}</td>`).join('\n')}<td style="${td}text-align:right">${fmt(c.normalMiles)} mi</td><td style="${td}text-align:right;background:#fff2cc;font-weight:700">${fmt(c.outOfAreaMiles)} mi</td><td style="${td}text-align:right;font-weight:700">${fmt(c.totalMiles)} mi</td><td style="${td}text-align:right;font-weight:700">${money(c.totalMiles*mileageRate)}</td><td style="${td}text-align:center">${c.missingRoutes}</td></tr>`).join('\n'):`<tr><td colspan="${w.dates.length+6}" style="${td}color:#666">No saved mileage was found for the selected days.</td></tr>`;
+  const dailyRows=w.days.map(d=>`<tr><td style="${td}font-weight:600">${esc(d.weekday)}</td><td style="${td}">${esc(shortDateLabel(d.date))}</td><td style="${td}text-align:right">${fmt(d.normalMiles||0)} mi</td><td style="${td}text-align:right;background:${d.outOfAreaMiles?'#fff2cc':'#fff'};font-weight:${d.outOfAreaMiles?'700':'400'}">${fmt(d.outOfAreaMiles||0)} mi</td><td style="${td}text-align:right;font-weight:700">${fmt(d.totalMiles||0)} mi</td><td style="${td}text-align:right;font-weight:700">${money((Number(d.totalMiles)||0)*mileageRate)}</td><td style="${td}text-align:center">${d.missingRoutes||0}</td></tr>`).join('\n');
   const ooaDetail=[];
   w.days.forEach(day=>(day.driverMileage||[]).forEach(d=>(d.routes||[]).filter(r=>r.outOfAreaType).forEach(r=>ooaDetail.push(`<tr><td style="${td}">${esc(day.weekday)} ${esc(shortDateLabel(day.date))}</td><td style="${td}font-weight:600">${esc(d.name)}</td><td style="${td}">${esc(r.crew||'')}</td><td style="${td}font-weight:700">${esc(r.typeLabel||r.routeType||'Out-of-Area')}</td><td style="${td}">${esc(r.from)} → ${esc(r.to)}</td><td style="${td}text-align:right;font-weight:700">${fmt(r.miles||0)} mi</td></tr>`))));
   return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff">${previewCopyToolbarHtml()}<div id="reportContent" style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
@@ -4949,8 +4989,12 @@ function weeklyMileageReportHtml(){
     <td style="width:25%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Total Payable Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.totalMiles)}</div></td>
     <td style="width:25%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Routes Missing</div><div style="font-size:24px;font-weight:700">${w.missingRoutes}</div></td>
   </tr></table>
-  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Driver and Day</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Driver</th>${headers}<th style="${th}">Scheduled</th><th style="${th}">Out-of-Area</th><th style="${th}">Report Total</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
-  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Totals</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Scheduled Miles</th><th style="${th}">Out-of-Area</th><th style="${th}">Total</th><th style="${th}">Missing</th></tr></thead><tbody>${dailyRows}</tbody></table>
+  <table style="width:100%;border-collapse:collapse;margin-top:10px"><tr>
+    <td style="width:50%;padding:12px;border:1px solid #d9e2f3;background:#f7f9fc;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Mileage Rate</div><div style="font-size:22px;font-weight:700">${money(mileageRate)} / mile</div></td>
+    <td style="width:50%;padding:12px;border:1px solid #b7d7a8;background:#e2f0d9;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Estimated Mileage Reimbursement</div><div style="font-size:24px;font-weight:700;color:#274e13">${money(estimatedReimbursement)}</div></td>
+  </tr></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Driver and Day</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Driver</th>${headers}<th style="${th}">Scheduled</th><th style="${th}">Out-of-Area</th><th style="${th}">Report Total</th><th style="${th}">Est. Reimbursement</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
+  <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Totals</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Scheduled Miles</th><th style="${th}">Out-of-Area</th><th style="${th}">Total</th><th style="${th}">Est. Reimbursement</th><th style="${th}">Missing</th></tr></thead><tbody>${dailyRows}</tbody></table>
   ${ooaDetail.length?`<h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Additional Out-of-Area Mileage</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Driver</th><th style="${th}">Crew</th><th style="${th}">Type</th><th style="${th}">Route</th><th style="${th}">Additional Miles</th></tr></thead><tbody>${ooaDetail.join('\n')}</tbody></table>`:''}
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Driver / Crew Detail</h2>
   ${w.crews.map(summary=>{
@@ -4960,13 +5004,14 @@ function weeklyMileageReportHtml(){
       const routeRows=(d.routes||[]).map(r=>`<tr style="${r.outOfAreaType?'background:#fff8df':''}"><td style="${td}">${esc(r.crew||'')}</td><td style="${td}">${esc(r.routeType||r.typeLabel||'Scheduled Job-to-Job')}</td><td style="${td}">${esc(r.from)}</td><td style="${td}">${esc(r.to)}</td><td style="${td}text-align:right">${r.miles==null?'Missing':fmt(r.miles)+' mi'}</td><td style="${td}text-align:center">${r.minutes==null?'—':r.minutes+' min'}</td><td style="${td}">${esc(r.note||'')}${r.includesCancellation?' Cancelled stop':''}</td></tr>`).join('\n');
       return `<div style="margin:12px 0 5px;font-size:14px;font-weight:700;color:#333">${esc(new Date(`${day.date}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'}))} — ${fmt(d.miles||0)} mi${d.outOfAreaMiles?` <span style="color:#8a5a00">(${fmt(d.outOfAreaMiles)} OOA)</span>`:''}</div><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Crew</th><th style="${th}">Type</th><th style="${th}">From</th><th style="${th}">To</th><th style="${th}">Distance</th><th style="${th}">Drive Time</th><th style="${th}">Note</th></tr></thead><tbody>${routeRows||`<tr><td colspan="7" style="${td}color:#666">No route legs.</td></tr>`}</tbody></table>`;
     }).join('\n');
-    return `<div style="font-size:17px;font-weight:700;color:#1f4e78;margin:22px 0 6px">${esc(driverName)} — ${fmt(summary.totalMiles||0)} mi report total</div>${dated}`;
+    return `<div style="font-size:17px;font-weight:700;color:#1f4e78;margin:22px 0 6px">${esc(driverName)} — ${fmt(summary.totalMiles||0)} mi report total — ${money((Number(summary.totalMiles)||0)*mileageRate)}</div>${dated}`;
   }).join('\n')}
   <div style="margin-top:24px;padding-top:12px;border-top:1px solid #d9e2f3;color:#666;font-size:11px">Scheduled mileage uses routed driving distance between mileage-eligible scheduled stops. Cancellation Review controls whether a cancelled stop remains in the route or is excluded because the crew did not travel there. Additional Out-of-Area mileage is recalculated from the currently active editable Out-of-Area list using the designated one-way mileage from ${esc(OUT_OF_AREA_CENTER.address)}.</div>
   </div></body></html>`;
 }
 function weeklyMileageReportText(){
   const w=weeklyMileageData();
+  const mileageRate=mileageRatePerMile(),estimatedReimbursement=w.totalMiles*mileageRate;
   let out=`VIP Mileage Report
 ${reportRangeLabel(w.dates)}${w.exclusions.length?`
 Excluding — ${[...new Set(w.exclusions.map(canonicalEmployeeName))].join(', ')}`:''}
@@ -4975,18 +5020,20 @@ Out-of-Area Center: ${OUT_OF_AREA_CENTER.address}
 Scheduled Job-to-Job Miles: ${fmt(w.normalMiles)}
 Additional Out-of-Area Miles: ${fmt(w.outOfAreaMiles)}
 Total Payable Miles: ${fmt(w.totalMiles)}
+Mileage Rate: ${money(mileageRate)} / mile
+Estimated Mileage Reimbursement: ${money(estimatedReimbursement)}
 Routes Missing: ${w.missingRoutes}
 
 MILEAGE BY DRIVER AND DAY
 `;
   w.crews.forEach(c=>{out+=`
-${c.name}`;w.dates.forEach(d=>out+=` | ${dayLabel(d).slice(0,3)}: ${fmt(c.byDate[d]||0)} mi`);out+=` | Scheduled: ${fmt(c.normalMiles)} | OOA: ${fmt(c.outOfAreaMiles)} | Total: ${fmt(c.totalMiles)} mi`;});
+${c.name}`;w.dates.forEach(d=>out+=` | ${dayLabel(d).slice(0,3)}: ${fmt(c.byDate[d]||0)} mi`);out+=` | Scheduled: ${fmt(c.normalMiles)} | OOA: ${fmt(c.outOfAreaMiles)} | Total: ${fmt(c.totalMiles)} mi | Reimbursement: ${money(c.totalMiles*mileageRate)}`;});
   out+='\n\nDAILY TOTALS\n';w.days.forEach(d=>out+=`
-${d.weekday} ${shortDateLabel(d.date)}: Scheduled ${fmt(d.normalMiles||0)} | OOA ${fmt(d.outOfAreaMiles||0)} | Total ${fmt(d.totalMiles||0)} mi`);
+${d.weekday} ${shortDateLabel(d.date)}: Scheduled ${fmt(d.normalMiles||0)} | OOA ${fmt(d.outOfAreaMiles||0)} | Total ${fmt(d.totalMiles||0)} mi | Reimbursement ${money((Number(d.totalMiles)||0)*mileageRate)}`);
   out+='\n\nDRIVER / CREW DETAIL\n';
   w.crews.forEach(summary=>{out+=`
 
-${summary.name} — ${fmt(summary.totalMiles||0)} mi report total`;w.days.forEach(day=>{const d=(day.driverMileage||[]).find(x=>driverKey(x.name)===driverKey(summary.name));if(!d)return;out+=`
+${summary.name} — ${fmt(summary.totalMiles||0)} mi report total — ${money((Number(summary.totalMiles)||0)*mileageRate)}`;w.days.forEach(day=>{const d=(day.driverMileage||[]).find(x=>driverKey(x.name)===driverKey(summary.name));if(!d)return;out+=`
   ${new Date(`${day.date}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'})} — ${fmt(d.miles||0)} mi`; (d.routes||[]).forEach(r=>{out+=`
     ${r.crew||''}: [${r.routeType||r.typeLabel||'Scheduled Job-to-Job'}] ${r.from} -> ${r.to} | ${r.miles==null?'Missing':fmt(r.miles)+' mi'}${r.note?' | '+r.note:''}${r.includesCancellation?' | Cancelled stop':''}`;});});});
   return out;
@@ -5020,10 +5067,10 @@ async function downloadWeeklyMileageCsv(){
   await resolveSavedCancellationMileageDecisions(reportDates());
   $('#savedMileageStatus').textContent='Checking selected saved days and repairing older mileage data if needed…';
   await repairSelectedMileageDays();renderSavedMileageDays();
-  const w=weeklyMileageData(),rows=[['Driver',...w.dates.map(d=>`${dayLabel(d)} ${d} Total Miles`),'Scheduled Miles','Out-of-Area Miles','Report Total Miles','Missing Routes']];
-  w.crews.forEach(c=>rows.push([c.name,...w.dates.map(d=>Number(c.byDate[d]||0)),+c.normalMiles.toFixed(1),+c.outOfAreaMiles.toFixed(1),+c.totalMiles.toFixed(1),c.missingRoutes]));
-  rows.push([]);rows.push(['DAILY TOTALS']);rows.push(['Date','Scheduled Miles','Out-of-Area Miles','Total Miles','Missing Routes']);
-  w.days.forEach(d=>rows.push([d.date,+Number(d.normalMiles||0).toFixed(1),+Number(d.outOfAreaMiles||0).toFixed(1),+Number(d.totalMiles||0).toFixed(1),d.missingRoutes||0]));
+  const w=weeklyMileageData(),mileageRate=mileageRatePerMile(),rows=[['Driver',...w.dates.map(d=>`${dayLabel(d)} ${d} Total Miles`),'Scheduled Miles','Out-of-Area Miles','Report Total Miles','Mileage Rate','Estimated Reimbursement','Missing Routes']];
+  w.crews.forEach(c=>rows.push([c.name,...w.dates.map(d=>Number(c.byDate[d]||0)),+c.normalMiles.toFixed(1),+c.outOfAreaMiles.toFixed(1),+c.totalMiles.toFixed(1),mileageRate,+(c.totalMiles*mileageRate).toFixed(2),c.missingRoutes]));
+  rows.push([]);rows.push(['DAILY TOTALS']);rows.push(['Date','Scheduled Miles','Out-of-Area Miles','Total Miles','Mileage Rate','Estimated Reimbursement','Missing Routes']);
+  w.days.forEach(d=>rows.push([d.date,+Number(d.normalMiles||0).toFixed(1),+Number(d.outOfAreaMiles||0).toFixed(1),+Number(d.totalMiles||0).toFixed(1),mileageRate,+((Number(d.totalMiles)||0)*mileageRate).toFixed(2),d.missingRoutes||0]));
   rows.push([]);rows.push(['OUT-OF-AREA DETAIL']);rows.push(['Date','Driver','Crew','Type','From','To','Additional Miles','Note']);
   w.days.forEach(day=>(day.driverMileage||[]).forEach(d=>(d.routes||[]).filter(r=>r.outOfAreaType).forEach(r=>rows.push([day.date,d.name,r.crew||'',r.typeLabel||r.routeType||'',r.from,r.to,Number(r.miles)||0,r.note||'']))));
   const csv=rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n'),blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`VIP-Weekly-Mileage-${w.dates[0]}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -5338,6 +5385,12 @@ $('#clearFloorplansBtn').onclick=()=>{
 };
 ['sameGap','diffGap','goodEff','badEff','travelBuffer','lateTolerance'].forEach(id=>{
   $('#'+id).addEventListener('change',()=>{saveSettings(); if(currentReport) render(currentReport=parseReport($('#pasteBox').value));});
+});
+$('#mileageRate')?.addEventListener('change',()=>{
+  const input=$('#mileageRate');
+  const value=Number(input.value);
+  input.value=(Number.isFinite(value)&&value>=0?value:0.50).toFixed(2);
+  saveSettings();
 });
 $('#refreshEmployeeDriverListBtn').onclick=refreshEmployeeDriverList;
 $('#saveEmployeeDriverListBtn').onclick=saveEmployeeDriverListFromUi;
