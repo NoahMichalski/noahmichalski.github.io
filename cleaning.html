@@ -4803,9 +4803,10 @@ function weeklyOperationsData(){
   totals.jobsPerPerson=totals.personDays?totals.completed/totals.personDays:0;
   return {dates,days,crews,travelRankings,totals};
 }
-function previewCopyToolbarHtml(){
-  return `<div style="font-family:Segoe UI,Arial,sans-serif;max-width:1600px;margin:12px auto 0;padding:0 20px">
+function previewCopyToolbarHtml(extraButtons=''){
+  return `<div style="font-family:Segoe UI,Arial,sans-serif;max-width:1600px;margin:12px auto 0;padding:0 20px;display:flex;gap:10px;flex-wrap:wrap">
     <button type="button" onclick="copyReportForOutlook()" style="background:#1f4e78;color:#fff;border:0;border-radius:5px;padding:10px 16px;font-weight:700;cursor:pointer">Copy for Outlook</button>
+    ${extraButtons}
   </div>
   <script>
   function copyReportForOutlook(){
@@ -4820,6 +4821,24 @@ function previewCopyToolbarHtml(){
     try{ok=document.execCommand('copy');}catch(e){}
     sel.removeAllRanges();
     alert(ok?'Formatted report copied. Paste it into Outlook.':'Copy was blocked by the browser. Select the report and copy it manually.');
+  }
+  async function copyDriverCrewSummary(){
+    var src=document.getElementById('driverCrewSummaryCopySource');
+    if(!src){alert('Driver / Crew Summary was not found.');return;}
+    var text=src.value||'';
+    if(!text.trim()){alert('There is no Driver / Crew Summary to copy for the selected days.');return;}
+    try{
+      await navigator.clipboard.writeText(text);
+      alert('Driver / Crew Summary copied.');
+    }catch(e){
+      src.style.display='block';
+      src.focus();
+      src.select();
+      var ok=false;
+      try{ok=document.execCommand('copy');}catch(err){}
+      src.style.display='none';
+      alert(ok?'Driver / Crew Summary copied.':'Copy was blocked by the browser.');
+    }
   }
   <\/script>`;
 }
@@ -4971,9 +4990,105 @@ function downloadWeeklyOperationsCsv(){
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
   a.href=url;a.download=`VIP-Weekly-Operations-${w.dates[0]}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
+function mileageSummaryStopsFromRoutes(routes){
+  const centerKey=normalizeName(OUT_OF_AREA_CENTER.name);
+  const out=[];
+  const add=value=>{
+    String(value||'').split('→').map(x=>x.trim()).filter(Boolean).forEach(name=>{
+      if(!name || name==='…' || normalizeName(name)===centerKey) return;
+      if(!out.length || normalizeName(out[out.length-1])!==normalizeName(name)) out.push(name);
+    });
+  };
+  (routes||[]).forEach(r=>{add(r.from);add(r.to);});
+  return out;
+}
+function driverCrewSummaryData(w){
+  const byDriver=new Map();
+  const ensureDriver=name=>{
+    const key=driverKey(name);
+    if(!byDriver.has(key)) byDriver.set(key,{name:canonicalEmployeeName(name),days:new Map()});
+    return byDriver.get(key);
+  };
+  w.days.forEach(day=>{
+    let parsed=null;
+    if(String(day.rawText||'').trim()){
+      try{parsed=parseReport(day.rawText);}catch(e){}
+    }
+    if(parsed){
+      (parsed.crews||[]).forEach(crew=>{
+        const stops=[];
+        mileageScheduledJobsForCrew(crew,day.date).forEach(job=>{
+          const name=String(job.subdivision||'').trim();
+          if(name && (!stops.length || normalizeName(stops[stops.length-1])!==normalizeName(name))) stops.push(name);
+        });
+        mileageDriversForCrew(day.date,crew.name).forEach(driver=>{
+          if(isMileageDriverExcluded(driver)) return;
+          const row=ensureDriver(driver);
+          if(!row.days.has(day.date)) row.days.set(day.date,{date:day.date,weekday:day.weekday||dayLabel(day.date),stops:[],crews:[],miles:0,missingRoutes:0});
+          const entry=row.days.get(day.date);
+          if(!entry.crews.some(x=>crewIdentityKey(x)===crewIdentityKey(crew.name))) entry.crews.push(crew.name);
+          stops.forEach(name=>{
+            if(!entry.stops.length || normalizeName(entry.stops[entry.stops.length-1])!==normalizeName(name)) entry.stops.push(name);
+          });
+        });
+      });
+    }
+    (day.driverMileage||[]).forEach(d=>{
+      if(isMileageDriverExcluded(d.name)) return;
+      const row=ensureDriver(d.name);
+      if(!row.days.has(day.date)) row.days.set(day.date,{date:day.date,weekday:day.weekday||dayLabel(day.date),stops:[],crews:[],miles:0,missingRoutes:0});
+      const entry=row.days.get(day.date);
+      entry.miles=Number(d.miles)||0;
+      entry.missingRoutes=Number(d.missingRoutes)||0;
+      if(!entry.stops.length) entry.stops=mileageSummaryStopsFromRoutes(d.routes||[]);
+      (d.routes||[]).forEach(r=>{
+        if(r.crew && !entry.crews.some(x=>crewIdentityKey(x)===crewIdentityKey(r.crew))) entry.crews.push(r.crew);
+      });
+    });
+  });
+  return [...byDriver.values()]
+    .map(driver=>({...driver,days:[...driver.days.values()].filter(x=>Number(x.miles)>0 || Number(x.missingRoutes)>0).sort((a,b)=>a.date.localeCompare(b.date))}))
+    .filter(driver=>driver.days.length)
+    .sort((a,b)=>a.name.localeCompare(b.name));
+}
+function driverCrewSummaryText(w){
+  const rows=driverCrewSummaryData(w),rate=mileageRatePerMile();
+  const lines=['Driver / Crew Summary'];
+  rows.forEach(driver=>{
+    lines.push('',driver.name.toUpperCase());
+    let driverMiles=0;
+    driver.days.forEach(day=>{
+      const dateLabel=new Date(`${day.date}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'numeric'});
+      const route=day.stops.length?day.stops.join(' - '):'Route details unavailable';
+      const dayMiles=Number(day.miles)||0;
+      driverMiles+=dayMiles;
+      const mileage=day.missingRoutes?`${fmt(dayMiles)} mi (${day.missingRoutes} route${day.missingRoutes===1?'':'s'} missing)`:`${fmt(dayMiles)} mi`;
+      lines.push(`${day.weekday} ${dateLabel} - ${route} - ${mileage} - ${money(dayMiles*rate)}`);
+    });
+    lines.push(`Total - ${fmt(driverMiles)} mi - ${money(driverMiles*rate)}`);
+  });
+  return lines.join('\n');
+}
+function driverCrewSummaryHtml(w){
+  const rows=driverCrewSummaryData(w),rate=mileageRatePerMile();
+  if(!rows.length) return '<div style="padding:14px;border:1px solid #d9e2f3;color:#666">No payable driver mileage was found for the selected days.</div>';
+  return rows.map(driver=>{
+    const driverMiles=driver.days.reduce((sum,day)=>sum+(Number(day.miles)||0),0);
+    return `<div style="margin:0 0 22px"><div style="font-size:15px;font-weight:800;color:#1f4e78;margin-bottom:5px">${esc(driver.name.toUpperCase())}</div>${driver.days.map(day=>{
+      const dateLabel=new Date(`${day.date}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'numeric'});
+      const route=day.stops.length?day.stops.join(' - '):'Route details unavailable';
+      const dayMiles=Number(day.miles)||0;
+      const mileage=day.missingRoutes?`${fmt(dayMiles)} mi (${day.missingRoutes} route${day.missingRoutes===1?'':'s'} missing)`:`${fmt(dayMiles)} mi`;
+      return `<div style="padding:4px 0;font-size:14px;line-height:1.45">${esc(`${day.weekday} ${dateLabel} - ${route} - ${mileage} - ${money(dayMiles*rate)}`)}</div>`;
+    }).join('')}<div style="margin-top:7px;padding-top:7px;border-top:1px solid #c9d5e3;font-size:14px;font-weight:800;color:#1f4e78">${esc(`Total - ${fmt(driverMiles)} mi - ${money(driverMiles*rate)}`)}</div></div>`;
+  }).join('');
+}
+
 function weeklyMileageReportHtml(){
   const w=weeklyMileageData();
   const mileageRate=mileageRatePerMile(),estimatedReimbursement=w.totalMiles*mileageRate;
+  const driverSummaryText=driverCrewSummaryText(w),driverSummaryHtml=driverCrewSummaryHtml(w);
+  const summaryCopyButton='<button type="button" onclick="copyDriverCrewSummary()" style="background:#24334c;color:#fff;border:0;border-radius:5px;padding:10px 16px;font-weight:700;cursor:pointer">Copy Driver / Crew Summary</button>';
   const td='padding:8px 10px;border:1px solid #d9e2f3;font-size:13px;';
   const th='padding:8px 10px;border:1px solid #b4c7e7;background:#d9e7f5;color:#000000;font-size:13px;text-align:left;font-weight:700;';
   const headers=w.dates.map(d=>`<th style="${th}">${dayLabel(d).slice(0,3)}<br><span style="font-weight:400">${new Date(`${d}T12:00:00`).toLocaleDateString('en-US',{month:'numeric',day:'numeric'})}</span></th>`).join('\n');
@@ -4981,7 +5096,7 @@ function weeklyMileageReportHtml(){
   const dailyRows=w.days.map(d=>`<tr><td style="${td}font-weight:600">${esc(d.weekday)}</td><td style="${td}">${esc(shortDateLabel(d.date))}</td><td style="${td}text-align:right">${fmt(d.normalMiles||0)} mi</td><td style="${td}text-align:right;background:${d.outOfAreaMiles?'#fff2cc':'#fff'};font-weight:${d.outOfAreaMiles?'700':'400'}">${fmt(d.outOfAreaMiles||0)} mi</td><td style="${td}text-align:right;font-weight:700">${fmt(d.totalMiles||0)} mi</td><td style="${td}text-align:right;font-weight:700">${money((Number(d.totalMiles)||0)*mileageRate)}</td><td style="${td}text-align:center">${d.missingRoutes||0}</td></tr>`).join('\n');
   const ooaDetail=[];
   w.days.forEach(day=>(day.driverMileage||[]).forEach(d=>(d.routes||[]).filter(r=>r.outOfAreaType).forEach(r=>ooaDetail.push(`<tr><td style="${td}">${esc(day.weekday)} ${esc(shortDateLabel(day.date))}</td><td style="${td}font-weight:600">${esc(d.name)}</td><td style="${td}">${esc(r.crew||'')}</td><td style="${td}font-weight:700">${esc(r.typeLabel||r.routeType||'Out-of-Area')}</td><td style="${td}">${esc(r.from)} → ${esc(r.to)}</td><td style="${td}text-align:right;font-weight:700">${fmt(r.miles||0)} mi</td></tr>`))));
-  return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff">${previewCopyToolbarHtml()}<div id="reportContent" style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
+  return `<!doctype html><html><head><meta charset="UTF-8"></head><body style="margin:0;background:#ffffff">${previewCopyToolbarHtml(summaryCopyButton)}<div id="reportContent" style="font-family:Segoe UI,Arial,sans-serif;color:#1f1f1f;max-width:1600px;margin:0 auto;padding:20px">
   <div style="background:#1f4e78;color:#fff;padding:20px 24px"><div style="font-size:25px;font-weight:700">VIP Mileage Report</div><div style="font-size:14px;margin-top:5px;color:#dbe8f4">${reportRangeLabel(w.dates)}</div><div style="font-size:12px;margin-top:7px">Out-of-Area center: ${esc(OUT_OF_AREA_CENTER.address)}</div>${w.exclusions.length?`<div style="font-size:13px;margin-top:7px"><strong>Excluding —</strong> ${esc([...new Set(w.exclusions.map(canonicalEmployeeName))].join(', '))}</div>`:''}</div>
   <table style="width:100%;border-collapse:collapse;margin-top:14px"><tr>
     <td style="width:25%;padding:12px;border:1px solid #d9e2f3;background:#eef3f8;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Scheduled Job-to-Job Miles</div><div style="font-size:24px;font-weight:700">${fmt(w.normalMiles)}</div></td>
@@ -4993,6 +5108,12 @@ function weeklyMileageReportHtml(){
     <td style="width:50%;padding:12px;border:1px solid #d9e2f3;background:#f7f9fc;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Mileage Rate</div><div style="font-size:22px;font-weight:700">${money(mileageRate)} / mile</div></td>
     <td style="width:50%;padding:12px;border:1px solid #b7d7a8;background:#e2f0d9;text-align:center"><div style="font-size:11px;color:#666;text-transform:uppercase">Estimated Mileage Reimbursement</div><div style="font-size:24px;font-weight:700;color:#274e13">${money(estimatedReimbursement)}</div></td>
   </tr></table>
+  <div style="break-before:page;page-break-before:always;margin-top:28px;padding-top:18px;border-top:2px solid #d9e2f3">
+    <h2 style="font-size:20px;color:#1f4e78;margin:0 0 4px">Driver / Crew Summary</h2>
+    <div style="font-size:12px;color:#666;margin-bottom:14px">Quick copy/paste summary for Paylocity. Each line shows the day, mileage-eligible subdivision sequence, payable miles, and reimbursement amount. Each driver includes a total at the bottom.</div>
+    <div id="driverCrewSummaryDisplay" style="padding:14px 16px;border:1px solid #d9e2f3;background:#f8fafc">${driverSummaryHtml}</div>
+    <textarea id="driverCrewSummaryCopySource" style="display:none">${esc(driverSummaryText)}</textarea>
+  </div>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Mileage by Driver and Day</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Driver</th>${headers}<th style="${th}">Scheduled</th><th style="${th}">Out-of-Area</th><th style="${th}">Report Total</th><th style="${th}">Est. Reimbursement</th><th style="${th}">Missing</th></tr></thead><tbody>${crewRows}</tbody></table>
   <h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Daily Totals</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Date</th><th style="${th}">Scheduled Miles</th><th style="${th}">Out-of-Area</th><th style="${th}">Total</th><th style="${th}">Est. Reimbursement</th><th style="${th}">Missing</th></tr></thead><tbody>${dailyRows}</tbody></table>
   ${ooaDetail.length?`<h2 style="font-size:18px;color:#1f4e78;margin:24px 0 8px">Additional Out-of-Area Mileage</h2><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">Day</th><th style="${th}">Driver</th><th style="${th}">Crew</th><th style="${th}">Type</th><th style="${th}">Route</th><th style="${th}">Additional Miles</th></tr></thead><tbody>${ooaDetail.join('\n')}</tbody></table>`:''}
@@ -5023,6 +5144,9 @@ Total Payable Miles: ${fmt(w.totalMiles)}
 Mileage Rate: ${money(mileageRate)} / mile
 Estimated Mileage Reimbursement: ${money(estimatedReimbursement)}
 Routes Missing: ${w.missingRoutes}
+
+DRIVER / CREW SUMMARY
+${driverCrewSummaryText(w)}
 
 MILEAGE BY DRIVER AND DAY
 `;
