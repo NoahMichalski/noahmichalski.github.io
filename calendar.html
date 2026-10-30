@@ -1203,7 +1203,10 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
     });
 
     byId('shortcutFile').addEventListener('change', e => handleShortcutUpload(e.target.files[0]));
-    byId('lotFile').addEventListener('change', e => handleLotUpload(e.target.files[0]));
+    byId('lotFile').addEventListener('change', async e => {
+      const input = e.target;
+      try { await handleLotUpload(input.files[0]); } finally { input.value = ''; }
+    });
 
     function showToast(message) {
       const t = byId('toast');
@@ -2017,8 +2020,13 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
       if (ext === 'json') {
         const text = await file.text();
         const data = JSON.parse(text);
-        return Array.isArray(data) ? data : (Array.isArray(data.rows) ? data.rows : []);
+        if (Array.isArray(data)) return data;
+        if (data && Array.isArray(data.rows)) return data.rows;
+        throw new Error('JSON must contain an array of rows or an object with a rows array.');
       }
+
+      if (!['csv', 'xlsx', 'xls'].includes(ext)) throw new Error('Choose an Excel (.xlsx/.xls), CSV, or JSON file.');
+      if (typeof XLSX === 'undefined') throw new Error('The spreadsheet reader did not load. Check your internet connection and reload this page before trying again.');
 
       if (ext === 'csv') {
         const text = await file.text();
@@ -2064,9 +2072,10 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
 
     async function handleLotUpload(file) {
       if (!file) return;
+      let nextRows;
       try {
         const rows = await readTabularFile(file);
-        lotRows = rows.map(row => {
+        nextRows = rows.map(row => {
           const builder = String(getColumnValue(row, ['Builder']) || '').trim();
           const subdivision = String(getColumnValue(row, ['Subdivision', 'Community', 'Neighborhood']) || '').trim();
           const lot = cleanLot(getColumnValue(row, ['Lot', 'LotNumber', 'Lot Number', 'Lot/Block', 'Job number']));
@@ -2084,15 +2093,33 @@ DR Horton | Madison Meadows *DR *Plain City | MD</div>
           };
         }).filter(r => r.lot && r.subdivision);
 
-        localStorage.setItem(STORAGE_KEYS.lots, JSON.stringify(lotRows));
-        localStorage.setItem(STORAGE_KEYS.updated, new Date().toLocaleString());
-        refreshStorageUI();
-        parseAndRender();
-        showToast(`Loaded ${lotRows.length} lot/address rows from ${file.name}.`);
+        if (!nextRows.length) throw new Error('No usable rows were found. The first sheet must have Subdivision and Lot columns with values (Community/Neighborhood and Lot Number are also supported).');
       } catch (err) {
         console.error(err);
-        showToast('Could not read floorplan/address file.');
+        showToast('Could not read floorplan/address file: ' + (err.message || String(err)));
+        return;
       }
+
+      lotRows = nextRows;
+      let saved = true;
+      try {
+        localStorage.setItem(STORAGE_KEYS.lots, JSON.stringify(lotRows));
+        localStorage.setItem(STORAGE_KEYS.updated, new Date().toLocaleString());
+      } catch (err) {
+        saved = false;
+        console.error('Floorplans loaded, but browser storage failed:', err);
+      }
+      try {
+        refreshStorageUI();
+        parseAndRender();
+      } catch (err) {
+        console.error(err);
+        showToast('Floorplans loaded, but the display could not refresh: ' + (err.message || String(err)));
+        return;
+      }
+      showToast(saved
+        ? `Loaded and saved ${lotRows.length} lot/address rows from ${file.name}.`
+        : `Loaded ${lotRows.length} rows for this session, but browser storage is full or unavailable. Re-upload after reopening or refreshing this page.`);
     }
 
     function resolveShortcut(typedSub) {
@@ -3510,7 +3537,11 @@ Surfaces Only = floors/surfaces`;
     function refreshStorageUI() {
       byId('shortcutLoaded').textContent = String(shortcutRows.length || 0);
       byId('lotLoaded').textContent = String(lotRows.length || 0);
-      byId('lastUpdate').textContent = localStorage.getItem(STORAGE_KEYS.updated) || 'Never';
+      try {
+        byId('lastUpdate').textContent = localStorage.getItem(STORAGE_KEYS.updated) || 'Never';
+      } catch {
+        byId('lastUpdate').textContent = 'Browser storage unavailable';
+      }
 
       byId('shortcutLoaded').className = 'pill ' + (shortcutRows.length ? 'good' : 'warn');
       byId('lotLoaded').className = 'pill ' + (lotRows.length ? 'good' : 'warn');
